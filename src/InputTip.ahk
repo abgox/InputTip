@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 1.0.0
+;@AHK2Exe-SetVersion 1.0.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 在光标处实时显示当前输入法状态的小工具
@@ -13,7 +13,7 @@ ListLines 0
 KeyHistory 0
 CoordMode 'Mouse', 'Screen'
 
-$Shift::Shift
+F24::F24
 
 name := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4),
     cname := name '.ini'

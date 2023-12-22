@@ -21,7 +21,6 @@
 
 -   基于 `AutoHotKey` 编写的一个小工具
 -   在光标处实时显示当前输入法中英文状态
--   缓解日常文字输入中经常错误输入导致回删这种降低效率与输入体验的场景
 
 ### 演示
 
@@ -29,7 +28,7 @@
 
 ### 使用
 
--   [下载](https://github.com/abgox/InputTip/releases/download/v1.0.0/InputTip.exe)并运行 `InputTip.exe` 即可
+-   [下载](https://github.com/abgox/InputTip/releases/download/v1.0.1/InputTip.exe)并运行 `InputTip.exe` 即可
 
 ### 配置文件
 
@@ -60,7 +59,7 @@
             2. 填写到这一个配置中，以 `,` 间隔
                 - `window_no_display=Notepad.exe,App1.exe,App2.exe`
 
-### 兼容情况(截至2023/11/2)
+### 兼容情况(截至2023/12/22)
 
 -   已知不可用
     -   讯飞输入法

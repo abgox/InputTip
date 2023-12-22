@@ -7,7 +7,7 @@ get_input_state() {
         DetectHiddenWindows True
         res := SendMessage(
             0x283,    ; Message : WM_IME_CONTROL
-            0x001,    ; wParam  : IMC_GETCONVERSIONMODE
+            0x005,    ; wParam  : IMC_GETCONVERSIONMODE
             0,    ; lParam  ： (NoArgs)
             , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
         )

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 1.0.1
+;@AHK2Exe-SetVersion 1.0.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 在光标处实时显示当前输入法状态的小工具
@@ -13,18 +13,15 @@ ListLines 0
 KeyHistory 0
 CoordMode 'Mouse', 'Screen'
 
-F24::F24
+config_path := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4) '.ini'
 
-name := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4),
-    cname := name '.ini'
+FileExist(config_path) ? 0 : FileInstall('config.ini', config_path, 1)
 
-FileExist(cname) ? 0 : FileInstall('config.ini', cname, 1)
-
-get_config(key) {
+get_config(k) {
     try {
-        return IniRead(cname, 'Config', key)
+        return IniRead(config_path, 'Config', k)
     } catch {
-        MsgBox('配置项缺失(两种解决方案)`n1.检查 ' cname ' 文件内容,自行添加缺失项`n2.删除 ' cname ' 文件,重新启动应用以生成默认配置')
+        MsgBox('配置项缺失(两种解决方案)`n1.检查 ' config_path ' 文件内容,自行添加缺失项`n2.删除 ' config_path ' 文件,重新启动应用以生成默认配置')
         ExitApp()
     }
 }
@@ -40,7 +37,7 @@ f_family := get_config('font_family'),
     offset_x := get_config('offset_x') * A_ScreenDPI / 96,
     offset_y := get_config('offset_y') * A_ScreenDPI / 96,
     no_show := StrSplit(get_config('window_no_display'), ','),
-    state := get_input_state(), win := '',
+    state := get_input_state(),
     old_x := '', old_y := '', old_i := ''
 
 make_gui(text) {
@@ -52,15 +49,11 @@ make_gui(text) {
     return g
 }
 
-CN_Gui := make_gui(CN_Text), EN_GUi := make_gui(EN_Text)
+CN_G := make_gui(CN_Text), EN_G := make_gui(EN_Text)
 
 while 1 {
     MouseGetPos(&x, &y)
-    try {
-        if ((A_TimeSincePriorHotkey && A_TimeSincePriorHotkey < 300) || win != WinGetID('A')) {
-            state := get_input_state(), win := WinGetID('A')
-        }
-    } catch {
+    if (A_TimeIdle < 30) {
         state := get_input_state()
     }
     if (!state) {
@@ -70,13 +63,13 @@ while 1 {
         old_x := x, old_y := y, old_i := state
         for v in no_show {
             if (WinActive('ahk_exe ' v)) {
-                EN_GUi.Hide(), CN_Gui.Hide()
+                EN_G.Hide(), CN_G.Hide()
                 continue 2
             }
         }
         state = 1
-            ? (CN_Gui.Hide(), EN_GUi.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y))
-            : (EN_GUi.Hide(), CN_Gui.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y))
+            ? (CN_G.Hide(), EN_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y))
+            : (EN_G.Hide(), CN_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y))
     }
     Sleep(1)
 }

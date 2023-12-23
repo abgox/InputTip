@@ -28,7 +28,7 @@
 
 ### 使用
 
--   [下载](https://github.com/abgox/InputTip/releases/download/v1.0.2/InputTip.exe)并运行 `InputTip.exe` 即可
+-   [下载](https://gitee.com/abgox/InputTip/releases/download/v1.0.2/InputTip.exe)并运行 `InputTip.exe` 即可
 
 ### 配置文件
 

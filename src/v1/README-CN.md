@@ -35,6 +35,11 @@
 
 -   [下载](https://gitee.com/abgox/InputTip/releases/download/v1.0.3/InputTip.exe) 并运行 `InputTip.exe` 即可
 
+-   设置开机自启动
+    1. 运行此软件后，在屏幕右下角图标处找到此软件
+    2. `鼠标右击` 软件图标
+    3. 点击 `开机自启动`
+
 ### 配置文件
 
 -   所在位置：`InputTip.exe` 的同级目录下

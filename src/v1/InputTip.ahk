@@ -3,7 +3,7 @@
 ;@AHK2Exe-SetVersion 1.0.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
-;@AHK2Exe-SetDescription InputTip - 在光标处实时显示输入法中英文状态的小工具
+;@AHK2Exe-SetDescription InputTip v1 - 在光标处实时显示输入法中英文状态的小工具
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource config.ini
@@ -37,7 +37,7 @@ f_family := get_config('font_family', 'SimHei'),
     offset_x := get_config('offset_x', '30') * A_ScreenDPI / 96,
     offset_y := get_config('offset_y', '-50') * A_ScreenDPI / 96,
     no_show := StrSplit(get_config('window_no_display', 'Notepad.exe'), ','),
-    state := get_input_state(),
+    state := 1,
     old_x := '', old_y := '', old_i := ''
 
 make_gui(text) {

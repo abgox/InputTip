@@ -13,6 +13,7 @@ code := ini("code", "0x005")
 CN := ini("CN", "1")
 
 A_TrayMenu.Delete()
+A_TrayMenu.Add("开机自启动", fn_startup)
 sub := Menu()
 subMap := {
     ; 无法使用：小鹤、小狼毫(rime)、手心输入法、谷歌输入法、2345王牌输入法
@@ -33,13 +34,32 @@ try {
     select := "默认"
     sub.Check(select)
 }
+try {
+    path_exe := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+    if (path_exe = A_ScriptFullPath) {
+        A_TrayMenu.Check("开机自启动")
+    }
+}
+fn_startup(item, *) {
+    try {
+        path_exe := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+        if (path_exe != A_ScriptFullPath) {
+            RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+        } else {
+            RegDelete("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+        }
+    } catch {
+        RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+    }
+    A_TrayMenu.ToggleCheck(item)
+}
 fn_restart(*) {
     Run(A_ScriptFullPath)
 }
 fn_exit(*) {
     ExitApp()
 }
-fn(ItemName, *) {
+fn(item, *) {
     do(k, v) {
         try {
             old_v := IniRead(config, "InputMethod", k)
@@ -50,9 +70,9 @@ fn(ItemName, *) {
             IniWrite(v, config, "InputMethod", k)
         }
     }
-    do("select", ItemName)
-    do("code", subMap.%ItemName%[1])
-    do("CN", subMap.%ItemName%[2])
+    do("select", item)
+    do("code", subMap.%item%[1])
+    do("CN", subMap.%item%[2])
     Run(A_ScriptFullPath)
 }
 

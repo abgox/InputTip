@@ -40,7 +40,7 @@ cur := {
 get_cursors("CN")
 get_cursors("EN")
 
-state := get_input_state()
+state := 1
 old_state := ''
 
 while 1 {

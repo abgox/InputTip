@@ -9,17 +9,15 @@ ini(key, default) {
     }
 }
 
-code := ini("code", "0x005")
-CN := ini("CN", "1")
-
+code := ini("code", "0x005"), CN := ini("CN", "1"), HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
 A_TrayMenu.Delete()
 A_TrayMenu.Add("开机自启动", fn_startup)
-sub := Menu()
 subMap := {
     ; 无法使用：小鹤、小狼毫(rime)、手心输入法、谷歌输入法、2345王牌输入法
     默认: ["0x005", "1"], ; 搜狗、百度、QQ、微信、微软、冰凌五笔
     讯飞输入法: ["0x005", "2"]
 }
+sub := Menu()
 sub.Add("默认", fn)
 sub.Add("讯飞输入法", fn)
 A_TrayMenu.Add("设置输入法", sub)
@@ -35,21 +33,21 @@ try {
     sub.Check(select)
 }
 try {
-    path_exe := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+    path_exe := RegRead(HKEY_startup, A_ScriptName)
     if (path_exe = A_ScriptFullPath) {
         A_TrayMenu.Check("开机自启动")
     }
 }
 fn_startup(item, *) {
     try {
-        path_exe := RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+        path_exe := RegRead(HKEY_startup, A_ScriptName)
         if (path_exe != A_ScriptFullPath) {
-            RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+            RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
         } else {
-            RegDelete("HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+            RegDelete(HKEY_startup, A_ScriptName)
         }
     } catch {
-        RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+        RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
     }
     A_TrayMenu.ToggleCheck(item)
 }

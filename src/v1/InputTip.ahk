@@ -8,7 +8,7 @@
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource config.ini
 #SingleInstance Force
-#Include ..\utils.ahk
+#Include utils.ahk
 ListLines 0
 KeyHistory 0
 CoordMode 'Mouse', 'Screen'

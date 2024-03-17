@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.0.0
+;@AHK2Exe-SetVersion 2.1.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 根据输入法中英文状态切换鼠标样式的小工具
@@ -8,7 +8,7 @@
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource InputTipCursor.zip
 #SingleInstance Force
-#Include ..\utils.ahk
+#Include utils.ahk
 ListLines 0
 KeyHistory 0
 
@@ -20,7 +20,7 @@ if (!DirExist("InputTipCursor")) {
 
 cur := {
     ARROW: [32512], ; 普通选择
-    IBEAM: [32513], ; 文本选择
+    IBEAM: [32513], ; 文本选择/文本输入
     WAIT: [32514], ; 繁忙
     CROSS: [32515], ; 精度选择
     UPARROW: [32516], ; 备用选择
@@ -34,14 +34,23 @@ cur := {
     APPSTARTING: [32650], ; 在后台工作
     HELP: [32651], ; 帮助选择
     PIN: [32671], ; 位置选择
-    PERSON: [32672] ; 人员选择
+    PERSON: [32672], ; 人员选择
+    PEN: [32631] ; 手写
 }
 
 get_cursors("CN")
 get_cursors("EN")
 
-state := 1
-old_state := ''
+del_list := [], state := 1, old_state := ''
+
+for k, v in cur.OwnProps() {
+    if (v.Length < 3) {
+        del_list.Push(k)
+    }
+}
+for v in del_list {
+    cur.DeleteProp(v)
+}
 
 while 1 {
     if (A_TimeIdle < 50) {
@@ -53,26 +62,24 @@ while 1 {
     }
     if (state != old_state) {
         old_state := state
-        state ? show("CN", 1) : show("EN", 2)
+        state ? show("CN", 2) : show("EN", 3)
     }
-    Sleep(1)
+    Sleep(50)
 }
 
 get_cursors(folder) {
     Loop Files, "InputTipCursor\" folder "\*.*" {
         n := StrUpper(SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4))
         for k, v in cur.OwnProps() {
-            if (InStr(n, k)) {
+            if (n = k) {
                 cur.%k%.push(A_LoopFileName)
             }
         }
     }
 }
 
-show(lang, num) {
+show(lang, index) {
     for k, v in cur.OwnProps() {
-        if (v.Length > num) {
-            DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", "InputTipCursor\" lang "\" v[num + 1], "Ptr"), "Int", v[1])
-        }
+        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", "InputTipCursor\" lang "\" v[index], "Ptr"), "Int", v[1])
     }
 }

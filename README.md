@@ -17,6 +17,9 @@
     <a href="https://img.shields.io/github/repo-size/abgox/InputTip.svg">
         <img src="https://img.shields.io/github/repo-size/abgox/InputTip.svg" alt="repo size" />
     </a>
+    <a href="https://img.shields.io/github/downloads/abgox/InputTip/total?color=blue&label=downloads">
+        <img src="https://img.shields.io/github/downloads/abgox/InputTip/total?color=blue&label=downloads" alt="download" />
+    </a>
 </p>
 
 ---
@@ -39,17 +42,18 @@
 
 -   设置开机自启动
 
-    1. 运行此软件后，在屏幕右下角图标处找到此软件
+    1. 运行此软件后，在底部任务栏右侧找到此软件图标
     2. `鼠标右击` 软件图标
     3. 点击 `开机自启动`
 
 -   设置鼠标样式
 
-    1. 运行此软件后，在屏幕右下角图标处找到此软件
+    1. 运行此软件后，在底部任务栏右侧找到此软件图标
     2. `鼠标右击` 软件图标
     3. 点击 `设置鼠标样式`
     4. 选择包含 `.cur` 或 `.ani` 文件的文件夹
-        - 比如默认的中文鼠标样式选择的文件夹: `InputTipCursor\oreo_default\Red`
+        - 比如默认的中文鼠标样式选择的文件夹: `InputTipCursor\CN_Default`
+        - 直接选择 `InputTipCursor\CN_Default` 和 `InputTipCursor\EN_Default` 即可快速重置为默认的中英文鼠标样式
     5. `鼠标右击` 软件图标，点击 `重启`
 
     -   [点击下载一些可以直接使用的鼠标样式](https://github.com/abgox/InputTip/releases/download/v2.1.0/cursorStyle.zip)
@@ -62,11 +66,16 @@
 
 ### 自定义光标样式
 
-> -   软件启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `CN`、`EN` 两个目录，分别存放当输入法状态为中文和英文时的光标样式
+> -   软件启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `CN`、`EN`、`CN_Default`、`EN_Default` 四个文件夹
+>     -   `CN`、`EN` 两个文件夹仅用于软件加载鼠标样式，不要修改它
+>         -   `CN`: 存放当输入法状态为中文时的光标样式
+>         -   `EN`: 存放当输入法状态为英文时的光标样式
+>     -   `CN_Default`: 存放当输入法状态为中文时的默认光标样式
+>     -   `EN_Default`: 存放当输入法状态为英文时的默认光标样式
 
 1. 请在 `InputTipCursor` 目录下创建一个文件夹
 
-    - 文件夹中所需的文件(后缀名为 `.cur` 或 `.ani`)
+    - 文件夹中包含鼠标样式文件(后缀名为 `.cur` 或 `.ani`)
     - 文件名大小写都可以
     - 每个文件都不是必须的，但建议至少添加 `Arrow`，`IBeam`，`Hand`
 
@@ -92,19 +101,19 @@
 
     - 详情参考 [关于光标(游标)](https://learn.microsoft.com/zh-cn/windows/win32/menurc/about-cursors)
 
-2. 在屏幕右下角图标处找到此软件，`鼠标右击` 软件图标，点击 `设置鼠标样式`
+2. 在底部任务栏右侧找到此软件图标，`鼠标右击` 软件图标，点击 `设置鼠标样式`
 3. 选择创建好的文件夹
-    - 注意，选择的文件夹不能是 `InputTipCursor` 目录下的 `EN` 和 `CN` 文件夹
+    - 注意: 选择的文件夹不能是 `InputTipCursor` 目录下的 `EN` 和 `CN` 文件夹
 
 ### 兼容情况(截至 2024/1/20)
 
 -   已知可用
     -   **搜狗**输入法、**百度**输入法、**微信**输入法、**QQ**输入法、**微软**、**冰凌**(五笔)输入法
     -   **讯飞**输入法(可用，需要设置)
-        1.  运行此软件后，在屏幕右下角图标处找到此软件
+        1.  运行此软件后，在底部任务栏右侧找到此软件图标
         2.  `鼠标右击` 软件图标
         3.  点击 `设置输入法`
         4.  点击 `讯飞输入法`
-        -   如果改用搜狗等上述输入法，需要再次改回 `默认`
+        -   如果改用搜狗、百度、微信等上述输入法，需要再次改回 `默认`
 -   已知不可用
     -   小鹤音形输入法、小狼毫(rime)输入法、手心输入法、谷歌输入法、2345 王牌输入法

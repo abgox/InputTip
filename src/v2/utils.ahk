@@ -1,20 +1,20 @@
-config := A_AppData "\InputTip_input_state.ini"
+config := "InputTip.ini"
 
 ini(key, default) {
     try {
-        return IniRead(config, "InputMethod", key)
+        return IniRead(config, "InputMethod-v2", key)
     } catch {
-        IniWrite(default, config, "InputMethod", key)
+        IniWrite(default, config, "InputMethod-v2", key)
         return default
     }
 }
 
 code := ini("code", "0x005"), CN := ini("CN", "1"), HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+
 A_TrayMenu.Delete()
 A_TrayMenu.Add("开机自启动", fn_startup)
 subMap := {
-    ; 无法使用：小鹤、小狼毫(rime)、手心输入法、谷歌输入法、2345王牌输入法
-    默认: ["0x005", "1"], ; 搜狗、百度、QQ、微信、微软、冰凌五笔
+    默认: ["0x005", "1"],
     讯飞输入法: ["0x005", "2"]
 }
 sub := Menu()
@@ -25,6 +25,7 @@ A_TrayMenu.Add()
 sub2 := Menu()
 sub2.Add("中文", fn_CN)
 sub2.Add("英文", fn_EN)
+sub2.Add("大写锁定", fn_Caps)
 A_TrayMenu.Add("设置鼠标样式", sub2)
 A_TrayMenu.Add("关于", about)
 A_TrayMenu.Add("重启", fn_restart)
@@ -33,7 +34,7 @@ try {
     select := ini("select", "默认")
     sub.Check(select)
 } catch {
-    IniWrite("默认", config, "InputMethod", "select")
+    IniWrite("默认", config, "InputMethod-v2", "select")
     select := "默认"
     sub.Check(select)
 }
@@ -74,7 +75,7 @@ verify(dir, folder) {
     }
     dir_name := SubStr(dir, -3)
     if (dir_name = "\EN" || dir_name = "\CN") {
-        MsgBox("不能选择 CN 或 EN 文件夹！", , "0x30 0x1000")
+        MsgBox("不能选择 CN/EN/Caps 文件夹！", , "0x30 0x1000")
         return
     }
     try {
@@ -83,12 +84,16 @@ verify(dir, folder) {
     }
 }
 fn_CN(*) {
-    dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为中文鼠标样式 (不能是 CN 或 EN 文件夹)")
+    dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为中文鼠标样式 (不能是 CN/EN/Caps 文件夹)")
     verify(dir, 'CN')
 }
 fn_EN(*) {
-    dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为英文鼠标样式 (不能是 CN 或 EN 文件夹)")
+    dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为英文鼠标样式 (不能是 CN/EN/Caps 文件夹)")
     verify(dir, 'EN')
+}
+fn_Caps(*){
+    dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为大写锁定鼠标样式 (不能是 CN/EN/Caps 文件夹)")
+    verify(dir, 'Caps')
 }
 about(*) {
     aboutGui := Gui("AlwaysOnTop +OwnDialogs")
@@ -101,13 +106,13 @@ about(*) {
     aboutGui := Gui("AlwaysOnTop +OwnDialogs")
     aboutGui.SetFont("q4 s12 w600", "微软雅黑")
     aboutGui.AddText("Center h30 w" Gui_width, "InputTip - 根据输入法中英文状态切换鼠标样式的小工具")
-    aboutGui.AddText("", "Github 仓库:")
-    aboutGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">Github</a>')
-    aboutGui.AddText("xs", "Gitee 仓库:")
-    aboutGui.AddLink("yp", '<a href="https://Gitee.com/abgox/InputTip">Gitee</a>')
-    aboutGui.AddText("xs", "获取更多已适配的鼠标样式文件:")
-    aboutGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip/releases/download/v2.1.0/cursorStyle.zip">链接(Github)</a>')
-    aboutGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip/releases/download/v2.1.0/cursorStyle.zip">链接(Gitee)</a>')
+    aboutGui.AddText("xs", "获取更多信息以及已适配的鼠标样式文件，你应该查看 : ")
+    aboutGui.AddText("xs", "官网:")
+    aboutGui.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
+    aboutGui.AddText("xs", "Github:")
+    aboutGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
+    aboutGui.AddText("xs", "Gitee: :")
+    aboutGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
 
     aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", close)
     aboutGui.OnEvent("Escape", close)
@@ -122,17 +127,20 @@ fn_restart(*) {
     Run(A_ScriptFullPath)
 }
 fn_exit(*) {
+    for v in info {
+        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
+    }
     ExitApp()
 }
 fn(item, *) {
     do(k, v) {
         try {
-            old_v := IniRead(config, "InputMethod", k)
+            old_v := IniRead(config, "InputMethod-v2", k)
             if (old_v != v) {
-                IniWrite(v, config, "InputMethod", k)
+                IniWrite(v, config, "InputMethod-v2", k)
             }
         } catch {
-            IniWrite(v, config, "InputMethod", k)
+            IniWrite(v, config, "InputMethod-v2", k)
         }
     }
     do("select", item)
@@ -144,15 +152,25 @@ fn(item, *) {
 /**
  * 获取当前输入法中英文状态
  * @returns {number} 1:中文 0:英文
+ * CN=1, EN=0   微信输入法,微软拼音，搜狗输入法,QQ输入法,冰凌五笔,
+ * CN=2, EN=1   讯飞输入法
+ * CN=EN=1(无法区分) 百度输入法，手心输入法，谷歌输入法，2345王牌输入法，小鹤音形,小狼毫(rime)
  */
-get_input_state() {
-    DetectHiddenWindows True
+getInputState() {
     res := SendMessage(
         0x283,    ; Message : WM_IME_CONTROL
         code,    ; wParam  : IMC_GETCONVERSIONMODE
         0,    ; lParam  ： (NoArgs)
         , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
     )
-    DetectHiddenWindows False
     return res = CN
+}
+
+replaceEnvVariables(str) {
+    while RegExMatch(str, "%\w+%", &match) {
+        env := match[]
+        envValue := EnvGet(StrReplace(env, "%", ""))
+        str := StrReplace(str, env, envValue)
+    }
+    return str
 }

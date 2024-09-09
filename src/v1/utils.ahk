@@ -1,4 +1,4 @@
-config := A_AppData "\InputTip_input_state.ini"
+config := "InputTip.ini"
 
 ini(key, default) {
     try {
@@ -22,6 +22,7 @@ sub.Add("默认", fn)
 sub.Add("讯飞输入法", fn)
 A_TrayMenu.Add("设置输入法", sub)
 A_TrayMenu.Add()
+A_TrayMenu.Add("关于", about)
 A_TrayMenu.Add("重启", fn_restart)
 A_TrayMenu.Add("退出", fn_exit)
 try {
@@ -51,6 +52,34 @@ fn_startup(item, *) {
     }
     A_TrayMenu.ToggleCheck(item)
 }
+about(*) {
+    aboutGui := Gui("AlwaysOnTop +OwnDialogs")
+    aboutGui.SetFont("q4 s12 w600", "微软雅黑")
+    aboutGui.AddText("Center h30", "InputTip - 根据输入法中英文状态切换鼠标样式的小工具")
+    aboutGui.Show("Hide")
+    aboutGui.GetPos(, , &Gui_width)
+    aboutGui.Destroy()
+
+    aboutGui := Gui("AlwaysOnTop +OwnDialogs")
+    aboutGui.SetFont("q4 s12 w600", "微软雅黑")
+    aboutGui.AddText("Center h30 w" Gui_width, "InputTip - 根据输入法中英文状态切换鼠标样式的小工具")
+    aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
+    aboutGui.AddText("xs", "官网:")
+    aboutGui.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
+    aboutGui.AddText("xs", "Github:")
+    aboutGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
+    aboutGui.AddText("xs", "Gitee: :")
+    aboutGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+
+    aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", close)
+    aboutGui.OnEvent("Escape", close)
+    aboutGui.Show()
+
+    close(*) {
+        aboutGui.Destroy()
+    }
+
+}
 fn_restart(*) {
     Run(A_ScriptFullPath)
 }
@@ -76,16 +105,17 @@ fn(item, *) {
 
 /**
  * 获取当前输入法中英文状态
- * @returns {number} 1:中文 0:英文 null:获取失败
+ * @returns {number} 1:中文 0:英文
+ * CN=1, EN=0   微信输入法,微软拼音，搜狗输入法,QQ输入法,冰凌五笔,
+ * CN=2, EN=1   讯飞输入法
+ * CN=EN=1(无法区分) 百度输入法，手心输入法，谷歌输入法，2345王牌输入法，小鹤音形,小狼毫(rime)
  */
-get_input_state() {
-    DetectHiddenWindows True
+getInputState() {
     res := SendMessage(
         0x283,    ; Message : WM_IME_CONTROL
         code,    ; wParam  : IMC_GETCONVERSIONMODE
         0,    ; lParam  ： (NoArgs)
         , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
     )
-    DetectHiddenWindows False
     return res = CN
 }

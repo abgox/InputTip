@@ -26,12 +26,14 @@
 ### 介绍
 
 - 基于 `AutoHotKey` 编写的一个小工具
-- 在光标处实时显示当前输入法中英文状态
-- [点击这里查看 v2](../../README.md)
+- 在光标处实时显示当前输入法中英文以及大写锁定状态
+- [点击这里查看 v2 版本](../../README.md)
+
+- [版本更新日志](https://inputtip.pages.dev/v1/changelog)
 
 ### 演示
 
-![demo](https://abgop.netlify.app/InputTip/demo.gif)
+![demo](https://inputtip.pages.dev/releases/v1/demo.gif)
 
 ### 使用
 
@@ -50,27 +52,7 @@
 
 - 配置文件名：`InputTip.ini`
 
-  - 与软件保持同名，如将软件名改为 `xxx.exe` ，则会自动创建 `xxx.ini`
-  - 此时旧的配置文件 `InputTip.ini` **请自行删除**
-
-- 配置说明(可按需更改)
-  - `font_family=SimHei` 字体显示
-  - `font_size=12` 字体大小(显示大小)
-  - `font_weight=900` 字体粗细
-  - `font_color=ffffff` 字体颜色(16 进制)
-  - `font_bgcolor=474E68` 背景颜色(16 进制)
-  - `windowTransparent=222` 透明度(0-255)
-  - `CN_Text=中` 中文状态显示
-  - `EN_Text=英` 英文状态显示
-  - `Caps_Text=Caps` 大写锁定状态显示
-  - `offset_x=30` X 轴显示位置偏移量
-  - `offset_y=-50` Y 轴显示位置偏移量
-  - `window_no_display=Notepad.exe` 希望隐藏的应用列表
-    - 默认写入 `Notepad.exe` ，因为记事本中输入法中英文状态获取有问题
-    - 具体写法：
-      1. 找到希望隐藏的应用窗口的 `.exe` 文件
-      2. 填写到这一个配置中，以 `,` 间隔
-         - `window_no_display=Notepad.exe,App1.exe,App2.exe`
+- [配置项说明](https://inputtip.pages.dev/v1/config)
 
 ### 兼容情况(截至 2024/9/9)
 

@@ -17,9 +17,6 @@
     <a href="https://img.shields.io/github/repo-size/abgox/InputTip.svg">
         <img src="https://img.shields.io/github/repo-size/abgox/InputTip.svg" alt="repo size" />
     </a>
-    <a href="https://img.shields.io/github/downloads/abgox/InputTip/total?color=blue&label=downloads">
-        <img src="https://img.shields.io/github/downloads/abgox/InputTip/total?color=blue&label=downloads" alt="download" />
-    </a>
 </p>
 
 ---
@@ -28,15 +25,23 @@
 
 ### 介绍
 
-- 基于 `AutoHotKey` 编写的一个小工具
-- 根据当前输入法中英文以及大写锁定状态切换光标样式
-  - [样式可以自定义](#自定义光标样式)
-  - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)，中文状态为红色，英文状态为蓝色，大写锁定为绿色
-- [点击这里查看 v1](./src/v1/README.md)
+- 基于 `AutoHotKey` 编写
+- 一个输入法状态(中文/英文/大写锁定)提示工具
+
+  - 根据输入法状态改变鼠标样式
+    - [样式可以自定义](#自定义光标样式)
+    - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)，默认中文状态为红色，英文状态为蓝色，大写锁定为绿色
+  - 在输入光标处根据输入法状态显示方块符号
+    - 默认中文状态为红色，英文状态为蓝色，大写锁定为绿色
+    - [通过配置文件自定义配置](https://inputtip.pages.dev/v2/config)
+
+- [点击这里查看 v1 版本](./src/v1/README.md)
+
+- [版本更新日志](https://inputtip.pages.dev/v2/changelog)
 
 ### 演示
 
-![demo](https://abgop.netlify.app/InputTip/demo_v2.gif)
+![demo](https://inputtip.pages.dev/releases/v2/demo.gif)
 
 ### 使用
 
@@ -60,6 +65,16 @@
 
   - [点击下载一些可以直接使用的鼠标样式](https://inputtip.pages.dev/releases/v2/cursorStyle.zip)
     - 这是一个压缩包，需要将其解压，放入 `InputTipCursor` 目录下，然后进行上述步骤即可
+
+### 配置文件
+
+- 所在位置：`InputTip.exe` 的同级目录下
+
+  - 启动软件后会检查配置文件，如果不存在会自动创建
+
+- 配置文件名：`InputTip.ini`
+
+- [配置项说明](https://inputtip.pages.dev/v2/config)
 
 ### 卸载
 
@@ -108,7 +123,6 @@
 
 2. 在底部任务栏右侧找到此软件图标，`鼠标右击` 软件图标，点击 `设置鼠标样式`
 3. 选择创建好的文件夹
-   - 注意: 选择的文件夹不能是 `InputTipCursor` 目录下的 `EN`/`CN`/`Caps` 文件夹
 
 ### 兼容情况(截至 2024/9/9)
 

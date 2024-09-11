@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.4.0
+;@AHK2Exe-SetVersion 2.5.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -17,7 +17,7 @@ DetectHiddenWindows True
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("2.4.0", "v2")
+checkVersion("2.5.0", "v2")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -40,8 +40,8 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
     EN_color := StrReplace(readIni("EN_color", "blue", "Config-v2"), '#', ''),
     Caps_color := StrReplace(readIni("Caps_color", "green", "Config-v2"), '#', ''),
     transparent := readIni('transparent', 222, "Config-v2"),
-    offset_x := readIni('offset_x', 15, "Config-v2") * A_ScreenDPI / 96,
-    offset_y := readIni('offset_y', -15, "Config-v2") * A_ScreenDPI / 96,
+    offset_x := readIni('offset_x', 5, "Config-v2") * A_ScreenDPI / 96,
+    offset_y := readIni('offset_y', 0, "Config-v2") * A_ScreenDPI / 96,
     symbol_height := readIni('symbol_height', 7, "Config-v2") * A_ScreenDPI / 96,
     symbol_width := readIni('symbol_width', 7, "Config-v2") * A_ScreenDPI / 96,
     window_no_display := StrSplit(readIni('window_no_display', 'notepad.exe,everything.exe', 'Config-v2'), ',')
@@ -183,7 +183,7 @@ if (changeCursor) {
                 TipGui.Hide()
             }
             canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
-            if (A_TimeIdle < 50) {
+            if (A_TimeIdle < 100) {
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
@@ -237,7 +237,7 @@ if (changeCursor) {
         }
     } else {
         while 1 {
-            if (A_TimeIdle < 50) {
+            if (A_TimeIdle < 100) {
                 if (GetKeyState("CapsLock", "T")) {
                     if (!isShowCaps) {
                         show("Caps")
@@ -284,7 +284,7 @@ if (changeCursor) {
                 TipGui.Hide()
             }
             canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
-            if (A_TimeIdle < 50) {
+            if (A_TimeIdle < 100) {
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
@@ -363,37 +363,32 @@ makeTrayMenu() {
             [
                 "模式1 适用于以下输入法:",
                 "- 微信输入法",
-                "- 微软(拼音/五笔)",
+                "- 微软(拼音/五笔)输入法",
                 "- 搜狗输入法",
                 "- QQ输入法",
-                "- 冰凌五笔",
-                "如果这些输入法不是你正在使用的，请选择其他模式。",
-                "--------------------------------------------------------------------",
+                "- 冰凌五笔输入法",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
             ],
             [
                 "模式2 适用于以下输入法:",
-                "- 微信输入法(有时会失灵，建议使用模式1)",
-                "- 微软(拼音/五笔)",
-                "- 搜狗输入法",
-                "- QQ输入法",
-                "- 冰凌五笔(有时会失灵，建议使用模式1)",
-                "- 小狼毫(rime)",
+                "- 小狼毫(rime)输入法",
                 "- 百度输入法",
                 "- 谷歌输入法",
-                "如果这些输入法不是你正在使用的，请选择其他模式。",
-                "--------------------------------------------------------------------",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
             ],
             [
                 "模式3 适用于以下输入法:",
                 "- 讯飞输入法",
-                "如果这些输入法不是你正在使用的，请选择其他模式。",
-                "--------------------------------------------------------------------",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
             ],
         ]
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
-        msgGui.SetFont("s12", "微软雅黑")
-        msgGui.AddText("yp", "")
+        msgGui.SetFont("s10", "微软雅黑")
+        msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?")
         for item in list[mode] {
             msgGui.AddText("xs", item)
         }
@@ -403,14 +398,17 @@ makeTrayMenu() {
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
         msgGui.SetFont("s12", "微软雅黑")
-        msgGui.AddText("yp", "")
-        msgGui.AddText("xs", "是否要从 模式" mode " 切换到 模式" index " ?")
-        msgGui.AddText("xs", "--------------------------------------------------------------------",)
+        str := ""
         for item in list[mode] {
-            msgGui.AddText("xs", item)
+            str .= "`n" item
         }
-        for item in list[index] {
-            msgGui.AddText("xs", item)
+        if (mode != index) {
+            for item in list[index] {
+                str .= "`n" item
+            }
+            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------" str)
+        } else {
+            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------" str)
         }
         msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
         msgGui.Show()

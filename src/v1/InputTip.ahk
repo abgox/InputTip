@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.3.0
+;@AHK2Exe-SetVersion 1.4.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -17,7 +17,7 @@ CoordMode 'Mouse', 'Screen'
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("1.3.0", "v1")
+checkVersion("1.4.0", "v1")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -51,7 +51,7 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
 makeTrayMenu()
 
 while 1 {
-    if (A_TimeIdle < 50) {
+    if (A_TimeIdle < 100) {
         MouseGetPos(&x, &y)
         canShow := 1, isShow := 0
         for v in window_no_display {
@@ -131,37 +131,32 @@ makeTrayMenu() {
             [
                 "模式1 适用于以下输入法:",
                 "- 微信输入法",
-                "- 微软(拼音/五笔)",
+                "- 微软(拼音/五笔)输入法",
                 "- 搜狗输入法",
                 "- QQ输入法",
-                "- 冰凌五笔",
-                "如果这些输入法不是你正在使用的，请选择其他模式。",
-                "--------------------------------------------------------------------",
+                "- 冰凌五笔输入法",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
             ],
             [
                 "模式2 适用于以下输入法:",
-                "- 微信输入法(有时会失灵，建议使用模式1)",
-                "- 微软(拼音/五笔)",
-                "- 搜狗输入法",
-                "- QQ输入法",
-                "- 冰凌五笔(有时会失灵，建议使用模式1)",
-                "- 小狼毫(rime)",
+                "- 小狼毫(rime)输入法",
                 "- 百度输入法",
                 "- 谷歌输入法",
-                "如果这些输入法不是你正在使用的，请选择其他模式。",
-                "--------------------------------------------------------------------",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
             ],
             [
                 "模式3 适用于以下输入法:",
                 "- 讯飞输入法",
-                "如果这些输入法不是你正在使用的，请选择其他模式。",
-                "--------------------------------------------------------------------",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
             ],
         ]
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
-        msgGui.SetFont("s12", "微软雅黑")
-        msgGui.AddText("yp", "")
+        msgGui.SetFont("s10", "微软雅黑")
+        msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?")
         for item in list[mode] {
             msgGui.AddText("xs", item)
         }
@@ -171,14 +166,17 @@ makeTrayMenu() {
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
         msgGui.SetFont("s12", "微软雅黑")
-        msgGui.AddText("yp", "")
-        msgGui.AddText("xs", "是否要从 模式" mode " 切换到 模式" index " ?")
-        msgGui.AddText("xs", "--------------------------------------------------------------------",)
+        str := ""
         for item in list[mode] {
-            msgGui.AddText("xs", item)
+            str .= "`n" item
         }
-        for item in list[index] {
-            msgGui.AddText("xs", item)
+        if(mode != index){
+            for item in list[index] {
+                str .= "`n" item
+            }
+            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------" str)
+        }else{
+            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------" str)
         }
         msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
         msgGui.Show()

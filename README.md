@@ -33,11 +33,12 @@
     - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)，默认中文状态为红色，英文状态为蓝色，大写锁定为绿色
   - 在输入光标处根据输入法状态显示方块符号
     - 默认中文状态为红色，英文状态为蓝色，大写锁定为绿色
-    - [通过配置文件自定义配置](https://inputtip.pages.dev/v2/config)
+    - [通过配置文件自定义配置](#关于配置文件)
 
 - [点击这里查看 v1 版本](./src/v1/README.md)
 
 - [版本更新日志](https://inputtip.pages.dev/v2/changelog)
+  - 如果你的网络环境无法访问它，请查看 [版本更新日志](./src/v2/CHANGELOG.md)
 
 ### 演示
 
@@ -66,15 +67,10 @@
   - [点击下载一些可以直接使用的鼠标样式](https://inputtip.pages.dev/releases/v2/cursorStyle.zip)
     - 这是一个压缩包，需要将其解压，放入 `InputTipCursor` 目录下，然后进行上述步骤即可
 
-### 配置文件
+### 关于配置文件
 
-- 所在位置：`InputTip.exe` 的同级目录下
-
-  - 启动软件后会检查配置文件，如果不存在会自动创建
-
-- 配置文件名：`InputTip.ini`
-
-- [配置项说明](https://inputtip.pages.dev/v2/config)
+- 请查看 [配置文件说明](https://inputtip.pages.dev/v2/config)
+  - 如果你的网络环境无法访问它，请查看 [配置文件说明](./src/v2/config.md)
 
 ### 卸载
 

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.4.0
+;@AHK2Exe-SetVersion 1.5.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -17,7 +17,7 @@ CoordMode 'Mouse', 'Screen'
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("1.4.0", "v1")
+checkVersion("1.5.0", "v1")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -113,6 +113,7 @@ makeTrayMenu() {
     sub.Add("模式1", fn_input)
     sub.Add("模式2", fn_input)
     sub.Add("模式3", fn_input)
+    sub.Add("模式4", fn_input)
     A_TrayMenu.Add("设置输入法", sub)
     sub.Check("模式" mode)
     A_TrayMenu.Add()
@@ -152,6 +153,12 @@ makeTrayMenu() {
                 "如果没有你使用的输入法，请选择其他模式",
                 "----------------------------------------------",
             ],
+            [
+                "模式4 适用于以下输入法:",
+                "- 手心输入法",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
+            ]
         ]
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
@@ -170,12 +177,12 @@ makeTrayMenu() {
         for item in list[mode] {
             str .= "`n" item
         }
-        if(mode != index){
+        if (mode != index) {
             for item in list[index] {
                 str .= "`n" item
             }
             msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------" str)
-        }else{
+        } else {
             msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------" str)
         }
         msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)

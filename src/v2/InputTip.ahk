@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.5.0
+;@AHK2Exe-SetVersion 2.6.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -17,7 +17,7 @@ DetectHiddenWindows True
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("2.5.0", "v2")
+checkVersion("2.6.0", "v2")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -339,6 +339,7 @@ makeTrayMenu() {
     sub.Add("模式1", fn_input)
     sub.Add("模式2", fn_input)
     sub.Add("模式3", fn_input)
+    sub.Add("模式4", fn_input)
     A_TrayMenu.Add("设置输入法", sub)
     sub.Check("模式" mode)
     A_TrayMenu.Add()
@@ -384,6 +385,12 @@ makeTrayMenu() {
                 "如果没有你使用的输入法，请选择其他模式",
                 "----------------------------------------------",
             ],
+            [
+                "模式4 适用于以下输入法:",
+                "- 手心输入法",
+                "如果没有你使用的输入法，请选择其他模式",
+                "----------------------------------------------",
+            ]
         ]
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")

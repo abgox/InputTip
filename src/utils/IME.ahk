@@ -105,13 +105,46 @@ class IME {
  * ;   中英文都返回1，因此无法判断是不是中文
  */
 isCN(mode) {
-    if (mode = 2) {
-        return IME.GetInputMode()
+    switch mode {
+        case 1:
+        {
+            ; 中文: 1
+            ; 英文: 0
+            return SendMessage(
+                0x283,    ; Message : WM_IME_CONTROL
+                0x005,    ; wParam  : IMC_GETCONVERSIONMODE
+                0,    ; lParam  ： (NoArgs)
+                , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
+            )
+        }
+        case 2:
+        {
+            ; 中文: 1
+            ; 英文: 0
+            return IME.GetInputMode()
+        }
+        case 3:
+        {
+            ; 中文: 2
+            ; 英文: 1
+            return 2 = SendMessage(
+                0x283,    ; Message : WM_IME_CONTROL
+                0x005,    ; wParam  : IMC_GETCONVERSIONMODE
+                0,    ; lParam  ： (NoArgs)
+                , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
+            )
+        }
+        case 4:
+        {
+            ; 中文:1025
+            ; 英文:1
+            return 1025 = SendMessage(
+                0x283,    ; Message : WM_IME_CONTROL
+                0x001,    ; wParam  : IMC_GETCONVERSIONMODE
+                0,    ; lParam  ： (NoArgs)
+                , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
+            )
+        }
+        default: return 0
     }
-    return mode = SendMessage(
-        0x283,    ; Message : WM_IME_CONTROL
-        0x005,    ; wParam  : IMC_GETCONVERSIONMODE
-        0,    ; lParam  ： (NoArgs)
-        , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-    )
 }

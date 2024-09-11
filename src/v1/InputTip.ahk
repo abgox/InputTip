@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.2.0
+;@AHK2Exe-SetVersion 1.3.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -12,27 +12,39 @@ KeyHistory 0
 DetectHiddenWindows True
 CoordMode 'Mouse', 'Screen'
 
-currentVersion := "1.2.0"
+#Include ..\utils\IME.ahk
+#Include ..\utils\ini.ahk
+#Include ..\utils\showMsg.ahk
+#Include ..\utils\checkVersion.ahk
 
-checkVersion()
+checkVersion("1.3.0", "v1")
 
-config := "InputTip.ini"
-
-code := ini("code", "0x005"),
-    CN := ini("CN", 1),
-    HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
-    font_family := ini('font_family', 'SimHei', 'Config'),
-    font_size := ini('font_size', 12, 'Config') * A_ScreenDPI / 96,
-    font_weight := ini('font_weight', 900, 'Config'),
-    font_color := StrReplace(ini('font_color', 'ffffff', 'Config'), '#', ''),
-    font_bgcolor := StrReplace(ini('font_bgcolor', '474E68', 'Config'), '#', ''),
-    windowTransparent := ini('windowTransparent', 222, 'Config'),
-    CN_Text := ini('CN_Text', '中', 'Config'),
-    EN_Text := ini('EN_Text', '英', 'Config'),
-    Caps_Text := ini('Caps_Text', 'Caps', 'Config'),
-    offset_x := ini('offset_x', 30, 'Config') * A_ScreenDPI / 96,
-    offset_y := ini('offset_y', -50, 'Config') * A_ScreenDPI / 96,
-    window_no_display := StrSplit(ini('window_no_display', 'notepad.exe,everything.exe', 'Config'), ','),
+try {
+    mode := IniRead("InputTip.ini", "InputMethod", "mode")
+} catch {
+    try {
+        mode := IniRead("InputTip.ini", "InputMethod", "CN")
+        if (mode = 2) {
+            mode := 3
+        }
+    } catch {
+        mode := 1
+    }
+    writeIni("mode", mode, "InputMethod")
+}
+HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
+    font_family := readIni('font_family', '微软雅黑', 'Config'),
+    font_size := readIni('font_size', 10, 'Config') * A_ScreenDPI / 96,
+    font_weight := readIni('font_weight', 600, 'Config'),
+    font_color := StrReplace(readIni('font_color', 'ffffff', 'Config'), '#', ''),
+    font_bgcolor := StrReplace(readIni('font_bgcolor', '474E68', 'Config'), '#', ''),
+    windowTransparent := readIni('windowTransparent', 222, 'Config'),
+    CN_Text := readIni('CN_Text', '中', 'Config'),
+    EN_Text := readIni('EN_Text', '英', 'Config'),
+    Caps_Text := readIni('Caps_Text', '大', 'Config'),
+    offset_x := readIni('offset_x', 30, 'Config') * A_ScreenDPI / 96,
+    offset_y := readIni('offset_y', -50, 'Config') * A_ScreenDPI / 96,
+    window_no_display := StrSplit(readIni('window_no_display', 'notepad.exe,everything.exe', 'Config'), ','),
     state := 1, old_x := '', old_y := '', old_i := '',
     CN_G := make_gui(CN_Text), EN_G := make_gui(EN_Text), Caps_G := make_gui(Caps_Text), isShowCaps := 0
 
@@ -53,11 +65,11 @@ while 1 {
         }
         if (GetKeyState("CapsLock", "T")) {
             isShowCaps := 1
-            EN_G.Hide(), CN_G.Hide(), Caps_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y)
+            EN_G.Hide(), CN_G.Hide(), Caps_G.Show('NA X' x + offset_x ' Y' y + offset_y)
             continue
         }
         try {
-            state := getInputState()
+            state := isCN(mode)
         } catch {
             EN_G.Hide(), CN_G.Hide()
             continue
@@ -65,7 +77,7 @@ while 1 {
         if (isShowCaps) {
             Caps_G.Hide()
             if (canShow) {
-                state ? (EN_G.Hide(), CN_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y)) : (CN_G.Hide(), EN_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y))
+                state ? (EN_G.Hide(), CN_G.Show('NA X' x + offset_x ' Y' y + offset_y)) : (CN_G.Hide(), EN_G.Show('NA X' x + offset_x ' Y' y + offset_y))
             }
             isShowCaps := 0
         }
@@ -73,113 +85,15 @@ while 1 {
             old_x := x, old_y := y, old_i := state, isShow := canShow
         }
         if (isShow) {
-            state ? (EN_G.Hide(), CN_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y)) : (CN_G.Hide(), EN_G.Show('NA AutoSize X' x + offset_x ' Y' y + offset_y))
+            state ? (EN_G.Hide(), CN_G.Show('NA X' x + offset_x ' Y' y + offset_y)) : (CN_G.Hide(), EN_G.Show('NA X' x + offset_x ' Y' y + offset_y))
             isShow := 0
         }
     }
     Sleep(1)
 }
 
-/**
- * 获取当前输入法中英文状态
- * @returns {number} 1:中文 0:英文
- * CN=1, EN=0   微信输入法,微软拼音，搜狗输入法,QQ输入法,冰凌五笔,
- * CN=2, EN=1   讯飞输入法
- * CN=EN=1(无法区分) 百度输入法，手心输入法，谷歌输入法，2345王牌输入法，小鹤音形,小狼毫(rime)
- */
-getInputState() {
-    res := SendMessage(
-        0x283,    ; Message : WM_IME_CONTROL
-        code,    ; wParam  : IMC_GETCONVERSIONMODE
-        0,    ; lParam  ： (NoArgs)
-        , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-    )
-    return res = CN
-}
-checkVersion() {
-    try {
-        req := ComObject("Msxml2.XMLHTTP")
-        ; 异步请求
-        req.open("GET", "https://inputtip.pages.dev/releases/v1/version.txt", true)
-        req.onreadystatechange := Ready
-        req.send()
-        Ready() {
-            if (req.readyState != 4) {
-                ; 没有完成.
-                return
-            }
-            compareVersion(new, old) {
-                newParts := StrSplit(new, ".")
-                oldParts := StrSplit(old, ".")
-                for i, part1 in newParts {
-                    try {
-                        part2 := oldParts[i]
-                    } catch {
-                        part2 := 0
-                    }
-                    if (part1 > part2) {
-                        return 1  ; new > old
-                    } else if (part1 < part2) {
-                        return -1  ; new < old
-                    }
-                }
-                return 0  ; new == old
-            }
-            newVersion := StrReplace(StrReplace(req.responseText, "`r", ""), "`n", "")
-            if (req.status == 200 && compareVersion(newVersion, currentVersion) > 0) {
-                TipGui := Gui("AlwaysOnTop +OwnDialogs")
-                TipGui.SetFont("q4 s12 w600", "微软雅黑")
-                TipGui.AddText(, "版本更新日志:")
-                TipGui.AddLink("yp", '<a href="https://inputtip.pages.dev/v1/changelog">https://inputtip.pages.dev/v1/changelog</a>')
-                TipGui.Show("Hide")
-                TipGui.GetPos(, , &Gui_width)
-                TipGui.Destroy()
-
-                TipGui := Gui("AlwaysOnTop +OwnDialogs")
-                TipGui.SetFont("q4 s12 w600", "微软雅黑")
-                TipGui.AddText(, "InputTip v1 有新版本了!")
-                TipGui.AddText(, currentVersion " => " newVersion)
-                TipGui.AddText(, "版本更新日志:")
-                TipGui.AddLink("yp", '<a href="https://inputtip.pages.dev/v1/changelog">https://inputtip.pages.dev/v1/changelog</a>')
-                TipGui.AddText("xs", "是否更新到最新版本?")
-                TipGui.AddText("xs", "只需要确认更新，会自动下载新版本替代旧版本并重启")
-                TipGui.AddButton("xs w" Gui_width, "确认更新").OnEvent("Click", updateVersion)
-                TipGui.Show()
-                updateVersion(*) {
-                    TipGui.Destroy()
-                    try {
-                        Download("https://inputtip.pages.dev/releases/v1/InputTip.exe", A_AppData "\abgox-InputTip.exe")
-                        Run("powershell -Command Start-Sleep -Seconds 1;Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
-                        ExitApp()
-                    } catch {
-                        errGui := Gui("AlwaysOnTop +OwnDialogs")
-                        errGui.SetFont("q4 s12 w600", "微软雅黑")
-                        errGui.AddText(, "InputTip v1 新版本下载错误!")
-                        errGui.AddText("xs", "手动前往官网下载最新版本!")
-                        errGui.AddText(, "----------------------")
-                        errGui.AddText("xs", "官网:")
-                        errGui.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
-                        errGui.AddText("xs", "Github:")
-                        errGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
-                        errGui.AddText("xs", "Gitee: :")
-                        errGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
-                        errGui.Show()
-                    }
-                }
-            }
-        }
-    }
-}
-ini(key, default, section := "InputMethod") {
-    try {
-        return IniRead(config, section, key)
-    } catch {
-        IniWrite(default, config, section, key)
-        return default
-    }
-}
 make_gui(text) {
-    g := Gui('-Caption +AlwaysOnTop ToolWindow LastFound'),
+    g := Gui('-Caption AlwaysOnTop ToolWindow LastFound'),
         g.BackColor := font_bgcolor, g.MarginX := 5, g.MarginY := 5
     g.SetFont('s' font_size ' c' font_color ' w' font_weight, font_family)
     WinSetTransparent(windowTransparent)
@@ -189,32 +103,109 @@ make_gui(text) {
 makeTrayMenu() {
     A_TrayMenu.Delete()
     A_TrayMenu.Add("开机自启动", fn_startup)
-    subMap := {
-        默认: ["0x005", "1"],
-        讯飞输入法: ["0x005", "2"]
+    try {
+        path_exe := RegRead(HKEY_startup, A_ScriptName)
+        if (path_exe = A_ScriptFullPath) {
+            A_TrayMenu.Check("开机自启动")
+        }
     }
     sub := Menu()
-    sub.Add("默认", fn)
-    sub.Add("讯飞输入法", fn)
+    sub.Add("模式1", fn_input)
+    sub.Add("模式2", fn_input)
+    sub.Add("模式3", fn_input)
     A_TrayMenu.Add("设置输入法", sub)
+    sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
+    A_TrayMenu.Add("关于", about)
+    A_TrayMenu.Add("重启", fn_restart)
+    A_TrayMenu.Add("退出", fn_exit)
+    /**
+     * 设置输入法
+     * @param item 点击的菜单项的名字
+     * @param index 点击的菜单项在它的菜单对象中的索引
+     */
+    fn_input(item, index, *) {
+        mode := readIni("mode", 1, "InputMethod")
+        list := [
+            [
+                "模式1 适用于以下输入法:",
+                "- 微信输入法",
+                "- 微软(拼音/五笔)",
+                "- 搜狗输入法",
+                "- QQ输入法",
+                "- 冰凌五笔",
+                "如果这些输入法不是你正在使用的，请选择其他模式。",
+                "--------------------------------------------------------------------",
+            ],
+            [
+                "模式2 适用于以下输入法:",
+                "- 微信输入法(有时会失灵，建议使用模式1)",
+                "- 微软(拼音/五笔)",
+                "- 搜狗输入法",
+                "- QQ输入法",
+                "- 冰凌五笔(有时会失灵，建议使用模式1)",
+                "- 小狼毫(rime)",
+                "- 百度输入法",
+                "- 谷歌输入法",
+                "如果这些输入法不是你正在使用的，请选择其他模式。",
+                "--------------------------------------------------------------------",
+            ],
+            [
+                "模式3 适用于以下输入法:",
+                "- 讯飞输入法",
+                "如果这些输入法不是你正在使用的，请选择其他模式。",
+                "--------------------------------------------------------------------",
+            ],
+        ]
+
+        msgGui := Gui("AlwaysOnTop +OwnDialogs")
+        msgGui.SetFont("s12", "微软雅黑")
+        msgGui.AddText("yp", "")
+        for item in list[mode] {
+            msgGui.AddText("xs", item)
+        }
+        msgGui.Show("Hide")
+        msgGui.GetPos(, , &Gui_width)
+        msgGui.Destroy()
+
+        msgGui := Gui("AlwaysOnTop +OwnDialogs")
+        msgGui.SetFont("s12", "微软雅黑")
+        msgGui.AddText("yp", "")
+        msgGui.AddText("xs", "是否要从 模式" mode " 切换到 模式" index " ?")
+        msgGui.AddText("xs", "--------------------------------------------------------------------",)
+        for item in list[mode] {
+            msgGui.AddText("xs", item)
+        }
+        for item in list[index] {
+            msgGui.AddText("xs", item)
+        }
+        msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
+        msgGui.Show()
+        yes(*) {
+            msgGui.Destroy()
+            writeIni("mode", index, "InputMethod")
+            Run(A_ScriptFullPath)
+        }
+    }
     fn_config(*) {
-        configGui := Gui("AlwaysOnTop +OwnDialogs")
-        configGui.SetFont("q4 s12 w600", "微软雅黑")
-        configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
-        configGui.AddText("xs", "配置项详细说明:")
-        configGui.AddLink("yp", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>')
+        configGui := Gui("AlwaysOnTop OwnDialogs")
+        configGui.SetFont("s12", "微软雅黑")
+        configGui.AddText("Center h30 ", "InputTip v1 - 更改配置")
+        configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
+        configGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v1/config.md">https://github.com/abgox/InputTip/blob/main/src/v1/config.md</a>')
         configGui.AddText("xs", "输入框中的值是配置当前的值")
         configGui.Show("Hide")
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
 
-        configGui := Gui("AlwaysOnTop +OwnDialogs")
-        configGui.SetFont("q4 s12 w600", "微软雅黑")
+        configGui := Gui("AlwaysOnTop OwnDialogs")
+        configGui.SetFont("s12", "微软雅黑")
         configGui.AddText("Center h30 ", "InputTip v1 - 更改配置")
-        configGui.AddText("xs", "配置项详细说明:")
-        configGui.AddLink("yp", '<a href="https://inputtip.pages.dev/v1/config">https://inputtip.pages.dev/v1/config</a>')
+        configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
+        configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v1/config">https://inputtip.pages.dev/v1/config</a>')
+        configGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v1/config.md">https://github.com/abgox/InputTip/blob/main/src/v1/config.md</a>')
+        configGui.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/blob/main/src/v1/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v1/config.md</a>')
         configGui.AddText("xs", "输入框中的值是配置当前的值")
         configGui.AddText("xs", "-------------------------------------")
 
@@ -251,55 +242,25 @@ makeTrayMenu() {
             configList := ["font_family", "font_size", "font_weight", "font_color", "font_bgcolor", "windowTransparent", "CN_Text", "EN_Text", "Caps_Text", "offset_x", "offset_y", "window_no_display"]
             for item in configList {
                 input := configGui.Submit().%item%
-                IniWrite(input, config, "Config", item)
+                writeIni(item, input, "Config")
             }
             input := configGui.Submit().window_no_display
-            IniWrite(RegExReplace(input, ",", "", , , StrLen(input) - 1), config, "Config", "window_no_display")
+            writeIni("window_no_display", RegExReplace(input, ",", "", , , StrLen(input) - 1), "Config")
             fn_restart()
         }
         configGui.Show()
     }
-    A_TrayMenu.Add("关于", about)
-    A_TrayMenu.Add("重启", fn_restart)
-    A_TrayMenu.Add("退出", fn_exit)
-    try {
-        select := ini("select", "默认")
-        sub.Check(select)
-    } catch {
-        IniWrite("默认", config, "InputMethod", "select")
-        select := "默认"
-        sub.Check(select)
-    }
-    try {
-        path_exe := RegRead(HKEY_startup, A_ScriptName)
-        if (path_exe = A_ScriptFullPath) {
-            A_TrayMenu.Check("开机自启动")
-        }
-    }
-    fn_startup(item, *) {
-        try {
-            path_exe := RegRead(HKEY_startup, A_ScriptName)
-            if (path_exe != A_ScriptFullPath) {
-                RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
-            } else {
-                RegDelete(HKEY_startup, A_ScriptName)
-            }
-        } catch {
-            RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
-        }
-        A_TrayMenu.ToggleCheck(item)
-    }
     about(*) {
-        aboutGui := Gui("AlwaysOnTop +OwnDialogs")
-        aboutGui.SetFont("q4 s12 w600", "微软雅黑")
+        aboutGui := Gui("AlwaysOnTop OwnDialogs")
+        aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("Center h30", "InputTip v1 - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.Show("Hide")
         aboutGui.GetPos(, , &Gui_width)
         aboutGui.Destroy()
 
-        aboutGui := Gui("AlwaysOnTop +OwnDialogs")
-        aboutGui.SetFont("q4 s12 w600", "微软雅黑")
-        aboutGui.AddText("Center h30 w" Gui_width, "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui := Gui("AlwaysOnTop OwnDialogs")
+        aboutGui.SetFont("s12", "微软雅黑")
+        aboutGui.AddText("Center h30 w" Gui_width, "InputTip v1 - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
         aboutGui.AddText("xs", "官网:")
         aboutGui.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
@@ -317,26 +278,23 @@ makeTrayMenu() {
         }
 
     }
+    fn_startup(item, *) {
+        try {
+            path_exe := RegRead(HKEY_startup, A_ScriptName)
+            if (path_exe != A_ScriptFullPath) {
+                RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
+            } else {
+                RegDelete(HKEY_startup, A_ScriptName)
+            }
+        } catch {
+            RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
+        }
+        A_TrayMenu.ToggleCheck(item)
+    }
     fn_restart(*) {
         Run(A_ScriptFullPath)
     }
     fn_exit(*) {
         ExitApp()
-    }
-    fn(item, *) {
-        do(k, v) {
-            try {
-                old_v := IniRead(config, "InputMethod", k)
-                if (old_v != v) {
-                    IniWrite(v, config, "InputMethod", k)
-                }
-            } catch {
-                IniWrite(v, config, "InputMethod", k)
-            }
-        }
-        do("select", item)
-        do("code", subMap.%item%[1])
-        do("CN", subMap.%item%[2])
-        Run(A_ScriptFullPath)
     }
 }

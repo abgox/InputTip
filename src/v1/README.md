@@ -30,6 +30,7 @@
 - [点击这里查看 v2 版本](../../README.md)
 
 - [版本更新日志](https://inputtip.pages.dev/v1/changelog)
+  - 如果你的网络环境无法访问它，请查看 [版本更新日志](./CHANGELOG.md)
 
 ### 演示
 
@@ -44,15 +45,9 @@
   2. `鼠标右击` 软件图标
   3. 点击 `开机自启动`
 
-### 配置文件
-
-- 所在位置：`InputTip.exe` 的同级目录下
-
-  - 启动软件后会检查配置文件，如果不存在会自动创建
-
-- 配置文件名：`InputTip.ini`
-
-- [配置项说明](https://inputtip.pages.dev/v1/config)
+### 关于配置文件
+- 请查看 [配置文件说明](https://inputtip.pages.dev/v1/config)
+  - 如果你的网络环境无法访问它，请查看 [配置文件说明](./config.md)
 
 ### 兼容情况(截至 2024/9/9)
 

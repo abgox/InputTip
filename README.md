@@ -44,6 +44,17 @@
 
 ![demo](https://inputtip.pages.dev/releases/v2/demo.gif)
 
+---
+
+- 推荐以下设置
+  - `symbol_height` 根据实际情况调整
+  - 如果不想覆盖光标，可以给 `offset_x` 设置一点偏移量，比如 `5`
+
+  ![config](https://inputtip.pages.dev/releases/v2/config-demo.png)
+
+- 效果
+  ![config](https://inputtip.pages.dev/releases/v2/config-demo.gif)
+
 ### 使用
 
 - [下载](https://inputtip.pages.dev/releases/v2/InputTip.exe) 并运行 `InputTip.exe` 即可

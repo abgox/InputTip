@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.7.1
+;@AHK2Exe-SetVersion 2.7.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -17,7 +17,7 @@ DetectHiddenWindows True
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("2.7.1", "v2")
+checkVersion("2.7.2", "v2")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -28,7 +28,7 @@ try {
             mode := 3
         }
     } catch {
-        mode := 1
+        mode := 2
     }
     writeIni("mode", mode, "InputMethod")
 }

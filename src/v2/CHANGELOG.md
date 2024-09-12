@@ -2,6 +2,15 @@
 
 - 注意: 如果你的网络环境无法访问 [官网](https://inputtip.pages.dev)，`InputTip.exe` 也将无法检测到版本更新，你可能需要额外关注项目仓库中是否有版本更新
 
+## 2.7.1
+
+- 由于不是所有的输入法都无法在记事本和 everything 中获取到中英文状态
+- 直接把 `notepad.exe,everything.exe` 赋值给 `app_hide_CN_EN` 配置是不合理的
+- 应该由用于自己去设置 `app_hide_CN_EN` 配置项
+  - 通过底部任务栏右侧的 `InputTip` 托盘图标，鼠标右键点击它，选择 `设置特殊软件`
+- 所以现在将 `app_hide_CN_EN` 配置的默认值更改为空
+- 不是一开始就使用 `2.7.1` 及以上版本的，你可以先去除掉 `notepad.exe,everything.exe`这个值，检查一下是否可以正常工作
+
 ## 2.7.0
 
 - 更改了配置项

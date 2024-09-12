@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.7.0
+;@AHK2Exe-SetVersion 2.7.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -17,7 +17,7 @@ DetectHiddenWindows True
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("2.7.0", "v2")
+checkVersion("2.7.1", "v2")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -38,7 +38,7 @@ try {
     try {
         app_hide_CN_EN := IniRead("InputTip.ini", "config-v2", "window_no_display")
     } catch {
-        app_hide_CN_EN := "notepad.exe,everything.exe"
+        app_hide_CN_EN := ""
     }
     writeIni("app_hide_CN_EN", app_hide_CN_EN, "config-v2")
 }

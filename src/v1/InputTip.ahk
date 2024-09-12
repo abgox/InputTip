@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.6.0
+;@AHK2Exe-SetVersion 1.6.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -17,7 +17,7 @@ CoordMode 'Mouse', 'Screen'
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("1.6.0", "v1")
+checkVersion("1.6.1", "v1")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -38,7 +38,7 @@ try {
     try {
         app_hide_CN_EN := IniRead("InputTip.ini", "config", "window_no_display")
     } catch {
-        app_hide_CN_EN := "notepad.exe,everything.exe"
+        app_hide_CN_EN := ""
     }
     writeIni("app_hide_CN_EN", app_hide_CN_EN, "config")
 }

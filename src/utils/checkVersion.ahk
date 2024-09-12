@@ -32,7 +32,7 @@ checkVersion(currentVersion, whichVersion) {
                 }
                 return 0  ; new == old
             }
-            newVersion := StrReplace(StrReplace(req.responseText, "`r", ""), "`n", "")
+            newVersion := StrReplace(StrReplace(StrReplace(req.responseText, "`r", ""), "`n", ""), "v", "")
             if (req.status == 200 && compareVersion(newVersion, currentVersion) > 0) {
                 TipGui := Gui("AlwaysOnTop OwnDialogs")
                 TipGui.SetFont("s12", "微软雅黑")

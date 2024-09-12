@@ -140,7 +140,7 @@ isCN(mode) {
             ; 英文:1
             return 1025 = SendMessage(
                 0x283,    ; Message : WM_IME_CONTROL
-                0x001,    ; wParam  : IMC_GETCONVERSIONMODE
+                0x001,    ; wParam  : IMC_GETOPENSTATUS
                 0,    ; lParam  ： (NoArgs)
                 , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
             )

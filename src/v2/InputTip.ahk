@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.6.0
+;@AHK2Exe-SetVersion 2.7.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -17,7 +17,7 @@ DetectHiddenWindows True
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("2.6.0", "v2")
+checkVersion("2.7.0", "v2")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -32,6 +32,16 @@ try {
     }
     writeIni("mode", mode, "InputMethod")
 }
+try {
+    app_hide_CN_EN := IniRead("InputTip.ini", "config-v2", "app_hide_CN_EN")
+} catch {
+    try {
+        app_hide_CN_EN := IniRead("InputTip.ini", "config-v2", "window_no_display")
+    } catch {
+        app_hide_CN_EN := "notepad.exe,everything.exe"
+    }
+    writeIni("app_hide_CN_EN", app_hide_CN_EN, "config-v2")
+}
 
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
     changeCursor := readIni("changeCursor", 1, "Config-v2"),
@@ -44,7 +54,11 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
     offset_y := readIni('offset_y', 0, "Config-v2") * A_ScreenDPI / 96,
     symbol_height := readIni('symbol_height', 7, "Config-v2") * A_ScreenDPI / 96,
     symbol_width := readIni('symbol_width', 7, "Config-v2") * A_ScreenDPI / 96,
-    window_no_display := StrSplit(readIni('window_no_display', 'notepad.exe,everything.exe', 'Config-v2'), ',')
+    ; 隐藏中英文状态方块符号提示
+    app_hide_CN_EN := StrSplit(app_hide_CN_EN, ','),
+    ; 隐藏输入法状态方块符号提示
+    app_hide_state := StrSplit(readIni('app_hide_state', '', 'Config-v2'), ',')
+
 
 makeTrayMenu()
 
@@ -167,23 +181,35 @@ for v in info {
 }
 state := 1, old_state := '', old_left := '', old_top := '', isShowCN := 1, isShowEN := 0, isShowCaps := 0
 if (changeCursor) {
+    show("CN")
     if (showSymbol) {
         TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
         WinSetTransparent(transparent)
         TipGui.BackColor := CN_color
         while 1 {
-            canShow := 1
-            for v in window_no_display {
+            is_hide_state := 0
+            for v in app_hide_state {
                 if (WinActive('ahk_exe ' v)) {
-                    canShow := 0
+                    is_hide_state := 1
                     break
                 }
             }
-            if (!canShow && !isShowCaps) {
+            if (is_hide_state) {
+                TipGui.Hide()
+                continue
+            }
+            is_hide_CN_EN := 0
+            for v in app_hide_CN_EN {
+                if (WinActive('ahk_exe ' v)) {
+                    is_hide_CN_EN := 1
+                    break
+                }
+            }
+            if (is_hide_CN_EN && !isShowCaps) {
                 TipGui.Hide()
             }
-            canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
-            if (A_TimeIdle < 100) {
+            if (A_TimeIdle < 500) {
+                canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
@@ -226,7 +252,7 @@ if (changeCursor) {
                             isShowCN := 0, isShowEN := 1, isShowCaps := 0, TipGui.BackColor := EN_color
                         }
                     }
-                    isShow := canShow && canShowSymbol
+                    isShow := !is_hide_CN_EN && canShowSymbol
                 }
                 if (isShow) {
                     TipGui.Show("NA w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y)
@@ -237,7 +263,7 @@ if (changeCursor) {
         }
     } else {
         while 1 {
-            if (A_TimeIdle < 100) {
+            if (A_TimeIdle < 500) {
                 if (GetKeyState("CapsLock", "T")) {
                     if (!isShowCaps) {
                         show("Caps")
@@ -273,18 +299,29 @@ if (changeCursor) {
         WinSetTransparent(transparent)
         TipGui.BackColor := CN_color
         while 1 {
-            canShow := 1
-            for v in window_no_display {
+            is_hide_state := 0
+            for v in app_hide_state {
                 if (WinActive('ahk_exe ' v)) {
-                    canShow := 0
+                    is_hide_state := 1
                     break
                 }
             }
-            if (!canShow && !isShowCaps) {
+            if (is_hide_state) {
+                TipGui.Hide()
+                continue
+            }
+            is_hide_CN_EN := 0
+            for v in app_hide_CN_EN {
+                if (WinActive('ahk_exe ' v)) {
+                    is_hide_CN_EN := 1
+                    break
+                }
+            }
+            if (is_hide_CN_EN && !isShowCaps) {
                 TipGui.Hide()
             }
-            canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
-            if (A_TimeIdle < 100) {
+            if (A_TimeIdle < 500) {
+                canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
@@ -312,7 +349,7 @@ if (changeCursor) {
                 if (state != old_state || left != old_left || top != old_top) {
                     old_state := state, old_left := left, old_top := top, isShow := 1
                     TipGui.BackColor := state ? CN_color : EN_color
-                    if (canShow && canShowSymbol) {
+                    if (!is_hide_CN_EN && canShowSymbol) {
                         isShow := 1
                     }
                 }
@@ -344,6 +381,185 @@ makeTrayMenu() {
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
+    sub1 := Menu()
+    sub1.Add("隐藏中英文状态方块符号提示", fn_hide_CN_EN)
+    fn_common(tipList) {
+        hideGui := Gui("AlwaysOnTop +OwnDialogs")
+        hideGui.SetFont("s12", "微软雅黑")
+        hideGui.AddButton("", tipList[2]).OnEvent("Click", add)
+        hideGui.AddButton("xs", tipList[3]).OnEvent("Click", remove)
+        hideGui.Show()
+        add(*) {
+            hideGui.Destroy()
+            show()
+            show() {
+                addGui := Gui("AlwaysOnTop OwnDialogs")
+                addGui.SetFont("s12", "微软雅黑")
+                addGui.AddText(, tipList[4])
+                addGui.AddText(, tipList[5])
+                LV := addGui.Add("ListView", "r10 NoSortHdr Sort", ["应用程序"])
+                LV.OnEvent("DoubleClick", LV_DoubleClick)
+                value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                value := SubStr(value, -1) = "," ? value : value ","
+                temp := ""
+                for v in WinGetList() {
+                    try {
+                        exe_name := ProcessGetName(WinGetPID("ahk_id " v))
+                        if (!RegExMatch(temp, exe_name ",") && !RegExMatch(value, exe_name ",")) {
+                            temp .= exe_name ","
+                            LV.Add(, exe_name)
+                        }
+                    }
+                }
+                LV.ModifyCol(1, "Auto")
+                addGui.OnEvent("Close", close)
+                close(*) {
+                    Run(A_ScriptFullPath)
+                }
+                addGui.Show()
+                LV_DoubleClick(LV, RowNumber)
+                {
+                    addGui.Hide()
+                    RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
+                    confirmGui := Gui("AlwaysOnTop +OwnDialogs")
+                    confirmGui.SetFont("s12", "微软雅黑")
+                    confirmGui.AddText(, tipList[6] RowText tipList[7])
+                    confirmGui.Show("Hide")
+                    confirmGui.GetPos(, , &Gui_width)
+                    confirmGui.Destroy()
+
+                    confirmGui := Gui("AlwaysOnTop +OwnDialogs")
+                    confirmGui.SetFont("s12", "微软雅黑")
+                    confirmGui.AddText(, tipList[6] RowText tipList[7])
+                    confirmGui.AddButton("xs w" Gui_width, "确认添加").OnEvent("Click", yes)
+                    confirmGui.Show()
+                    yes(*) {
+                        addGui.Destroy()
+                        confirmGui.Destroy()
+                        value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                        valueArr := StrSplit(value, ",")
+                        result := ""
+                        is_exist := 0
+                        for v in valueArr {
+                            if (v = RowText) {
+                                is_exist := 1
+                            }
+                            if (Trim(v)) {
+                                result .= v ","
+                            }
+                        }
+                        if (is_exist) {
+                            MsgBox(RowText " 已存在!", , "0x1000")
+                        } else {
+                            writeIni(tipList[1], result RowText, "Config-v2")
+                        }
+                        show()
+                    }
+                }
+            }
+        }
+        remove(*) {
+            hideGui.Destroy()
+            show()
+            show() {
+                rmGui := Gui("AlwaysOnTop OwnDialogs")
+                rmGui.SetFont("s12", "微软雅黑")
+                rmGui.AddText(, tipList[8])
+                rmGui.AddText(, tipList[9])
+                LV := rmGui.Add("ListView", "r10 NoSortHdr Sort", ["应用程序"])
+                LV.OnEvent("DoubleClick", LV_DoubleClick)
+                value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                valueArr := StrSplit(value, ",")
+
+                for v in valueArr {
+                    if (Trim(v)) {
+                        LV.Add(, v)
+                    }
+                }
+                LV.ModifyCol(1, "Auto")
+                rmGui.OnEvent("Close", close)
+                close(*) {
+                    Run(A_ScriptFullPath)
+                }
+                rmGui.Show()
+                LV_DoubleClick(LV, RowNumber) {
+                    rmGui.Hide()
+                    RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
+                    confirmGui := Gui("AlwaysOnTop +OwnDialogs")
+                    confirmGui.SetFont("s12", "微软雅黑")
+                    confirmGui.AddText(, tipList[10] RowText tipList[11])
+                    confirmGui.Show("Hide")
+                    confirmGui.GetPos(, , &Gui_width)
+                    confirmGui.Destroy()
+
+                    confirmGui := Gui("AlwaysOnTop +OwnDialogs")
+                    confirmGui.SetFont("s12", "微软雅黑")
+                    confirmGui.AddText(, tipList[10] RowText tipList[11])
+                    confirmGui.AddButton("xs w" Gui_width, "确认移除").OnEvent("Click", yes)
+                    confirmGui.Show()
+                    yes(*) {
+                        rmGui.Destroy()
+                        confirmGui.Destroy()
+                        value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                        valueArr := StrSplit(value, ",")
+                        is_exist := 0
+                        result := ""
+                        for v in valueArr {
+                            if (v = RowText) {
+                                is_exist := 1
+                            } else {
+                                if (Trim(v)) {
+                                    result .= v ","
+                                }
+                            }
+                        }
+                        if (is_exist) {
+                            writeIni(tipList[1], result, "Config-v2")
+                        } else {
+                            MsgBox(RowText " 不存在或已经移除!", , "0x1000")
+                        }
+                        show()
+                    }
+                }
+            }
+        }
+    }
+    fn_hide_CN_EN(*) {
+        fn_common(
+            [
+                "app_hide_CN_EN",
+                "将应用添加到隐藏中英文状态方块符号提示的应用列表中",
+                "从隐藏中英文状态方块符号提示的应用列表中移除应用",
+                "以下列表中是当前系统正在运行的应用程序",
+                "双击应用程序，将其添加到隐藏中英文状态方块符号提示的应用列表中",
+                "是否要将 ",
+                " 添加到隐藏中英文状态方块符号提示的应用列表中？`n在此列表中的所有应用里，InputTip.exe 都不会根据中英文状态显示不同颜色的方块符号，但会显示大写锁定方块符号",
+                "以下列表中是隐藏中英文状态方块符号提示的应用列表",
+                "双击应用程序，将其移除",
+                "是否要将 ",
+                " 移除？`n移除后，在此应用中，InputTip.exe 会根据中英文状态显示不同颜色的方块符号"
+            ]
+        )
+    }
+    sub1.Add("隐藏输入法状态方块符号提示", fn_hide_state)
+    fn_hide_state(*) {
+        fn_common(
+            [
+                "app_hide_state",
+                "将应用添加到隐藏输入法状态方块符号提示的应用列表中",
+                "从隐藏输入法状态方块符号提示的应用列表中移除应用",
+                "以下列表中是当前系统正在运行的应用程序",
+                "双击应用程序，将其添加到隐藏输入法状态方块符号提示的应用列表中",
+                "是否要将 ",
+                " 添加到隐藏输入法状态方块符号提示的应用列表中？`n在此列表中的所有应用里，InputTip.exe 都不会显示方块符号",
+                "以下列表中是隐藏输入法状态方块符号提示的应用列表",
+                "双击应用程序，将其移除",
+                "是否要将 ",
+                " 移除？`n移除后，在此应用中，InputTip.exe 会根据输入法状态显示不同颜色的方块符号"
+            ]
+        )
+    }
+    A_TrayMenu.Add("设置特殊软件", sub1)
     sub2 := Menu()
     sub2.Add("中文", fn_CN)
     sub2.Add("英文", fn_EN)
@@ -440,47 +656,36 @@ makeTrayMenu() {
         configGui.SetFont("s12", "微软雅黑")
         configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
         configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
-        configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>')
-        configGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        configGui.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        configGui.AddText("xs", "请输入框中的值是配置当前的值")
-        configGui.AddText("xs", "-------------------------------------")
+        configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+        configGui.AddText("xs", "请输入框中的值是配置当前的值`n---------------------------------------------------------------------------------")
 
         configGui.AddText("xs", "changeCursor: ")
-        configGui.AddEdit("vchangeCursor yp w150", changeCursor)
-        configGui.AddText("xs", "showSymbol: ")
-        configGui.AddEdit("vshowSymbol yp w150", showSymbol)
+        configGui.AddEdit("vchangeCursor yp w100", changeCursor)
+        configGui.AddText("yp x" Gui_width / 2, "showSymbol: ")
+        configGui.AddEdit("vshowSymbol yp w100", showSymbol)
         configGui.AddText("xs", "CN_color: ")
-        configGui.AddEdit("vCN_color yp w150", CN_color)
-        configGui.AddText("xs", "EN_color: ")
-        configGui.AddEdit("vEN_color yp w150", EN_color)
+        configGui.AddEdit("vCN_color yp w100", CN_color)
+        configGui.AddText("yp x" Gui_width / 2, "EN_color: ")
+        configGui.AddEdit("vEN_color yp w100", EN_color)
         configGui.AddText("xs", "Caps_color: ")
-        configGui.AddEdit("vCaps_color yp w150", Caps_color)
-        configGui.AddText("xs", "transparent: ")
-        configGui.AddEdit("vtransparent yp w150", transparent)
+        configGui.AddEdit("vCaps_color yp w100", Caps_color)
+        configGui.AddText("yp x" Gui_width / 2, "transparent: ")
+        configGui.AddEdit("vtransparent yp w100", transparent)
         configGui.AddText("xs", "offset_x: ")
-        configGui.AddEdit("voffset_x yp w150", offset_x / A_ScreenDPI * 96)
-        configGui.AddText("xs", "offset_y: ")
-        configGui.AddEdit("voffset_y yp w150", offset_y / A_ScreenDPI * 96)
+        configGui.AddEdit("voffset_x yp w100", offset_x / A_ScreenDPI * 96)
+        configGui.AddText("yp x" Gui_width / 2, "offset_y: ")
+        configGui.AddEdit("voffset_y yp w100", offset_y / A_ScreenDPI * 96)
         configGui.AddText("xs", "symbol_height: ")
-        configGui.AddEdit("vsymbol_height yp w150", symbol_height / A_ScreenDPI * 96)
-        configGui.AddText("xs", "symbol_width: ")
-        configGui.AddEdit("vsymbol_width yp w150", symbol_width / A_ScreenDPI * 96)
-        configGui.AddText("xs", "window_no_display: ")
-        window_no_display_str := ""
-        for v in window_no_display {
-            window_no_display_str .= v ","
-        }
-        configGui.AddEdit("vwindow_no_display xs w" Gui_width, window_no_display_str)
+        configGui.AddEdit("vsymbol_height yp w100", symbol_height / A_ScreenDPI * 96)
+        configGui.AddText("yp x" Gui_width / 2, "symbol_width: ")
+        configGui.AddEdit("vsymbol_width yp w100", symbol_width / A_ScreenDPI * 96)
         configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
         changeConfig(*) {
-            configList := ["changeCursor", "showSymbol", "CN_color", "EN_color", "Caps_color", "transparent", "offset_x", "offset_y", "symbol_height", "symbol_width", "window_no_display"]
+            configList := ["changeCursor", "showSymbol", "CN_color", "EN_color", "Caps_color", "transparent", "offset_x", "offset_y", "symbol_height", "symbol_width"]
             for item in configList {
                 input := configGui.Submit().%item%
                 writeIni(item, input, "Config-v2")
             }
-            input := configGui.Submit().window_no_display
-            writeIni("window_no_display", RegExReplace(input, ",", "", , , StrLen(input) - 1), "Config-v2")
             if (configGui.Submit().changeCursor != 1) {
                 for v in info {
                     DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)

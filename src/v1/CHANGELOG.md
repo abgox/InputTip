@@ -2,6 +2,18 @@
 
 - 注意: 如果你的网络环境无法访问 [官网](https://inputtip.pages.dev)，`InputTip.exe` 也将无法检测到版本更新，你可能需要额外关注项目仓库中是否有版本更新
 
+## 1.6.0
+
+- 更改了配置项
+  - `window_no_display` => `app_hide_CN_EN`
+  - `window_no_display` 的值会复制给 `app_hide_CN_EN`
+- 添加了一个配置项:
+  - `app_hide_state`
+- 在任务栏底部右侧的软件托盘菜单中添加了一个子菜单 `设置特殊软件`
+  - 可以在它的子项中，快速的设置 `app_hide_CN_EN` 和 `app_hide_state`
+- 提高了处理逻辑的阈值时间，解决有时状态更新不及时的问题
+- 其他的修复和优化
+
 ## 1.5.0
 
 - 添加 `模式4` 以兼容手心输入法

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.6.2
+;@AHK2Exe-SetVersion 1.6.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -17,7 +17,7 @@ CoordMode 'Mouse', 'Screen'
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("1.6.2", "v1")
+checkVersion("1.6.3", "v1")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -334,63 +334,22 @@ makeTrayMenu() {
      */
     fn_input(item, index, *) {
         mode := readIni("mode", 1, "InputMethod")
-        list := [
-            [
-                "模式1 适用于以下输入法:",
-                "- 微信输入法",
-                "- 微软(拼音/五笔)输入法",
-                "- 搜狗输入法",
-                "- QQ输入法",
-                "- 冰凌五笔输入法",
-                "如果没有你使用的输入法，请选择其他模式",
-                "----------------------------------------------",
-            ],
-            [
-                "模式2 适用于以下输入法:",
-                "- 小狼毫(rime)输入法",
-                "- 百度输入法",
-                "- 谷歌输入法",
-                "如果没有你使用的输入法，请选择其他模式",
-                "----------------------------------------------",
-            ],
-            [
-                "模式3 适用于以下输入法:",
-                "- 讯飞输入法",
-                "如果没有你使用的输入法，请选择其他模式",
-                "----------------------------------------------",
-            ],
-            [
-                "模式4 适用于以下输入法:",
-                "- 手心输入法",
-                "如果没有你使用的输入法，请选择其他模式",
-                "----------------------------------------------",
-            ]
-        ]
-
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
         msgGui.SetFont("s10", "微软雅黑")
-        msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?")
-        for item in list[mode] {
-            msgGui.AddText("xs", item)
-        }
+        msgGui.AddLink(, '<a href="https://inputtip.pages.dev/v1/#兼容情况">https://inputtip.pages.dev/v1/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v1/README.md#兼容情况">https://github.com/abgox/InputTip/blob/main/src/v1/README.md#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v1/README.md#-4">https://gitee.com/abgox/InputTip/blob/main/src/v1/README.md#-4</a>')
         msgGui.Show("Hide")
         msgGui.GetPos(, , &Gui_width)
         msgGui.Destroy()
 
         msgGui := Gui("AlwaysOnTop +OwnDialogs")
         msgGui.SetFont("s12", "微软雅黑")
-        str := ""
-        for item in list[mode] {
-            str .= "`n" item
-        }
         if (mode != index) {
-            for item in list[index] {
-                str .= "`n" item
-            }
-            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------" str)
+            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------")
         } else {
-            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------" str)
+            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
         }
+        msgGui.AddText(, "模式相关信息请查看以下任意地址:")
+        msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v1/#兼容情况">https://inputtip.pages.dev/v1/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v1/README.md#兼容情况">https://github.com/abgox/InputTip/blob/main/src/v1/README.md#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v1/README.md#-4">https://gitee.com/abgox/InputTip/blob/main/src/v1/README.md#-4</a>')
         msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
         msgGui.Show()
         yes(*) {

@@ -94,17 +94,11 @@ class IME {
 
 /**
  * 判断当前输入法状态是否为中文
- * @param {1 | 2 | 3} mode 使用的模式
+ * @param {1 | 2 | 3 | 4} mode 使用的模式
  * @returns {Boolean} 输入法是否为中文
- * @example
- * ; 微信输入法,微软(拼音/五笔)，搜狗输入法,QQ输入法,冰凌五笔
- * ;   中文时，返回1，英文时返回0
- * ; 讯飞输入法
- * ;   中文时，返回2，英文时返回1
- * ; 百度输入法，手心输入法，谷歌输入法，2345王牌输入法，小鹤音形,小狼毫(rime)
- * ;   中英文都返回1，因此无法判断是不是中文
  */
 isCN(mode) {
+    DetectHiddenWindows true
     switch mode {
         case 1:
         {
@@ -147,4 +141,5 @@ isCN(mode) {
         }
         default: return 0
     }
+    DetectHiddenWindows false
 }

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.7.3
+;@AHK2Exe-SetVersion 2.7.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -18,7 +18,8 @@ InstallMouseHook
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-checkVersion("2.7.3", "v2")
+currentVersion := "2.7.5"
+checkVersion(currentVersion, "v2")
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -59,7 +60,6 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
     app_hide_CN_EN := StrSplit(app_hide_CN_EN, ','),
     ; 隐藏输入法状态方块符号提示
     app_hide_state := StrSplit(readIni('app_hide_state', '', 'Config-v2'), ',')
-
 
 makeTrayMenu()
 
@@ -210,7 +210,7 @@ if (changeCursor) {
                 TipGui.Hide()
             }
             if (A_TimeIdle < 500) {
-                canShowSymbol := GetCaretPosEx(&left, &top, , , true)
+                canShowSymbol := GetCaretPosEx(&left, &top)
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
@@ -322,7 +322,7 @@ if (changeCursor) {
                 TipGui.Hide()
             }
             if (A_TimeIdle < 500) {
-                canShowSymbol := GetCaretPosEx(&left, &top, &right, &bottom, true)
+                canShowSymbol := GetCaretPosEx(&left, &top)
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
@@ -672,7 +672,6 @@ makeTrayMenu() {
         }
 
         dir_name := StrSplit(dir, "\")[-1]
-        MsgBox(dir_name)
         if (dir_name = "EN" || dir_name = "CN" || dir_name = "Caps") {
             MsgBox("不能选择 CN/EN/Caps 文件夹！", , "0x30 0x1000")
             return
@@ -680,6 +679,7 @@ makeTrayMenu() {
         try {
             DirDelete(A_ScriptDir "\InputTipCursor\" folder, 1)
             DirCopy(dir, A_ScriptDir "\InputTipCursor\" folder, 1)
+            MsgBox("鼠标样式文件夹修改成功!")
         }
     }
     fn_CN(*) {
@@ -723,7 +723,7 @@ makeTrayMenu() {
     about(*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
-        aboutGui.AddText("Center h30", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText("Center h30 w" Gui_width, "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.Show("Hide")
         aboutGui.GetPos(, , &Gui_width)
         aboutGui.Destroy()
@@ -731,6 +731,7 @@ makeTrayMenu() {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("Center h30 w" Gui_width, "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText(, "当前版本: " currentVersion)
         aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
         aboutGui.AddText("xs", "官网:")
         aboutGui.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
@@ -778,24 +779,28 @@ replaceEnvVariables(str) {
     return str
 }
 
-GetCaretPosEx(&left?, &top?, &right?, &bottom?, useHook := false) {
+GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
+    /*
+    # getCaretPosFromGui 能获取到正确的坐标，但不通用
+        - 记事本(notepad)
+        - powerToys
+        - ahk gui
+    */
     if getCaretPosFromGui(&hwnd := 0)
-        return true
-    try
-        className := WinGetClass(hwnd)
-    catch
-        className := ""
-    if className ~= "^(?:Windows|Microsoft)\.UI\..+"
-        funcs := [getCaretPosFromUIA, getCaretPosFromHook, getCaretPosFromMSAA]
-    else if className ~= "^HwndWrapper\[PowerShell_ISE\.exe;;[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\]"
-        funcs := [getCaretPosFromHook, getCaretPosFromWpfCaret]
-    else
-        funcs := [getCaretPosFromMSAA, getCaretPosFromUIA, getCaretPosFromHook]
+        return getCaretPosFromGui.Name
+
+    ; # getCaretPosFromWpfCaret，getCaretPosFromUIA 两个方法一定能获取到正确的坐标，但是不通用
+    if (WinActive("ahk_exe powershell_ise.exe")) {
+        funcs := [getCaretPosFromWpfCaret]
+    } else if (WinActive("ahk_exe WindowsTerminal.exe")) {
+        funcs := [getCaretPosFromUIA]
+    } else {
+        ; # getCaretPosFromHook 更通用，但是对于副屏来说，其缩放如果高于 125%, 获取到的坐标就有会很大偏差
+        funcs := [getCaretPosFromHook, getCaretPosFromUIA, getCaretPosFromMSAA]
+    }
     for fn in funcs {
-        if fn == getCaretPosFromHook && !useHook
-            continue
         if fn()
-            return true
+            return fn.Name
     }
     return false
 

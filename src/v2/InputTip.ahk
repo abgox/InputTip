@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.10.2
+;@AHK2Exe-SetVersion 2.10.4
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.10.2"
+currentVersion := "2.10.4"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -197,6 +197,7 @@ if (changeCursor) {
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 if (exe_name != lastWindow) {
+                    WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (RegExMatch(app_CN, "," exe_name ",")) {
                         if (GetKeyState("CapsLock", "T")) {
@@ -284,6 +285,32 @@ if (changeCursor) {
         }
     } else {
         while 1 {
+            try {
+                exe_name := ProcessGetName(WinGetPID("A"))
+                if (exe_name != lastWindow) {
+                    WinWaitActive("ahk_exe" exe_name)
+                    lastWindow := exe_name
+                    if (RegExMatch(app_CN, "," exe_name ",")) {
+                        if (GetKeyState("CapsLock", "T")) {
+                            SendInput("{CapsLock}")
+                        }
+                        if (!isCN(mode)) {
+                            SendInput("{Shift}")
+                        }
+                    } else if (RegExMatch(app_EN, "," exe_name ",")) {
+                        if (GetKeyState("CapsLock", "T")) {
+                            SendInput("{CapsLock}")
+                        }
+                        if (isCN(mode)) {
+                            SendInput("{Shift}")
+                        }
+                    } else if (RegExMatch(app_Caps, "," exe_name ",")) {
+                        if (!isShowCaps) {
+                            SendInput("{CapsLock}")
+                        }
+                    }
+                }
+            }
             if (A_TimeIdle < 500) {
                 if (GetKeyState("CapsLock", "T")) {
                     if (!isShowCaps) {
@@ -320,6 +347,29 @@ if (changeCursor) {
             is_hide_CN_EN := 0, is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                if (exe_name != lastWindow) {
+                    WinWaitActive("ahk_exe" exe_name)
+                    lastWindow := exe_name
+                    if (RegExMatch(app_CN, "," exe_name ",")) {
+                        if (GetKeyState("CapsLock", "T")) {
+                            SendInput("{CapsLock}")
+                        }
+                        if (!isCN(mode)) {
+                            SendInput("{Shift}")
+                        }
+                    } else if (RegExMatch(app_EN, "," exe_name ",")) {
+                        if (GetKeyState("CapsLock", "T")) {
+                            SendInput("{CapsLock}")
+                        }
+                        if (isCN(mode)) {
+                            SendInput("{Shift}")
+                        }
+                    } else if (RegExMatch(app_Caps, "," exe_name ",")) {
+                        if (!isShowCaps) {
+                            SendInput("{CapsLock}")
+                        }
+                    }
+                }
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
                 if (is_hide_state) {
                     TipGui.Hide()
@@ -475,6 +525,7 @@ makeTrayMenu() {
                 value := IniRead("InputTip.ini", "config-v2", tipList[1])
                 value := SubStr(value, -1) = "," ? value : value ","
                 temp := ""
+                DetectHiddenWindows 0
                 for v in WinGetList() {
                     try {
                         exe_name := ProcessGetName(WinGetPID("ahk_id " v))
@@ -485,6 +536,7 @@ makeTrayMenu() {
                         }
                     }
                 }
+                DetectHiddenWindows 1
                 LV.ModifyCol(1, "Auto")
                 addGui.OnEvent("Close", close)
                 close(*) {

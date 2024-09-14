@@ -27,6 +27,7 @@
 
 - 基于 `AutoHotKey` 编写的一个小工具
 - 在光标处实时显示当前输入法中英文以及大写锁定状态
+- 根据不同窗口自动切换不同的输入状态
 - [点击这里查看 v2 版本](../../README.md)
 
 - [版本更新日志](https://inputtip.pages.dev/v1/changelog)

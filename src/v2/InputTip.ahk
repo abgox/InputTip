@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.10.0
+;@AHK2Exe-SetVersion 2.10.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.10.0"
+currentVersion := "2.10.2"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -654,7 +654,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_EN", SubStr(result,2), "Config-v2")
+                writeIni("app_EN", SubStr(result, 2), "Config-v2")
             }
 
             if (RegExMatch(value_Caps, "," RowText ",")) {
@@ -665,7 +665,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_Caps", SubStr(result,2), "Config-v2")
+                writeIni("app_Caps", SubStr(result, 2), "Config-v2")
             }
         }
     }
@@ -698,7 +698,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_CN", SubStr(result,2), "Config-v2")
+                writeIni("app_CN", SubStr(result, 2), "Config-v2")
             }
 
             if (RegExMatch(value_Caps, "," RowText ",")) {
@@ -709,7 +709,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_Caps", SubStr(result,2), "Config-v2")
+                writeIni("app_Caps", SubStr(result, 2), "Config-v2")
             }
         }
     }
@@ -742,7 +742,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_CN", SubStr(result,2), "Config-v2")
+                writeIni("app_CN", SubStr(result, 2), "Config-v2")
             }
 
             if (RegExMatch(value_EN, "," RowText ",")) {
@@ -753,7 +753,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_EN", SubStr(result,2), "Config-v2")
+                writeIni("app_EN", SubStr(result, 2), "Config-v2")
             }
         }
     }
@@ -787,7 +787,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_hide_state", SubStr(result,2), "Config-v2")
+                writeIni("app_hide_state", SubStr(result, 2), "Config-v2")
             }
         }
     }
@@ -819,7 +819,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_hide_CN_EN", SubStr(result,2), "Config-v2")
+                writeIni("app_hide_CN_EN", SubStr(result, 2), "Config-v2")
             }
         }
     }
@@ -1169,8 +1169,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         if (fn()) {
             fnName := fn.Name
             if (fnName == "getCaretPosFromHook" || fnName == "getCaretPosFromMSAA") {
-                left += offset["offset_x_" isWhichScreen().num]
-                top += offset["offset_y_" isWhichScreen().num]
+                try {
+                    left += offset["offset_x_" isWhichScreen().num]
+                    top += offset["offset_y_" isWhichScreen().num]
+                }
             }
             return fnName
         }

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.8.0
+;@AHK2Exe-SetVersion 2.9.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -13,13 +13,14 @@ KeyHistory 0
 DetectHiddenWindows 1
 InstallKeybdHook
 InstallMouseHook
+CoordMode 'Mouse', 'Screen'
 
 #Include ..\utils\IME.ahk
 #Include ..\utils\ini.ahk
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.8.0"
+currentVersion := "2.9.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -53,14 +54,22 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
     EN_color := StrReplace(readIni("EN_color", "blue", "Config-v2"), '#', ''),
     Caps_color := StrReplace(readIni("Caps_color", "green", "Config-v2"), '#', ''),
     transparent := readIni('transparent', 222, "Config-v2"),
-    offset_x := readIni('offset_x', 5, "Config-v2") * A_ScreenDPI / 96,
-    offset_y := readIni('offset_y', 0, "Config-v2") * A_ScreenDPI / 96,
-    symbol_height := readIni('symbol_height', 7, "Config-v2") * A_ScreenDPI / 96,
-    symbol_width := readIni('symbol_width', 7, "Config-v2") * A_ScreenDPI / 96,
+    offset_x := readIni('offset_x', 5, "Config-v2"),
+    offset_y := readIni('offset_y', 0, "Config-v2"),
+    symbol_height := readIni('symbol_height', 7, "Config-v2"),
+    symbol_width := readIni('symbol_width', 7, "Config-v2"),
     ; 隐藏中英文状态方块符号提示
-    app_hide_CN_EN := "," app_hide_CN_EN ","
-; 隐藏输入法状态方块符号提示
-app_hide_state := "," readIni('app_hide_state', '', 'Config-v2') ","
+    app_hide_CN_EN := "," app_hide_CN_EN ",",
+    ; 隐藏输入法状态方块符号提示
+    app_hide_state := "," readIni('app_hide_state', '', 'Config-v2') ",",
+    screenList := getScreenInfo(),
+    ; 特别的偏移量设置
+    offset := Map()
+
+for v in screenList {
+    offset["offset_x_" v.num] := readIni("offset_x_" v.num, 0, "Config-v2")
+    offset["offset_y_" v.num] := readIni("offset_y_" v.num, 0, "Config-v2")
+}
 
 makeTrayMenu()
 
@@ -162,7 +171,7 @@ if (changeCursor) {
             }
         }
     }
-}else{
+} else {
     for v in info {
         try {
             v.origin := replaceEnvVariables(RegRead("HKEY_CURRENT_USER\Control Panel\Cursors", curMap.%v.type%))
@@ -179,16 +188,18 @@ if (changeCursor) {
     show("CN")
     if (showSymbol) {
         while 1 {
+            is_hide_CN_EN := 0, is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
                 if (is_hide_state) {
                     TipGui.Hide()
-                } else {
-                    is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
-                    if (is_hide_CN_EN && !isShowCaps) {
-                        TipGui.Hide()
-                    }
+                    continue
+                }
+                is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
+                if (is_hide_CN_EN && !isShowCaps) {
+                    TipGui.Hide()
+                    continue
                 }
             }
             if (A_TimeIdle < 500) {
@@ -196,7 +207,7 @@ if (changeCursor) {
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
-                        TipGui.Show("NA w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y)
+                        TipShow()
                     } else {
                         TipGui.Hide()
                     }
@@ -238,7 +249,7 @@ if (changeCursor) {
                     isShow := !is_hide_CN_EN && canShowSymbol
                 }
                 if (isShow) {
-                    TipGui.Show("NA w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y)
+                    TipShow()
                     isShow := 0
                 }
             }
@@ -279,16 +290,18 @@ if (changeCursor) {
 } else {
     if (showSymbol) {
         while 1 {
+            is_hide_CN_EN := 0, is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
                 if (is_hide_state) {
                     TipGui.Hide()
-                } else {
-                    is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
-                    if (is_hide_CN_EN && !isShowCaps) {
-                        TipGui.Hide()
-                    }
+                    continue
+                }
+                is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
+                if (is_hide_CN_EN && !isShowCaps) {
+                    TipGui.Hide()
+                    continue
                 }
             }
             if (A_TimeIdle < 500) {
@@ -296,7 +309,7 @@ if (changeCursor) {
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
                     if (canShowSymbol) {
-                        TipGui.Show("NA w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y)
+                        TipShow()
                         isShowCaps := 1
                     } else {
                         TipGui.Hide()
@@ -325,13 +338,17 @@ if (changeCursor) {
                     }
                 }
                 if (isShow) {
-                    TipGui.Show("NA w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y)
+                    TipShow()
                     isShow := 0
                 }
             }
             Sleep(50)
         }
     }
+}
+
+TipShow(){
+    TipGui.Show("NA w" symbol_width * A_ScreenDPI / 96 "h" symbol_height * A_ScreenDPI / 96 "x" left "y" top)
 }
 
 makeTrayMenu() {
@@ -352,6 +369,57 @@ makeTrayMenu() {
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
+    A_TrayMenu.Add("设置特殊偏移量", fn_offset)
+    fn_offset(*) {
+        offsetGui := Gui("AlwaysOnTop OwnDialogs")
+        offsetGui.SetFont("s12", "微软雅黑")
+        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
+        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里设置的特殊偏移量不会覆盖配置中的 offset_x 和 offset_y，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
+        offsetGui.AddText("", "")
+
+        offsetGui.Show("Hide")
+        offsetGui.GetPos(, , &Gui_width)
+        offsetGui.Destroy()
+
+        offsetGui := Gui("AlwaysOnTop OwnDialogs")
+        offsetGui.SetFont("s12", "微软雅黑")
+        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
+        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里设置的特殊偏移量不会覆盖配置中的 offset_x 和 offset_y，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
+        offsetGui.AddText(, "------------------------------------------------------")
+
+        screenList := getScreenInfo()
+        pages := []
+        for v in screenList {
+            pages.push("屏幕 " v.num)
+        }
+        tab := offsetGui.AddTab3("", pages)
+
+        for v in screenList {
+            tab.UseTab(v.num)
+            if(v.num = v.main){
+                offsetGui.AddText(, "这是主屏幕(主显示器)，屏幕标识为: " v.num)
+            }else{
+                offsetGui.AddText(, "这是副屏幕(副显示器)，屏幕标识为: " v.num)
+            }
+            offsetGui.AddText("", "offset_x: ")
+            offsetGui.AddEdit("voffset_x_" v.num " yp w100", offset["offset_x_" v.num])
+            offsetGui.AddText("yp", "offset_y: ")
+            offsetGui.AddEdit("voffset_y_" v.num " yp w100", offset["offset_y_" v.num])
+        }
+        tab.UseTab(0)
+        offsetGui.AddButton("w" Gui_width, "确定").OnEvent("Click", save)
+        save(*) {
+            for v in screenList {
+                x := offsetGui.Submit().%"offset_x_" v.num%
+                writeIni("offset_x_" v.num, x, "Config-v2")
+                y := offsetGui.Submit().%"offset_y_" v.num%
+                writeIni("offset_y_" v.num, y, "Config-v2")
+            }
+            Run(A_ScriptFullPath)
+        }
+        offsetGui.Show()
+
+    }
     sub1 := Menu()
     sub1.Add("隐藏中英文状态方块符号提示", fn_hide_CN_EN)
     fn_common(tipList) {
@@ -631,13 +699,13 @@ makeTrayMenu() {
         configGui.AddText("yp x" Gui_width / 2, "transparent: ")
         configGui.AddEdit("vtransparent yp w100", transparent)
         configGui.AddText("xs", "offset_x: ")
-        configGui.AddEdit("voffset_x yp w100", offset_x / A_ScreenDPI * 96)
+        configGui.AddEdit("voffset_x yp w100", offset_x)
         configGui.AddText("yp x" Gui_width / 2, "offset_y: ")
-        configGui.AddEdit("voffset_y yp w100", offset_y / A_ScreenDPI * 96)
+        configGui.AddEdit("voffset_y yp w100", offset_y)
         configGui.AddText("xs", "symbol_height: ")
-        configGui.AddEdit("vsymbol_height yp w100", symbol_height / A_ScreenDPI * 96)
+        configGui.AddEdit("vsymbol_height yp w100", symbol_height)
         configGui.AddText("yp x" Gui_width / 2, "symbol_width: ")
-        configGui.AddEdit("vsymbol_width yp w100", symbol_width / A_ScreenDPI * 96)
+        configGui.AddEdit("vsymbol_width yp w100", symbol_width)
         configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
         changeConfig(*) {
             changeCursor := configGui.Submit().changeCursor
@@ -850,6 +918,38 @@ replaceEnvVariables(str) {
     return str
 }
 
+/**
+ * 获取到屏幕信息
+ * @returns {Array} 一个数组 [{num:1,left:0,top:0,right:0,bottom:0}]
+ */
+getScreenInfo() {
+    list := []
+    MonitorCount := MonitorGetCount()
+    MonitorPrimary := MonitorGetPrimary()
+    Loop MonitorCount
+    {
+        MonitorGet A_Index, &L, &T, &R, &B
+        MonitorGetWorkArea A_Index, &WL, &WT, &WR, &WB
+        list.Push({
+            main: MonitorPrimary,
+            count: MonitorCount,
+            num: A_Index,
+            left: L,
+            top: T,
+            right: R,
+            bottom: B
+        })
+    }
+    return list
+}
+isWhichScreen() {
+    MouseGetPos(&x, &y)
+    for v in screenList {
+        if (x >= v.left && x <= v.right && y >= v.top && y <= v.bottom) {
+            return v
+        }
+    }
+}
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     /*
     # getCaretPosFromGui 能获取到正确的坐标，但不通用
@@ -870,8 +970,16 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         funcs := [getCaretPosFromHook, getCaretPosFromUIA, getCaretPosFromMSAA]
     }
     for fn in funcs {
-        if fn()
-            return fn.Name
+        if (fn()) {
+            fnName := fn.Name
+            left += offset_x
+            top += offset_y
+            if (fnName == "getCaretPosFromHook" || fnName == "getCaretPosFromMSAA") {
+                left += offset["offset_x_" isWhichScreen().num]
+                top += offset["offset_y_" isWhichScreen().num]
+            }
+            return fnName
+        }
     }
     return false
 

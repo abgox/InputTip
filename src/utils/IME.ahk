@@ -94,11 +94,11 @@ class IME {
 
 /**
  * 判断当前输入法状态是否为中文
+ * 需要: DetectHiddenWindows 1
  * @param {1 | 2 | 3 | 4} mode 使用的模式
  * @returns {Boolean} 输入法是否为中文
  */
 isCN(mode) {
-    DetectHiddenWindows true
     switch mode {
         case 1:
         {
@@ -141,5 +141,4 @@ isCN(mode) {
         }
         default: return 0
     }
-    DetectHiddenWindows false
 }

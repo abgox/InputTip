@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.9.0
+;@AHK2Exe-SetVersion 2.10.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -14,13 +14,14 @@ DetectHiddenWindows 1
 InstallKeybdHook
 InstallMouseHook
 CoordMode 'Mouse', 'Screen'
+SetStoreCapsLockMode 0
 
 #Include ..\utils\IME.ahk
 #Include ..\utils\ini.ahk
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.9.0"
+currentVersion := "2.10.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -62,6 +63,9 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
     app_hide_CN_EN := "," app_hide_CN_EN ",",
     ; 隐藏输入法状态方块符号提示
     app_hide_state := "," readIni('app_hide_state', '', 'Config-v2') ",",
+    app_CN := "," readIni('app_CN', '', 'Config-v2') ",",
+    app_EN := "," readIni('app_EN', '', 'Config-v2') ",",
+    app_Caps := "," readIni('app_Caps', '', 'Config-v2') ",",
     screenList := getScreenInfo(),
     ; 特别的偏移量设置
     offset := Map()
@@ -184,6 +188,7 @@ TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 WinSetTransparent(transparent)
 TipGui.Opt("-LastFound")
 TipGui.BackColor := CN_color
+lastWindow := ""
 if (changeCursor) {
     show("CN")
     if (showSymbol) {
@@ -191,6 +196,29 @@ if (changeCursor) {
             is_hide_CN_EN := 0, is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                if (exe_name != lastWindow) {
+                    lastWindow := exe_name
+                    if (RegExMatch(app_CN, "," exe_name ",")) {
+                        if (GetKeyState("CapsLock", "T")) {
+                            SendInput("{CapsLock}")
+                        }
+                        if (!isCN(mode)) {
+                            SendInput("{Shift}")
+                        }
+                    } else if (RegExMatch(app_EN, "," exe_name ",")) {
+                        if (GetKeyState("CapsLock", "T")) {
+                            SendInput("{CapsLock}")
+                        }
+                        if (isCN(mode)) {
+                            SendInput("{Shift}")
+                        }
+                    } else if (RegExMatch(app_Caps, "," exe_name ",")) {
+                        if (!isShowCaps) {
+                            SendInput("{CapsLock}")
+                        }
+                    }
+                }
+
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
                 if (is_hide_state) {
                     TipGui.Hide()
@@ -199,7 +227,6 @@ if (changeCursor) {
                 is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
                 if (is_hide_CN_EN && !isShowCaps) {
                     TipGui.Hide()
-                    continue
                 }
             }
             if (A_TimeIdle < 500) {
@@ -301,7 +328,6 @@ if (changeCursor) {
                 is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
                 if (is_hide_CN_EN && !isShowCaps) {
                     TipGui.Hide()
-                    continue
                 }
             }
             if (A_TimeIdle < 500) {
@@ -347,8 +373,8 @@ if (changeCursor) {
     }
 }
 
-TipShow(){
-    TipGui.Show("NA w" symbol_width * A_ScreenDPI / 96 "h" symbol_height * A_ScreenDPI / 96 "x" left "y" top)
+TipShow() {
+    TipGui.Show("NA w" symbol_width * A_ScreenDPI / 96 "h" symbol_height * A_ScreenDPI / 96 "x" left + offset_x "y" top + offset_y)
 }
 
 makeTrayMenu() {
@@ -396,9 +422,9 @@ makeTrayMenu() {
 
         for v in screenList {
             tab.UseTab(v.num)
-            if(v.num = v.main){
+            if (v.num = v.main) {
                 offsetGui.AddText(, "这是主屏幕(主显示器)，屏幕标识为: " v.num)
-            }else{
+            } else {
                 offsetGui.AddText(, "这是副屏幕(副显示器)，屏幕标识为: " v.num)
             }
             offsetGui.AddText("", "offset_x: ")
@@ -421,8 +447,7 @@ makeTrayMenu() {
 
     }
     sub1 := Menu()
-    sub1.Add("隐藏中英文状态方块符号提示", fn_hide_CN_EN)
-    fn_common(tipList) {
+    fn_common(tipList, addFn) {
         hideGui := Gui("AlwaysOnTop +OwnDialogs")
         hideGui.SetFont("s12", "微软雅黑")
         hideGui.AddButton("", tipList[2]).OnEvent("Click", add)
@@ -500,6 +525,7 @@ makeTrayMenu() {
                         if (is_exist) {
                             MsgBox(RowText " 已存在!", , "0x1000")
                         } else {
+                            addFn(RowText)
                             writeIni(tipList[1], result RowText, "Config-v2")
                         }
                         show()
@@ -509,16 +535,25 @@ makeTrayMenu() {
         }
         remove(*) {
             hideGui.Destroy()
-            show(1)
-            show(isFirst) {
+            show()
+            show() {
                 value := IniRead("InputTip.ini", "config-v2", tipList[1])
                 valueArr := StrSplit(value, ",")
+
+                rmGui := Gui("AlwaysOnTop OwnDialogs")
+                rmGui.SetFont("s12", "微软雅黑")
+                rmGui.AddText(, tipList[8])
+                rmGui.AddText(, tipList[9])
+                rmGui.Show("Hide")
+                rmGui.GetPos(, , &Gui_width)
+                rmGui.Destroy()
+
                 rmGui := Gui("AlwaysOnTop OwnDialogs")
                 rmGui.SetFont("s12", "微软雅黑")
                 if (valueArr.Length > 0) {
                     rmGui.AddText(, tipList[8])
                     rmGui.AddText(, tipList[9])
-                    LV := rmGui.Add("ListView", "r10 NoSortHdr Sort Grid", ["应用"])
+                    LV := rmGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用"])
                     LV.OnEvent("DoubleClick", LV_DoubleClick)
                     for v in valueArr {
                         if (Trim(v)) {
@@ -553,17 +588,16 @@ makeTrayMenu() {
                                     is_exist := 1
                                 } else {
                                     if (Trim(v)) {
-                                        result .= v ","
+                                        result .= "," v
                                     }
                                 }
                             }
                             if (is_exist) {
-                                writeIni(tipList[1], result, "Config-v2")
+                                writeIni(tipList[1], SubStr(result, 2), "Config-v2")
                             } else {
                                 MsgBox(RowText " 不存在或已经移除!", , "0x1000")
                             }
-                            show(0)
-                            Run(A_ScriptFullPath)
+                            show()
                         }
                     }
                     rmGui.OnEvent("Close", close)
@@ -572,26 +606,160 @@ makeTrayMenu() {
                     }
                     rmGui.Show()
                 } else {
-                    if (isFirst) {
-                        rmGui.SetFont("s14", "微软雅黑")
-                        rmGui.AddText(, "当前没有可以移除的应用")
-                        rmgui.Show("Hide")
-                        rmGui.GetPos(, , &Gui_width)
-                        rmGui.Destroy()
+                    rmGui.SetFont("s14", "微软雅黑")
+                    rmGui.AddText(, "当前没有可以移除的应用")
+                    rmgui.Show("Hide")
+                    rmGui.GetPos(, , &Gui_width)
+                    rmGui.Destroy()
 
-                        rmGui := Gui("AlwaysOnTop OwnDialogs")
-                        rmGui.SetFont("s12", "微软雅黑")
-                        rmGui.AddText("Center w" Gui_width, "当前没有可以移除的应用")
-                        rmGui.AddButton("w" Gui_width, "确定").OnEvent("Click", esc)
-                        esc(*) {
-                            rmGui.Destroy()
-                        }
-                        rmGui.Show()
+                    rmGui := Gui("AlwaysOnTop OwnDialogs")
+                    rmGui.SetFont("s12", "微软雅黑")
+                    rmGui.AddText("Center w" Gui_width, "当前没有可以移除的应用")
+                    rmGui.AddButton("w" Gui_width, "确定").OnEvent("Click", esc)
+                    rmGui.OnEvent("Close", esc)
+                    esc(*) {
+                        rmGui.Destroy()
+                        Run(A_ScriptFullPath)
                     }
+                    rmGui.Show()
                 }
             }
         }
     }
+    sub1.Add("自动切换中文状态", fn_switch_CN)
+    fn_switch_CN(*) {
+        fn_common(
+            [
+                "app_CN",
+                "将应用添加到自动切换中文状态的应用列表中",
+                "从自动切换中文状态的应用列表中移除应用",
+                "以下列表中是当前系统正在运行的应用程序",
+                "双击应用程序，将其添加到自动切换中文状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
+                "是否要将 ",
+                " 添加到自动切换中文状态的应用列表中？`n------------------------------------------------`n此列表中的效果`n- 当在此应用中，InputTip 会自动切换到中文状态",
+                "以下列表中是自动切换中文状态的应用列表",
+                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
+                "是否要将 ",
+                " 移除？`n移除后，在此应用中，InputTip 不会再自动切换到中文状态"
+            ], fn
+        )
+        fn(RowText) {
+            value_EN := "," IniRead("InputTip.ini", "config-v2", "app_EN") ","
+            value_Caps := "," IniRead("InputTip.ini", "config-v2", "app_Caps") ","
+            if (RegExMatch(value_EN, "," RowText ",")) {
+                valueArr := StrSplit(value_EN, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_EN", SubStr(result,2), "Config-v2")
+            }
+
+            if (RegExMatch(value_Caps, "," RowText ",")) {
+                valueArr := StrSplit(value_Caps, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_Caps", SubStr(result,2), "Config-v2")
+            }
+        }
+    }
+    sub1.Add("自动切换英文状态", fn_switch_EN)
+    fn_switch_EN(*) {
+        fn_common(
+            [
+                "app_EN",
+                "将应用添加到自动切换英文状态的应用列表中",
+                "从自动切换英文状态的应用列表中移除应用",
+                "以下列表中是当前系统正在运行的应用程序",
+                "双击应用程序，将其添加到自动切换英文状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
+                "是否要将 ",
+                " 添加到自动切换英文状态的应用列表中？`n------------------------------------------------`n此列表中的效果`n- 当在此应用中，InputTip 会自动切换英文状态",
+                "以下列表中是自动切换英文状态的应用列表",
+                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
+                "是否要将 ",
+                " 移除？`n移除后，在此应用中，InputTip 不会再自动切换英文状态"
+            ],
+            fn
+        )
+        fn(RowText) {
+            value_CN := "," IniRead("InputTip.ini", "config-v2", "app_CN") ","
+            value_Caps := "," IniRead("InputTip.ini", "config-v2", "app_Caps") ","
+            if (RegExMatch(value_CN, "," RowText ",")) {
+                valueArr := StrSplit(value_CN, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_CN", SubStr(result,2), "Config-v2")
+            }
+
+            if (RegExMatch(value_Caps, "," RowText ",")) {
+                valueArr := StrSplit(value_Caps, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_Caps", SubStr(result,2), "Config-v2")
+            }
+        }
+    }
+    sub1.Add("自动切换大写锁定状态", fn_switch_Caps)
+    fn_switch_Caps(*) {
+        fn_common(
+            [
+                "app_Caps",
+                "将应用添加到自动切换大写锁定状态的应用列表中",
+                "从自动切换大写锁定状态的应用列表中移除应用",
+                "以下列表中是当前系统正在运行的应用程序",
+                "双击应用程序，将其添加到自动切换大写锁定状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
+                "是否要将 ",
+                " 添加到自动切换大写锁定状态的应用列表中？`n------------------------------------------------`n此列表中的效果`n- 当在此应用中，InputTip 会自动切换大写锁定状态",
+                "以下列表中是自动切换大写锁定状态的应用列表",
+                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
+                "是否要将 ",
+                " 移除？`n移除后，在此应用中，InputTip 不会再自动切换大写锁定状态"
+            ],
+            fn
+        )
+        fn(RowText) {
+            value_CN := "," IniRead("InputTip.ini", "config-v2", "app_CN") ","
+            value_EN := "," IniRead("InputTip.ini", "config-v2", "app_EN") ","
+            if (RegExMatch(value_CN, "," RowText ",")) {
+                valueArr := StrSplit(value_CN, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_CN", SubStr(result,2), "Config-v2")
+            }
+
+            if (RegExMatch(value_EN, "," RowText ",")) {
+                valueArr := StrSplit(value_EN, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_EN", SubStr(result,2), "Config-v2")
+            }
+        }
+    }
+    A_TrayMenu.Add("设置自动切换", sub1)
+    sub2 := Menu()
+    sub2.Add("隐藏中英文状态方块符号提示", fn_hide_CN_EN)
     fn_hide_CN_EN(*) {
         fn_common(
             [
@@ -599,17 +767,31 @@ makeTrayMenu() {
                 "将应用添加到隐藏中英文状态方块符号提示的应用列表中",
                 "从隐藏中英文状态方块符号提示的应用列表中移除应用",
                 "以下列表中是当前系统正在运行的应用程序",
-                "双击应用程序，将其添加到隐藏中英文状态方块符号提示的应用列表中",
+                "双击应用程序，将其添加到隐藏中英文状态方块符号提示的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
                 "是否要将 ",
                 " 添加到隐藏中英文状态方块符号提示的应用列表中？`n------------------------------------------------`n此列表中的效果:`n- InputTip.exe 不会根据中英文状态显示不同颜色的方块符号`n- 只会显示大写锁定方块符号",
                 "以下列表中是隐藏中英文状态方块符号提示的应用列表",
-                "双击应用程序，将其移除",
+                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
                 "是否要将 ",
                 " 移除？`n移除后，在此应用中，InputTip.exe 会根据中英文状态显示不同颜色的方块符号"
-            ]
+            ],
+            fn
         )
+        fn(RowText) {
+            value := "," IniRead("InputTip.ini", "config-v2", "app_hide_state") ","
+            if (RegExMatch(value, "," RowText ",")) {
+                valueArr := StrSplit(value, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_hide_state", SubStr(result,2), "Config-v2")
+            }
+        }
     }
-    sub1.Add("隐藏输入法状态方块符号提示", fn_hide_state)
+    sub2.Add("隐藏输入法状态方块符号提示", fn_hide_state)
     fn_hide_state(*) {
         fn_common(
             [
@@ -617,17 +799,31 @@ makeTrayMenu() {
                 "将应用添加到隐藏输入法状态方块符号提示的应用列表中",
                 "从隐藏输入法状态方块符号提示的应用列表中移除应用",
                 "以下列表中是当前系统正在运行的应用程序",
-                "双击应用程序，将其添加到隐藏输入法状态方块符号提示的应用列表中",
+                "双击应用程序，将其添加到隐藏输入法状态方块符号提示的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
                 "是否要将 ",
                 " 添加到隐藏输入法状态方块符号提示的应用列表中？`n------------------------------------------------`n此列表中的效果`n- InputTip.exe 不会显示方块符号`n- 中英文/大写锁定状态下的方块符号都不会显示",
                 "以下列表中是隐藏输入法状态方块符号提示的应用列表",
-                "双击应用程序，将其移除",
+                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
                 "是否要将 ",
                 " 移除？`n移除后，在此应用中，InputTip.exe 会根据输入法状态显示不同颜色的方块符号"
-            ]
+            ],
+            fn
         )
+        fn(RowText) {
+            value := "," IniRead("InputTip.ini", "config-v2", "app_hide_CN_EN") ","
+            if (RegExMatch(value, "," RowText ",")) {
+                valueArr := StrSplit(value, ",")
+                result := ""
+                for v in valueArr {
+                    if (v != RowText && Trim(v)) {
+                        result .= "," v
+                    }
+                }
+                writeIni("app_hide_CN_EN", SubStr(result,2), "Config-v2")
+            }
+        }
     }
-    A_TrayMenu.Add("设置特殊软件", sub1)
+    A_TrayMenu.Add("设置特殊软件", sub2)
     sub2 := Menu()
     sub2.Add("中文", fn_CN)
     sub2.Add("英文", fn_EN)
@@ -972,8 +1168,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     for fn in funcs {
         if (fn()) {
             fnName := fn.Name
-            left += offset_x
-            top += offset_y
             if (fnName == "getCaretPosFromHook" || fnName == "getCaretPosFromMSAA") {
                 left += offset["offset_x_" isWhichScreen().num]
                 top += offset["offset_y_" isWhichScreen().num]

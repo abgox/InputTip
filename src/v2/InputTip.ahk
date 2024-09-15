@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.10.5
+;@AHK2Exe-SetVersion 2.11.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.10.5"
+currentVersion := "2.11.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -66,6 +66,7 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
     app_CN := "," readIni('app_CN', '', 'Config-v2') ",",
     app_EN := "," readIni('app_EN', '', 'Config-v2') ",",
     app_Caps := "," readIni('app_Caps', '', 'Config-v2') ",",
+    border_type := readIni('border_type', 1, "Config-v2"),
     screenList := getScreenInfo(),
     ; 特别的偏移量设置
     offset := Map()
@@ -186,7 +187,12 @@ if (changeCursor) {
 state := 1, old_state := '', old_left := '', old_top := '', isShowCN := 1, isShowEN := 0, isShowCaps := 0, left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 WinSetTransparent(transparent)
-TipGui.Opt("-LastFound")
+switch border_type {
+    case 1: TipGui.Opt("-LastFound +e0x00000001")
+    case 2: TipGui.Opt("-LastFound +e0x00000200")
+    case 3: TipGui.Opt("-LastFound +e0x00020000")
+    default: TipGui.Opt("-LastFound")
+}
 TipGui.BackColor := CN_color
 lastWindow := ""
 if (changeCursor) {
@@ -445,6 +451,40 @@ makeTrayMenu() {
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
+    A_TrayMenu.Add("设置方块符号边框", fn_border)
+    fn_border(*) {
+        borderGui := Gui("AlwaysOnTop +OwnDialogs")
+        borderGui.SetFont("s12", "微软雅黑")
+        borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 三种样式中最明显的，个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，感官上更细一点")
+        borderGui.Show("Hide")
+        borderGui.GetPos(, , &Gui_width)
+        borderGui.Destroy()
+
+        borderGui := Gui("AlwaysOnTop +OwnDialogs")
+        borderGui.SetFont("s12", "微软雅黑")
+        borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式")
+        borderGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", add1)
+        add1(*) {
+            set(1)
+        }
+        borderGui.AddButton("w" Gui_width, "设置为样式2").OnEvent("Click", add2)
+        add2(*) {
+            set(2)
+        }
+        borderGui.AddButton("w" Gui_width, "设置为样式3").OnEvent("Click", add3)
+        add3(*) {
+            set(3)
+        }
+        borderGui.AddButton("w" Gui_width, "去掉边框样式").OnEvent("Click", rm)
+        rm(*) {
+            set(0)
+        }
+        set(type){
+            writeIni("border_type", type, "Config-v2")
+            Run(A_ScriptFullPath)
+        }
+        borderGui.Show()
+    }
     A_TrayMenu.Add("设置特殊偏移量", fn_offset)
     fn_offset(*) {
         offsetGui := Gui("AlwaysOnTop OwnDialogs")

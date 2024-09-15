@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.7.0
+;@AHK2Exe-SetVersion 1.8.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -18,7 +18,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "1.7.0"
+currentVersion := "1.8.0"
 checkVersion(currentVersion, "v1")
 
 try {
@@ -48,7 +48,7 @@ try {
 
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
     font_family := readIni('font_family', '微软雅黑', 'Config'),
-    font_size := readIni('font_size', 10, 'Config') * A_ScreenDPI / 96,
+    font_size := readIni('font_size', 10, 'Config'),
     font_weight := readIni('font_weight', 600, 'Config'),
     font_color := StrReplace(readIni('font_color', 'ffffff', 'Config'), '#', ''),
     font_bgcolor := StrReplace(readIni('font_bgcolor', '474E68', 'Config'), '#', ''),
@@ -136,7 +136,7 @@ while 1 {
 make_gui(text) {
     g := Gui('-Caption AlwaysOnTop ToolWindow LastFound'),
         g.BackColor := font_bgcolor, g.MarginX := 5, g.MarginY := 5
-    g.SetFont('s' font_size ' c' font_color ' w' font_weight, font_family)
+    g.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
     WinSetTransparent(windowTransparent)
     g.AddText(, text)
     return g
@@ -558,35 +558,110 @@ makeTrayMenu() {
         configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
         configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v1/config">https://inputtip.pages.dev/v1/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v1/config.md">https://github.com/abgox/InputTip/blob/main/src/v1/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v1/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v1/config.md</a>')
         configGui.AddText("xs", "输入框中的值是配置当前的值`n---------------------------------------------------------------------------------")
-
-        configGui.AddText("xs", "font_family: ")
-        configGui.AddEdit("vfont_family yp w100", font_family)
-        configGui.AddText("yp x" Gui_width / 2, "font_size: ")
-        configGui.AddEdit("vfont_size yp w100", font_size / A_ScreenDPI * 96)
-        configGui.AddText("xs", "font_weight: ")
-        configGui.AddEdit("vfont_weight yp w100", font_weight)
-        configGui.AddText("yp x" Gui_width / 2, "font_color: ")
-        configGui.AddEdit("vfont_color yp w100", font_color)
-        configGui.AddText("xs", "font_bgcolor: ")
-        configGui.AddEdit("vfont_bgcolor yp w100", font_bgcolor)
-        configGui.AddText("yp x" Gui_width / 2, "CN_Text: ")
-        configGui.AddEdit("vCN_Text yp w100", CN_Text)
-        configGui.AddText("xs ", "EN_Text: ")
-        configGui.AddEdit("vEN_Text yp w100", EN_Text)
-        configGui.AddText("yp x" Gui_width / 2, "Caps_Text: ")
-        configGui.AddEdit("vCaps_Text yp w100", Caps_Text)
-        configGui.AddText("xs", "offset_x: ")
-        configGui.AddEdit("voffset_x yp w100", offset_x / A_ScreenDPI * 96)
-        configGui.AddText("yp x" Gui_width / 2, "offset_y: ")
-        configGui.AddEdit("voffset_y yp w100", offset_y / A_ScreenDPI * 96)
-        configGui.AddText("xs", "windowTransparent: ")
-        configGui.AddEdit("vwindowTransparent yp w100", windowTransparent)
+        offset_x := readIni('offset_x', 30, 'Config'), offset_y := readIni('offset_y', -50, 'Config')
+        configList := [{
+            config: "font_family",
+            options: ""
+        }, {
+            config: "font_size",
+            options: "Number"
+        }, {
+            config: "font_weight",
+            options: "Number"
+        }, {
+            config: "font_color",
+            options: ""
+        }, {
+            config: "font_bgcolor",
+            options: ""
+        }, {
+            config: "CN_Text",
+            options: ""
+        }, {
+            config: "EN_Text",
+            options: ""
+        }, {
+            config: "Caps_Text",
+            options: ""
+        }, {
+            config: "offset_x",
+            options: ""
+        }, {
+            config: "offset_y",
+            options: ""
+        }, {
+            config: "windowTransparent",
+            options: "Number"
+        }]
+        isFirst := 1
+        for v in configList {
+            if (isFirst) {
+                configGui.AddText("xs", v.config ": ")
+            } else {
+                configGui.AddText("yp x" Gui_width / 2, v.config ": ")
+            }
+            isFirst := !isFirst
+            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
+        }
         configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
         changeConfig(*) {
-            configList := ["font_family", "font_size", "font_weight", "font_color", "font_bgcolor", "windowTransparent", "CN_Text", "EN_Text", "Caps_Text", "offset_x", "offset_y"]
+            font_size := configGui.Submit().font_size
+            if (!IsNumber(font_size)) {
+                showMsg(["font_size 配置的值错误!", "它应该是一个数字。"])
+                return
+            }
+            font_weight := configGui.Submit().font_weight
+            if (!IsNumber(font_weight)) {
+                showMsg(["font_weight 配置的值错误!", "它应该是一个数字。"])
+                return
+            }
+            font_color := configGui.Submit().font_color
+            if (!isColor(font_color)) {
+                showMsg(["font_color 配置的值错误!", "它应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
+                return
+            }
+            font_bgcolor := configGui.Submit().font_bgcolor
+            if (!isColor(font_bgcolor)) {
+                showMsg(["font_bgcolor 配置的值错误!", "它应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
+                return
+            }
+            isColor(v) {
+                v := StrReplace(v, "#", "")
+                colorList := ",red,blue,green,yellow,purple,gray,black,white,"
+                if (RegExMatch(colorList, "," v ",")) {
+                    return 1
+                }
+                if (StrLen(v) > 8) {
+                    return 0
+                }
+                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
+                for item in vList {
+                    v := StrReplace(v, item, "")
+                }
+                return !Trim(v)
+            }
+            offset_x := configGui.Submit().offset_x
+            if (!IsNumber(offset_x)) {
+                showMsg(["offset_x 配置的值错误!", "它应该是一个数字。"])
+                return
+            }
+            offset_y := configGui.Submit().offset_y
+            if (!IsNumber(offset_y)) {
+                showMsg(["offset_y 配置的值错误!", "它应该是一个数字。"])
+                return
+            }
+            windowTransparent := configGui.Submit().windowTransparent
+            if (IsFloat(windowTransparent)) {
+                showMsg(["windowTransparent 配置的值错误!", "它不能是一个小数", "它应该是 0 到 255 之间的整数。"])
+                return
+            } else {
+                if (windowTransparent < 0 || windowTransparent > 255) {
+                    showMsg(["windowTransparent 配置的值错误!", "它应该是 0 到 255 之间的整数。"])
+                    return
+                }
+            }
             for item in configList {
-                input := configGui.Submit().%item%
-                writeIni(item, input, "Config")
+                writeIni(item.config, configGui.Submit().%item.config%, "Config")
             }
             fn_restart()
         }

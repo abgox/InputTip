@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.10.4
+;@AHK2Exe-SetVersion 2.10.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.10.4"
+currentVersion := "2.10.5"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -934,26 +934,47 @@ makeTrayMenu() {
         configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
         configGui.AddText("xs", "请输入框中的值是配置当前的值`n---------------------------------------------------------------------------------")
 
-        configGui.AddText("xs", "changeCursor: ")
-        configGui.AddEdit("vchangeCursor yp w100", changeCursor)
-        configGui.AddText("yp x" Gui_width / 2, "showSymbol: ")
-        configGui.AddEdit("vshowSymbol yp w100", showSymbol)
-        configGui.AddText("xs", "CN_color: ")
-        configGui.AddEdit("vCN_color yp w100", CN_color)
-        configGui.AddText("yp x" Gui_width / 2, "EN_color: ")
-        configGui.AddEdit("vEN_color yp w100", EN_color)
-        configGui.AddText("xs", "Caps_color: ")
-        configGui.AddEdit("vCaps_color yp w100", Caps_color)
-        configGui.AddText("yp x" Gui_width / 2, "transparent: ")
-        configGui.AddEdit("vtransparent yp w100", transparent)
-        configGui.AddText("xs", "offset_x: ")
-        configGui.AddEdit("voffset_x yp w100", offset_x)
-        configGui.AddText("yp x" Gui_width / 2, "offset_y: ")
-        configGui.AddEdit("voffset_y yp w100", offset_y)
-        configGui.AddText("xs", "symbol_height: ")
-        configGui.AddEdit("vsymbol_height yp w100", symbol_height)
-        configGui.AddText("yp x" Gui_width / 2, "symbol_width: ")
-        configGui.AddEdit("vsymbol_width yp w100", symbol_width)
+        configList := [{
+            config: "changeCursor",
+            options: "Number Limit1"
+        }, {
+            config: "showSymbol",
+            options: "Number Limit1"
+        }, {
+            config: "CN_color",
+            options: ""
+        }, {
+            config: "EN_color",
+            options: ""
+        }, {
+            config: "Caps_color",
+            options: ""
+        }, {
+            config: "transparent",
+            options: "Number"
+        }, {
+            config: "offset_x",
+            options: ""
+        }, {
+            config: "offset_y",
+            options: ""
+        }, {
+            config: "symbol_height",
+            options: ""
+        }, {
+            config: "symbol_width",
+            options: ""
+        }]
+        isFirst := 1
+        for v in configList {
+            if (isFirst) {
+                configGui.AddText("xs", v.config ": ")
+            } else {
+                configGui.AddText("yp x" Gui_width / 2, v.config ": ")
+            }
+            isFirst := !isFirst
+            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
+        }
         configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
         changeConfig(*) {
             changeCursor := configGui.Submit().changeCursor
@@ -1004,10 +1025,10 @@ makeTrayMenu() {
                 if (RegExMatch(colorList, "," v ",")) {
                     return 1
                 }
-                if (StrLen(v) > 6) {
+                if (StrLen(v) > 8) {
                     return 0
                 }
-                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F"]
+                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
                 for item in vList {
                     v := StrReplace(v, item, "")
                 }
@@ -1033,10 +1054,8 @@ makeTrayMenu() {
                 showMsg(["symbol_width 配置的值错误!", "它应该是一个数字。"])
                 return
             }
-
-            configList := ["changeCursor", "showSymbol", "CN_color", "EN_color", "Caps_color", "transparent", "offset_x", "offset_y", "symbol_height", "symbol_width"]
             for item in configList {
-                writeIni(item, %item%, "Config-v2")
+                writeIni(item.config, configGui.Submit().%item.config%, "Config-v2")
             }
             fn_restart()
         }

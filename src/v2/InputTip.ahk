@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.11.0
+;@AHK2Exe-SetVersion 2.12.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -16,12 +16,12 @@ InstallMouseHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
+#Include .\utils\ini.ahk
 #Include ..\utils\IME.ahk
-#Include ..\utils\ini.ahk
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.11.0"
+currentVersion := "2.12.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -45,35 +45,50 @@ try {
     } catch {
         app_hide_CN_EN := ""
     }
-    writeIni("app_hide_CN_EN", app_hide_CN_EN, "config-v2")
+    writeIni("app_hide_CN_EN", app_hide_CN_EN)
 }
 
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
-    changeCursor := readIni("changeCursor", 1, "Config-v2"),
-    showSymbol := readIni("showSymbol", 1, "Config-v2"),
-    CN_color := StrReplace(readIni("CN_color", "red", "Config-v2"), '#', ''),
-    EN_color := StrReplace(readIni("EN_color", "blue", "Config-v2"), '#', ''),
-    Caps_color := StrReplace(readIni("Caps_color", "green", "Config-v2"), '#', ''),
-    transparent := readIni('transparent', 222, "Config-v2"),
-    offset_x := readIni('offset_x', 5, "Config-v2"),
-    offset_y := readIni('offset_y', 0, "Config-v2"),
-    symbol_height := readIni('symbol_height', 7, "Config-v2"),
-    symbol_width := readIni('symbol_width', 7, "Config-v2"),
+    changeCursor := readIni("changeCursor", 1),
+    showSymbol := readIni("showSymbol", 1),
+    CN_color := StrReplace(readIni("CN_color", "red"), '#', ''),
+    EN_color := StrReplace(readIni("EN_color", "blue"), '#', ''),
+    Caps_color := StrReplace(readIni("Caps_color", "green"), '#', ''),
+    transparent := readIni('transparent', 222),
+    offset_x := readIni('offset_x', 5),
+    offset_y := readIni('offset_y', 0),
+    symbol_height := readIni('symbol_height', 7),
+    symbol_width := readIni('symbol_width', 7),
     ; 隐藏中英文状态方块符号提示
     app_hide_CN_EN := "," app_hide_CN_EN ",",
     ; 隐藏输入法状态方块符号提示
-    app_hide_state := "," readIni('app_hide_state', '', 'Config-v2') ",",
-    app_CN := "," readIni('app_CN', '', 'Config-v2') ",",
-    app_EN := "," readIni('app_EN', '', 'Config-v2') ",",
-    app_Caps := "," readIni('app_Caps', '', 'Config-v2') ",",
-    border_type := readIni('border_type', 1, "Config-v2"),
+    app_hide_state := "," readIni('app_hide_state', '') ",",
+    app_CN := "," readIni('app_CN', '') ",",
+    app_EN := "," readIni('app_EN', '') ",",
+    app_Caps := "," readIni('app_Caps', '') ",",
+    border_type := readIni('border_type', 1),
+    border_color_CN := StrReplace(readIni('border_color_CN', 'yellow'), '#', ''),
+    border_color_EN := StrReplace(readIni('border_color_EN', 'yellow'), '#', ''),
+    border_color_Caps := StrReplace(readIni('border_color_Caps', 'yellow'), '#', ''),
+    border_margin_left := readIni('border_margin_left', 3),
+    border_margin_right := readIni('border_margin_right', 3),
+    border_margin_top := readIni('border_margin_top', 3),
+    border_margin_bottom := readIni('border_margin_bottom', 3),
+    border_transparent := readIni('border_transparent', 255),
+    symbolWidth := symbol_width * A_ScreenDPI / 96,
+    symbolHeight := symbol_height * A_ScreenDPI / 96,
+    borderWidth := (symbol_width + border_margin_left + border_margin_right) * A_ScreenDPI / 96,
+    borderHeight := (symbol_height + border_margin_top + border_margin_bottom) * A_ScreenDPI / 96,
+    borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI / 96,
+    borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI / 96,
+    ; 屏幕分辨率
     screenList := getScreenInfo(),
     ; 特别的偏移量设置
     offset := Map()
 
 for v in screenList {
-    offset["offset_x_" v.num] := readIni("offset_x_" v.num, 0, "Config-v2")
-    offset["offset_y_" v.num] := readIni("offset_y_" v.num, 0, "Config-v2")
+    offset["offset_x_" v.num] := readIni("offset_x_" v.num, 0)
+    offset["offset_y_" v.num] := readIni("offset_y_" v.num, 0)
 }
 
 makeTrayMenu()
@@ -194,6 +209,11 @@ switch border_type {
     default: TipGui.Opt("-LastFound")
 }
 TipGui.BackColor := CN_color
+
+borderGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
+WinSetTransparent(border_transparent)
+borderGui.Opt("-LastFound")
+borderGui.BackColor := border_color_CN
 lastWindow := ""
 if (changeCursor) {
     show("CN")
@@ -240,10 +260,9 @@ if (changeCursor) {
                 canShowSymbol := GetCaretPosEx(&left, &top)
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
-                    if (canShowSymbol) {
+                    borderGui.BackColor := border_color_Caps
+                    if (canShowSymbol && !isShowCaps) {
                         TipShow()
-                    } else {
-                        TipGui.Hide()
                     }
                     if (!isShowCaps) {
                         show("Caps")
@@ -260,10 +279,10 @@ if (changeCursor) {
                 if (isShowCaps) {
                     if (state) {
                         show("CN")
-                        isShowCN := 1, isShowEN := 0, TipGui.BackColor := CN_color
+                        isShowCN := 1, isShowEN := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
                     } else {
                         show("EN")
-                        isShowCN := 0, isShowEN := 1, TipGui.BackColor := EN_color
+                        isShowCN := 0, isShowEN := 1, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
                     }
                     isShowCaps := 0, isShow := 1
                 }
@@ -272,12 +291,12 @@ if (changeCursor) {
                     if (state) {
                         if (!isShowCN) {
                             show("CN")
-                            isShowCN := 1, isShowEN := 0, isShowCaps := 0, TipGui.BackColor := CN_color
+                            isShowCN := 1, isShowEN := 0, isShowCaps := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
                         }
                     } else {
                         if (!isShowEN) {
                             show("EN")
-                            isShowCN := 0, isShowEN := 1, isShowCaps := 0, TipGui.BackColor := EN_color
+                            isShowCN := 0, isShowEN := 1, isShowCaps := 0, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
                         }
                     }
                     isShow := !is_hide_CN_EN && canShowSymbol
@@ -390,12 +409,11 @@ if (changeCursor) {
                 canShowSymbol := GetCaretPosEx(&left, &top)
                 if (GetKeyState("CapsLock", "T")) {
                     TipGui.BackColor := Caps_color
-                    if (canShowSymbol) {
+                    borderGui.BackColor := border_color_Caps
+                    if (canShowSymbol && !isShowCaps) {
                         TipShow()
-                        isShowCaps := 1
-                    } else {
-                        TipGui.Hide()
                     }
+                    isShowCN := 0, isShowEN := 0, isShowCaps := 1
                     continue
                 }
                 try {
@@ -406,18 +424,24 @@ if (changeCursor) {
                 }
                 if (isShowCaps) {
                     if (state) {
-                        TipGui.BackColor := CN_color
+                        isShowCN := 1, isShowEN := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
                     } else {
-                        TipGui.BackColor := EN_color
+                        isShowCN := 0, isShowEN := 1, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
                     }
                     isShowCaps := 0, isShow := 1
                 }
                 if (state != old_state || left != old_left || top != old_top) {
-                    old_state := state, old_left := left, old_top := top, isShow := 1
-                    TipGui.BackColor := state ? CN_color : EN_color
-                    if (!is_hide_CN_EN && canShowSymbol) {
-                        isShow := 1
+                    old_state := state, old_left := left, old_top := top
+                    if (state) {
+                        if (!isShowCN) {
+                            isShowCN := 1, isShowEN := 0, isShowCaps := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
+                        }
+                    } else {
+                        if (!isShowEN) {
+                            isShowCN := 0, isShowEN := 1, isShowCaps := 0, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
+                        }
                     }
+                    isShow := !is_hide_CN_EN && canShowSymbol
                 }
                 if (isShow) {
                     TipShow()
@@ -430,12 +454,30 @@ if (changeCursor) {
 }
 
 TipShow() {
-    TipGui.Show("NA w" symbol_width * A_ScreenDPI / 96 "h" symbol_height * A_ScreenDPI / 96 "x" left + offset_x "y" top + offset_y)
+    if (border_type = 4) {
+        borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top)
+        TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
+    } else {
+        TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + offset_x "y" top + offset_y)
+    }
 }
 
 makeTrayMenu() {
     A_TrayMenu.Delete()
     A_TrayMenu.Add("开机自启动", fn_startup)
+    fn_startup(item, *) {
+        try {
+            path_exe := RegRead(HKEY_startup, A_ScriptName)
+            if (path_exe != A_ScriptFullPath) {
+                RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
+            } else {
+                RegDelete(HKEY_startup, A_ScriptName)
+            }
+        } catch {
+            RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
+        }
+        A_TrayMenu.ToggleCheck(item)
+    }
     try {
         path_exe := RegRead(HKEY_startup, A_ScriptName)
         if (path_exe = A_ScriptFullPath) {
@@ -448,21 +490,186 @@ makeTrayMenu() {
     sub.Add("模式3", fn_input)
     sub.Add("模式4", fn_input)
     A_TrayMenu.Add("设置输入法", sub)
+    /**
+     * 设置输入法模式
+     * @param item 点击的菜单项的名字
+     * @param index 点击的菜单项在它的菜单对象中的索引
+     */
+    fn_input(item, index, *) {
+        mode := readIni("mode", 1, "InputMethod")
+        msgGui := Gui("AlwaysOnTop +OwnDialogs")
+        msgGui.SetFont("s10", "微软雅黑")
+        msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
+        msgGui.Show("Hide")
+        msgGui.GetPos(, , &Gui_width)
+        msgGui.Destroy()
+
+        msgGui := Gui("AlwaysOnTop +OwnDialogs")
+        msgGui.SetFont("s12", "微软雅黑")
+        if (mode != index) {
+            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------")
+        } else {
+            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
+        }
+        msgGui.AddText(, "模式相关信息请查看以下任意地址:")
+        msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
+        msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
+        msgGui.Show()
+        yes(*) {
+            msgGui.Destroy()
+            writeIni("mode", index, "InputMethod")
+            fn_restart()
+        }
+    }
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
+    fn_config(*) {
+        configGui := Gui("AlwaysOnTop OwnDialogs")
+        configGui.SetFont("s12", "微软雅黑")
+        configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
+        configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
+        configGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+        configGui.AddText("xs", "请输入框中的值是当前生效的值`n--------------------------------------------------------------------------------------------------------")
+        configGui.Show("Hide")
+        configGui.GetPos(, , &Gui_width)
+        configGui.Destroy()
+
+        configGui := Gui("AlwaysOnTop OwnDialogs")
+        configGui.SetFont("s12", "微软雅黑")
+        configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
+        configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
+        configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+        configGui.AddText("xs", "请输入框中的值是当前生效的值`n--------------------------------------------------------------------------------------------------------")
+
+        configList := [{
+            config: "changeCursor",
+            options: "Number Limit1",
+            tip: "是否更改鼠标样式"
+        }, {
+            config: "showSymbol",
+            options: "Number Limit1",
+            tip: "是否显示方块符号"
+        }, {
+            config: "CN_color",
+            options: "",
+            tip: "中文状态时方块符号的颜色"
+        }, {
+            config: "EN_color",
+            options: "",
+            tip: "英文状态时方块符号的颜色"
+        }, {
+            config: "Caps_color",
+            options: "",
+            tip: "大写锁定状态时方块符号的颜色"
+        }, {
+            config: "transparent",
+            options: "Number",
+            tip: "方块符号的透明度"
+        }, {
+            config: "offset_x",
+            options: "",
+            tip: "方块符号的水平偏移量"
+        }, {
+            config: "offset_y",
+            options: "",
+            tip: "方块符号的垂直偏移量"
+        }, {
+            config: "symbol_height",
+            options: "",
+            tip: "方块符号的高度"
+        }, {
+            config: "symbol_width",
+            options: "",
+            tip: "方块符号的宽度"
+        }]
+        isFirst := 1
+        for v in configList {
+            if (isFirst) {
+                configGui.AddText("xs", v.tip ": ")
+            } else {
+                configGui.AddText("yp x" Gui_width / 2, v.tip ": ")
+            }
+            isFirst := !isFirst
+            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
+        }
+        configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
+        changeConfig(*) {
+            isColor(v) {
+                v := StrReplace(v, "#", "")
+                colorList := ",red,blue,green,yellow,purple,gray,black,white,"
+                if (RegExMatch(colorList, "," v ",")) {
+                    return 1
+                }
+                if (StrLen(v) > 8) {
+                    return 0
+                }
+                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
+                for item in vList {
+                    v := StrReplace(v, item, "")
+                }
+                return !Trim(v)
+            }
+            isValid := 1
+            list := [configList[1], configList[2]]
+            for v in list {
+                value:= configGui.Submit().%v.config%
+                if (value != 1 && value != 0) {
+                    showMsg(["配置错误!", v.tip " 的值只能是 0 或 1。"])
+                    isValid := 0
+                }
+            }
+            list := [configList[3], configList[4], configList[5]]
+            for v in list {
+                if (!isColor(configGui.Submit().%v.config%)) {
+                    showMsg(["配置错误!", v.tip " 应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
+                    isValid := 0
+                }
+            }
+            transparent := configGui.Submit().transparent
+            if (IsFloat(transparent)) {
+                showMsg(["配置错误!", configList[6].tip " 不能是一个小数"])
+                isValid := 0
+            } else {
+                if (transparent < 0 || transparent > 255) {
+                    showMsg(["配置错误!", configList[6].tip " 应该是 0 到 255 之间的整数。"])
+                    isValid := 0
+                }
+            }
+            list := [configList[7], configList[8], configList[9], configList[10]]
+            for v in list {
+                if (!IsNumber(configGui.Submit().%v.config%)) {
+                    showMsg(["配置错误!", v.tip " 应该是一个数字。"])
+                    isValid := 0
+                }
+            }
+            if (isValid) {
+                if (changeCursor = 0) {
+                    for v in info {
+                        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
+                    }
+                    MsgBox("尝试恢复默认鼠标样式。`n如果没有正常恢复，请重启电脑。")
+                }
+                for item in configList {
+                    writeIni(item.config, configGui.Submit().%item.config%)
+                }
+                fn_restart()
+            }
+        }
+        configGui.Show()
+    }
     A_TrayMenu.Add("设置方块符号边框", fn_border)
     fn_border(*) {
         borderGui := Gui("AlwaysOnTop +OwnDialogs")
         borderGui.SetFont("s12", "微软雅黑")
-        borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 三种样式中最明显的，个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，感官上更细一点")
+        borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 三种样式中最明显的，个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，感官上更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
         borderGui.Show("Hide")
         borderGui.GetPos(, , &Gui_width)
         borderGui.Destroy()
 
         borderGui := Gui("AlwaysOnTop +OwnDialogs")
         borderGui.SetFont("s12", "微软雅黑")
-        borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式")
+        borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
         borderGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", add1)
         add1(*) {
             set(1)
@@ -479,9 +686,125 @@ makeTrayMenu() {
         rm(*) {
             set(0)
         }
-        set(type){
-            writeIni("border_type", type, "Config-v2")
-            Run(A_ScriptFullPath)
+        set(type) {
+            writeIni("border_type", type)
+            fn_restart()
+        }
+        borderGui.AddButton("w" Gui_width, "自定义样式边框").OnEvent("Click", custom)
+        custom(*) {
+            borderGui.Destroy()
+            customGui := Gui("AlwaysOnTop OwnDialogs")
+            customGui.SetFont("s12", "微软雅黑")
+            customGui.AddText("Center h30 ", "InputTip v2 - 自定义方块符号样式边框")
+            customGui.AddText("xs", "你可以从以下任意可用地址中获取相关的配置说明:")
+            customGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+            customGui.AddText("xs", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
+            customGui.Show("Hide")
+            customGui.GetPos(, , &Gui_width)
+            customGui.Destroy()
+
+            customGui := Gui("AlwaysOnTop OwnDialogs")
+            customGui.SetFont("s12", "微软雅黑")
+            customGui.AddText("Center h30 ", "InputTip v2 - 自定义方块符号样式边框")
+            customGui.AddText("xs", "你可以从以下任意可用地址中获取相关的配置说明:")
+            customGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+            customGui.AddText("xs", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
+
+            configList := [{
+                config: "border_margin_left",
+                options: "Number",
+                tip: "左边的边框宽度"
+            }, {
+                config: "border_margin_right",
+                options: "Number",
+                tip: "右边的边框宽度"
+            }, {
+                config: "border_margin_top",
+                options: "Number",
+                tip: "上边的边框宽度"
+            }, {
+                config: "border_margin_bottom",
+                options: "Number",
+                tip: "下边的边框宽度"
+            }, {
+                config: "border_color_CN",
+                options: "",
+                tip: "中文状态时的边框颜色"
+            }, {
+                config: "border_color_EN",
+                options: "",
+                tip: "英文状态时的边框颜色"
+            }, {
+                config: "border_color_Caps",
+                options: "",
+                tip: "大写状态时的边框颜色"
+            }, {
+                config: "border_transparent",
+                options: "Number",
+                tip: "边框的透明度"
+            }]
+            isFirst := 1
+            for v in configList {
+                if (isFirst) {
+                    customGui.AddText("xs", v.tip ": ")
+                } else {
+                    customGui.AddText("yp x" Gui_width / 2, v.tip ": ")
+                }
+                isFirst := !isFirst
+                customGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
+            }
+            customGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", saveConfig)
+            customGui.Show()
+
+            saveConfig(*) {
+                list := [configList[1], configList[2], configList[3], configList[4]]
+                isValid := 1
+                for v in list {
+                    if (!IsNumber(customGui.Submit().%v.config%)) {
+                        showMsg(["配置错误!", v.tip " 应该是一个数字。"])
+                        isValid := 0
+                    }
+                }
+                list := [configList[5], configList[6], configList[7]]
+                for v in list {
+                    if (!isColor(customGui.Submit().%v.config%)) {
+                        showMsg(["配置错误!", v.tip " 应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
+                        isValid := 0
+                    }
+                }
+                transparent := customGui.Submit().border_transparent
+                if (IsFloat(transparent)) {
+                    showMsg(["配置错误!", "它不能是一个小数", configList[8].tip " 应该是 0 到 255 之间的整数。"])
+                    isValid := 0
+                } else {
+                    if (transparent < 0 || transparent > 255) {
+                        showMsg(["配置错误!", configList[8].tip " 应该是 0 到 255 之间的整数。"])
+                        isValid := 0
+                    }
+                }
+                isColor(v) {
+                    v := StrReplace(v, "#", "")
+                    colorList := ",red,blue,green,yellow,purple,gray,black,white,"
+                    if (RegExMatch(colorList, "," v ",")) {
+                        return 1
+                    }
+                    if (StrLen(v) > 8) {
+                        return 0
+                    }
+                    vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
+                    for item in vList {
+                        v := StrReplace(v, item, "")
+                    }
+                    return !Trim(v)
+                }
+                if (isValid) {
+                    writeIni("border_type", 4)
+                    for item in configList {
+                        writeIni(item.config, customGui.Submit().%item.config%)
+                    }
+                    fn_restart()
+                }
+            }
         }
         borderGui.Show()
     }
@@ -490,7 +813,7 @@ makeTrayMenu() {
         offsetGui := Gui("AlwaysOnTop OwnDialogs")
         offsetGui.SetFont("s12", "微软雅黑")
         offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
-        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里设置的特殊偏移量不会覆盖配置中的 offset_x 和 offset_y，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
+        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
         offsetGui.AddText("", "")
 
         offsetGui.Show("Hide")
@@ -500,7 +823,7 @@ makeTrayMenu() {
         offsetGui := Gui("AlwaysOnTop OwnDialogs")
         offsetGui.SetFont("s12", "微软雅黑")
         offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
-        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里设置的特殊偏移量不会覆盖配置中的 offset_x 和 offset_y，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
+        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
         offsetGui.AddText(, "------------------------------------------------------")
 
         screenList := getScreenInfo()
@@ -517,9 +840,9 @@ makeTrayMenu() {
             } else {
                 offsetGui.AddText(, "这是副屏幕(副显示器)，屏幕标识为: " v.num)
             }
-            offsetGui.AddText("", "offset_x: ")
+            offsetGui.AddText("", "水平方向的偏移量: ")
             offsetGui.AddEdit("voffset_x_" v.num " yp w100", offset["offset_x_" v.num])
-            offsetGui.AddText("yp", "offset_y: ")
+            offsetGui.AddText("yp", "垂直方向的偏移量: ")
             offsetGui.AddEdit("voffset_y_" v.num " yp w100", offset["offset_y_" v.num])
         }
         tab.UseTab(0)
@@ -527,11 +850,11 @@ makeTrayMenu() {
         save(*) {
             for v in screenList {
                 x := offsetGui.Submit().%"offset_x_" v.num%
-                writeIni("offset_x_" v.num, x, "Config-v2")
+                writeIni("offset_x_" v.num, x)
                 y := offsetGui.Submit().%"offset_y_" v.num%
-                writeIni("offset_y_" v.num, y, "Config-v2")
+                writeIni("offset_y_" v.num, y)
             }
-            Run(A_ScriptFullPath)
+            fn_restart()
         }
         offsetGui.Show()
 
@@ -562,7 +885,7 @@ makeTrayMenu() {
 
                 LV := addGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用", "标题"])
                 LV.OnEvent("DoubleClick", LV_DoubleClick)
-                value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                value := readIni(tipList[1], "")
                 value := SubStr(value, -1) = "," ? value : value ","
                 temp := ""
                 DetectHiddenWindows 0
@@ -580,7 +903,7 @@ makeTrayMenu() {
                 LV.ModifyCol(1, "Auto")
                 addGui.OnEvent("Close", close)
                 close(*) {
-                    Run(A_ScriptFullPath)
+                    fn_restart()
                 }
                 addGui.Show()
                 LV_DoubleClick(LV, RowNumber)
@@ -602,7 +925,7 @@ makeTrayMenu() {
                     yes(*) {
                         addGui.Destroy()
                         confirmGui.Destroy()
-                        value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                        value := readIni(tipList[1], "")
                         valueArr := StrSplit(value, ",")
                         result := ""
                         is_exist := 0
@@ -618,7 +941,7 @@ makeTrayMenu() {
                             MsgBox(RowText " 已存在!", , "0x1000")
                         } else {
                             addFn(RowText)
-                            writeIni(tipList[1], result RowText, "Config-v2")
+                            writeIni(tipList[1], result RowText)
                         }
                         show()
                     }
@@ -629,7 +952,7 @@ makeTrayMenu() {
             hideGui.Destroy()
             show()
             show() {
-                value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                value := readIni(tipList[1], "")
                 valueArr := StrSplit(value, ",")
 
                 rmGui := Gui("AlwaysOnTop OwnDialogs")
@@ -671,7 +994,7 @@ makeTrayMenu() {
                         yes(*) {
                             rmGui.Destroy()
                             confirmGui.Destroy()
-                            value := IniRead("InputTip.ini", "config-v2", tipList[1])
+                            value := readIni(tipList[1], "")
                             valueArr := StrSplit(value, ",")
                             is_exist := 0
                             result := ""
@@ -685,7 +1008,7 @@ makeTrayMenu() {
                                 }
                             }
                             if (is_exist) {
-                                writeIni(tipList[1], SubStr(result, 2), "Config-v2")
+                                writeIni(tipList[1], SubStr(result, 2))
                             } else {
                                 MsgBox(RowText " 不存在或已经移除!", , "0x1000")
                             }
@@ -694,7 +1017,7 @@ makeTrayMenu() {
                     }
                     rmGui.OnEvent("Close", close)
                     close(*) {
-                        Run(A_ScriptFullPath)
+                        fn_restart()
                     }
                     rmGui.Show()
                 } else {
@@ -711,7 +1034,7 @@ makeTrayMenu() {
                     rmGui.OnEvent("Close", esc)
                     esc(*) {
                         rmGui.Destroy()
-                        Run(A_ScriptFullPath)
+                        fn_restart()
                     }
                     rmGui.Show()
                 }
@@ -736,8 +1059,8 @@ makeTrayMenu() {
             ], fn
         )
         fn(RowText) {
-            value_EN := "," IniRead("InputTip.ini", "config-v2", "app_EN") ","
-            value_Caps := "," IniRead("InputTip.ini", "config-v2", "app_Caps") ","
+            value_EN := "," readIni("app_EN", "") ","
+            value_Caps := "," readIni("app_Caps", "") ","
             if (RegExMatch(value_EN, "," RowText ",")) {
                 valueArr := StrSplit(value_EN, ",")
                 result := ""
@@ -746,7 +1069,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_EN", SubStr(result, 2), "Config-v2")
+                writeIni("app_EN", SubStr(result, 2))
             }
 
             if (RegExMatch(value_Caps, "," RowText ",")) {
@@ -757,7 +1080,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_Caps", SubStr(result, 2), "Config-v2")
+                writeIni("app_Caps", SubStr(result, 2))
             }
         }
     }
@@ -780,8 +1103,8 @@ makeTrayMenu() {
             fn
         )
         fn(RowText) {
-            value_CN := "," IniRead("InputTip.ini", "config-v2", "app_CN") ","
-            value_Caps := "," IniRead("InputTip.ini", "config-v2", "app_Caps") ","
+            value_CN := "," readIni("app_CN", "") ","
+            value_Caps := "," readIni("app_Caps", "") ","
             if (RegExMatch(value_CN, "," RowText ",")) {
                 valueArr := StrSplit(value_CN, ",")
                 result := ""
@@ -790,7 +1113,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_CN", SubStr(result, 2), "Config-v2")
+                writeIni("app_CN", SubStr(result, 2))
             }
 
             if (RegExMatch(value_Caps, "," RowText ",")) {
@@ -801,7 +1124,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_Caps", SubStr(result, 2), "Config-v2")
+                writeIni("app_Caps", SubStr(result, 2))
             }
         }
     }
@@ -824,8 +1147,8 @@ makeTrayMenu() {
             fn
         )
         fn(RowText) {
-            value_CN := "," IniRead("InputTip.ini", "config-v2", "app_CN") ","
-            value_EN := "," IniRead("InputTip.ini", "config-v2", "app_EN") ","
+            value_CN := "," readIni("app_CN", "") ","
+            value_EN := "," readIni("app_EN", "") ","
             if (RegExMatch(value_CN, "," RowText ",")) {
                 valueArr := StrSplit(value_CN, ",")
                 result := ""
@@ -834,7 +1157,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_CN", SubStr(result, 2), "Config-v2")
+                writeIni("app_CN", SubStr(result, 2))
             }
 
             if (RegExMatch(value_EN, "," RowText ",")) {
@@ -845,7 +1168,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_EN", SubStr(result, 2), "Config-v2")
+                writeIni("app_EN", SubStr(result, 2))
             }
         }
     }
@@ -870,7 +1193,7 @@ makeTrayMenu() {
             fn
         )
         fn(RowText) {
-            value := "," IniRead("InputTip.ini", "config-v2", "app_hide_state") ","
+            value := "," readIni("app_hide_state", "") ","
             if (RegExMatch(value, "," RowText ",")) {
                 valueArr := StrSplit(value, ",")
                 result := ""
@@ -879,7 +1202,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_hide_state", SubStr(result, 2), "Config-v2")
+                writeIni("app_hide_state", SubStr(result, 2))
             }
         }
     }
@@ -902,7 +1225,7 @@ makeTrayMenu() {
             fn
         )
         fn(RowText) {
-            value := "," IniRead("InputTip.ini", "config-v2", "app_hide_CN_EN") ","
+            value := "," readIni("app_hide_CN_EN", "") ","
             if (RegExMatch(value, "," RowText ",")) {
                 valueArr := StrSplit(value, ",")
                 result := ""
@@ -911,7 +1234,7 @@ makeTrayMenu() {
                         result .= "," v
                     }
                 }
-                writeIni("app_hide_CN_EN", SubStr(result, 2), "Config-v2")
+                writeIni("app_hide_CN_EN", SubStr(result, 2))
             }
         }
     }
@@ -921,186 +1244,6 @@ makeTrayMenu() {
     sub2.Add("英文", fn_EN)
     sub2.Add("大写锁定", fn_Caps)
     A_TrayMenu.Add("设置鼠标样式", sub2)
-    A_TrayMenu.Add("下载鼠标样式包", dlPackage)
-    A_TrayMenu.Add("关于", about)
-    A_TrayMenu.Add("重启", fn_restart)
-    A_TrayMenu.Add("退出", fn_exit)
-    /**
-     * 设置输入法模式
-     * @param item 点击的菜单项的名字
-     * @param index 点击的菜单项在它的菜单对象中的索引
-     */
-    fn_input(item, index, *) {
-        mode := readIni("mode", 1, "InputMethod")
-        msgGui := Gui("AlwaysOnTop +OwnDialogs")
-        msgGui.SetFont("s10", "微软雅黑")
-        msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
-        msgGui.Show("Hide")
-        msgGui.GetPos(, , &Gui_width)
-        msgGui.Destroy()
-
-        msgGui := Gui("AlwaysOnTop +OwnDialogs")
-        msgGui.SetFont("s12", "微软雅黑")
-        if (mode != index) {
-            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------")
-        } else {
-            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
-        }
-        msgGui.AddText(, "模式相关信息请查看以下任意地址:")
-        msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
-        msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
-        msgGui.Show()
-        yes(*) {
-            msgGui.Destroy()
-            writeIni("mode", index, "InputMethod")
-            Run(A_ScriptFullPath)
-        }
-    }
-    fn_config(*) {
-        configGui := Gui("AlwaysOnTop OwnDialogs")
-        configGui.SetFont("s12", "微软雅黑")
-        configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
-        configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
-        configGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        configGui.AddText("xs", "输入框中的值是配置当前的值")
-        configGui.Show("Hide")
-        configGui.GetPos(, , &Gui_width)
-        configGui.Destroy()
-
-        configGui := Gui("AlwaysOnTop OwnDialogs")
-        configGui.SetFont("s12", "微软雅黑")
-        configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
-        configGui.AddText("xs", "你可以从以下任意可用地址中获取配置说明:")
-        configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        configGui.AddText("xs", "请输入框中的值是配置当前的值`n---------------------------------------------------------------------------------")
-
-        configList := [{
-            config: "changeCursor",
-            options: "Number Limit1"
-        }, {
-            config: "showSymbol",
-            options: "Number Limit1"
-        }, {
-            config: "CN_color",
-            options: ""
-        }, {
-            config: "EN_color",
-            options: ""
-        }, {
-            config: "Caps_color",
-            options: ""
-        }, {
-            config: "transparent",
-            options: "Number"
-        }, {
-            config: "offset_x",
-            options: ""
-        }, {
-            config: "offset_y",
-            options: ""
-        }, {
-            config: "symbol_height",
-            options: ""
-        }, {
-            config: "symbol_width",
-            options: ""
-        }]
-        isFirst := 1
-        for v in configList {
-            if (isFirst) {
-                configGui.AddText("xs", v.config ": ")
-            } else {
-                configGui.AddText("yp x" Gui_width / 2, v.config ": ")
-            }
-            isFirst := !isFirst
-            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
-        }
-        configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
-        changeConfig(*) {
-            changeCursor := configGui.Submit().changeCursor
-            if (changeCursor != 1 && changeCursor != 0) {
-                showMsg(["changeCursor 配置的值错误!", "它可以接受的值是 0 或 1。"])
-                return
-            } else {
-                if (changeCursor = 0) {
-                    for v in info {
-                        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
-                    }
-                    MsgBox("尝试恢复默认鼠标样式。`n如果没有正常恢复，请重启电脑。")
-                }
-            }
-            showSymbol := configGui.Submit().showSymbol
-            if (showSymbol != 1 && showSymbol != 0) {
-                showMsg(["showSymbol 配置的值错误!", "它可以接受的值是 0 或 1。"])
-                return
-            }
-            CN_color := configGui.Submit().CN_color
-            if (!isColor(CN_color)) {
-                showMsg(["CN_color 配置的值错误!", "它应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
-                return
-            }
-            EN_color := configGui.Submit().EN_color
-            if (!isColor(EN_color)) {
-                showMsg(["EN_color 配置的值错误!", "它应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
-                return
-            }
-            Caps_color := configGui.Submit().Caps_color
-            if (!isColor(Caps_color)) {
-                showMsg(["Caps_color 配置的值错误!", "它应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
-                return
-            }
-            transparent := configGui.Submit().transparent
-            if (IsFloat(transparent)) {
-                showMsg(["transparent 配置的值错误!", "它不能是一个小数", "它应该是 0 到 255 之间的整数。"])
-                return
-            } else {
-                if (transparent < 0 || transparent > 255) {
-                    showMsg(["transparent 配置的值错误!", "它应该是 0 到 255 之间的整数。"])
-                    return
-                }
-            }
-            isColor(v) {
-                v := StrReplace(v, "#", "")
-                colorList := ",red,blue,green,yellow,purple,gray,black,white,"
-                if (RegExMatch(colorList, "," v ",")) {
-                    return 1
-                }
-                if (StrLen(v) > 8) {
-                    return 0
-                }
-                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
-                for item in vList {
-                    v := StrReplace(v, item, "")
-                }
-                return !Trim(v)
-            }
-            offset_x := configGui.Submit().offset_x
-            if (!IsNumber(offset_x)) {
-                showMsg(["offset_x 配置的值错误!", "它应该是一个数字。"])
-                return
-            }
-            offset_y := configGui.Submit().offset_y
-            if (!IsNumber(offset_y)) {
-                showMsg(["offset_y 配置的值错误!", "它应该是一个数字。"])
-                return
-            }
-            symbol_height := configGui.Submit().symbol_height
-            if (!IsNumber(symbol_height)) {
-                showMsg(["symbol_height 配置的值错误!", "它应该是一个数字。"])
-                return
-            }
-            symbol_width := configGui.Submit().symbol_width
-            if (!IsNumber(symbol_width)) {
-                showMsg(["symbol_width 配置的值错误!", "它应该是一个数字。"])
-                return
-            }
-            for item in configList {
-                writeIni(item.config, configGui.Submit().%item.config%, "Config-v2")
-            }
-            fn_restart()
-        }
-        configGui.Show()
-    }
     verify(dir, folder) {
         if (!dir) {
             return
@@ -1152,6 +1295,7 @@ makeTrayMenu() {
         dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为大写锁定鼠标样式 (不能是 CN/EN/Caps 文件夹)")
         verify(dir, 'Caps')
     }
+    A_TrayMenu.Add("下载鼠标样式包", dlPackage)
     dlPackage(*) {
         dlGui := Gui("AlwaysOnTop OwnDialogs")
         dlGui.SetFont("s12", "微软雅黑")
@@ -1166,6 +1310,7 @@ makeTrayMenu() {
             dlGui.Destroy()
         }
     }
+    A_TrayMenu.Add("关于", about)
     about(*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
@@ -1195,22 +1340,11 @@ makeTrayMenu() {
         }
 
     }
-    fn_startup(item, *) {
-        try {
-            path_exe := RegRead(HKEY_startup, A_ScriptName)
-            if (path_exe != A_ScriptFullPath) {
-                RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
-            } else {
-                RegDelete(HKEY_startup, A_ScriptName)
-            }
-        } catch {
-            RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, A_ScriptName)
-        }
-        A_TrayMenu.ToggleCheck(item)
-    }
+    A_TrayMenu.Add("重启", fn_restart)
     fn_restart(*) {
         Run(A_ScriptFullPath)
     }
+    A_TrayMenu.Add("退出", fn_exit)
     fn_exit(*) {
         ExitApp()
     }

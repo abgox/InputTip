@@ -1,0 +1,47 @@
+name: "🐞 Bug 报告"
+description: 提交一个 Bug 报告
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 开始之前...
+      description: 你是否已经做出努力?
+      options:
+        - label: 你正在使用 InputTip 的最新版本。
+          required: true
+        - label: 你已经阅读了项目的 README 文件。
+        - label: 你已经查看了 https://inputtip.pages.dev/
+        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了相关问题。
+  - type: dropdown
+    id: windows-version
+    attributes:
+      label: 你正在使用什么 Windows 版本?
+      options:
+        - Windows 11
+        - Windows 10
+      multiple: true
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: bug 复现步骤
+      placeholder: 如何复现这个 bug?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+  - type: textarea
+    id: actually-happening
+    attributes:
+      label: 实际发生了什么?
+    validations:
+      required: true
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 还有其他你想要补充的信息吗？

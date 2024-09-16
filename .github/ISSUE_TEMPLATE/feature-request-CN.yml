@@ -1,0 +1,29 @@
+name: 💡 功能请求
+description: 请求一个新功能或功能增强
+title: "[Request]: "
+labels: ["feature"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述这个功能请求
+      description: |
+        请详细描述您的功能要求或增强。
+        它解决了 InputTip 中的哪些不足?
+        哪些用例支持您的请求?
+    validations:
+      required: true
+  - type: dropdown
+    id: windows-version
+    attributes:
+      label: 你正在使用什么 Windows 版本?
+      options:
+        - Windows 11
+        - Windows 10
+      multiple: true
+    validations:
+      required: true
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 还有其他你想要补充的信息吗？

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.13.0
+;@AHK2Exe-SetVersion 2.13.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.13.0"
+currentVersion := "2.13.1"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -267,17 +267,8 @@ if (changeCursor) {
                         switch_Caps()
                     }
                 }
-
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
-                if (is_hide_state) {
-                    TipGui.Hide()
-                    Sleep(50)
-                    continue
-                }
                 is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
-                if (is_hide_CN_EN && !isShowCaps) {
-                    TipGui.Hide()
-                }
             }
             if (A_TimeIdle < 500) {
                 canShowSymbol := GetCaretPosEx(&left, &top)
@@ -519,6 +510,10 @@ if (changeCursor) {
 }
 
 TipShow() {
+    if (is_hide_state || (is_hide_CN_EN && !isShowCaps)) {
+        TipGui.Hide()
+        return
+    }
     if (border_type = 4) {
         borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top)
         TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)

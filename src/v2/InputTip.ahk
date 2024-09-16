@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.12.0
+;@AHK2Exe-SetVersion 2.13.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.12.0"
+currentVersion := "2.13.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -48,47 +48,80 @@ try {
     writeIni("app_hide_CN_EN", app_hide_CN_EN)
 }
 
-HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
-    changeCursor := readIni("changeCursor", 1),
-    showSymbol := readIni("showSymbol", 1),
-    CN_color := StrReplace(readIni("CN_color", "red"), '#', ''),
-    EN_color := StrReplace(readIni("EN_color", "blue"), '#', ''),
-    Caps_color := StrReplace(readIni("Caps_color", "green"), '#', ''),
-    transparent := readIni('transparent', 222),
-    offset_x := readIni('offset_x', 5),
-    offset_y := readIni('offset_y', 0),
-    symbol_height := readIni('symbol_height', 7),
-    symbol_width := readIni('symbol_width', 7),
-    ; 隐藏中英文状态方块符号提示
-    app_hide_CN_EN := "," app_hide_CN_EN ",",
-    ; 隐藏输入法状态方块符号提示
-    app_hide_state := "," readIni('app_hide_state', '') ",",
-    app_CN := "," readIni('app_CN', '') ",",
-    app_EN := "," readIni('app_EN', '') ",",
-    app_Caps := "," readIni('app_Caps', '') ",",
-    border_type := readIni('border_type', 1),
-    border_color_CN := StrReplace(readIni('border_color_CN', 'yellow'), '#', ''),
-    border_color_EN := StrReplace(readIni('border_color_EN', 'yellow'), '#', ''),
-    border_color_Caps := StrReplace(readIni('border_color_Caps', 'yellow'), '#', ''),
-    border_margin_left := readIni('border_margin_left', 3),
-    border_margin_right := readIni('border_margin_right', 3),
-    border_margin_top := readIni('border_margin_top', 3),
-    border_margin_bottom := readIni('border_margin_bottom', 3),
-    border_transparent := readIni('border_transparent', 255),
-    symbolWidth := symbol_width * A_ScreenDPI / 96,
-    symbolHeight := symbol_height * A_ScreenDPI / 96,
-    borderWidth := (symbol_width + border_margin_left + border_margin_right) * A_ScreenDPI / 96,
-    borderHeight := (symbol_height + border_margin_top + border_margin_bottom) * A_ScreenDPI / 96,
-    borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI / 96,
-    borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI / 96,
-    ; 屏幕分辨率
-    screenList := getScreenInfo(),
-    ; 特别的偏移量设置
-    offset := Map()
+HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+changeCursor := readIni("changeCursor", 1)
+showSymbol := readIni("showSymbol", 1)
+CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
+EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
+Caps_color := StrReplace(readIni("Caps_color", "green"), '#', '')
+transparent := readIni('transparent', 222)
+offset_x := readIni('offset_x', 5)
+offset_y := readIni('offset_y', 0)
+symbol_height := readIni('symbol_height', 7)
+symbol_width := readIni('symbol_width', 7)
+; 隐藏中英文状态方块符号提示
+app_hide_CN_EN := "," app_hide_CN_EN ","
+; 隐藏输入法状态方块符号提示
+app_hide_state := "," readIni('app_hide_state', '') ","
+app_CN := "," readIni('app_CN', '') ","
+app_EN := "," readIni('app_EN', '') ","
+app_Caps := "," readIni('app_Caps', '') ","
+hotkey_CN := readIni('hotkey_CN', '')
+hotkey_EN := readIni('hotkey_EN', '')
+hotkey_Caps := readIni('hotkey_Caps', '')
+border_type := readIni('border_type', 1)
+border_color_CN := StrReplace(readIni('border_color_CN', 'yellow'), '#', '')
+border_color_EN := StrReplace(readIni('border_color_EN', 'yellow'), '#', '')
+border_color_Caps := StrReplace(readIni('border_color_Caps', 'yellow'), '#', '')
+border_margin_left := readIni('border_margin_left', 3)
+border_margin_right := readIni('border_margin_right', 3)
+border_margin_top := readIni('border_margin_top', 3)
+border_margin_bottom := readIni('border_margin_bottom', 3)
+border_transparent := readIni('border_transparent', 255)
+symbolWidth := symbol_width * A_ScreenDPI / 96
+symbolHeight := symbol_height * A_ScreenDPI / 96
+borderWidth := (symbol_width + border_margin_left + border_margin_right) * A_ScreenDPI / 96
+borderHeight := (symbol_height + border_margin_top + border_margin_bottom) * A_ScreenDPI / 96
+borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI / 96
+borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI / 96
+; 屏幕分辨率
+screenList := getScreenInfo()
+; 特别的偏移量设置
+offset := Map()
 
 for v in screenList {
     offset["offset_x_" v.num] := readIni("offset_x_" v.num, 0)
     offset["offset_y_" v.num] := readIni("offset_y_" v.num, 0)
+}
+if (hotkey_CN) {
+    Hotkey(hotkey_CN, switch_CN)
+}
+switch_CN(*) {
+    if (GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+    if (!isCN(mode)) {
+        SendInput("{Shift}")
+    }
+}
+if (hotkey_EN) {
+    Hotkey(hotkey_EN, switch_EN)
+}
+switch_EN(*) {
+    if (GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+    if (isCN(mode)) {
+        SendInput("{Shift}")
+    }
+}
+if (hotkey_Caps) {
+    Hotkey(hotkey_Caps, switch_Caps)
+}
+switch_Caps(*) {
+    if (!GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
 }
 
 makeTrayMenu()
@@ -219,36 +252,26 @@ if (changeCursor) {
     show("CN")
     if (showSymbol) {
         while 1 {
-            is_hide_CN_EN := 0, is_hide_state := 0
+            is_hide_CN_EN := 0
+            is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 if (exe_name != lastWindow) {
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (RegExMatch(app_CN, "," exe_name ",")) {
-                        if (GetKeyState("CapsLock", "T")) {
-                            SendInput("{CapsLock}")
-                        }
-                        if (!isCN(mode)) {
-                            SendInput("{Shift}")
-                        }
+                        switch_CN()
                     } else if (RegExMatch(app_EN, "," exe_name ",")) {
-                        if (GetKeyState("CapsLock", "T")) {
-                            SendInput("{CapsLock}")
-                        }
-                        if (isCN(mode)) {
-                            SendInput("{Shift}")
-                        }
+                        switch_EN()
                     } else if (RegExMatch(app_Caps, "," exe_name ",")) {
-                        if (!isShowCaps) {
-                            SendInput("{CapsLock}")
-                        }
+                        switch_Caps()
                     }
                 }
 
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
                 if (is_hide_state) {
                     TipGui.Hide()
+                    Sleep(50)
                     continue
                 }
                 is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
@@ -259,44 +282,74 @@ if (changeCursor) {
             if (A_TimeIdle < 500) {
                 canShowSymbol := GetCaretPosEx(&left, &top)
                 if (GetKeyState("CapsLock", "T")) {
-                    TipGui.BackColor := Caps_color
-                    borderGui.BackColor := border_color_Caps
-                    if (canShowSymbol && !isShowCaps) {
-                        TipShow()
-                    }
-                    if (!isShowCaps) {
+                    if (isShowCaps) {
+                        if (left != old_left || top != old_top) {
+                            old_left := left
+                            old_top := top
+                            canShowSymbol ? TipShow() : TipGui.Hide()
+                        }
+                    } else {
+                        isShowCN := 0
+                        isShowEN := 0
+                        isShowCaps := 1
+                        old_left := left
+                        old_top := top
                         show("Caps")
+                        if (canShowSymbol) {
+                            TipGui.BackColor := Caps_color, borderGui.BackColor := border_color_Caps
+                            TipShow()
+                        } else {
+                            TipGui.Hide()
+                        }
                     }
-                    isShowCN := 0, isShowEN := 0, isShowCaps := 1
+                    Sleep(50)
                     continue
                 }
                 try {
                     state := isCN(mode)
                 } catch {
                     TipGui.Hide()
+                    Sleep(50)
                     continue
                 }
                 if (isShowCaps) {
                     if (state) {
                         show("CN")
-                        isShowCN := 1, isShowEN := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
+                        isShowCN := 1
+                        isShowEN := 0
+                        TipGui.BackColor := CN_color
+                        borderGui.BackColor := border_color_CN
                     } else {
                         show("EN")
-                        isShowCN := 0, isShowEN := 1, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
+                        isShowCN := 0
+                        isShowEN := 1
+                        TipGui.BackColor := EN_color
+                        borderGui.BackColor := border_color_EN
                     }
-                    isShowCaps := 0, isShow := 1
+                    isShowCaps := 0
+                    isShow := 1
                 }
                 if (state != old_state || left != old_left || top != old_top) {
-                    old_state := state, old_left := left, old_top := top
+                    old_state := state
+                    old_left := left
+                    old_top := top
                     if (state) {
                         if (!isShowCN) {
                             show("CN")
-                            isShowCN := 1, isShowEN := 0, isShowCaps := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
+                            isShowCN := 1
+                            isShowEN := 0
+                            isShowCaps := 0
+                            TipGui.BackColor := CN_color
+                            borderGui.BackColor := border_color_CN
                         }
                     } else {
                         if (!isShowEN) {
                             show("EN")
-                            isShowCN := 0, isShowEN := 1, isShowCaps := 0, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
+                            isShowCN := 0
+                            isShowEN := 1
+                            isShowCaps := 0
+                            TipGui.BackColor := EN_color
+                            borderGui.BackColor := border_color_EN
                         }
                     }
                     isShow := !is_hide_CN_EN && canShowSymbol
@@ -316,23 +369,11 @@ if (changeCursor) {
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (RegExMatch(app_CN, "," exe_name ",")) {
-                        if (GetKeyState("CapsLock", "T")) {
-                            SendInput("{CapsLock}")
-                        }
-                        if (!isCN(mode)) {
-                            SendInput("{Shift}")
-                        }
+                        switch_CN()
                     } else if (RegExMatch(app_EN, "," exe_name ",")) {
-                        if (GetKeyState("CapsLock", "T")) {
-                            SendInput("{CapsLock}")
-                        }
-                        if (isCN(mode)) {
-                            SendInput("{Shift}")
-                        }
+                        switch_EN()
                     } else if (RegExMatch(app_Caps, "," exe_name ",")) {
-                        if (!isShowCaps) {
-                            SendInput("{CapsLock}")
-                        }
+                        switch_Caps()
                     }
                 }
             }
@@ -342,11 +383,13 @@ if (changeCursor) {
                         show("Caps")
                         isShowCaps := 1
                     }
+                    Sleep(50)
                     continue
                 }
                 try {
                     state := isCN(mode)
                 } catch {
+                    Sleep(50)
                     continue
                 }
                 if (isShowCaps) {
@@ -369,35 +412,25 @@ if (changeCursor) {
 } else {
     if (showSymbol) {
         while 1 {
-            is_hide_CN_EN := 0, is_hide_state := 0
+            is_hide_CN_EN := 0
+            is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 if (exe_name != lastWindow) {
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (RegExMatch(app_CN, "," exe_name ",")) {
-                        if (GetKeyState("CapsLock", "T")) {
-                            SendInput("{CapsLock}")
-                        }
-                        if (!isCN(mode)) {
-                            SendInput("{Shift}")
-                        }
+                        switch_CN()
                     } else if (RegExMatch(app_EN, "," exe_name ",")) {
-                        if (GetKeyState("CapsLock", "T")) {
-                            SendInput("{CapsLock}")
-                        }
-                        if (isCN(mode)) {
-                            SendInput("{Shift}")
-                        }
+                        switch_EN()
                     } else if (RegExMatch(app_Caps, "," exe_name ",")) {
-                        if (!isShowCaps) {
-                            SendInput("{CapsLock}")
-                        }
+                        switch_Caps()
                     }
                 }
                 is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
                 if (is_hide_state) {
                     TipGui.Hide()
+                    Sleep(50)
                     continue
                 }
                 is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
@@ -408,37 +441,69 @@ if (changeCursor) {
             if (A_TimeIdle < 500) {
                 canShowSymbol := GetCaretPosEx(&left, &top)
                 if (GetKeyState("CapsLock", "T")) {
-                    TipGui.BackColor := Caps_color
-                    borderGui.BackColor := border_color_Caps
-                    if (canShowSymbol && !isShowCaps) {
-                        TipShow()
+                    if (isShowCaps) {
+                        if (left != old_left || top != old_top) {
+                            old_left := left
+                            old_top := top
+                            canShowSymbol ? TipShow() : TipGui.Hide()
+                        }
+                    } else {
+                        isShowCN := 0
+                        isShowEN := 0
+                        isShowCaps := 1
+                        old_left := left
+                        old_top := top
+                        if (canShowSymbol) {
+                            TipGui.BackColor := Caps_color, borderGui.BackColor := border_color_Caps
+                            TipShow()
+                        } else {
+                            TipGui.Hide()
+                        }
                     }
-                    isShowCN := 0, isShowEN := 0, isShowCaps := 1
+                    Sleep(50)
                     continue
                 }
                 try {
                     state := isCN(mode)
                 } catch {
                     TipGui.Hide()
+                    Sleep(50)
                     continue
                 }
                 if (isShowCaps) {
                     if (state) {
-                        isShowCN := 1, isShowEN := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
+                        isShowCN := 1
+                        isShowEN := 0
+                        TipGui.BackColor := CN_color
+                        borderGui.BackColor := border_color_CN
                     } else {
-                        isShowCN := 0, isShowEN := 1, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
+                        isShowCN := 0
+                        isShowEN := 1
+                        TipGui.BackColor := EN_color
+                        borderGui.BackColor := border_color_EN
                     }
-                    isShowCaps := 0, isShow := 1
+                    isShowCaps := 0
+                    isShow := 1
                 }
                 if (state != old_state || left != old_left || top != old_top) {
-                    old_state := state, old_left := left, old_top := top
+                    old_state := state
+                    old_left := left
+                    old_top := top
                     if (state) {
                         if (!isShowCN) {
-                            isShowCN := 1, isShowEN := 0, isShowCaps := 0, TipGui.BackColor := CN_color, borderGui.BackColor := border_color_CN
+                            isShowCN := 1
+                            isShowEN := 0
+                            isShowCaps := 0
+                            TipGui.BackColor := CN_color
+                            borderGui.BackColor := border_color_CN
                         }
                     } else {
                         if (!isShowEN) {
-                            isShowCN := 0, isShowEN := 1, isShowCaps := 0, TipGui.BackColor := EN_color, borderGui.BackColor := border_color_EN
+                            isShowCN := 0
+                            isShowEN := 1
+                            isShowCaps := 0
+                            TipGui.BackColor := EN_color
+                            borderGui.BackColor := border_color_EN
                         }
                     }
                     isShow := !is_hide_CN_EN && canShowSymbol
@@ -613,7 +678,7 @@ makeTrayMenu() {
             isValid := 1
             list := [configList[1], configList[2]]
             for v in list {
-                value:= configGui.Submit().%v.config%
+                value := configGui.Submit().%v.config%
                 if (value != 1 && value != 0) {
                     showMsg(["配置错误!", v.tip " 的值只能是 0 或 1。"])
                     isValid := 0
@@ -644,7 +709,7 @@ makeTrayMenu() {
                 }
             }
             if (isValid) {
-                if (changeCursor = 0) {
+                if (configGui.Submit().changeCursor = 0) {
                     for v in info {
                         DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
                     }
@@ -807,57 +872,6 @@ makeTrayMenu() {
             }
         }
         borderGui.Show()
-    }
-    A_TrayMenu.Add("设置特殊偏移量", fn_offset)
-    fn_offset(*) {
-        offsetGui := Gui("AlwaysOnTop OwnDialogs")
-        offsetGui.SetFont("s12", "微软雅黑")
-        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
-        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
-        offsetGui.AddText("", "")
-
-        offsetGui.Show("Hide")
-        offsetGui.GetPos(, , &Gui_width)
-        offsetGui.Destroy()
-
-        offsetGui := Gui("AlwaysOnTop OwnDialogs")
-        offsetGui.SetFont("s12", "微软雅黑")
-        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
-        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
-        offsetGui.AddText(, "------------------------------------------------------")
-
-        screenList := getScreenInfo()
-        pages := []
-        for v in screenList {
-            pages.push("屏幕 " v.num)
-        }
-        tab := offsetGui.AddTab3("", pages)
-
-        for v in screenList {
-            tab.UseTab(v.num)
-            if (v.num = v.main) {
-                offsetGui.AddText(, "这是主屏幕(主显示器)，屏幕标识为: " v.num)
-            } else {
-                offsetGui.AddText(, "这是副屏幕(副显示器)，屏幕标识为: " v.num)
-            }
-            offsetGui.AddText("", "水平方向的偏移量: ")
-            offsetGui.AddEdit("voffset_x_" v.num " yp w100", offset["offset_x_" v.num])
-            offsetGui.AddText("yp", "垂直方向的偏移量: ")
-            offsetGui.AddEdit("voffset_y_" v.num " yp w100", offset["offset_y_" v.num])
-        }
-        tab.UseTab(0)
-        offsetGui.AddButton("w" Gui_width, "确定").OnEvent("Click", save)
-        save(*) {
-            for v in screenList {
-                x := offsetGui.Submit().%"offset_x_" v.num%
-                writeIni("offset_x_" v.num, x)
-                y := offsetGui.Submit().%"offset_y_" v.num%
-                writeIni("offset_y_" v.num, y)
-            }
-            fn_restart()
-        }
-        offsetGui.Show()
-
     }
     sub1 := Menu()
     fn_common(tipList, addFn) {
@@ -1051,11 +1065,11 @@ makeTrayMenu() {
                 "以下列表中是当前系统正在运行的应用程序",
                 "双击应用程序，将其添加到自动切换中文状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 添加到自动切换中文状态的应用列表中？`n------------------------------------------------`n此列表中的效果`n- 当在此应用中，InputTip 会自动切换到中文状态",
+                " 添加到自动切换中文状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换到中文状态`n- 注意: InputTip 通过 Shift 键切换中英文状态，所以请确保 Shift 键可以切换中英文状态",
                 "以下列表中是自动切换中文状态的应用列表",
                 "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 移除？`n移除后，在此应用中，InputTip 不会再自动切换到中文状态"
+                " 移除？`n移除后，当从其他应用首次切换到此应用中，InputTip 不会再自动切换到中文状态"
             ], fn
         )
         fn(RowText) {
@@ -1094,11 +1108,11 @@ makeTrayMenu() {
                 "以下列表中是当前系统正在运行的应用程序",
                 "双击应用程序，将其添加到自动切换英文状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 添加到自动切换英文状态的应用列表中？`n------------------------------------------------`n此列表中的效果`n- 当在此应用中，InputTip 会自动切换英文状态",
+                " 添加到自动切换英文状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换英文状态`n- 注意: InputTip 通过 Shift 键切换中英文状态，所以请确保 Shift 键可以切换中英文状态",
                 "以下列表中是自动切换英文状态的应用列表",
                 "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 移除？`n移除后，在此应用中，InputTip 不会再自动切换英文状态"
+                " 移除？`n移除后，当从其他应用首次切换到此应用中，InputTip 不会再自动切换英文状态"
             ],
             fn
         )
@@ -1138,11 +1152,11 @@ makeTrayMenu() {
                 "以下列表中是当前系统正在运行的应用程序",
                 "双击应用程序，将其添加到自动切换大写锁定状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 添加到自动切换大写锁定状态的应用列表中？`n------------------------------------------------`n此列表中的效果`n- 当在此应用中，InputTip 会自动切换大写锁定状态",
+                " 添加到自动切换大写锁定状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换大写锁定状态",
                 "以下列表中是自动切换大写锁定状态的应用列表",
                 "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 移除？`n移除后，在此应用中，InputTip 不会再自动切换大写锁定状态"
+                " 移除？`n移除后，当从其他应用首次切换到此应用中，InputTip 不会再自动切换大写锁定状态"
             ],
             fn
         )
@@ -1173,6 +1187,109 @@ makeTrayMenu() {
         }
     }
     A_TrayMenu.Add("设置自动切换", sub1)
+    A_TrayMenu.Add("设置强制切换快捷键", fn_switch_hotkey)
+    fn_switch_hotkey(*) {
+        hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
+        hotkeyGui.SetFont("s12", "微软雅黑")
+        hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.Show("Hide")
+        hotkeyGui.GetPos(, , &Gui_width)
+        hotkeyGui.Destroy()
+
+        hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
+        hotkeyGui.SetFont("s12", "微软雅黑")
+        hotkeyGui.AddText(, "设置强制切换输入法状态的快捷键")
+        hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------")
+
+        configList := [{
+            config: "hotkey_CN",
+            options: "",
+            tip: "强制切换到中文状态",
+            with: "win_CN",
+        }, {
+            config: "hotkey_EN",
+            options: "",
+            tip: "强制切换到英文状态",
+            with: "win_EN",
+        }, {
+            config: "hotkey_Caps",
+            options: "",
+            tip: "强制切换到大写锁定",
+            with: "win_Caps",
+        }]
+
+        for v in configList {
+            hotkeyGui.AddText("xs", v.tip ": ")
+            value := readIni(v.config, '')
+            hotkeyGui.AddHotkey("yp v" v.config, StrReplace(value, "#", ""))
+            hotkeyGui.AddCheckbox("yp v" v.with, "Win").Value := RegExMatch(value, "#")
+        }
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
+        hotkeyGui.OnEvent("Close", yes)
+        yes(*) {
+            for v in configList {
+                if (hotkeyGui.Submit().%v.with%) {
+                    key := "#" hotkeyGui.Submit().%v.config%
+                } else {
+                    key := hotkeyGui.Submit().%v.config%
+                }
+                writeIni(v.config, key)
+            }
+            fn_restart()
+        }
+        hotkeyGui.Show()
+    }
+    A_TrayMenu.Add("设置特殊偏移量", fn_offset)
+    fn_offset(*) {
+        offsetGui := Gui("AlwaysOnTop OwnDialogs")
+        offsetGui.SetFont("s12", "微软雅黑")
+        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
+        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
+        offsetGui.AddText(, "------------------------------------------------------")
+        offsetGui.Show("Hide")
+        offsetGui.GetPos(, , &Gui_width)
+        offsetGui.Destroy()
+
+        offsetGui := Gui("AlwaysOnTop OwnDialogs")
+        offsetGui.SetFont("s12", "微软雅黑")
+        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
+        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
+        offsetGui.AddText(, "------------------------------------------------------")
+
+        screenList := getScreenInfo()
+        pages := []
+        for v in screenList {
+            pages.push("屏幕 " v.num)
+        }
+        tab := offsetGui.AddTab3("", pages)
+
+        for v in screenList {
+            tab.UseTab(v.num)
+            if (v.num = v.main) {
+                offsetGui.AddText(, "这是主屏幕(主显示器)，屏幕标识为: " v.num)
+            } else {
+                offsetGui.AddText(, "这是副屏幕(副显示器)，屏幕标识为: " v.num)
+            }
+            offsetGui.AddText("", "水平方向的偏移量: ")
+            offsetGui.AddEdit("voffset_x_" v.num " yp w100", offset["offset_x_" v.num])
+            offsetGui.AddText("yp", "垂直方向的偏移量: ")
+            offsetGui.AddEdit("voffset_y_" v.num " yp w100", offset["offset_y_" v.num])
+        }
+        tab.UseTab(0)
+        offsetGui.AddButton("w" Gui_width, "确定").OnEvent("Click", save)
+        save(*) {
+            for v in screenList {
+                x := offsetGui.Submit().%"offset_x_" v.num%
+                writeIni("offset_x_" v.num, x)
+                y := offsetGui.Submit().%"offset_y_" v.num%
+                writeIni("offset_y_" v.num, y)
+            }
+            fn_restart()
+        }
+        offsetGui.Show()
+
+    }
     sub2 := Menu()
     sub2.Add("隐藏中英文状态方块符号提示", fn_hide_CN_EN)
     fn_hide_CN_EN(*) {

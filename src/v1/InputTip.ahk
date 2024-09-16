@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.9.0
+;@AHK2Exe-SetVersion 1.10.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -18,7 +18,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "1.9.0"
+currentVersion := "1.10.0"
 checkVersion(currentVersion, "v1")
 
 try {
@@ -46,26 +46,67 @@ try {
 }
 
 
-HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
-    font_family := readIni('font_family', '微软雅黑'),
-    font_size := readIni('font_size', 10),
-    font_weight := readIni('font_weight', 600),
-    font_color := StrReplace(readIni('font_color', 'ffffff'), '#', ''),
-    font_bgcolor := StrReplace(readIni('font_bgcolor', '474E68'), '#', ''),
-    windowTransparent := readIni('windowTransparent', 222),
-    CN_Text := readIni('CN_Text', '中'),
-    EN_Text := readIni('EN_Text', '英'),
-    Caps_Text := readIni('Caps_Text', '大'),
-    offset_x := readIni('offset_x', 30) * A_ScreenDPI / 96,
-    offset_y := readIni('offset_y', -50) * A_ScreenDPI / 96,
-    ; 隐藏中英文状态字符提示
-    app_hide_CN_EN := "," app_hide_CN_EN ",",
-    app_CN := "," readIni('app_CN', '') ",",
-    app_EN := "," readIni('app_EN', '') ",",
-    app_Caps := "," readIni('app_Caps', '') ",",
-    state := 1, old_x := '', old_y := '', old_i := '',
-    CN_G := make_gui(CN_Text), EN_G := make_gui(EN_Text), Caps_G := make_gui(Caps_Text), isShowCaps := 0,
-    lastWindow := ""
+HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+font_family := readIni('font_family', '微软雅黑')
+font_size := readIni('font_size', 10)
+font_weight := readIni('font_weight', 600)
+font_color := StrReplace(readIni('font_color', 'ffffff'), '#', '')
+font_bgcolor := StrReplace(readIni('font_bgcolor', '474E68'), '#', '')
+windowTransparent := readIni('windowTransparent', 222)
+CN_Text := readIni('CN_Text', '中')
+EN_Text := readIni('EN_Text', '英')
+Caps_Text := readIni('Caps_Text', '大')
+offset_x := readIni('offset_x', 30) * A_ScreenDPI / 96
+offset_y := readIni('offset_y', -50) * A_ScreenDPI / 96
+; 隐藏中英文状态字符提示
+app_hide_CN_EN := "," app_hide_CN_EN ","
+app_CN := "," readIni('app_CN', '') ","
+app_EN := "," readIni('app_EN', '') ","
+app_Caps := "," readIni('app_Caps', '') ","
+hotkey_CN := readIni('hotkey_CN', '')
+hotkey_EN := readIni('hotkey_EN', '')
+hotkey_Caps := readIni('hotkey_Caps', '')
+state := 1
+old_x := ''
+old_y := ''
+old_i := ''
+CN_G := make_gui(CN_Text)
+EN_G := make_gui(EN_Text)
+Caps_G := make_gui(Caps_Text)
+isShowCaps := 0
+lastWindow := ""
+
+if (hotkey_CN) {
+    Hotkey(hotkey_CN, switch_CN)
+}
+switch_CN(*) {
+    if (GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+    if (!isCN(mode)) {
+        SendInput("{Shift}")
+    }
+}
+if (hotkey_EN) {
+    Hotkey(hotkey_EN, switch_EN)
+}
+switch_EN(*) {
+    if (GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+    if (isCN(mode)) {
+        SendInput("{Shift}")
+    }
+}
+if (hotkey_Caps) {
+    Hotkey(hotkey_Caps, switch_Caps)
+}
+switch_Caps(*) {
+    if (!GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+}
+
 makeTrayMenu()
 
 while 1 {
@@ -76,26 +117,13 @@ while 1 {
             WinWaitActive("ahk_exe" exe_name)
             lastWindow := exe_name
             if (RegExMatch(app_CN, "," exe_name ",")) {
-                if (GetKeyState("CapsLock", "T")) {
-                    SendInput("{CapsLock}")
-                }
-                if (!isCN(mode)) {
-                    SendInput("{Shift}")
-                }
+                switch_CN()
             } else if (RegExMatch(app_EN, "," exe_name ",")) {
-                if (GetKeyState("CapsLock", "T")) {
-                    SendInput("{CapsLock}")
-                }
-                if (isCN(mode)) {
-                    SendInput("{Shift}")
-                }
+                switch_EN()
             } else if (RegExMatch(app_Caps, "," exe_name ",")) {
-                if (!isShowCaps) {
-                    SendInput("{CapsLock}")
-                }
+                switch_Caps()
             }
         }
-
         is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
         if (is_hide_CN_EN && !isShowCaps) {
             EN_G.Hide(), CN_G.Hide()
@@ -106,13 +134,16 @@ while 1 {
         isShow := 0
         if (GetKeyState("CapsLock", "T")) {
             isShowCaps := 1
-            EN_G.Hide(), CN_G.Hide(), Caps_G.Show('NA X' x + offset_x ' Y' y + offset_y)
+            EN_G.Hide()
+            CN_G.Hide()
+            Caps_G.Show('NA X' x + offset_x ' Y' y + offset_y)
             continue
         }
         try {
             state := isCN(mode)
         } catch {
-            EN_G.Hide(), CN_G.Hide()
+            EN_G.Hide()
+            CN_G.Hide()
             continue
         }
         if (isShowCaps) {
@@ -123,7 +154,10 @@ while 1 {
             isShowCaps := 0
         }
         if (x != old_x || y != old_y || state != old_i) {
-            old_x := x, old_y := y, old_i := state, isShow := !is_hide_CN_EN
+            old_x := x
+            old_y := y
+            old_i := state
+            isShow := !is_hide_CN_EN
         }
         if (isShow) {
             state ? (EN_G.Hide(), CN_G.Show('NA X' x + offset_x ' Y' y + offset_y)) : (CN_G.Hide(), EN_G.Show('NA X' x + offset_x ' Y' y + offset_y))
@@ -325,7 +359,7 @@ makeTrayMenu() {
                     isValid := 0
                 }
             }
-            if(isValid){
+            if (isValid) {
                 for item in configList {
                     writeIni(item.config, configGui.Submit().%item.config%)
                 }
@@ -648,6 +682,59 @@ makeTrayMenu() {
         }
     }
     A_TrayMenu.Add("设置自动切换", sub1)
+    A_TrayMenu.Add("设置强制切换快捷键", fn_switch_hotkey)
+    fn_switch_hotkey(*) {
+        hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
+        hotkeyGui.SetFont("s12", "微软雅黑")
+        hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.Show("Hide")
+        hotkeyGui.GetPos(, , &Gui_width)
+        hotkeyGui.Destroy()
+
+        hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
+        hotkeyGui.SetFont("s12", "微软雅黑")
+        hotkeyGui.AddText(, "设置强制切换输入法状态的快捷键")
+        hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------")
+
+        configList := [{
+            config: "hotkey_CN",
+            options: "",
+            tip: "强制切换到中文状态",
+            with: "win_CN",
+        }, {
+            config: "hotkey_EN",
+            options: "",
+            tip: "强制切换到英文状态",
+            with: "win_EN",
+        }, {
+            config: "hotkey_Caps",
+            options: "",
+            tip: "强制切换到大写锁定",
+            with: "win_Caps",
+        }]
+
+        for v in configList {
+            hotkeyGui.AddText("xs", v.tip ": ")
+            value := readIni(v.config, '')
+            hotkeyGui.AddHotkey("yp v" v.config, StrReplace(value, "#", ""))
+            hotkeyGui.AddCheckbox("yp v" v.with, "Win").Value := RegExMatch(value, "#")
+        }
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
+        hotkeyGui.OnEvent("Close", yes)
+        yes(*) {
+            for v in configList {
+                if (hotkeyGui.Submit().%v.with%) {
+                    key := "#" hotkeyGui.Submit().%v.config%
+                } else {
+                    key := hotkeyGui.Submit().%v.config%
+                }
+                writeIni(v.config, key)
+            }
+            fn_restart()
+        }
+        hotkeyGui.Show()
+    }
     sub2 := Menu()
     sub2.Add("隐藏中英文状态字符", fn_hide_CN_EN)
     fn_hide_CN_EN(*) {

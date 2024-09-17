@@ -41,6 +41,11 @@
 
 - [下载](https://inputtip.pages.dev/releases/v1/InputTip.exe) 并运行 `InputTip.exe` 即可
 
+  - 推荐做法: 新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它
+    - 因为运行 `InputTip.exe` 后，会产生以下文件
+      - `InputTip.ini` 配置文件
+    - 这样做的话，所有相关的文件都在同一个目录中，方便管理
+
 - 设置开机自启动
   1. 运行 `InputTip.exe` 后，在屏幕右下角图标处找到软件托盘图标
   2. `鼠标右击` 软件图标

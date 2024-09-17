@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.13.4
+;@AHK2Exe-SetVersion 2.13.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.13.4"
+currentVersion := "2.13.5"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -899,6 +899,44 @@ makeTrayMenu() {
                     }
                 }
                 DetectHiddenWindows 1
+                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程，你可以点击此按钮手动添加进程").OnEvent("Click", (*) {
+                    g := Gui("AlwaysOnTop OwnDialogs")
+                    g.SetFont("s12", "微软雅黑")
+                    g.AddText(, "- 进程名称应该是 xxx.exe 这样的格式，例如: QQ.exe`n- 每一次只能添加一个")
+                    g.Show("Hide")
+                    g.GetPos(, , &Gui_width)
+                    g.Destroy()
+
+                    g := Gui("AlwaysOnTop OwnDialogs")
+                    g.SetFont("s12", "微软雅黑")
+                    g.AddText(, "手动添加进程")
+                    g.AddText(, "- 进程名称应该是 xxx.exe 这样的格式，例如: QQ.exe`n- 每一次只能添加一个")
+                    g.AddText(, "进程名称: ")
+                    g.AddEdit("yp vexe_name", "")
+                    g.AddButton("xs w" Gui_width, "确认添加").OnEvent("Click", (*) {
+                        exe_name := g.Submit().exe_name
+                        value := readIni(tipList[1], "")
+                        valueArr := StrSplit(value, ",")
+                        result := ""
+                        is_exist := 0
+                        for v in valueArr {
+                            if (v = exe_name) {
+                                is_exist := 1
+                            }
+                            if (Trim(v)) {
+                                result .= v ","
+                            }
+                        }
+                        if (is_exist) {
+                            MsgBox(exe_name " 已存在!", , "0x1000")
+                        } else {
+                            addFn(exe_name)
+                            writeIni(tipList[1], result exe_name)
+                        }
+                        g.Destroy()
+                    })
+                    g.Show()
+                })
                 LV.ModifyCol(1, "Auto")
                 addGui.OnEvent("Close", close)
                 close(*) {

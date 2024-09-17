@@ -1,6 +1,6 @@
-#Requires AutoHotkey v2.0
+#Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.13.3
+;@AHK2Exe-SetVersion 2.13.4
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.13.3"
+currentVersion := "2.13.4"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -94,14 +94,14 @@ for v in screenList {
     offset["offset_y_" v.num] := readIni("offset_y_" v.num, 0)
 }
 if (hotkey_CN) {
-    Hotkey(hotkey_CN, switch_CN)
+    Hotkey("$" hotkey_CN, switch_CN)
 }
 switch_CN(*) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
     if (!isCN(mode)) {
-        SendInput("{Shift}")
+        IME.SetInputMode(1)
     }
 }
 if (hotkey_EN) {
@@ -112,11 +112,11 @@ switch_EN(*) {
         SendInput("{CapsLock}")
     }
     if (isCN(mode)) {
-        SendInput("{Shift}")
+        IME.SetInputMode(0)
     }
 }
 if (hotkey_Caps) {
-    Hotkey(hotkey_Caps, switch_Caps)
+    Hotkey("$" hotkey_Caps, switch_Caps)
 }
 switch_Caps(*) {
     if (!GetKeyState("CapsLock", "T")) {
@@ -543,46 +543,39 @@ makeTrayMenu() {
         }
     }
     sub := Menu()
-    sub.Add("模式1", fn_input)
-    sub.Add("模式2", fn_input)
-    sub.Add("模式3", fn_input)
-    sub.Add("模式4", fn_input)
-    A_TrayMenu.Add("设置输入法", sub)
-    /**
-     * 设置输入法模式
-     * @param item 点击的菜单项的名字
-     * @param index 点击的菜单项在它的菜单对象中的索引
-     */
-    fn_input(item, index, *) {
-        mode := readIni("mode", 1, "InputMethod")
-        msgGui := Gui("AlwaysOnTop +OwnDialogs")
-        msgGui.SetFont("s10", "微软雅黑")
-        msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
-        msgGui.Show("Hide")
-        msgGui.GetPos(, , &Gui_width)
-        msgGui.Destroy()
-
-        msgGui := Gui("AlwaysOnTop +OwnDialogs")
-        msgGui.SetFont("s12", "微软雅黑")
-        if (mode != index) {
-            msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------")
-        } else {
-            msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
-        }
-        msgGui.AddText(, "模式相关信息请查看以下任意地址:")
-        msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
-        msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
-        msgGui.Show()
-        yes(*) {
+    list := ["模式1", "模式2", "模式3", "模式4"]
+    for v in list {
+        sub.Add(v, (item, index, *) {
+            mode := readIni("mode", 1, "InputMethod")
+            msgGui := Gui("AlwaysOnTop +OwnDialogs")
+            msgGui.SetFont("s10", "微软雅黑")
+            msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
+            msgGui.Show("Hide")
+            msgGui.GetPos(, , &Gui_width)
             msgGui.Destroy()
-            writeIni("mode", index, "InputMethod")
-            fn_restart()
-        }
+
+            msgGui := Gui("AlwaysOnTop +OwnDialogs")
+            msgGui.SetFont("s12", "微软雅黑")
+            if (mode != index) {
+                msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------")
+            } else {
+                msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
+            }
+            msgGui.AddText(, "模式相关信息请查看以下任意地址:")
+            msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
+            msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
+            msgGui.Show()
+            yes(*) {
+                msgGui.Destroy()
+                writeIni("mode", index, "InputMethod")
+                fn_restart()
+            }
+        })
     }
+    A_TrayMenu.Add("设置输入法", sub)
     sub.Check("模式" mode)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("更改配置", fn_config)
-    fn_config(*) {
+    A_TrayMenu.Add("更改配置", (*) {
         configGui := Gui("AlwaysOnTop OwnDialogs")
         configGui.SetFont("s12", "微软雅黑")
         configGui.AddText("Center h30 ", "InputTip v2 - 更改配置")
@@ -715,9 +708,8 @@ makeTrayMenu() {
             }
         }
         configGui.Show()
-    }
-    A_TrayMenu.Add("设置方块符号边框", fn_border)
-    fn_border(*) {
+    })
+    A_TrayMenu.Add("设置方块符号边框", (*) {
         borderGui := Gui("AlwaysOnTop +OwnDialogs")
         borderGui.SetFont("s12", "微软雅黑")
         borderGui.AddText(, "设置方块符号的边框`n`n目前可以使用三种样式`n- 样式1: 三种样式中最明显的，个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，感官上更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
@@ -865,7 +857,7 @@ makeTrayMenu() {
             }
         }
         borderGui.Show()
-    }
+    })
     sub1 := Menu()
     fn_common(tipList, addFn) {
         hideGui := Gui("AlwaysOnTop +OwnDialogs")
@@ -1048,8 +1040,7 @@ makeTrayMenu() {
             }
         }
     }
-    sub1.Add("自动切换中文状态", fn_switch_CN)
-    fn_switch_CN(*) {
+    sub1.Add("自动切换中文状态", (*) {
         fn_common(
             [
                 "app_CN",
@@ -1058,7 +1049,7 @@ makeTrayMenu() {
                 "以下列表中是当前系统正在运行的应用程序",
                 "双击应用程序，将其添加到自动切换中文状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 添加到自动切换中文状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换到中文状态`n- 注意: InputTip 通过 Shift 键切换中英文状态，所以请确保 Shift 键可以切换中英文状态",
+                " 添加到自动切换中文状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换到中文状态",
                 "以下列表中是自动切换中文状态的应用列表",
                 "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
@@ -1090,9 +1081,8 @@ makeTrayMenu() {
                 writeIni("app_Caps", SubStr(result, 2))
             }
         }
-    }
-    sub1.Add("自动切换英文状态", fn_switch_EN)
-    fn_switch_EN(*) {
+    })
+    sub1.Add("自动切换英文状态", (*) {
         fn_common(
             [
                 "app_EN",
@@ -1101,7 +1091,7 @@ makeTrayMenu() {
                 "以下列表中是当前系统正在运行的应用程序",
                 "双击应用程序，将其添加到自动切换英文状态的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
-                " 添加到自动切换英文状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换英文状态`n- 注意: InputTip 通过 Shift 键切换中英文状态，所以请确保 Shift 键可以切换中英文状态",
+                " 添加到自动切换英文状态的应用列表中？`n--------------------------------------------------------------------------------------------------------------`n- 添加后，当从其他应用首次切换到此应用中，InputTip 会自动切换英文状态",
                 "以下列表中是自动切换英文状态的应用列表",
                 "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在三个自动切换列表(中/英/大写)中，同时添加了同一个应用，只有最新的生效，其他两个会被移除",
                 "是否要将 ",
@@ -1134,9 +1124,8 @@ makeTrayMenu() {
                 writeIni("app_Caps", SubStr(result, 2))
             }
         }
-    }
-    sub1.Add("自动切换大写锁定状态", fn_switch_Caps)
-    fn_switch_Caps(*) {
+    })
+    sub1.Add("自动切换大写锁定状态", (*) {
         fn_common(
             [
                 "app_Caps",
@@ -1178,10 +1167,9 @@ makeTrayMenu() {
                 writeIni("app_EN", SubStr(result, 2))
             }
         }
-    }
+    })
     A_TrayMenu.Add("设置自动切换", sub1)
-    A_TrayMenu.Add("设置强制切换快捷键", fn_switch_hotkey)
-    fn_switch_hotkey(*) {
+    A_TrayMenu.Add("设置强制切换快捷键", (*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
         hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
@@ -1232,9 +1220,8 @@ makeTrayMenu() {
             fn_restart()
         }
         hotkeyGui.Show()
-    }
-    A_TrayMenu.Add("设置特殊偏移量", fn_offset)
-    fn_offset(*) {
+    })
+    A_TrayMenu.Add("设置特殊偏移量", (*) {
         offsetGui := Gui("AlwaysOnTop OwnDialogs")
         offsetGui.SetFont("s12", "微软雅黑")
         offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
@@ -1282,10 +1269,9 @@ makeTrayMenu() {
         }
         offsetGui.Show()
 
-    }
+    })
     sub2 := Menu()
-    sub2.Add("隐藏中英文状态方块符号提示", fn_hide_CN_EN)
-    fn_hide_CN_EN(*) {
+    sub2.Add("隐藏中英文状态方块符号提示", (*) {
         fn_common(
             [
                 "app_hide_CN_EN",
@@ -1315,9 +1301,8 @@ makeTrayMenu() {
                 writeIni("app_hide_state", SubStr(result, 2))
             }
         }
-    }
-    sub2.Add("隐藏输入法状态方块符号提示", fn_hide_state)
-    fn_hide_state(*) {
+    })
+    sub2.Add("隐藏输入法状态方块符号提示", (*) {
         fn_common(
             [
                 "app_hide_state",
@@ -1347,12 +1332,33 @@ makeTrayMenu() {
                 writeIni("app_hide_CN_EN", SubStr(result, 2))
             }
         }
-    }
+    })
     A_TrayMenu.Add("设置特殊软件", sub2)
     sub2 := Menu()
-    sub2.Add("中文", fn_CN)
-    sub2.Add("英文", fn_EN)
-    sub2.Add("大写锁定", fn_Caps)
+    sub2.Add("中文", (*) {
+        if (!changeCursor) {
+            MsgBox("请先在配置中将 changeCursor 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
+            return
+        }
+        dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为中文鼠标样式 (不能是 CN/EN/Caps 文件夹)")
+        verify(dir, 'CN')
+    })
+    sub2.Add("英文", (*) {
+        if (!changeCursor) {
+            MsgBox("请先在配置中将 changeCursor 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
+            return
+        }
+        dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为英文鼠标样式 (不能是 CN/EN/Caps 文件夹)")
+        verify(dir, 'EN')
+    })
+    sub2.Add("大写锁定", (*) {
+        if (!changeCursor) {
+            MsgBox("请先在配置中将 changeCursor 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
+            return
+        }
+        dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为大写锁定鼠标样式 (不能是 CN/EN/Caps 文件夹)")
+        verify(dir, 'Caps')
+    })
     A_TrayMenu.Add("设置鼠标样式", sub2)
     verify(dir, folder) {
         if (!dir) {
@@ -1381,32 +1387,7 @@ makeTrayMenu() {
             MsgBox("鼠标样式文件夹修改成功!")
         }
     }
-    fn_CN(*) {
-        if (!changeCursor) {
-            MsgBox("请先在配置中将 changeCursor 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
-            return
-        }
-        dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为中文鼠标样式 (不能是 CN/EN/Caps 文件夹)")
-        verify(dir, 'CN')
-    }
-    fn_EN(*) {
-        if (!changeCursor) {
-            MsgBox("请先在配置中将 changeCursor 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
-            return
-        }
-        dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为英文鼠标样式 (不能是 CN/EN/Caps 文件夹)")
-        verify(dir, 'EN')
-    }
-    fn_Caps(*) {
-        if (!changeCursor) {
-            MsgBox("请先在配置中将 changeCursor 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
-            return
-        }
-        dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为大写锁定鼠标样式 (不能是 CN/EN/Caps 文件夹)")
-        verify(dir, 'Caps')
-    }
-    A_TrayMenu.Add("下载鼠标样式包", dlPackage)
-    dlPackage(*) {
+    A_TrayMenu.Add("下载鼠标样式包", (*) {
         dlGui := Gui("AlwaysOnTop OwnDialogs")
         dlGui.SetFont("s12", "微软雅黑")
         dlGui.AddText("Center h30", "从以下任意可用地址中下载鼠标样式包:")
@@ -1419,9 +1400,8 @@ makeTrayMenu() {
         close(*) {
             dlGui.Destroy()
         }
-    }
-    A_TrayMenu.Add("关于", about)
-    about(*) {
+    })
+    A_TrayMenu.Add("关于", (*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("Center h30", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
@@ -1449,15 +1429,14 @@ makeTrayMenu() {
             aboutGui.Destroy()
         }
 
-    }
+    })
     A_TrayMenu.Add("重启", fn_restart)
     fn_restart(*) {
         Run(A_ScriptFullPath)
     }
-    A_TrayMenu.Add("退出", fn_exit)
-    fn_exit(*) {
+    A_TrayMenu.Add("退出", (*) {
         ExitApp()
-    }
+    })
 }
 
 replaceEnvVariables(str) {

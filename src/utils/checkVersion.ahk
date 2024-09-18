@@ -59,7 +59,7 @@ checkVersion(currentVersion, whichVersion) {
                     TipGui.Destroy()
                     try {
                         Download("https://inputtip.pages.dev/releases/" whichVersion "/InputTip.exe", A_AppData "\abgox-InputTip.exe")
-                        Run("powershell -Command Start-Sleep -Seconds 3;Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
+                        Run("powershell -NoProfile -Command Start-Sleep -Seconds 3;Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
                         ExitApp()
                     } catch {
                         errGui := Gui("AlwaysOnTop OwnDialogs")

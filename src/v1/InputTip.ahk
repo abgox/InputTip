@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v1
-;@AHK2Exe-SetVersion 1.10.1
+;@AHK2Exe-SetVersion 1.10.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
@@ -18,7 +18,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "1.10.1"
+currentVersion := "1.10.2"
 checkVersion(currentVersion, "v1")
 
 try {

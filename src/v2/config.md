@@ -35,7 +35,7 @@
 - 默认值: `blue`
 - 可以是常见的颜色英文单词，也可以是十六进制颜色值(带不带 `#` 都可以)。
 
-### 大写锁定状态时方块符号的颜色
+### 大写锁定时方块符号的颜色
 
 - 在 `InputTip.ini` 的键名: `Caps_color`
 - 默认值: `green`
@@ -97,3 +97,12 @@
     - `offset_x_2`
     - `offset_y_2`
     - ...
+  - 显示文本字符相关的配置
+    - `showChar`
+    - `font_family`
+    - `font_size`
+    - `font_weight`
+    - `font_color`
+    - `CN_Text`
+    - `EN_Text`
+    - `Caps_Text`

@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.14.2
+;@AHK2Exe-SetVersion 2.14.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.14.2"
+currentVersion := "2.14.3"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -565,10 +565,19 @@ TipShow(type) {
         }
     } else {
         if (border_type = 4) {
-            borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
-            TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
-        } else {
+            if (TipGui.BackColor) {
+                borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
+                TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
+            } else {
+                borderGui.Hide()
+                TipGui.Hide()
+            }
+            return
+        }
+        if (TipGui.BackColor) {
             TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + offset_x "y" top + offset_y)
+        } else {
+            TipGui.Hide()
         }
     }
 }
@@ -800,6 +809,7 @@ makeTrayMenu() {
             }
         })
         tab.UseTab(3)
+        configGui.AddText(, "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号")
         list := [configList[4], configList[5], configList[6], configList[7], configList[8], configList[9], configList[10], configList[11]]
         isFirst := 1
         for v in list {
@@ -814,7 +824,7 @@ makeTrayMenu() {
         }
         tab.UseTab(4)
         list := [configList[12], configList[13], configList[14], configList[15], configList[16], configList[17], configList[18]]
-        configGui.AddText(, "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定")
+        configGui.AddText(, "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时的字符设置，可以留空，留空表示不显示")
         isFirst := 1
         for v in list {
             if (isFirst) {
@@ -1417,7 +1427,7 @@ makeTrayMenu() {
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
 
-        hotkeyGui := Gui("AlwaysOnTop OwnDialogs",A_ScriptName " - 设置强制切换输入法状态的快捷键")
+        hotkeyGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置强制切换输入法状态的快捷键")
         hotkeyGui.SetFont("s12", "微软雅黑")
         hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
         hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------")

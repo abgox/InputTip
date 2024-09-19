@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.14.1
+;@AHK2Exe-SetVersion 2.14.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -8,6 +8,7 @@
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource InputTipCursor.zip
 #SingleInstance Force
+Persistent
 ListLines 0
 KeyHistory 0
 DetectHiddenWindows 1
@@ -21,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.14.1"
+currentVersion := "2.14.2"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -106,6 +107,15 @@ for v in screenList {
 if (hotkey_CN) {
     Hotkey(hotkey_CN, switch_CN)
 }
+if (hotkey_EN) {
+    Hotkey(hotkey_EN, switch_EN)
+}
+if (hotkey_Caps) {
+    Hotkey(hotkey_Caps, switch_Caps)
+}
+/**
+ * 将输入法状态切换为中文
+ */
 switch_CN(*) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
@@ -113,10 +123,13 @@ switch_CN(*) {
     if (!isCN(mode)) {
         IME.SetInputMode(1)
     }
+    if (!isCN(mode)) {
+        SendInput("{Shift}")
+    }
 }
-if (hotkey_EN) {
-    Hotkey(hotkey_EN, switch_EN)
-}
+/**
+ * 将输入法状态切换为英文
+ */
 switch_EN(*) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
@@ -124,10 +137,13 @@ switch_EN(*) {
     if (isCN(mode)) {
         IME.SetInputMode(0)
     }
+    if (isCN(mode)) {
+        SendInput("{Shift}")
+    }
 }
-if (hotkey_Caps) {
-    Hotkey(hotkey_Caps, switch_Caps)
-}
+/**
+ * 将输入法状态切换为大写锁定
+ */
 switch_Caps(*) {
     if (!GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
@@ -195,7 +211,7 @@ curMap := {
 if (changeCursor) {
     if (!DirExist("InputTipCursor")) {
         FileExist("InputTipCursor.zip") ? 0 : FileInstall("InputTipCursor.zip", "InputTipCursor.zip", 1)
-        RunWait("powershell -Command Expand-Archive -Path '" A_ScriptDir "\InputTipCursor.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
+        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipCursor.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
         FileDelete("InputTipCursor.zip")
     } else {
         noList := [], dirList := ["CN", "CN_Default", "EN", "EN_Default", "Caps", "Caps_Default"]
@@ -205,7 +221,7 @@ if (changeCursor) {
             }
         }
         if (noList.length > 0) {
-            RunWait("powershell -Command Expand-Archive -Path '" A_ScriptDir "\InputTipCursor.zip' -DestinationPath '" A_AppData "\abgox-InputTipCursor-temp'", , "Hide")
+            RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipCursor.zip' -DestinationPath '" A_AppData "\abgox-InputTipCursor-temp'", , "Hide")
             for dir in noList {
                 dirCopy(A_AppData "\abgox-InputTipCursor-temp\InputTipCursor\" dir, "InputTipCursor\" dir)
             }
@@ -244,6 +260,22 @@ if (changeCursor) {
 
 state := 1, old_state := '', old_left := '', old_top := '', isShowCN := 1, isShowEN := 0, isShowCaps := 0, left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
+if (showChar) {
+    TipGui.MarginX := 0, TipGui.MarginY := 0
+    TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
+    TipGuiText := TipGui.AddText(, CN_Text)
+    TipGuiText := TipGui.AddText(, EN_Text)
+    TipGuiText := TipGui.AddText(, Caps_Text)
+    TipGui.Show("Hide")
+    TipGui.GetPos(, , &Gui_width)
+    TipGui.Destroy()
+
+    TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
+    TipGui.MarginX := 0, TipGui.MarginY := 0
+    TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
+
+    TipGuiText := TipGui.AddText("w" Gui_width, CN_Text)
+}
 WinSetTransparent(transparent)
 switch border_type {
     case 1: TipGui.Opt("-LastFound +e0x00000001")
@@ -251,11 +283,7 @@ switch border_type {
     case 3: TipGui.Opt("-LastFound +e0x00020000")
     default: TipGui.Opt("-LastFound")
 }
-if (showChar) {
-    TipGui.MarginX := 0, TipGui.MarginY := 0
-    TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
-    TipGuiText := TipGui.AddText(, CN_Text)
-}
+
 TipGui.BackColor := CN_color
 
 borderGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
@@ -529,8 +557,12 @@ if (changeCursor) {
 
 TipShow(type) {
     if (showChar) {
-        TipGuiText.Value := %type "_Text"%
-        TipGui.Show("NA x" left + offset_x "y" top + offset_y)
+        if (%type "_Text"%) {
+            TipGuiText.Value := %type "_Text"%
+            TipGui.Show("NA x" left + offset_x "y" top + offset_y)
+        } else {
+            TipGui.Hide()
+        }
     } else {
         if (border_type = 4) {
             borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
@@ -1385,9 +1417,8 @@ makeTrayMenu() {
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
 
-        hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
+        hotkeyGui := Gui("AlwaysOnTop OwnDialogs",A_ScriptName " - 设置强制切换输入法状态的快捷键")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "设置强制切换输入法状态的快捷键")
         hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
         hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------")
 

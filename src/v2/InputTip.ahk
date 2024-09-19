@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.14.0
+;@AHK2Exe-SetVersion 2.14.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -21,7 +21,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.14.0"
+currentVersion := "2.14.1"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -570,7 +570,7 @@ makeTrayMenu() {
             mode := readIni("mode", 1, "InputMethod")
             msgGui := Gui("AlwaysOnTop +OwnDialogs")
             msgGui.SetFont("s10", "微软雅黑")
-            msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
+            msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
             msgGui.Show("Hide")
             msgGui.GetPos(, , &Gui_width)
             msgGui.Destroy()
@@ -583,7 +583,7 @@ makeTrayMenu() {
                 msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
             }
             msgGui.AddText(, "模式相关信息请查看以下任意地址:")
-            msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#-6">https://gitee.com/abgox/InputTip#-6</a>')
+            msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
             msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
             msgGui.Show()
             yes(*) {
@@ -697,7 +697,8 @@ makeTrayMenu() {
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
         tab.UseTab(2)
-        configGui.AddText(, "- 1 表示开启，0 表示关闭`n- 方块符号和字符最多只能开启一个，如果同时开启，则优先显示字符")
+        configGui.AddText(, "你可以从以下任意可用地址中获取设置鼠标样式文件夹的相关说明:")
+        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义光标样式">https://inputtip.pages.dev/v2/#自定义光标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义光标样式">https://github.com/abgox/InputTip#自定义光标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义光标样式">https://gitee.com/abgox/InputTip#自定义光标样式</a>')
         configGui.AddButton("w" Gui_width, "设置中文状态鼠标样式").OnEvent("Click", (*) {
             configGui.Destroy()
             if (!changeCursor) {

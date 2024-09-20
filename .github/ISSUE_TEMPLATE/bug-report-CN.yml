@@ -16,6 +16,7 @@ body:
         - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了相关问题。
           required: true
         - label: 你已经查看了 [一些常见的使用问题](https://inputtip.pages.dev/FAQ/)
+          required: true
   - type: dropdown
     id: windows-version
     attributes:

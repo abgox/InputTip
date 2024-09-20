@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.17.1
+;@AHK2Exe-SetVersion 2.17.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.17.1"
+currentVersion := "2.17.2"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -1503,7 +1503,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
 
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,YoudaoDict.exe,OneCommander.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,"
     Gui_UIA_list := ",ONENOTE.EXE,POWERPNT.EXE,"
 
     if (InStr(Wpf_list, "," exe_name ",")) {

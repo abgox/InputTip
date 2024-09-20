@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.15.0
+;@AHK2Exe-SetVersion 2.16.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.15.0"
+currentVersion := "2.16.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -52,6 +52,7 @@ try {
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
 changeCursor := readIni("changeCursor", 1)
 showSymbol := readIni("showSymbol", 1)
+HideSymbolDelay := readIni("HideSymbolDelay", 0)
 CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
 EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
 Caps_color := StrReplace(readIni("Caps_color", "green"), '#', '')
@@ -74,10 +75,10 @@ border_type := readIni('border_type', 1)
 border_color_CN := StrReplace(readIni('border_color_CN', 'yellow'), '#', '')
 border_color_EN := StrReplace(readIni('border_color_EN', 'yellow'), '#', '')
 border_color_Caps := StrReplace(readIni('border_color_Caps', 'yellow'), '#', '')
-border_margin_left := readIni('border_margin_left', 3)
-border_margin_right := readIni('border_margin_right', 3)
-border_margin_top := readIni('border_margin_top', 3)
-border_margin_bottom := readIni('border_margin_bottom', 3)
+border_margin_left := readIni('border_margin_left', 1)
+border_margin_right := readIni('border_margin_right', 1)
+border_margin_top := readIni('border_margin_top', 1)
+border_margin_bottom := readIni('border_margin_bottom', 1)
 border_transparent := readIni('border_transparent', 255)
 symbolWidth := symbol_width * A_ScreenDPI / 96
 symbolHeight := symbol_height * A_ScreenDPI / 96
@@ -291,6 +292,7 @@ WinSetTransparent(border_transparent)
 borderGui.Opt("-LastFound")
 borderGui.BackColor := border_color_CN
 lastWindow := ""
+needHide := 1
 if (changeCursor) {
     show("CN")
     if (showSymbol) {
@@ -300,6 +302,10 @@ if (changeCursor) {
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 if (exe_name != lastWindow) {
+                    needHide := 0
+                    SetTimer((*) {
+                        global needHide := 1
+                    }, HideSymbolDelay)
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (InStr(app_CN, "," exe_name ",")) {
@@ -312,6 +318,10 @@ if (changeCursor) {
                 }
                 is_hide_state := InStr(app_hide_state, "," exe_name ",")
                 is_hide_CN_EN := InStr(app_hide_CN_EN, "," exe_name ",")
+            }
+            if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
+                TipGui.Hide()
+                continue
             }
             if (A_TimeIdle < 500) {
                 if (is_hide_state || (is_hide_CN_EN && !isShowCaps)) {
@@ -627,7 +637,7 @@ makeTrayMenu() {
             }
             msgGui.AddText(, "模式相关信息请查看以下任意地址:")
             msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
-            msgGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes)
+            msgGui.AddButton("xs w" Gui_width + msgGui.MarginX * 2, "确认").OnEvent("Click", yes)
             msgGui.Show()
             yes(*) {
                 msgGui.Destroy()
@@ -640,15 +650,15 @@ makeTrayMenu() {
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", (*) {
+        size := A_ScreenHeight < 1000 ? "s10" : "s12"
         configGui := Gui("AlwaysOnTop OwnDialogs")
-        configGui.SetFont("s12", "微软雅黑")
-        configGui.AddText(, "输入框中的值是当前生效的值`n-------------------------------------------------------------------------------")
+        configGui.SetFont(size, "微软雅黑")
+        configGui.AddText(, "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------------------")
         configGui.Show("Hide")
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
-
         configGui := Gui("AlwaysOnTop OwnDialogs", "InputTip v2 - 更改配置")
-        configGui.SetFont("s12", "微软雅黑")
+        configGui.SetFont(size, "微软雅黑")
         configList := [{
             config: "changeCursor",
             options: "Number Limit1",
@@ -694,6 +704,10 @@ makeTrayMenu() {
             options: "",
             tip: "方块符号的宽度"
         }, {
+            config: "HideSymbolDelay",
+            options: "Number",
+            tip: "方块符号在多少毫秒后隐藏(默认为0，即不隐藏)"
+        }, {
             config: "font_family",
             options: "",
             tip: "设置字符的字体"
@@ -723,20 +737,12 @@ makeTrayMenu() {
             tip: "设置大写锁定时显示的字符"
         }]
 
-        tab := configGui.AddTab3(, ["显示形式", "鼠标样式配置", "方块符号配置", "文本字符配置", "在线配置文件说明", "配色网站"])
+        tab := configGui.AddTab3(, ["显示形式", "鼠标样式配置", "方块符号配置", "方块符号边框配置", "文本字符配置", "在线配置文件说明", "配色网站"])
         tab.UseTab(1)
-        configGui.AddText(, "- 以下配置项只能使用 1 或 0，1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n  - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n  - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效")
-
+        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0，1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n  - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n  - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效")
         list := [configList[1], configList[2], configList[3]]
-        isFirst := 1
         for v in list {
-            if (isFirst) {
-                opt := "Section"
-                isFirst := 0
-            } else {
-                opt := "xs"
-            }
-            configGui.AddText(opt, v.tip ": ")
+            configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
         tab.UseTab(2)
@@ -811,164 +817,42 @@ makeTrayMenu() {
             }
         })
         tab.UseTab(3)
-        configGui.AddText(, "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号")
-        list := [configList[4], configList[5], configList[6], configList[7], configList[8], configList[9], configList[10], configList[11]]
-        isFirst := 1
+        configGui.AddText("Section", "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号")
+        list := [configList[4], configList[5], configList[6], configList[7], configList[8], configList[9], configList[10], configList[11], configList[12]]
         for v in list {
-            if (isFirst) {
-                opt := "Section"
-                isFirst := 0
-            } else {
-                opt := "xs"
-            }
-            configGui.AddText(opt, v.tip ": ")
+            configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
         tab.UseTab(4)
-        list := [configList[12], configList[13], configList[14], configList[15], configList[16], configList[17], configList[18]]
-        configGui.AddText(, "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时的字符设置，可以留空，留空表示不显示")
-        isFirst := 1
-        for v in list {
-            if (isFirst) {
-                opt := "Section"
-                isFirst := 0
-            } else {
-                opt := "xs"
-            }
-            configGui.AddText(opt, v.tip ": ")
-            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
-        }
-        tab.UseTab(5)
-        configGui.AddText(, "你可以从以下任意可用地址中获取配置说明:")
-        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>')
-        configGui.AddLink(, '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        configGui.AddLink(, '<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        tab.UseTab(6)
-        configGui.AddText(, "- 对于配置中颜色相关的配置，建议使用16进制的颜色值`n- 不过由于没有调色板，可能并不好设置`n- 建议使用以下配色网站(也可以自己去找)，找到喜欢的颜色，复制16进制值`n- 显示的颜色以最终渲染的颜色效果为准")
-        configGui.AddLink(, '<a href="https://colorhunt.co">https://colorhunt.co</a>')
-        configGui.AddLink(, '<a href="https://materialui.co/colors">https://materialui.co/colors</a>')
-        configGui.AddLink(, '<a href="https://color.adobe.com/zh/create/color-wheel">https://color.adobe.com/zh/create/color-wheel</a>')
-        configGui.AddLink(, '<a href="https://colordesigner.io/color-palette-builder">https://colordesigner.io/color-palette-builder</a>')
-        tab.UseTab(0)
-        configGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", changeConfig)
-        changeConfig(*) {
-            isColor(v) {
-                v := StrReplace(v, "#", "")
-                colorList := ",red,blue,green,yellow,purple,gray,black,white,"
-                if (InStr(colorList, "," v ",")) {
-                    return 1
-                }
-                if (StrLen(v) > 8) {
-                    return 0
-                }
-                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
-                for item in vList {
-                    v := StrReplace(v, item, "")
-                }
-                return !Trim(v)
-            }
-            isValid := 1
-            list := [configList[1], configList[2], configList[3]]
-            for v in list {
-                value := configGui.Submit().%v.config%
-                if (value != 1 && value != 0) {
-                    showMsg(["配置错误!", v.tip " 的值只能是 0 或 1。"])
-                    isValid := 0
-                }
-            }
-            list := [configList[4], configList[5], configList[6], configList[15]]
-            for v in list {
-                if (!isColor(configGui.Submit().%v.config%)) {
-                    showMsg(["配置错误!", v.tip " 应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
-                    isValid := 0
-                }
-            }
-            transparent := configGui.Submit().transparent
-            if (IsFloat(transparent)) {
-                showMsg(["配置错误!", configList[7].tip " 不能是一个小数"])
-                isValid := 0
-            } else {
-                if (transparent < 0 || transparent > 255) {
-                    showMsg(["配置错误!", configList[7].tip " 应该是 0 到 255 之间的整数。"])
-                    isValid := 0
-                }
-            }
-            list := [configList[8], configList[9]]
-            for v in list {
-                if (!IsNumber(configGui.Submit().%v.config%)) {
-                    showMsg(["配置错误!", v.tip " 应该是一个数字。"])
-                    isValid := 0
-                }
-            }
-            list := [configList[10], configList[11]]
-            for v in list {
-                value := configGui.Submit().%v.config%
-                if (!IsNumber(value) || value < 0) {
-                    showMsg(["配置错误!", v.tip " 应该是一个大于 0 的数字。"])
-                    isValid := 0
-                }
-            }
-            if (isValid) {
-                if (configGui.Submit().changeCursor = 0) {
-                    for v in info {
-                        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
-                    }
-                    MsgBox("尝试恢复默认鼠标样式。`n如果没有正常恢复，请重启电脑。")
-                }
-                for item in configList {
-                    writeIni(item.config, configGui.Submit().%item.config%)
-                }
-                fn_restart()
-            }
-        }
-        configGui.Show()
-    })
-    A_TrayMenu.Add("设置方块符号边框", (*) {
-        borderGui := Gui("AlwaysOnTop +OwnDialogs")
-        borderGui.SetFont("s12", "微软雅黑")
-        borderGui.AddText(, "目前可以使用三种样式`n- 样式1: 三种样式中最明显的，个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，感官上更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
-        borderGui.Show("Hide")
-        borderGui.GetPos(, , &Gui_width)
-        borderGui.Destroy()
-
-        borderGui := Gui("AlwaysOnTop +OwnDialogs", A_ScriptName " - 设置方块符号的边框")
-        borderGui.SetFont("s12", "微软雅黑")
-        borderGui.AddText(, "目前可以使用三种样式`n- 样式1: 个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
-        borderGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", (*) {
+        configGui.AddText(, "目前可以使用三种样式`n- 样式1: 普通边框`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
+        configGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", (*) {
             set(1)
         })
-        borderGui.AddButton("w" Gui_width, "设置为样式2").OnEvent("Click", (*) {
+        configGui.AddButton("w" Gui_width, "设置为样式2").OnEvent("Click", (*) {
             set(2)
         })
-        borderGui.AddButton("w" Gui_width, "设置为样式3").OnEvent("Click", (*) {
+        configGui.AddButton("w" Gui_width, "设置为样式3").OnEvent("Click", (*) {
             set(3)
         })
-        borderGui.AddButton("w" Gui_width, "去掉边框样式").OnEvent("Click", (*) {
+        configGui.AddButton("w" Gui_width, "去掉边框样式").OnEvent("Click", (*) {
             set(0)
         })
         set(type) {
             writeIni("border_type", type)
             fn_restart()
         }
-        borderGui.AddButton("w" Gui_width, "自定义样式边框").OnEvent("Click", custom)
-        custom(*) {
-            borderGui.Destroy()
+        configGui.AddButton("w" Gui_width, "自定义样式边框").OnEvent("Click", (*) {
+            configGui.Destroy()
             customGui := Gui("AlwaysOnTop OwnDialogs")
             customGui.SetFont("s12", "微软雅黑")
-            customGui.AddText("Center h30 ", "InputTip v2 - 自定义方块符号样式边框")
-            customGui.AddText("xs", "你可以从以下任意可用地址中获取相关的配置说明:")
-            customGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-            customGui.AddText("xs", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
+            customGui.AddText("", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
             customGui.Show("Hide")
             customGui.GetPos(, , &Gui_width)
             customGui.Destroy()
 
-            customGui := Gui("AlwaysOnTop OwnDialogs")
+            customGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 自定义方块符号样式边框")
             customGui.SetFont("s12", "微软雅黑")
-            customGui.AddText("Center h30 ", "InputTip v2 - 自定义方块符号样式边框")
-            customGui.AddText("xs", "你可以从以下任意可用地址中获取相关的配置说明:")
-            customGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-            customGui.AddText("xs", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
+            customGui.AddText("", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
 
             configList := [{
                 config: "border_margin_left",
@@ -1065,8 +949,99 @@ makeTrayMenu() {
                     fn_restart()
                 }
             }
+        })
+
+        tab.UseTab(5)
+        list := [configList[13], configList[14], configList[15], configList[16], configList[17], configList[18], configList[19]]
+        configGui.AddText("Section", "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时的字符设置，可以留空，留空表示不显示")
+        for v in list {
+            configGui.AddText("xs", v.tip ": ")
+            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
-        borderGui.Show()
+        tab.UseTab(6)
+        configGui.AddText(, "你可以从以下任意可用地址中获取配置说明:")
+        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>')
+        configGui.AddLink(, '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+        configGui.AddLink(, '<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
+        tab.UseTab(7)
+        configGui.AddText(, "- 对于配置中颜色相关的配置，建议使用16进制的颜色值`n- 不过由于没有调色板，可能并不好设置`n- 建议使用以下配色网站(也可以自己去找)，找到喜欢的颜色，复制16进制值`n- 显示的颜色以最终渲染的颜色效果为准")
+        configGui.AddLink(, '<a href="https://colorhunt.co">https://colorhunt.co</a>')
+        configGui.AddLink(, '<a href="https://materialui.co/colors">https://materialui.co/colors</a>')
+        configGui.AddLink(, '<a href="https://color.adobe.com/zh/create/color-wheel">https://color.adobe.com/zh/create/color-wheel</a>')
+        configGui.AddLink(, '<a href="https://colordesigner.io/color-palette-builder">https://colordesigner.io/color-palette-builder</a>')
+        tab.UseTab(0)
+        configGui.AddButton(" w" Gui_width + configGui.MarginX * 2, "确认").OnEvent("Click", changeConfig)
+        changeConfig(*) {
+            isColor(v) {
+                v := StrReplace(v, "#", "")
+                colorList := ",red,blue,green,yellow,purple,gray,black,white,"
+                if (InStr(colorList, "," v ",")) {
+                    return 1
+                }
+                if (StrLen(v) > 8) {
+                    return 0
+                }
+                vList := ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
+                for item in vList {
+                    v := StrReplace(v, item, "")
+                }
+                return !Trim(v)
+            }
+            isValid := 1
+            list := [configList[1], configList[2], configList[3]]
+            for v in list {
+                value := configGui.Submit().%v.config%
+                if (value != 1 && value != 0) {
+                    showMsg(["配置错误!", v.tip " 的值只能是 0 或 1。"])
+                    isValid := 0
+                }
+            }
+            list := [configList[4], configList[5], configList[6], configList[15]]
+            for v in list {
+                if (!isColor(configGui.Submit().%v.config%)) {
+                    showMsg(["配置错误!", v.tip " 应该是一个颜色英文单词或者十六进制颜色值。", "支持的颜色英文单词: red, blue, green, yellow, purple, gray, black, white"])
+                    isValid := 0
+                }
+            }
+            transparent := configGui.Submit().transparent
+            if (IsFloat(transparent)) {
+                showMsg(["配置错误!", configList[7].tip " 不能是一个小数"])
+                isValid := 0
+            } else {
+                if (transparent < 0 || transparent > 255) {
+                    showMsg(["配置错误!", configList[7].tip " 应该是 0 到 255 之间的整数。"])
+                    isValid := 0
+                }
+            }
+            list := [configList[8], configList[9]]
+            for v in list {
+                if (!IsNumber(configGui.Submit().%v.config%)) {
+                    showMsg(["配置错误!", v.tip " 应该是一个数字。"])
+                    isValid := 0
+                }
+            }
+            list := [configList[10], configList[11]]
+            for v in list {
+                value := configGui.Submit().%v.config%
+                if (!IsNumber(value) || value < 0) {
+                    showMsg(["配置错误!", v.tip " 应该是一个大于 0 的数字。"])
+                    isValid := 0
+                }
+            }
+            if (isValid) {
+                if (configGui.Submit().changeCursor = 0) {
+                    for v in info {
+                        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
+                    }
+                    MsgBox("尝试恢复默认鼠标样式。`n如果没有正常恢复，请重启电脑。")
+                }
+                for item in configList {
+                    writeIni(item.config, configGui.Submit().%item.config%)
+                }
+                fn_restart()
+            }
+        }
+        configGui.Show()
     })
     sub1 := Menu()
     fn_common(tipList, addFn) {
@@ -1614,7 +1589,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
 
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,"
-    MSAA_list := ",EXCEL.EXE,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,"
     Gui_UIA_list := ",ONENOTE.EXE,POWERPNT.EXE,"
 
     if (InStr(Wpf_list, "," exe_name ",")) {

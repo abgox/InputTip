@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.14.3
+;@AHK2Exe-SetVersion 2.15.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.14.3"
+currentVersion := "2.15.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -56,8 +56,8 @@ CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
 EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
 Caps_color := StrReplace(readIni("Caps_color", "green"), '#', '')
 transparent := readIni('transparent', 222)
-offset_x := readIni('offset_x', 5)
-offset_y := readIni('offset_y', 0)
+offset_x := readIni('offset_x', 10)
+offset_y := readIni('offset_y', -10)
 symbol_height := readIni('symbol_height', 7)
 symbol_width := readIni('symbol_width', 7)
 ; 隐藏中英文状态方块符号提示
@@ -90,7 +90,7 @@ screenList := getScreenInfo()
 ; 特别的偏移量设置
 offset := Map()
 
-; 字符显示相关的配置
+; 文本字符相关的配置
 showChar := readIni("showChar", 0)
 font_family := readIni('font_family', '微软雅黑')
 font_size := readIni('font_size', 7)
@@ -302,22 +302,23 @@ if (changeCursor) {
                 if (exe_name != lastWindow) {
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
-                    if (RegExMatch(app_CN, "," exe_name ",")) {
+                    if (InStr(app_CN, "," exe_name ",")) {
                         switch_CN()
-                    } else if (RegExMatch(app_EN, "," exe_name ",")) {
+                    } else if (InStr(app_EN, "," exe_name ",")) {
                         switch_EN()
-                    } else if (RegExMatch(app_Caps, "," exe_name ",")) {
+                    } else if (InStr(app_Caps, "," exe_name ",")) {
                         switch_Caps()
                     }
                 }
-                is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
-                is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
+                is_hide_state := InStr(app_hide_state, "," exe_name ",")
+                is_hide_CN_EN := InStr(app_hide_CN_EN, "," exe_name ",")
             }
             if (A_TimeIdle < 500) {
                 if (is_hide_state || (is_hide_CN_EN && !isShowCaps)) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
+                    DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
                     canShowSymbol := GetCaretPosEx(&left, &top)
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -407,11 +408,11 @@ if (changeCursor) {
                 if (exe_name != lastWindow) {
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
-                    if (RegExMatch(app_CN, "," exe_name ",")) {
+                    if (InStr(app_CN, "," exe_name ",")) {
                         switch_CN()
-                    } else if (RegExMatch(app_EN, "," exe_name ",")) {
+                    } else if (InStr(app_EN, "," exe_name ",")) {
                         switch_EN()
-                    } else if (RegExMatch(app_Caps, "," exe_name ",")) {
+                    } else if (InStr(app_Caps, "," exe_name ",")) {
                         switch_Caps()
                     }
                 }
@@ -458,22 +459,23 @@ if (changeCursor) {
                 if (exe_name != lastWindow) {
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
-                    if (RegExMatch(app_CN, "," exe_name ",")) {
+                    if (InStr(app_CN, "," exe_name ",")) {
                         switch_CN()
-                    } else if (RegExMatch(app_EN, "," exe_name ",")) {
+                    } else if (InStr(app_EN, "," exe_name ",")) {
                         switch_EN()
-                    } else if (RegExMatch(app_Caps, "," exe_name ",")) {
+                    } else if (InStr(app_Caps, "," exe_name ",")) {
                         switch_Caps()
                     }
                 }
-                is_hide_state := RegExMatch(app_hide_state, "," exe_name ",")
-                is_hide_CN_EN := RegExMatch(app_hide_CN_EN, "," exe_name ",")
+                is_hide_state := InStr(app_hide_state, "," exe_name ",")
+                is_hide_CN_EN := InStr(app_hide_CN_EN, "," exe_name ",")
             }
             if (A_TimeIdle < 500) {
                 if (is_hide_state || (is_hide_CN_EN && !isShowCaps)) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
+                    DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
                     canShowSymbol := GetCaretPosEx(&left, &top)
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -721,7 +723,7 @@ makeTrayMenu() {
             tip: "设置大写锁定时显示的字符"
         }]
 
-        tab := configGui.AddTab3(, ["显示形式", "鼠标样式配置", "方块符号配置", "字符显示配置", "在线配置文件说明", "配色网站"])
+        tab := configGui.AddTab3(, ["显示形式", "鼠标样式配置", "方块符号配置", "文本字符配置", "在线配置文件说明", "配色网站"])
         tab.UseTab(1)
         configGui.AddText(, "- 以下配置项只能使用 1 或 0，1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n  - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n  - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效")
 
@@ -853,7 +855,7 @@ makeTrayMenu() {
             isColor(v) {
                 v := StrReplace(v, "#", "")
                 colorList := ",red,blue,green,yellow,purple,gray,black,white,"
-                if (RegExMatch(colorList, "," v ",")) {
+                if (InStr(colorList, "," v ",")) {
                     return 1
                 }
                 if (StrLen(v) > 8) {
@@ -932,22 +934,18 @@ makeTrayMenu() {
         borderGui := Gui("AlwaysOnTop +OwnDialogs", A_ScriptName " - 设置方块符号的边框")
         borderGui.SetFont("s12", "微软雅黑")
         borderGui.AddText(, "目前可以使用三种样式`n- 样式1: 个人感觉效果最好的`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
-        borderGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", add1)
-        add1(*) {
+        borderGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", (*) {
             set(1)
-        }
-        borderGui.AddButton("w" Gui_width, "设置为样式2").OnEvent("Click", add2)
-        add2(*) {
+        })
+        borderGui.AddButton("w" Gui_width, "设置为样式2").OnEvent("Click", (*) {
             set(2)
-        }
-        borderGui.AddButton("w" Gui_width, "设置为样式3").OnEvent("Click", add3)
-        add3(*) {
+        })
+        borderGui.AddButton("w" Gui_width, "设置为样式3").OnEvent("Click", (*) {
             set(3)
-        }
-        borderGui.AddButton("w" Gui_width, "去掉边框样式").OnEvent("Click", rm)
-        rm(*) {
+        })
+        borderGui.AddButton("w" Gui_width, "去掉边框样式").OnEvent("Click", (*) {
             set(0)
-        }
+        })
         set(type) {
             writeIni("border_type", type)
             fn_restart()
@@ -1047,7 +1045,7 @@ makeTrayMenu() {
                 isColor(v) {
                     v := StrReplace(v, "#", "")
                     colorList := ",red,blue,green,yellow,purple,gray,black,white,"
-                    if (RegExMatch(colorList, "," v ",")) {
+                    if (InStr(colorList, "," v ",")) {
                         return 1
                     }
                     if (StrLen(v) > 8) {
@@ -1104,7 +1102,7 @@ makeTrayMenu() {
                     try {
                         exe_name := ProcessGetName(WinGetPID("ahk_id " v))
                         title := WinGetTitle("ahk_id " v)
-                        if (!RegExMatch(temp, exe_name ",") && !RegExMatch(value, exe_name ",")) {
+                        if (!InStr(temp, exe_name ",") && !InStr(value, exe_name ",")) {
                             temp .= exe_name ","
                             LV.Add(, exe_name, WinGetTitle("ahk_id " v))
                         }
@@ -1309,7 +1307,7 @@ makeTrayMenu() {
         fn(RowText) {
             value_EN := "," readIni("app_EN", "") ","
             value_Caps := "," readIni("app_Caps", "") ","
-            if (RegExMatch(value_EN, "," RowText ",")) {
+            if (InStr(value_EN, "," RowText ",")) {
                 valueArr := StrSplit(value_EN, ",")
                 result := ""
                 for v in valueArr {
@@ -1320,7 +1318,7 @@ makeTrayMenu() {
                 writeIni("app_EN", SubStr(result, 2))
             }
 
-            if (RegExMatch(value_Caps, "," RowText ",")) {
+            if (InStr(value_Caps, "," RowText ",")) {
                 valueArr := StrSplit(value_Caps, ",")
                 result := ""
                 for v in valueArr {
@@ -1352,7 +1350,7 @@ makeTrayMenu() {
         fn(RowText) {
             value_CN := "," readIni("app_CN", "") ","
             value_Caps := "," readIni("app_Caps", "") ","
-            if (RegExMatch(value_CN, "," RowText ",")) {
+            if (InStr(value_CN, "," RowText ",")) {
                 valueArr := StrSplit(value_CN, ",")
                 result := ""
                 for v in valueArr {
@@ -1363,7 +1361,7 @@ makeTrayMenu() {
                 writeIni("app_CN", SubStr(result, 2))
             }
 
-            if (RegExMatch(value_Caps, "," RowText ",")) {
+            if (InStr(value_Caps, "," RowText ",")) {
                 valueArr := StrSplit(value_Caps, ",")
                 result := ""
                 for v in valueArr {
@@ -1395,7 +1393,7 @@ makeTrayMenu() {
         fn(RowText) {
             value_CN := "," readIni("app_CN", "") ","
             value_EN := "," readIni("app_EN", "") ","
-            if (RegExMatch(value_CN, "," RowText ",")) {
+            if (InStr(value_CN, "," RowText ",")) {
                 valueArr := StrSplit(value_CN, ",")
                 result := ""
                 for v in valueArr {
@@ -1406,7 +1404,7 @@ makeTrayMenu() {
                 writeIni("app_CN", SubStr(result, 2))
             }
 
-            if (RegExMatch(value_EN, "," RowText ",")) {
+            if (InStr(value_EN, "," RowText ",")) {
                 valueArr := StrSplit(value_EN, ",")
                 result := ""
                 for v in valueArr {
@@ -1453,11 +1451,9 @@ makeTrayMenu() {
             hotkeyGui.AddText("xs", v.tip ": ")
             value := readIni(v.config, '')
             hotkeyGui.AddHotkey("yp v" v.config, StrReplace(value, "#", ""))
-            hotkeyGui.AddCheckbox("yp v" v.with, "Win").Value := RegExMatch(value, "#")
+            hotkeyGui.AddCheckbox("yp v" v.with, "Win").Value := InStr(value, "#")
         }
-        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
-        hotkeyGui.OnEvent("Close", yes)
-        yes(*) {
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", (*) {
             for v in configList {
                 if (hotkeyGui.Submit().%v.with%) {
                     key := "#" hotkeyGui.Submit().%v.config%
@@ -1467,57 +1463,8 @@ makeTrayMenu() {
                 writeIni(v.config, key)
             }
             fn_restart()
-        }
+        })
         hotkeyGui.Show()
-    })
-    A_TrayMenu.Add("设置特殊偏移量", (*) {
-        offsetGui := Gui("AlwaysOnTop OwnDialogs")
-        offsetGui.SetFont("s12", "微软雅黑")
-        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
-        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
-        offsetGui.AddText(, "------------------------------------------------------")
-        offsetGui.Show("Hide")
-        offsetGui.GetPos(, , &Gui_width)
-        offsetGui.Destroy()
-
-        offsetGui := Gui("AlwaysOnTop OwnDialogs")
-        offsetGui.SetFont("s12", "微软雅黑")
-        offsetGui.AddText(, "设置各个屏幕的方块符号的特殊偏移量")
-        offsetGui.AddText(, "- 由于缩放大于 125% 的副屏上方块符号显示位置会存在偏差`n- 你需要手动的设置特殊偏移量使其正确显示`n- 这里的特殊偏移量不会覆盖配置中设置的水平/垂直方向的偏移量，而是叠加`n- 每块屏幕的编号，可以在 系统设置 -> 屏幕 -> 标识 中找到")
-        offsetGui.AddText(, "------------------------------------------------------")
-
-        screenList := getScreenInfo()
-        pages := []
-        for v in screenList {
-            pages.push("屏幕 " v.num)
-        }
-        tab := offsetGui.AddTab3("", pages)
-
-        for v in screenList {
-            tab.UseTab(v.num)
-            if (v.num = v.main) {
-                offsetGui.AddText(, "这是主屏幕(主显示器)，屏幕标识为: " v.num)
-            } else {
-                offsetGui.AddText(, "这是副屏幕(副显示器)，屏幕标识为: " v.num)
-            }
-            offsetGui.AddText("", "水平方向的偏移量: ")
-            offsetGui.AddEdit("voffset_x_" v.num " yp w100", offset["offset_x_" v.num])
-            offsetGui.AddText("yp", "垂直方向的偏移量: ")
-            offsetGui.AddEdit("voffset_y_" v.num " yp w100", offset["offset_y_" v.num])
-        }
-        tab.UseTab(0)
-        offsetGui.AddButton("w" Gui_width, "确定").OnEvent("Click", save)
-        save(*) {
-            for v in screenList {
-                x := offsetGui.Submit().%"offset_x_" v.num%
-                writeIni("offset_x_" v.num, x)
-                y := offsetGui.Submit().%"offset_y_" v.num%
-                writeIni("offset_y_" v.num, y)
-            }
-            fn_restart()
-        }
-        offsetGui.Show()
-
     })
     sub2 := Menu()
     sub2.Add("隐藏中英文状态方块符号提示", (*) {
@@ -1539,7 +1486,7 @@ makeTrayMenu() {
         )
         fn(RowText) {
             value := "," readIni("app_hide_state", "") ","
-            if (RegExMatch(value, "," RowText ",")) {
+            if (InStr(value, "," RowText ",")) {
                 valueArr := StrSplit(value, ",")
                 result := ""
                 for v in valueArr {
@@ -1570,7 +1517,7 @@ makeTrayMenu() {
         )
         fn(RowText) {
             value := "," readIni("app_hide_CN_EN", "") ","
-            if (RegExMatch(value, "," RowText ",")) {
+            if (InStr(value, "," RowText ",")) {
                 valueArr := StrSplit(value, ",")
                 result := ""
                 for v in valueArr {
@@ -1663,48 +1610,50 @@ isWhichScreen() {
     }
 }
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
-    /*
-    # getCaretPosFromGui 能获取到正确的坐标，但不通用
-        - 记事本(notepad)
-        - powerToys
-        - ahk gui
-        - Word
-        - ...
-    */
-    if (getCaretPosFromGui(&hwnd := 0)) {
-        return 1
-    }
+    hwnd := getHwnd()
 
-    ; # getCaretPosFromWpfCaret，getCaretPosFromUIA 两个方法获取到的坐标几乎都正确，但是不通用
-    if (WinActive("ahk_exe powershell_ise.exe")) {
-        funcs := [getCaretPosFromWpfCaret]
+    Wpf_list := ",powershell_ise.exe,"
+    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,"
+    MSAA_list := ",EXCEL.EXE,"
+    Gui_UIA_list := ",ONENOTE.EXE,POWERPNT.EXE,"
+
+    if (InStr(Wpf_list, "," exe_name ",")) {
+        if (getCaretPosFromWpfCaret()) {
+            return 1
+        }
+    } else if (InStr(UIA_list, "," exe_name ",")) {
+        if (getCaretPosFromUIA()) {
+            return 1
+        }
     }
-    else if (WinActive("ahk_exe code.exe")) {
-        funcs := [getCaretPosFromHook]
+    else if (InStr(MSAA_list, "," exe_name ",")) {
+        if (getCaretPosFromMSAA()) {
+            return 1
+        }
+    } else if (InStr(Gui_UIA_list, "," exe_name ",")) {
+        if (getCaretPosFromGui(&hwnd := 0)) {
+            return 1
+        }
+        if (getCaretPosFromUIA()) {
+            return 1
+        }
     }
     else {
-        ; # getCaretPosFromHook 更通用，但是对于副屏来说，其缩放如果高于 125%, 获取到的坐标就有会很大偏差,且它有一部分兼容性问题
-        funcs := [getCaretPosFromMSAA, getCaretPosFromUIA, getCaretPosFromHook]
-    }
-    if (WinActive("ahk_exe ONENOTE.EXE")) {
-        ; getCaretPosFromHook 有兼容性问题的窗口
-        funcs.RemoveAt(funcs.Length)
-    }
-
-    for fn in funcs {
-        if (fn()) {
-            fnName := fn.Name
-            if (fnName == "getCaretPosFromHook" || fnName == "getCaretPosFromMSAA") {
-                ; getCaretPosFromHook getCaretPosFromMSAA 方法在副屏上的位置有偏差，需要特殊处理偏移量
-                try {
-                    left += offset["offset_x_" isWhichScreen().num]
-                    top += offset["offset_y_" isWhichScreen().num]
-                }
-            }
+        if (getCaretPosFromHook()) {
             return 1
         }
     }
     return 0
+
+    getHwnd(hwnd := 0) {
+        x64 := A_PtrSize == 8
+        guiThreadInfo := Buffer(x64 ? 72 : 48)
+        NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
+        if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
+            hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
+        }
+        return hwnd
+    }
 
     getCaretPosFromGui(&hwnd) {
         x64 := A_PtrSize == 8

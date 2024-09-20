@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.16.0
+;@AHK2Exe-SetVersion 2.17.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.16.0"
+currentVersion := "2.17.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -49,6 +49,15 @@ try {
     writeIni("app_hide_CN_EN", app_hide_CN_EN)
 }
 
+try {
+    for v in ["Taskmgr.exe", "explorer.exe", "StartMenuExperienceHost.exe"] {
+        app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
+        if (!InStr(app_hide_state, v)) {
+            writeIni("app_hide_state", app_hide_state (app_hide_state? "," : "") v)
+        }
+    }
+}
+
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
 changeCursor := readIni("changeCursor", 1)
 showSymbol := readIni("showSymbol", 1)
@@ -61,10 +70,8 @@ offset_x := readIni('offset_x', 10)
 offset_y := readIni('offset_y', -10)
 symbol_height := readIni('symbol_height', 7)
 symbol_width := readIni('symbol_width', 7)
-; 隐藏中英文状态方块符号提示
-app_hide_CN_EN := "," app_hide_CN_EN ","
-; 隐藏输入法状态方块符号提示
-app_hide_state := "," readIni('app_hide_state', '') ","
+; 隐藏方块符号
+app_hide_state := "," readIni('app_hide_state', 'Taskmgr.exe,explorer.exe,StartMenuExperienceHost.exe') ","
 app_CN := "," readIni('app_CN', '') ","
 app_EN := "," readIni('app_EN', '') ","
 app_Caps := "," readIni('app_Caps', '') ","
@@ -88,8 +95,6 @@ borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI 
 borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI / 96
 ; 屏幕分辨率
 screenList := getScreenInfo()
-; 特别的偏移量设置
-offset := Map()
 
 ; 文本字符相关的配置
 showChar := readIni("showChar", 0)
@@ -101,10 +106,6 @@ CN_Text := readIni('CN_Text', '中')
 EN_Text := readIni('EN_Text', '英')
 Caps_Text := readIni('Caps_Text', '大')
 
-for v in screenList {
-    offset["offset_x_" v.num] := readIni("offset_x_" v.num, 0)
-    offset["offset_y_" v.num] := readIni("offset_y_" v.num, 0)
-}
 if (hotkey_CN) {
     Hotkey(hotkey_CN, switch_CN)
 }
@@ -259,7 +260,7 @@ if (changeCursor) {
     }
 }
 
-state := 1, old_state := '', old_left := '', old_top := '', isShowCN := 1, isShowEN := 0, isShowCaps := 0, left := 0, top := 0
+state := 1, old_state := '', old_left := '', old_top := '', left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 if (showChar) {
     TipGui.MarginX := 0, TipGui.MarginY := 0
@@ -292,9 +293,146 @@ WinSetTransparent(border_transparent)
 borderGui.Opt("-LastFound")
 borderGui.BackColor := border_color_CN
 lastWindow := ""
+lastState := state
 needHide := 1
 if (changeCursor) {
     show("CN")
+    if (showSymbol) {
+        while 1 {
+            is_hide_CN_EN := 0
+            is_hide_state := 0
+            try {
+                exe_name := ProcessGetName(WinGetPID("A"))
+                if (exe_name != lastWindow) {
+                    needHide := 0
+                    SetTimer((*) {
+                        global needHide := 1
+                    }, HideSymbolDelay)
+                    WinWaitActive("ahk_exe" exe_name)
+                    lastWindow := exe_name
+                    if (InStr(app_CN, "," exe_name ",")) {
+                        switch_CN()
+                    } else if (InStr(app_EN, "," exe_name ",")) {
+                        switch_EN()
+                    } else if (InStr(app_Caps, "," exe_name ",")) {
+                        switch_Caps()
+                    }
+                }
+                is_hide_state := InStr(app_hide_state, "," exe_name ",")
+                is_hide_CN_EN := InStr(app_hide_CN_EN, "," exe_name ",")
+            }
+
+            if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
+                TipGui.Hide()
+                continue
+            }
+            if (A_TimeIdle < 500) {
+                if (is_hide_state || (is_hide_CN_EN && (state != 2))) {
+                    canShowSymbol := 0
+                    TipGui.Hide()
+                } else {
+                    DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+                    canShowSymbol := GetCaretPosEx(&left, &top)
+                }
+                if (GetKeyState("CapsLock", "T")) {
+                    if (state = 2) {
+                        if (left != old_left || top != old_top) {
+                            canShowSymbol ? TipShow("Caps") : TipGui.Hide()
+                        }
+                    } else {
+                        state := 2
+                        show("Caps")
+                        if (canShowSymbol) {
+                            TipGui.BackColor := Caps_color, borderGui.BackColor := border_color_Caps
+                            TipShow("Caps")
+                        } else {
+                            TipGui.Hide()
+                        }
+                    }
+                    old_left := left
+                    old_top := top
+                    old_state := state
+                    Sleep(50)
+                    continue
+                }
+                try {
+                    state := isCN(mode)
+                    v := state = 1 ? "CN" : "EN"
+                } catch {
+                    TipGui.Hide()
+                    Sleep(50)
+                    continue
+                }
+                if (state != old_state) {
+                    show(v)
+                    TipGui.BackColor := %v "_color"%
+                    borderGui.BackColor := %"border_color_" v%
+                    if (canShowSymbol) {
+                        TipShow(v)
+                    } else {
+                        TipGui.Hide()
+                    }
+                    old_state := state
+                }
+                if (left != old_left || top != old_top) {
+                    old_left := left
+                    old_top := top
+                    if (canShowSymbol) {
+                        TipShow(v)
+                    } else {
+                        TipGui.Hide()
+                    }
+                }
+            }
+            Sleep(50)
+        }
+    } else {
+        while 1 {
+            try {
+                exe_name := ProcessGetName(WinGetPID("A"))
+                if (exe_name != lastWindow) {
+                    WinWaitActive("ahk_exe" exe_name)
+                    lastWindow := exe_name
+                    if (InStr(app_CN, "," exe_name ",")) {
+                        switch_CN()
+                    } else if (InStr(app_EN, "," exe_name ",")) {
+                        switch_EN()
+                    } else if (InStr(app_Caps, "," exe_name ",")) {
+                        switch_Caps()
+                    }
+                }
+            }
+            if (A_TimeIdle < 500) {
+                if (GetKeyState("CapsLock", "T")) {
+                    if (state != 2) {
+                        show("Caps")
+                        state := 2
+                    }
+                    old_state := state
+                    Sleep(50)
+                    continue
+                }
+                try {
+                    state := isCN(mode)
+                    v := state = 1 ? "CN" : "EN"
+                } catch {
+                    Sleep(50)
+                    continue
+                }
+                if (state != old_state) {
+                    show(v)
+                    old_state := state
+                }
+            }
+            Sleep(50)
+        }
+    }
+    show(type) {
+        for v in info {
+            DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
+        }
+    }
+} else {
     if (showSymbol) {
         while 1 {
             is_hide_CN_EN := 0
@@ -324,7 +462,7 @@ if (changeCursor) {
                 continue
             }
             if (A_TimeIdle < 500) {
-                if (is_hide_state || (is_hide_CN_EN && !isShowCaps)) {
+                if (is_hide_state || (is_hide_CN_EN && (state != 2))) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
@@ -332,19 +470,12 @@ if (changeCursor) {
                     canShowSymbol := GetCaretPosEx(&left, &top)
                 }
                 if (GetKeyState("CapsLock", "T")) {
-                    if (isShowCaps) {
+                    if (state = 2) {
                         if (left != old_left || top != old_top) {
-                            old_left := left
-                            old_top := top
                             canShowSymbol ? TipShow("Caps") : TipGui.Hide()
                         }
                     } else {
-                        isShowCN := 0
-                        isShowEN := 0
-                        isShowCaps := 1
-                        old_left := left
-                        old_top := top
-                        show("Caps")
+                        state := 2
                         if (canShowSymbol) {
                             TipGui.BackColor := Caps_color, borderGui.BackColor := border_color_Caps
                             TipShow("Caps")
@@ -352,214 +483,38 @@ if (changeCursor) {
                             TipGui.Hide()
                         }
                     }
+                    old_left := left
+                    old_top := top
+                    old_state := state
                     Sleep(50)
                     continue
                 }
                 try {
                     state := isCN(mode)
+                    v := state = 1 ? "CN" : "EN"
                 } catch {
                     TipGui.Hide()
                     Sleep(50)
                     continue
-                }
-                if (isShowCaps) {
-                    if (state) {
-                        show("CN")
-                        isShowCN := 1
-                        isShowEN := 0
-                        TipGui.BackColor := CN_color
-                        borderGui.BackColor := border_color_CN
-                    } else {
-                        show("EN")
-                        isShowCN := 0
-                        isShowEN := 1
-                        TipGui.BackColor := EN_color
-                        borderGui.BackColor := border_color_EN
-                    }
-                    isShowCaps := 0
-                    isShow := 1
-                }
-                if (state != old_state || left != old_left || top != old_top) {
-                    old_state := state
-                    old_left := left
-                    old_top := top
-                    if (state) {
-                        if (!isShowCN) {
-                            show("CN")
-                            isShowCN := 1
-                            isShowEN := 0
-                            isShowCaps := 0
-                            TipGui.BackColor := CN_color
-                            borderGui.BackColor := border_color_CN
-                        }
-                    } else {
-                        if (!isShowEN) {
-                            show("EN")
-                            isShowCN := 0
-                            isShowEN := 1
-                            isShowCaps := 0
-                            TipGui.BackColor := EN_color
-                            borderGui.BackColor := border_color_EN
-                        }
-                    }
-                    isShow := !is_hide_CN_EN && canShowSymbol
-                }
-                if (isShow) {
-                    state ? TipShow("CN") : TipShow("EN")
-                    isShow := 0
-                }
-            }
-            Sleep(50)
-        }
-    } else {
-        while 1 {
-            try {
-                exe_name := ProcessGetName(WinGetPID("A"))
-                if (exe_name != lastWindow) {
-                    WinWaitActive("ahk_exe" exe_name)
-                    lastWindow := exe_name
-                    if (InStr(app_CN, "," exe_name ",")) {
-                        switch_CN()
-                    } else if (InStr(app_EN, "," exe_name ",")) {
-                        switch_EN()
-                    } else if (InStr(app_Caps, "," exe_name ",")) {
-                        switch_Caps()
-                    }
-                }
-            }
-            if (A_TimeIdle < 500) {
-                if (GetKeyState("CapsLock", "T")) {
-                    if (!isShowCaps) {
-                        show("Caps")
-                        isShowCaps := 1
-                    }
-                    Sleep(50)
-                    continue
-                }
-                try {
-                    state := isCN(mode)
-                } catch {
-                    Sleep(50)
-                    continue
-                }
-                if (isShowCaps) {
-                    state ? show("CN") : show("EN")
-                    isShowCaps := 0
                 }
                 if (state != old_state) {
-                    old_state := state
-                    state ? show("CN") : show("EN")
-                }
-            }
-            Sleep(50)
-        }
-    }
-    show(type) {
-        for v in info {
-            DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
-        }
-    }
-} else {
-    if (showSymbol) {
-        while 1 {
-            is_hide_CN_EN := 0
-            is_hide_state := 0
-            try {
-                exe_name := ProcessGetName(WinGetPID("A"))
-                if (exe_name != lastWindow) {
-                    WinWaitActive("ahk_exe" exe_name)
-                    lastWindow := exe_name
-                    if (InStr(app_CN, "," exe_name ",")) {
-                        switch_CN()
-                    } else if (InStr(app_EN, "," exe_name ",")) {
-                        switch_EN()
-                    } else if (InStr(app_Caps, "," exe_name ",")) {
-                        switch_Caps()
-                    }
-                }
-                is_hide_state := InStr(app_hide_state, "," exe_name ",")
-                is_hide_CN_EN := InStr(app_hide_CN_EN, "," exe_name ",")
-            }
-            if (A_TimeIdle < 500) {
-                if (is_hide_state || (is_hide_CN_EN && !isShowCaps)) {
-                    canShowSymbol := 0
-                    TipGui.Hide()
-                } else {
-                    DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
-                    canShowSymbol := GetCaretPosEx(&left, &top)
-                }
-                if (GetKeyState("CapsLock", "T")) {
-                    if (isShowCaps) {
-                        if (left != old_left || top != old_top) {
-                            old_left := left
-                            old_top := top
-                            canShowSymbol ? TipShow("Caps") : TipGui.Hide()
-                        }
+                    if (canShowSymbol) {
+                        TipShow(v)
                     } else {
-                        isShowCN := 0
-                        isShowEN := 0
-                        isShowCaps := 1
-                        old_left := left
-                        old_top := top
-                        show("Caps")
-                        if (canShowSymbol) {
-                            TipGui.BackColor := Caps_color, borderGui.BackColor := border_color_Caps
-                            TipShow("Caps")
-                        } else {
-                            TipGui.Hide()
-                        }
+                        TipGui.Hide()
                     }
-                    Sleep(50)
-                    continue
-                }
-                try {
-                    state := isCN(mode)
-                } catch {
-                    TipGui.Hide()
-                    Sleep(50)
-                    continue
-                }
-                if (isShowCaps) {
-                    if (state) {
-                        isShowCN := 1
-                        isShowEN := 0
-                        TipGui.BackColor := CN_color
-                        borderGui.BackColor := border_color_CN
-                    } else {
-                        isShowCN := 0
-                        isShowEN := 1
-                        TipGui.BackColor := EN_color
-                        borderGui.BackColor := border_color_EN
-                    }
-                    isShowCaps := 0
-                    isShow := 1
-                }
-                if (state != old_state || left != old_left || top != old_top) {
+                    TipGui.BackColor := %v "_color"%
+                    borderGui.BackColor := %"border_color_" v%
                     old_state := state
+                }
+                if (left != old_left || top != old_top) {
                     old_left := left
                     old_top := top
-                    if (state) {
-                        if (!isShowCN) {
-                            isShowCN := 1
-                            isShowEN := 0
-                            isShowCaps := 0
-                            TipGui.BackColor := CN_color
-                            borderGui.BackColor := border_color_CN
-                        }
+                    if (canShowSymbol) {
+                        TipShow(v)
                     } else {
-                        if (!isShowEN) {
-                            isShowCN := 0
-                            isShowEN := 1
-                            isShowCaps := 0
-                            TipGui.BackColor := EN_color
-                            borderGui.BackColor := border_color_EN
-                        }
+                        TipGui.Hide()
                     }
-                    isShow := !is_hide_CN_EN && canShowSymbol
-                }
-                if (isShow) {
-                    state ? TipShow("CN") : TipShow("EN")
-                    isShow := 0
                 }
             }
             Sleep(50)
@@ -1029,7 +984,7 @@ makeTrayMenu() {
                 }
             }
             if (isValid) {
-                if (configGui.Submit().changeCursor = 0) {
+                if (configGui.Submit().changeCursor = 0 && changeCursor = 1) {
                     for v in info {
                         DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
                     }
@@ -1056,18 +1011,18 @@ makeTrayMenu() {
             show() {
                 addGui := Gui("AlwaysOnTop OwnDialogs")
                 addGui.SetFont("s12", "微软雅黑")
-                addGui.AddText(, tipList[4])
                 addGui.AddText(, tipList[5])
+                addGui.AddText(, tipList[4])
                 addGui.Show("Hide")
                 addGui.GetPos(, , &Gui_width)
                 addGui.Destroy()
 
                 addGui := Gui("AlwaysOnTop OwnDialogs")
                 addGui.SetFont("s12", "微软雅黑")
-                addGui.AddText(, tipList[4])
                 addGui.AddText(, tipList[5])
+                addGui.AddText(, tipList[4])
 
-                LV := addGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用", "标题"])
+                LV := addGui.AddListView("r8 NoSortHdr Sort Grid w" Gui_width, ["应用", "标题"])
                 LV.OnEvent("DoubleClick", LV_DoubleClick)
                 value := readIni(tipList[1], "")
                 value := SubStr(value, -1) = "," ? value : value ","
@@ -1179,8 +1134,8 @@ makeTrayMenu() {
 
                 rmGui := Gui("AlwaysOnTop OwnDialogs")
                 rmGui.SetFont("s12", "微软雅黑")
-                rmGui.AddText(, tipList[8])
                 rmGui.AddText(, tipList[9])
+                rmGui.AddText(, tipList[8])
                 rmGui.Show("Hide")
                 rmGui.GetPos(, , &Gui_width)
                 rmGui.Destroy()
@@ -1188,13 +1143,15 @@ makeTrayMenu() {
                 rmGui := Gui("AlwaysOnTop OwnDialogs")
                 rmGui.SetFont("s12", "微软雅黑")
                 if (valueArr.Length > 0) {
-                    rmGui.AddText(, tipList[8])
                     rmGui.AddText(, tipList[9])
+                    rmGui.AddText(, tipList[8])
                     LV := rmGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用"])
                     LV.OnEvent("DoubleClick", LV_DoubleClick)
+                    temp := ","
                     for v in valueArr {
-                        if (Trim(v)) {
+                        if (Trim(v) && !InStr(temp, "," v ",")) {
                             LV.Add(, v)
+                            temp .= v ","
                         }
                     }
                     LV.ModifyCol(1, "Auto")
@@ -1441,70 +1398,26 @@ makeTrayMenu() {
         })
         hotkeyGui.Show()
     })
-    sub2 := Menu()
-    sub2.Add("隐藏中英文状态方块符号提示", (*) {
-        fn_common(
-            [
-                "app_hide_CN_EN",
-                "将应用添加到隐藏中英文状态方块符号提示的应用列表中",
-                "从隐藏中英文状态方块符号提示的应用列表中移除应用",
-                "以下列表中是当前系统正在运行的应用程序",
-                "双击应用程序，将其添加到隐藏中英文状态方块符号提示的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
-                "是否要将 ",
-                " 添加到隐藏中英文状态方块符号提示的应用列表中？`n------------------------------------------------`n此列表中的效果:`n- InputTip.exe 不会根据中英文状态显示不同颜色的方块符号`n- 只会显示大写锁定方块符号",
-                "以下列表中是隐藏中英文状态方块符号提示的应用列表",
-                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
-                "是否要将 ",
-                " 移除？`n移除后，在此应用中，InputTip.exe 会根据中英文状态显示不同颜色的方块符号"
-            ],
-            fn
-        )
-        fn(RowText) {
-            value := "," readIni("app_hide_state", "") ","
-            if (InStr(value, "," RowText ",")) {
-                valueArr := StrSplit(value, ",")
-                result := ""
-                for v in valueArr {
-                    if (v != RowText && Trim(v)) {
-                        result .= "," v
-                    }
-                }
-                writeIni("app_hide_state", SubStr(result, 2))
-            }
-        }
-    })
-    sub2.Add("隐藏输入法状态方块符号提示", (*) {
+    A_TrayMenu.Add("指定隐藏方块符号的应用", (*) {
         fn_common(
             [
                 "app_hide_state",
-                "将应用添加到隐藏输入法状态方块符号提示的应用列表中",
-                "从隐藏输入法状态方块符号提示的应用列表中移除应用",
-                "以下列表中是当前系统正在运行的应用程序",
-                "双击应用程序，将其添加到隐藏输入法状态方块符号提示的应用列表中`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
+                "将应用添加到隐藏方块符号的应用列表中",
+                "从隐藏方块符号的应用列表中移除应用",
+                "以下是当前系统正在运行的应用程序列表",
+                "双击应用程序，将其添加到隐藏方块符号的应用列表中`n- 在已添加的应用中，InputTip.exe 不再显示方块符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
                 "是否要将 ",
-                " 添加到隐藏输入法状态方块符号提示的应用列表中？`n------------------------------------------------`n此列表中的效果`n- InputTip.exe 不会显示方块符号`n- 中英文/大写锁定状态下的方块符号都不会显示",
-                "以下列表中是隐藏输入法状态方块符号提示的应用列表",
-                "双击应用程序，将其移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的窗口设置才生效`n- 在两个隐藏列表中(隐藏中英文/输入法状态方块符号提示)，同时添加了同一个应用，只有最新的生效，另一个会被移除",
+                " 添加到隐藏方块符号的应用列表中？`n添加后，在此应用中，InputTip.exe 不再显示方块符号",
+                "以下是隐藏方块符号的应用列表",
+                "双击应用程序，将其从隐藏方块符号的应用列表中移除`n- 在已移除的应用中，InputTip.exe 会显示方块符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
                 "是否要将 ",
-                " 移除？`n移除后，在此应用中，InputTip.exe 会根据输入法状态显示不同颜色的方块符号"
+                " 移除？`n移除后，在此应用中，InputTip.exe 会显示方块符号"
             ],
             fn
         )
-        fn(RowText) {
-            value := "," readIni("app_hide_CN_EN", "") ","
-            if (InStr(value, "," RowText ",")) {
-                valueArr := StrSplit(value, ",")
-                result := ""
-                for v in valueArr {
-                    if (v != RowText && Trim(v)) {
-                        result .= "," v
-                    }
-                }
-                writeIni("app_hide_CN_EN", SubStr(result, 2))
-            }
+        fn(*) {
         }
     })
-    A_TrayMenu.Add("设置特殊软件", sub2)
     A_TrayMenu.Add("关于", (*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
@@ -1588,7 +1501,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
 
     Wpf_list := ",powershell_ise.exe,"
-    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,"
+    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,YoudaoDict.exe,"
     MSAA_list := ",EXCEL.EXE,DingTalk.exe,"
     Gui_UIA_list := ",ONENOTE.EXE,POWERPNT.EXE,"
 

@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.17.0
+;@AHK2Exe-SetVersion 2.17.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.17.0"
+currentVersion := "2.17.1"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -53,7 +53,7 @@ try {
     for v in ["Taskmgr.exe", "explorer.exe", "StartMenuExperienceHost.exe"] {
         app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
         if (!InStr(app_hide_state, v)) {
-            writeIni("app_hide_state", app_hide_state (app_hide_state? "," : "") v)
+            writeIni("app_hide_state", app_hide_state (app_hide_state ? "," : "") v)
         }
     }
 }
@@ -605,10 +605,11 @@ makeTrayMenu() {
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", (*) {
+        line := "-------------------------------------------------------------------------------------------------------------------"
         size := A_ScreenHeight < 1000 ? "s10" : "s12"
         configGui := Gui("AlwaysOnTop OwnDialogs")
         configGui.SetFont(size, "微软雅黑")
-        configGui.AddText(, "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------------------")
+        configGui.AddText(, "输入框中的值是当前生效的值`n------------------------------------------------------------------------------------------------------------")
         configGui.Show("Hide")
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
@@ -694,7 +695,7 @@ makeTrayMenu() {
 
         tab := configGui.AddTab3(, ["显示形式", "鼠标样式配置", "方块符号配置", "方块符号边框配置", "文本字符配置", "在线配置文件说明", "配色网站"])
         tab.UseTab(1)
-        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0，1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n  - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n  - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效")
+        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0，1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n  - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n  - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效`n" line)
         list := [configList[1], configList[2], configList[3]]
         for v in list {
             configGui.AddText("xs", v.tip ": ")
@@ -702,7 +703,7 @@ makeTrayMenu() {
         }
         tab.UseTab(2)
         configGui.AddText(, "你可以从以下任意可用地址中获取设置鼠标样式文件夹的相关说明:")
-        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义光标样式">https://inputtip.pages.dev/v2/#自定义光标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义光标样式">https://github.com/abgox/InputTip#自定义光标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义光标样式">https://gitee.com/abgox/InputTip#自定义光标样式</a>')
+        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义光标样式">https://inputtip.pages.dev/v2/#自定义光标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义光标样式">https://github.com/abgox/InputTip#自定义光标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义光标样式">https://gitee.com/abgox/InputTip#自定义光标样式</a>`n' line)
         configGui.AddButton("w" Gui_width, "设置中文状态鼠标样式").OnEvent("Click", (*) {
             configGui.Destroy()
             if (!changeCursor) {
@@ -772,14 +773,14 @@ makeTrayMenu() {
             }
         })
         tab.UseTab(3)
-        configGui.AddText("Section", "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号")
+        configGui.AddText("Section", "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号`n" line)
         list := [configList[4], configList[5], configList[6], configList[7], configList[8], configList[9], configList[10], configList[11], configList[12]]
         for v in list {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
         tab.UseTab(4)
-        configGui.AddText(, "目前可以使用三种样式`n- 样式1: 普通边框`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框")
+        configGui.AddText(, "目前可以使用三种样式`n- 样式1: 普通边框`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框`n" line)
         configGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", (*) {
             set(1)
         })
@@ -908,7 +909,7 @@ makeTrayMenu() {
 
         tab.UseTab(5)
         list := [configList[13], configList[14], configList[15], configList[16], configList[17], configList[18], configList[19]]
-        configGui.AddText("Section", "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时的字符设置，可以留空，留空表示不显示")
+        configGui.AddText("Section", "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时的字符设置，可以留空，留空表示不显示`n" line)
         for v in list {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
@@ -1501,7 +1502,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
 
     Wpf_list := ",powershell_ise.exe,"
-    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,YoudaoDict.exe,"
+    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,YoudaoDict.exe,OneCommander.exe,"
     MSAA_list := ",EXCEL.EXE,DingTalk.exe,"
     Gui_UIA_list := ",ONENOTE.EXE,POWERPNT.EXE,"
 

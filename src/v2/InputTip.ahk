@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.17.5
+;@AHK2Exe-SetVersion 2.17.6
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.17.5"
+currentVersion := "2.17.6"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -47,6 +47,15 @@ try {
         app_hide_CN_EN := ""
     }
     writeIni("app_hide_CN_EN", app_hide_CN_EN)
+}
+
+try {
+    for v in ["ApplicationFrameHost.exe"] {
+        app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
+        if (!InStr(app_hide_state, v)) {
+            writeIni("app_hide_state", app_hide_state (app_hide_state ? "," : "") v)
+        }
+    }
 }
 
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"

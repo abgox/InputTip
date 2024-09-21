@@ -1,12 +1,13 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.17.6
+;@AHK2Exe-SetVersion 2.18.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
 ;@Ahk2Exe-SetCopyright Copyright (c) 2024-present abgox
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource InputTipCursor.zip
+;@Ahk2Exe-AddResource InputTipSymbol.zip
 #SingleInstance Force
 Persistent
 ListLines 0
@@ -22,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.17.6"
+currentVersion := "2.18.0"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -61,6 +62,7 @@ try {
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
 changeCursor := readIni("changeCursor", 1)
 showSymbol := readIni("showSymbol", 1)
+showPic := readIni("showPic", 1)
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
 CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
 EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
@@ -68,8 +70,12 @@ Caps_color := StrReplace(readIni("Caps_color", "green"), '#', '')
 transparent := readIni('transparent', 222)
 offset_x := readIni('offset_x', 10)
 offset_y := readIni('offset_y', -10)
-symbol_height := readIni('symbol_height', 7)
 symbol_width := readIni('symbol_width', 7)
+symbol_height := readIni('symbol_height', 7)
+pic_offset_x := readIni('pic_offset_x', 5)
+pic_offset_y := readIni('pic_offset_y', -10)
+pic_symbol_width := readIni('pic_symbol_width', 9)
+pic_symbol_height := readIni('pic_symbol_height', 9)
 ; 隐藏方块符号
 app_hide_state := "," readIni('app_hide_state', 'Taskmgr.exe,explorer.exe,StartMenuExperienceHost.exe') ","
 app_CN := "," readIni('app_CN', '') ","
@@ -89,6 +95,8 @@ border_margin_bottom := readIni('border_margin_bottom', 1)
 border_transparent := readIni('border_transparent', 255)
 symbolWidth := symbol_width * A_ScreenDPI / 96
 symbolHeight := symbol_height * A_ScreenDPI / 96
+picSymbolWidth := pic_symbol_width * A_ScreenDPI / 96
+picSymbolHeight := pic_symbol_height * A_ScreenDPI / 96
 borderWidth := (symbol_width + border_margin_left + border_margin_right) * A_ScreenDPI / 96
 borderHeight := (symbol_height + border_margin_top + border_margin_bottom) * A_ScreenDPI / 96
 borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI / 96
@@ -259,45 +267,81 @@ if (changeCursor) {
         }
     }
 }
+showPicList := ","
+if (showPic) {
+    fileList := ["CN", "EN", "Caps"]
+    if (!DirExist("InputTipSymbol")) {
+        FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
+        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
+        FileDelete("InputTipSymbol.zip")
+    } else {
+        noList := []
+        for f in fileList {
+            if (!FileExist("InputTipSymbol\default\" f ".png")) {
+                noList.push(f)
+            }
+        }
+        if (noList.length > 0) {
+            FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
+            RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
+            dirCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\default", "InputTipSymbol\default", 1)
+            DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
+        }
+    }
+    for f in fileList {
+        if (FileExist("InputTipSymbol\" f ".png")) {
+            showPicList .= f ","
+        }
+    }
+}
 
 state := 1, old_state := '', old_left := '', old_top := '', left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
-if (showChar) {
-    TipGui.MarginX := 0, TipGui.MarginY := 0
-    TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
-    TipGuiText := TipGui.AddText(, CN_Text)
-    TipGuiText := TipGui.AddText(, EN_Text)
-    TipGuiText := TipGui.AddText(, Caps_Text)
-    TipGui.Show("Hide")
-    TipGui.GetPos(, , &Gui_width)
-    TipGui.Destroy()
+if (showPic) {
+    TipGui.BackColor := "000000"
+    WinSetTransColor("000000", TipGui)
+    TipGui.Opt("-LastFound")
+    TipGuiPic := TipGui.AddPicture("w" picSymbolWidth " h" picSymbolHeight, "InputTipSymbol\default\CN.png")
+    CN_color := "000000"
+    EN_color := "000000"
+    Caps_color := "000000"
+} else {
+    if (showChar) {
+        TipGui.MarginX := 0, TipGui.MarginY := 0
+        TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
+        TipGuiText := TipGui.AddText(, CN_Text)
+        TipGuiText := TipGui.AddText(, EN_Text)
+        TipGuiText := TipGui.AddText(, Caps_Text)
+        TipGui.Show("Hide")
+        TipGui.GetPos(, , &Gui_width)
+        TipGui.Destroy()
 
-    TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
-    TipGui.MarginX := 0, TipGui.MarginY := 0
-    TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
+        TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
+        TipGui.MarginX := 0, TipGui.MarginY := 0
+        TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
 
-    TipGuiText := TipGui.AddText("w" Gui_width, CN_Text)
+        TipGuiText := TipGui.AddText("w" Gui_width, CN_Text)
+    }
+    WinSetTransparent(transparent)
+    switch border_type {
+        case 1: TipGui.Opt("-LastFound +e0x00000001")
+        case 2: TipGui.Opt("-LastFound +e0x00000200")
+        case 3: TipGui.Opt("-LastFound +e0x00020000")
+        default: TipGui.Opt("-LastFound")
+    }
+    TipGui.BackColor := CN_color
 }
-WinSetTransparent(transparent)
-switch border_type {
-    case 1: TipGui.Opt("-LastFound +e0x00000001")
-    case 2: TipGui.Opt("-LastFound +e0x00000200")
-    case 3: TipGui.Opt("-LastFound +e0x00020000")
-    default: TipGui.Opt("-LastFound")
-}
-
-TipGui.BackColor := CN_color
-
 borderGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 WinSetTransparent(border_transparent)
 borderGui.Opt("-LastFound")
 borderGui.BackColor := border_color_CN
+
 lastWindow := ""
 lastState := state
 needHide := 1
+
 if (changeCursor) {
-    show("CN")
-    if (showSymbol) {
+    if (showPic || showSymbol) {
         while 1 {
             is_hide_CN_EN := 0
             is_hide_state := 0
@@ -432,7 +476,7 @@ if (changeCursor) {
         }
     }
 } else {
-    if (showSymbol) {
+    if (showPic || showSymbol) {
         while 1 {
             is_hide_CN_EN := 0
             is_hide_state := 0
@@ -522,28 +566,41 @@ if (changeCursor) {
 }
 
 TipShow(type) {
-    if (showChar) {
-        if (%type "_Text"%) {
-            TipGuiText.Value := %type "_Text"%
-            TipGui.Show("NA x" left + offset_x "y" top + offset_y)
+    if (showPic) {
+        if (InStr(showPicList, "," type ",")) {
+            try {
+                TipGuiPic.Value := "InputTipSymbol/" type ".png"
+                TipGui.Show("NA x" left + pic_offset_x "y" top + pic_offset_y)
+            } catch {
+                TipGui.Hide()
+            }
         } else {
             TipGui.Hide()
         }
     } else {
-        if (border_type = 4) {
-            if (TipGui.BackColor) {
-                borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
-                TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
+        if (showChar) {
+            if (%type "_Text"%) {
+                TipGuiText.Value := %type "_Text"%
+                TipGui.Show("NA x" left + offset_x "y" top + offset_y)
             } else {
-                borderGui.Hide()
                 TipGui.Hide()
             }
-            return
-        }
-        if (TipGui.BackColor) {
-            TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + offset_x "y" top + offset_y)
         } else {
-            TipGui.Hide()
+            if (border_type = 4) {
+                if (TipGui.BackColor) {
+                    borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
+                    TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
+                } else {
+                    borderGui.Hide()
+                    TipGui.Hide()
+                }
+                return
+            }
+            if (TipGui.BackColor) {
+                TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + offset_x "y" top + offset_y)
+            } else {
+                TipGui.Hide()
+            }
         }
     }
 }
@@ -604,15 +661,15 @@ makeTrayMenu() {
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", (*) {
-        line := "-------------------------------------------------------------------------------------------------------------------"
+        line := "-----------------------------------------------------------------------------------------------"
         size := A_ScreenHeight < 1000 ? "s10" : "s12"
-        configGui := Gui("AlwaysOnTop OwnDialogs")
+        configGui := Gui("OwnDialogs")
         configGui.SetFont(size, "微软雅黑")
-        configGui.AddText(, "输入框中的值是当前生效的值`n------------------------------------------------------------------------------------------------------------")
+        configGui.AddText(, "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------------")
         configGui.Show("Hide")
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
-        configGui := Gui("AlwaysOnTop OwnDialogs", "InputTip v2 - 更改配置")
+        configGui := Gui("OwnDialogs", "InputTip v2 - 更改配置")
         configGui.SetFont(size, "微软雅黑")
         configList := [{
             config: "changeCursor",
@@ -690,12 +747,32 @@ makeTrayMenu() {
             config: "Caps_Text",
             options: "",
             tip: "设置大写锁定时显示的字符"
+        }, {
+            config: "showPic",
+            options: "Number Limit1",
+            tip: "是否显示图片符号"
+        }, {
+            config: "pic_offset_x",
+            options: "",
+            tip: "图片符号的水平偏移量"
+        }, {
+            config: "pic_offset_y",
+            options: "",
+            tip: "图片符号的垂直偏移量"
+        }, {
+            config: "pic_symbol_width",
+            options: "",
+            tip: "图片符号的宽度"
+        }, {
+            config: "pic_symbol_height",
+            options: "",
+            tip: "图片符号的高度"
         }]
 
-        tab := configGui.AddTab3(, ["显示形式", "鼠标样式配置", "方块符号配置", "方块符号边框配置", "文本字符配置", "在线配置文件说明", "配色网站"])
+        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本字符", "在线配置文件说明", "配色网站"])
         tab.UseTab(1)
-        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0，1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n  - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n  - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效`n" line)
-        list := [configList[1], configList[2], configList[3]]
+        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0。 1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n    - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n    - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效`n- 图片符号与方块符号是互斥的，当图片符号设置为 1 时，方块符号、文本符号都无效`n" line)
+        list := [configList[1], configList[2], configList[3], configList[20]]
         for v in list {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
@@ -704,7 +781,6 @@ makeTrayMenu() {
         configGui.AddText(, "你可以从以下任意可用地址中获取设置鼠标样式文件夹的相关说明:")
         configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义光标样式">https://inputtip.pages.dev/v2/#自定义光标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义光标样式">https://github.com/abgox/InputTip#自定义光标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义光标样式">https://gitee.com/abgox/InputTip#自定义光标样式</a>`n' line)
         configGui.AddButton("w" Gui_width, "设置中文状态鼠标样式").OnEvent("Click", (*) {
-            configGui.Destroy()
             if (!changeCursor) {
                 MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
                 return
@@ -713,7 +789,6 @@ makeTrayMenu() {
             verify(dir, 'CN')
         })
         configGui.AddButton("w" Gui_width, "设置英文状态鼠标样式").OnEvent("Click", (*) {
-            configGui.Destroy()
             if (!changeCursor) {
                 MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
                 return
@@ -722,7 +797,6 @@ makeTrayMenu() {
             verify(dir, 'EN')
         })
         configGui.AddButton("w" Gui_width, "设置大写锁定鼠标样式").OnEvent("Click", (*) {
-            configGui.Destroy()
             if (!changeCursor) {
                 MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
                 return
@@ -757,7 +831,6 @@ makeTrayMenu() {
             }
         }
         configGui.AddButton("w" Gui_width, "下载鼠标样式包").OnEvent("Click", (*) {
-            configGui.Destroy()
             dlGui := Gui("AlwaysOnTop OwnDialogs")
             dlGui.SetFont("s12", "微软雅黑")
             dlGui.AddText("Center h30", "从以下任意可用地址中下载鼠标样式包:")
@@ -772,13 +845,27 @@ makeTrayMenu() {
             }
         })
         tab.UseTab(3)
-        configGui.AddText("Section", "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号`n" line)
-        list := [configList[4], configList[5], configList[6], configList[7], configList[8], configList[9], configList[10], configList[11], configList[12]]
+        configGui.AddText("Section", "- 图片符号通过加载图片实现，你可以通过替换图片来自定义任何符号，不一定是图片符号`n    - 你可以用自己喜欢的符号图片、或者自己制作一个符号图片替换对应的图片`n    - 限制: 图片必须是 .png 类型的图片`n- 如果在特定状态下，你不想显示圆点，把 InputTipSymbol 目录下对应的图片删除即可`n    - 中文状态: CN.png`n    - 英文状态: EN.png`n    - 大写锁定: Caps.png`n- 如果后悔了，从 InputTipSymbol 目录下的 default 目录中把对应的图片复制回来即可`n" line)
+        list := [configList[21], configList[22], configList[23], configList[24]]
         for v in list {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
+        configGui.AddText("xs", "图片符号在多少毫秒后隐藏(默认为0，即不隐藏):`n(此配置与方块符号中的是同一个配置)")
+        configGui.AddEdit("vHideSymbolDelay2" " yp w100 Number", HideSymbolDelay)
         tab.UseTab(4)
+        configGui.AddText("Section", "- 对于不同状态时的颜色设置，可以留空，留空表示不显示方块符号`n" line)
+        list := [configList[4], configList[5], configList[6]]
+        for v in list {
+            configGui.AddText("xs", v.tip ": ")
+            configGui.AddEdit("v" v.config " yp w100 " v.options, readIni(v.config, ""))
+        }
+        list := [configList[7], configList[8], configList[9], configList[10], configList[11], configList[12]]
+        for v in list {
+            configGui.AddText("xs", v.tip ": ")
+            configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
+        }
+        tab.UseTab(5)
         configGui.AddText(, "目前可以使用三种样式`n- 样式1: 普通边框`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框`n" line)
         configGui.AddButton("w" Gui_width, "设置为样式1").OnEvent("Click", (*) {
             set(1)
@@ -906,19 +993,19 @@ makeTrayMenu() {
             }
         })
 
-        tab.UseTab(5)
+        tab.UseTab(6)
         list := [configList[13], configList[14], configList[15], configList[16], configList[17], configList[18], configList[19]]
         configGui.AddText("Section", "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时的字符设置，可以留空，留空表示不显示`n" line)
         for v in list {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w100 " v.options, %v.config%)
         }
-        tab.UseTab(6)
+        tab.UseTab(7)
         configGui.AddText(, "你可以从以下任意可用地址中获取配置说明:")
         configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/config">https://inputtip.pages.dev/v2/config</a>')
         configGui.AddLink(, '<a href="https://github.com/abgox/InputTip/blob/main/src/v2/config.md">https://github.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
         configGui.AddLink(, '<a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md">https://gitee.com/abgox/InputTip/blob/main/src/v2/config.md</a>')
-        tab.UseTab(7)
+        tab.UseTab(8)
         configGui.AddText(, "- 对于配置中颜色相关的配置，建议使用16进制的颜色值`n- 不过由于没有调色板，可能并不好设置`n- 建议使用以下配色网站(也可以自己去找)，找到喜欢的颜色，复制16进制值`n- 显示的颜色以最终渲染的颜色效果为准")
         configGui.AddLink(, '<a href="https://colorhunt.co">https://colorhunt.co</a>')
         configGui.AddLink(, '<a href="https://materialui.co/colors">https://materialui.co/colors</a>')
@@ -992,6 +1079,9 @@ makeTrayMenu() {
                 }
                 for item in configList {
                     writeIni(item.config, configGui.Submit().%item.config%)
+                }
+                if (configGui.Submit().HideSymbolDelay2 != configGui.Submit().HideSymbolDelay) {
+                    writeIni("HideSymbolDelay", configGui.Submit().HideSymbolDelay2)
                 }
                 fn_restart()
             }
@@ -1500,10 +1590,10 @@ isWhichScreen() {
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
 
-    disable_lsit := ",wetype_update.exe,"
+    disable_lsit := ",wetype_update.exe,AnLink.exe,"
     Wpf_list := ",powershell_ise.exe,"
-    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad3.exe,"
+    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,"
 
     if (InStr(disable_lsit, "," exe_name ",")) {

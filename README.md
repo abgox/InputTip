@@ -66,6 +66,7 @@
   - 推荐做法: 新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它
     - 因为运行 `InputTip.exe` 后，会产生以下文件或文件夹
       - `InputTipCursor` 光标样式文件夹
+      - `InputTipSymbol` 图片符号文件夹
       - `InputTip.ini` 配置文件
     - 这样做的话，所有相关的文件或文件夹都在同一个目录中，方便管理
 
@@ -99,6 +100,7 @@
 
   - 软件本体 `InputTip.exe`
   - 光标样式文件夹 `InputTipCursor` (软件本体的同级目录下)
+  - 图片符号文件夹 `InputTipSymbol` (软件本体的同级目录下)
   - 配置文件 `InputTip.ini` (软件本体的同级目录下)
 
 - 退出 `InputTip.exe`，删除以上文件即可。(记得先移除 `开机自启动`)
@@ -107,7 +109,7 @@
 
 ### 自定义光标样式
 
-- 软件启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `CN`、`CN_Default`、`EN`、`EN_Default`、`Caps`、`Caps_Default` 六个文件夹
+- `InputTip.exe` 启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `CN`、`CN_Default`、`EN`、`EN_Default`、`Caps`、`Caps_Default` 六个文件夹
   - **这六个文件夹都不能手动修改**
   - `CN`、`EN`、`Caps` 用于实时加载中文/英文/大写锁定状态的鼠标样式
     - 当通过托盘图标去设置鼠标样式时，会相对应的复制到 `CN`、`EN`、`Caps` 文件夹中
@@ -147,6 +149,20 @@
 2. 在底部任务栏右侧找到此软件托盘图标，`鼠标右击` 软件托盘图标，点击 `设置鼠标样式`
 3. 选择创建好的文件夹
    - 选择的文件夹中的鼠标样式文件会被复制到对应的 `CN`/`EN`/`Caps` 文件夹中，用于加载
+
+### 自定义图片符号
+
+- `InputTip.exe` 启动后，会在同级目录下生成 `InputTipSymbol` 目录，其中包括 `CN.png`、`EN.png`、`Caps.png` 三个图片文件以及 `default` 文件夹
+
+  - `CN.png`、`EN.png`、`Caps.png`
+    - 这三个图片文件分别对应中文/英文/大写锁定状态的图片符号
+    - 你可以随意替换它们
+      - 你可以替换为自己喜欢的图片符号，或者自己制作一个图片符号
+      - 限制: 必须是 `.png` 格式
+  - `default` 文件夹中包含了默认的图片符号
+
+- 如果你自己替换后，想换回默认的图片符号，你可以将 `default` 文件夹中对应的图片文件复制到 `InputTipSymbol` 目录下即可
+- 或者你可以直接删除 `InputTipSymbol` 目录然后重启 `InputTip.exe`，它会重新创建
 
 ### 兼容情况
 

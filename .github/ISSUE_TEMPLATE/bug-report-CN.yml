@@ -17,6 +17,13 @@ body:
           required: true
         - label: 你已经查看了 [一些常见的使用问题](https://inputtip.pages.dev/FAQ/)
           required: true
+  - type: input
+    id: version
+    attributes:
+      label: 当前使用的 InputTip 版本
+      description: 在软件的托盘菜单中，点击 "关于" 进行查看
+    validations:
+      required: true
   - type: dropdown
     id: windows-version
     attributes:

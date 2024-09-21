@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.18.2
+;@AHK2Exe-SetVersion 2.18.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.18.2"
+currentVersion := "2.18.3"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -104,7 +104,7 @@ borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI /
 ; 屏幕分辨率
 screenList := getScreenInfo()
 
-; 文本字符相关的配置
+; 文本符号相关的配置
 showChar := readIni("showChar", 0)
 font_family := readIni('font_family', '微软雅黑')
 font_size := readIni('font_size', 7)
@@ -683,7 +683,7 @@ makeTrayMenu() {
         }, {
             config: "showChar",
             options: "Number Limit1",
-            tip: "是否显示文本字符"
+            tip: "是否显示文本符号"
         }, {
             config: "CN_color",
             options: "",
@@ -723,31 +723,31 @@ makeTrayMenu() {
         }, {
             config: "font_family",
             options: "",
-            tip: "设置字符的字体"
+            tip: "字符的字体"
         }, {
             config: "font_size",
             options: "Number",
-            tip: "设置字符的大小"
+            tip: "字符的大小"
         }, {
             config: "font_weight",
             options: "Number",
-            tip: "设置字符的粗细"
+            tip: "字符的粗细"
         }, {
             config: "font_color",
             options: "",
-            tip: "设置字符的颜色"
+            tip: "字符的颜色"
         }, {
             config: "CN_Text",
             options: "",
-            tip: "设置中文状态时显示的字符"
+            tip: "中文状态时显示的文本字符"
         }, {
             config: "EN_Text",
             options: "",
-            tip: "设置英文状态时显示的字符"
+            tip: "英文状态时显示的文本字符"
         }, {
             config: "Caps_Text",
             options: "",
-            tip: "设置大写锁定时显示的字符"
+            tip: "大写锁定时显示的文本字符"
         }, {
             config: "showPic",
             options: "Number Limit1",
@@ -770,9 +770,9 @@ makeTrayMenu() {
             tip: "图片符号的高度"
         }]
 
-        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本字符", "在线配置文件说明", "配色网站"])
+        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本符号", "在线配置文件说明", "配色网站"])
         tab.UseTab(1)
-        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0。 1 表示是，0 表示否`n- 文本字符是在方块符号的基础上添加的`n    - 因此如果显示文本字符设置为 1，则显示方块符号也必须设置为 1`n    - 当显示方块符号设置为 0，即使显示文本字符设置为 1 也无效`n- 图片符号与方块符号是互斥的，当图片符号设置为 1 时，方块符号、文本符号都无效`n" line)
+        configGui.AddText("Section", "- 以下配置项只能使用 1 或 0。 1 表示是，0 表示否`n- 文本符号是在方块符号的基础上添加的`n    - 因此如果显示文本符号设置为 1，则显示方块符号也必须设置为 1`n    - 当显示方块符号设置为 0，即使显示文本符号设置为 1 也无效`n- 图片符号与方块符号是互斥的，当图片符号设置为 1 时，方块符号、文本符号都无效`n" line)
         list := [configList[1], configList[2], configList[3], configList[20]]
         for v in list {
             configGui.AddText("xs", v.tip ": ")
@@ -1552,20 +1552,20 @@ makeTrayMenu() {
         })
         hotkeyGui.Show()
     })
-    A_TrayMenu.Add("指定隐藏方块符号的应用", (*) {
+    A_TrayMenu.Add("指定隐藏符号的应用", (*) {
         fn_common(
             [
                 "app_hide_state",
-                "将应用添加到隐藏方块符号的应用列表中",
-                "从隐藏方块符号的应用列表中移除应用",
+                "将应用添加到隐藏符号的应用列表中",
+                "从隐藏符号的应用列表中移除应用",
                 "以下是当前系统正在运行的应用程序列表",
-                "双击应用程序，将其添加到隐藏方块符号的应用列表中`n- 在已添加的应用中，InputTip.exe 不再显示方块符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
+                "双击应用程序，将其添加到隐藏符号的应用列表中`n- 在已添加的应用中，InputTip.exe 不再显示符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
                 "是否要将 ",
-                " 添加到隐藏方块符号的应用列表中？`n添加后，在此应用中，InputTip.exe 不再显示方块符号",
-                "以下是隐藏方块符号的应用列表",
-                "双击应用程序，将其从隐藏方块符号的应用列表中移除`n- 在已移除的应用中，InputTip.exe 会显示方块符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
+                " 添加到隐藏符号的应用列表中？`n添加后，在此应用中，InputTip.exe 不再显示符号",
+                "以下是隐藏符号的应用列表",
+                "双击应用程序，将其从隐藏符号的应用列表中移除`n- 在已移除的应用中，InputTip.exe 会显示符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
                 "是否要将 ",
-                " 移除？`n移除后，在此应用中，InputTip.exe 会显示方块符号"
+                " 移除？`n移除后，在此应用中，InputTip.exe 会显示符号"
             ],
             fn
         )

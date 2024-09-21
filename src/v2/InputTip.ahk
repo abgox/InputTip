@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.18.1
+;@AHK2Exe-SetVersion 2.18.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.18.1"
+currentVersion := "2.18.2"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -73,7 +73,7 @@ offset_y := readIni('offset_y', -10)
 symbol_width := readIni('symbol_width', 7)
 symbol_height := readIni('symbol_height', 7)
 pic_offset_x := readIni('pic_offset_x', 5)
-pic_offset_y := readIni('pic_offset_y', -10)
+pic_offset_y := readIni('pic_offset_y', -20)
 pic_symbol_width := readIni('pic_symbol_width', 9)
 pic_symbol_height := readIni('pic_symbol_height', 9)
 ; 隐藏方块符号
@@ -231,11 +231,13 @@ if (changeCursor) {
             }
         }
         if (noList.length > 0) {
+            FileExist("InputTipCursor.zip") ? 0 : FileInstall("InputTipCursor.zip", "InputTipCursor.zip", 1)
             RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipCursor.zip' -DestinationPath '" A_AppData "\abgox-InputTipCursor-temp'", , "Hide")
             for dir in noList {
                 dirCopy(A_AppData "\abgox-InputTipCursor-temp\InputTipCursor\" dir, "InputTipCursor\" dir)
             }
             DirDelete(A_AppData "\abgox-InputTipCursor-temp", 1)
+            FileDelete("InputTipCursor.zip")
         }
     }
     for p in ["EN", "CN", "Caps"] {
@@ -268,30 +270,29 @@ if (changeCursor) {
     }
 }
 showPicList := ","
-if (showPic) {
-    fileList := ["CN", "EN", "Caps"]
-    if (!DirExist("InputTipSymbol")) {
-        FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
-        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
-        FileDelete("InputTipSymbol.zip")
-    } else {
-        noList := []
-        for f in fileList {
-            if (!FileExist("InputTipSymbol\default\" f ".png")) {
-                noList.push(f)
-            }
-        }
-        if (noList.length > 0) {
-            FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
-            RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
-            dirCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\default", "InputTipSymbol\default", 1)
-            DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
+fileList := ["CN", "EN", "Caps"]
+if (!DirExist("InputTipSymbol")) {
+    FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
+    RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
+    FileDelete("InputTipSymbol.zip")
+} else {
+    noList := []
+    for f in fileList {
+        if (!FileExist("InputTipSymbol\default\" f ".png")) {
+            noList.push(f)
         }
     }
-    for f in fileList {
-        if (FileExist("InputTipSymbol\" f ".png")) {
-            showPicList .= f ","
-        }
+    if (noList.length > 0 || !FileExist("InputTipSymbol\default\offer.png")) {
+        FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
+        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
+        dirCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\default", "InputTipSymbol\default", 1)
+        DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
+        FileDelete("InputTipSymbol.zip")
+    }
+}
+for f in fileList {
+    if (FileExist("InputTipSymbol\" f ".png")) {
+        showPicList .= f ","
     }
 }
 
@@ -831,7 +832,7 @@ makeTrayMenu() {
             }
         }
         configGui.AddButton("w" Gui_width, "下载鼠标样式包").OnEvent("Click", (*) {
-            dlGui := Gui("AlwaysOnTop OwnDialogs")
+            dlGui := Gui("AlwaysOnTop OwnDialogs", "下载鼠标样式包")
             dlGui.SetFont("s12", "微软雅黑")
             dlGui.AddText("Center h30", "从以下任意可用地址中下载鼠标样式包:")
             dlGui.AddLink("xs", '<a href="https://inputtip.pages.dev/releases/v2/cursorStyle.zip">https://inputtip.pages.dev/releases/v2/cursorStyle.zip</a>')
@@ -1442,15 +1443,18 @@ makeTrayMenu() {
     A_TrayMenu.Add("设置强制切换快捷键", (*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.AddText(, "--------------------------------------------------------------------------------------------")
         hotkeyGui.Show("Hide")
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
 
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置强制切换输入法状态的快捷键")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-        hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------")
+
+        tab := hotkeyGui.AddTab3(, ["设置快捷键", "手动输入快捷键"])
+        tab.UseTab(1)
+        hotkeyGui.AddText("Section", "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------------------")
 
         configList := [{
             config: "hotkey_CN",
@@ -1473,7 +1477,7 @@ makeTrayMenu() {
             hotkeyGui.AddText("xs", v.tip ": ")
             value := readIni(v.config, '')
             hotkeyGui.AddHotkey("yp v" v.config, StrReplace(value, "#", ""))
-            hotkeyGui.AddCheckbox("yp v" v.with, "Win").Value := InStr(value, "#")
+            hotkeyGui.AddCheckbox("yp v" v.with, "Win 键").Value := InStr(value, "#")
         }
         hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", (*) {
             for v in configList {
@@ -1482,6 +1486,66 @@ makeTrayMenu() {
                 } else {
                     key := hotkeyGui.Submit().%v.config%
                 }
+                writeIni(v.config, key)
+            }
+            fn_restart()
+        })
+        tab.UseTab(2)
+        hotkeyGui.AddText("Section", "- 你首先需要点击下方的手动输入快捷键相关帮助")
+        for v in configList {
+            hotkeyGui.AddText("xs", v.tip ": ")
+            hotkeyGui.AddEdit("yp w300 v" v.config "2", readIni(v.config, ''))
+        }
+        hotkeyGui.AddButton("xs w" Gui_width, "快捷键手动输入的相关帮助").OnEvent("Click", (*) {
+            helpGui := Gui("AlwaysOnTop OwnDialogs")
+            helpGui.SetFont("s12", "微软雅黑")
+            helpGui.AddText(, "--------------------------------------------------------------------------------------------")
+            helpGui.Show("Hide")
+            helpGui.GetPos(, , &Gui_width)
+            helpGui.Destroy()
+
+            helpGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 手动输入快捷键相关帮助")
+            helpGui.SetFont("s12", "微软雅黑")
+            helpGui.AddText(, "- 你首先要清楚以下符号和按键之间的对应关系`n- ^ 表示 Ctrl， + 表示 Shift， # 表示 Win, ! 表示 Alt`n- 下面有一些常见的快捷键组合对应列表，相信你看了就知道大概需要如何输入你想要的快捷键了`n- 需要注意: 如果你输入的快捷键中有 #，# 必须放在最前面，比如 #^Space")
+            key_list := [
+                ["LShift", "左侧 Shift (单独使用)，组合其他按键时需要使用 +"],
+                ["RShift", "右侧 Shift (单独使用)，组合其他按键时需要使用 +"],
+                ["LAlt", "左侧 Alt (单独使用)，组合其他按键时需要使用 !"],
+                ["RAlt", "右侧 Alt (单独使用)，组合其他按键时需要使用 !"],
+                ["LCtrl", "左侧 Ctrl (单独使用)，组合其他按键时需要使用 ^"],
+                ["RCtrl", "右侧 Ctrl (单独使用)，组合其他按键时需要使用 ^"],
+                ["^Space", "Ctrl + Space(空格键)"],
+                ["<^Space", "左侧的 Ctrl + Space"],
+                [">^Space", "右侧的 Ctrl + Space"],
+                ["^,", "Ctrl + ,"],
+                ["^.", "Ctrl + ."],
+                ["!/", "Alt + /"],
+                ["!a", "Alt + A"],
+                ["#b", "Win + C"],
+                ["#^c", "Win + Ctrl + C"],
+                ["#+^d", "Win + Shift + Ctrl + D"],
+                ["!Up", "Alt + ↑"],
+                ["!Down", "Alt + ↓"],
+                ["!Left", "Alt + ←"],
+                ["!Right", "Alt + →"],
+                ["!Home", "Alt + Home"],
+                ["!End", "Alt + End"],
+                ["!PgUp", "Alt + ↑"],
+                ["!PgDn", "Alt + ↓"],
+                ["!Tab", "Alt + Tab"],
+                ["!Esc", "Alt + Esc"],
+                ["!Enter", "Alt + Enter"]
+            ]
+            LV := helpGui.AddListView("r10 NoSortHdr Grid w" Gui_width, ["你需要输入的值", "实际会生效的快捷键"])
+            helpGui.AddLink(, '点击链接，查看完整按键映射列表: <a href="https://wyagd001.github.io/v2/docs/KeyList.htm#general">https://wyagd001.github.io/v2/docs/KeyList.htm#general</a>')
+            for k in key_list {
+                LV.Add("", k[1], k[2])
+            }
+            helpGui.Show()
+        })
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", (*) {
+            for v in configList {
+                key := hotkeyGui.Submit().%v.config "2"%
                 writeIni(v.config, key)
             }
             fn_restart()
@@ -1511,14 +1575,14 @@ makeTrayMenu() {
     A_TrayMenu.Add("关于", (*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
-        aboutGui.AddText("Center h30", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText("", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.Show("Hide")
         aboutGui.GetPos(, , &Gui_width)
         aboutGui.Destroy()
 
-        aboutGui := Gui("AlwaysOnTop OwnDialogs")
+        aboutGui := Gui("AlwaysOnTop OwnDialogs", "InputTip.exe - 关于")
         aboutGui.SetFont("s12", "微软雅黑")
-        aboutGui.AddText("Center h30 w" Gui_width, "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText("Center w" Gui_width, "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.AddText(, "当前版本: " currentVersion)
         aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
         aboutGui.AddText("xs", "官网:")
@@ -1527,15 +1591,13 @@ makeTrayMenu() {
         aboutGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
         aboutGui.AddText("xs", "Gitee: :")
         aboutGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
-
-        aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", close)
-        aboutGui.OnEvent("Escape", close)
-        aboutGui.Show()
-
-        close(*) {
+        aboutGui.AddText("xs", "---------------------------------------------------------------------")
+        aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
+        aboutGui.AddPicture("yp w222 h-1", "InputTipSymbol\default\offer.png")
+        aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", (*) {
             aboutGui.Destroy()
-        }
-
+        })
+        aboutGui.Show()
     })
     A_TrayMenu.Add("重启", fn_restart)
     fn_restart(*) {

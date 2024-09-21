@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.17.3
+;@AHK2Exe-SetVersion 2.17.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,7 +22,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.17.3"
+currentVersion := "2.17.5"
 checkVersion(currentVersion, "v2")
 
 try {
@@ -47,15 +47,6 @@ try {
         app_hide_CN_EN := ""
     }
     writeIni("app_hide_CN_EN", app_hide_CN_EN)
-}
-
-try {
-    for v in ["Taskmgr.exe", "explorer.exe", "StartMenuExperienceHost.exe"] {
-        app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
-        if (!InStr(app_hide_state, v)) {
-            writeIni("app_hide_state", app_hide_state (app_hide_state ? "," : "") v)
-        }
-    }
 }
 
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
@@ -321,7 +312,6 @@ if (changeCursor) {
                 is_hide_state := InStr(app_hide_state, "," exe_name ",")
                 is_hide_CN_EN := InStr(app_hide_CN_EN, "," exe_name ",")
             }
-
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 continue
@@ -498,13 +488,13 @@ if (changeCursor) {
                     continue
                 }
                 if (state != old_state) {
+                    TipGui.BackColor := %v "_color"%
+                    borderGui.BackColor := %"border_color_" v%
                     if (canShowSymbol) {
                         TipShow(v)
                     } else {
                         TipGui.Hide()
                     }
-                    TipGui.BackColor := %v "_color"%
-                    borderGui.BackColor := %"border_color_" v%
                     old_state := state
                 }
                 if (left != old_left || top != old_top) {
@@ -1503,9 +1493,9 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
 
     disable_lsit := ",wetype_update.exe,"
     Wpf_list := ",powershell_ise.exe,"
-    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,YoudaoDict.exe,OneCommander.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,QQ.exe,"
-    Gui_UIA_list := ",ONENOTE.EXE,POWERPNT.EXE,"
+    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad3.exe,"
+    Gui_UIA_list := ",POWERPNT.EXE,"
 
     if (InStr(disable_lsit, "," exe_name ",")) {
         return 0
@@ -1708,10 +1698,14 @@ end:
         static WM_GET_CARET_POS := DllCall("RegisterWindowMessageW", "str", "WM_GET_CARET_POS", "uint")
         if !tid := DllCall("GetWindowThreadProcessId", "ptr", hwnd, "ptr*", &pid := 0, "uint")
             return false
+
+        ; ! 导致许多应用崩溃/自动输入/删除内容的源头
         ; Update caret position
-        try {
-            SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
-        }
+        ; try {
+        ;     SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
+        ; }
+        ; !
+
         ; PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ
         if !hProcess := DllCall("OpenProcess", "uint", 1082, "int", false, "uint", pid, "ptr")
             return false

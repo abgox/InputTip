@@ -17,7 +17,7 @@ body:
     id: windows-version
     attributes:
       label: 你正在使用什么 Windows 系统版本?
-      description: 如果是 Windows 10 以前的系统，请选择 "其他", 并在最后的补充信息中说明具体系统版本。
+      description: 如果是 Windows 10 以前的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本。
       options:
         - Windows 11
         - Windows 10

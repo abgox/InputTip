@@ -6,29 +6,28 @@ body:
   - type: checkboxes
     id: checks
     attributes:
-      label: 开始之前...
-      description: 你应该确保已经完成了下面这些事情。
+      label: 你应该确保已经完成了下面这些事情。
       options:
-        - label: 你正在使用 InputTip 的最新版本。
-          required: true
         - label: 你已经阅读了项目的 README 文件。
           required: true
-        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了相关问题。
+        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue。
           required: true
-        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.pages.dev/FAQ/)
+        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.pages.dev/FAQ/), 其中没有你遇到的问题。
           required: true
   - type: input
     id: version
     attributes:
       label: 当前使用的 InputTip 版本
-      description: 在软件的托盘菜单中，点击 "关于" 进行查看
+      description: |
+        在软件的托盘菜单中，点击 **关于** 进行查看。
+        如果不是最新版本(**[点击查看最新版本号](https://inputtip.pages.dev/releases/v2/version.txt)**)，请先更新到最新版本，如果问题依然存在，再提交 issue。
     validations:
       required: true
   - type: dropdown
     id: windows-version
     attributes:
       label: 你正在使用什么 Windows 系统版本?
-      description: 如果是 Windows 10 以前的系统，请选择 "其他", 并在最后的补充信息中说明具体系统版本。
+      description: 如果是 Windows 10 以前的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本。
       options:
         - Windows 11
         - Windows 10
@@ -40,20 +39,32 @@ body:
     id: steps-to-reproduce
     attributes:
       label: bug 复现步骤
-      placeholder: 如何复现这个 bug?
+      placeholder: |
+        如何复现这个 bug?
+        描述尽量简单易懂。
+        如果可以，请提供截图、动图、录屏等来帮助理解这个问题发生的全过程。
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
       label: 期望结果
+      placeholder: |
+        你认为它应该是什么样的?
   - type: textarea
     id: actually-happening
     attributes:
       label: 实际发生了什么?
+      placeholder: |
+        描述尽量简单易懂。
+        如果可以，请提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
     validations:
       required: true
   - type: textarea
     id: additional-info
     attributes:
       label: 还有其他你想要补充的信息吗？
+      placeholder: |
+        提供应用的下载地址以方便测试。
+        你对这个问题有什么看法?
+        ...

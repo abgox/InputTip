@@ -36,26 +36,20 @@ checkVersion(currentVersion, whichVersion) {
             if (req.status == 200 && compareVersion(newVersion, currentVersion) > 0) {
                 TipGui := Gui("AlwaysOnTop OwnDialogs")
                 TipGui.SetFont("s12", "微软雅黑")
-                TipGui.AddText(, "从以下任意地址获取版本更新日志:")
-                TipGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/config.md">https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/config.md</a>')
+                TipGui.AddLink("", '<a href="https://inputtip.pages.dev/' whichVersion '/changelog">https://inputtip.pages.dev/' whichVersion '/changelog</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md">https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md">https://gitee.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md</a>')
                 TipGui.Show("Hide")
                 TipGui.GetPos(, , &Gui_width)
                 TipGui.Destroy()
 
-                TipGui := Gui("AlwaysOnTop OwnDialogs")
+                TipGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 版本更新")
                 TipGui.SetFont("s12", "微软雅黑")
                 TipGui.AddText(, "InputTip " whichVersion " 有新版本了!")
                 TipGui.AddText(, currentVersion " => " newVersion)
                 TipGui.AddText(, "从以下任意地址获取版本更新日志:")
-                TipGui.AddLink("xs", '<a href="https://inputtip.pages.dev/' whichVersion '/changelog">https://inputtip.pages.dev/' whichVersion '/changelog</a>')
-                TipGui.AddLink("xs", '<a href="https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md">https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md</a>')
-                TipGui.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md">https://gitee.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md</a>')
-                TipGui.AddText("xs", "--------------------------------------------------")
-                TipGui.AddText("xs", "是否更新到最新版本?")
-                TipGui.AddText("xs", "只需要确认更新，会自动下载新版本替代旧版本并重启")
-                TipGui.AddButton("xs w" Gui_width, "确认更新").OnEvent("Click", updateVersion)
-                TipGui.Show()
-                updateVersion(*) {
+                TipGui.AddLink("xs", '<a href="https://inputtip.pages.dev/' whichVersion '/changelog">https://inputtip.pages.dev/' whichVersion '/changelog</a>`n<a href="https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md">https://github.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md</a>`n<a href="https://gitee.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md">https://gitee.com/abgox/InputTip/blob/main/src/' whichVersion '/CHANGELOG.md</a>')
+                TipGui.AddText("xs", "--------------------------------------------------------------------------------------")
+                TipGui.AddText("xs", "是否更新到最新版本?`n只需要确认更新，会自动下载新版本替代旧版本并重启")
+                TipGui.AddButton("xs w" Gui_width, "确认更新").OnEvent("Click", (*) {
                     TipGui.Destroy()
                     try {
                         Download("https://inputtip.pages.dev/releases/" whichVersion "/InputTip.exe", A_AppData "\abgox-InputTip.exe")
@@ -75,7 +69,15 @@ checkVersion(currentVersion, whichVersion) {
                         errGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
                         errGui.Show()
                     }
-                }
+                })
+                TipGui.AddButton("xs w" Gui_width, "忽略更新").OnEvent("Click", (*) {
+                    TipGui.Destroy()
+                    global ignoreUpdate := 1
+                    writeIni("ignoreUpdate", 1)
+                    A_TrayMenu.Check("忽略更新")
+                    showMsg(["忽略版本更新成功!","即使有新版本下次启动时也不会再提示更新!","如果你在使用过程中有任何问题，你需要确定当前是否为最新版本!","如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue","Github 和其他相关地址可以在软件托盘菜单的 `"关于`" 中找到"])
+                })
+                TipGui.Show()
             }
         }
     }

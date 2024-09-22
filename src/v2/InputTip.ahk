@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.18.4
+;@AHK2Exe-SetVersion 2.19.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,8 +23,11 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.18.4"
-checkVersion(currentVersion, "v2")
+currentVersion := "2.19.0"
+ignoreUpdate := readIni("ignoreUpdate", 0)
+if (!ignoreUpdate) {
+    checkVersion(currentVersion, "v2")
+}
 
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
@@ -340,7 +343,7 @@ borderGui.BackColor := border_color_CN
 lastWindow := ""
 lastState := state
 needHide := 1
-
+exe_name := ""
 if (changeCursor) {
     if (showPic || showSymbol) {
         while 1 {
@@ -628,6 +631,13 @@ makeTrayMenu() {
             A_TrayMenu.Check("开机自启动")
         }
     }
+    A_TrayMenu.Add("忽略更新", fn_update)
+    fn_update(item, *) {
+        global ignoreUpdate := !ignoreUpdate
+        writeIni("ignoreUpdate", ignoreUpdate)
+        A_TrayMenu.ToggleCheck(item)
+    }
+    ignoreUpdate ? A_TrayMenu.Check("忽略更新") : 0
     sub := Menu()
     list := ["模式1", "模式2", "模式3", "模式4"]
     for v in list {
@@ -666,7 +676,7 @@ makeTrayMenu() {
         size := A_ScreenHeight < 1000 ? "s10" : "s12"
         configGui := Gui("OwnDialogs")
         configGui.SetFont(size, "微软雅黑")
-        configGui.AddText(, "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------------")
+        configGui.AddText(, "输入框中的值是当前生效的值`n-------------------------------------------------------------------------------------------")
         configGui.Show("Hide")
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
@@ -770,7 +780,7 @@ makeTrayMenu() {
             tip: "图片符号的高度"
         }]
 
-        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本符号", "在线配置文件说明", "配色网站"])
+        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本符号", "配置文件说明", "配色网站"])
         tab.UseTab(1)
         configGui.AddText("Section", "- 以下配置项只能使用 1 或 0。 1 表示是，0 表示否`n- 文本符号是在方块符号的基础上添加的`n    - 因此如果显示文本符号设置为 1，则显示方块符号也必须设置为 1`n    - 当显示方块符号设置为 0，即使显示文本符号设置为 1 也无效`n- 图片符号与方块符号是互斥的，当图片符号设置为 1 时，方块符号、文本符号都无效`n" line)
         list := [configList[1], configList[2], configList[3], configList[20]]
@@ -1443,7 +1453,7 @@ makeTrayMenu() {
     A_TrayMenu.Add("设置强制切换快捷键", (*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "--------------------------------------------------------------------------------------------")
+        hotkeyGui.AddText(, "--------------------------------------------------------------------")
         hotkeyGui.Show("Hide")
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
@@ -1454,7 +1464,7 @@ makeTrayMenu() {
         tab := hotkeyGui.AddTab3(, ["设置快捷键", "手动输入快捷键"])
         tab.UseTab(1)
         hotkeyGui.AddText("Section", "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-        hotkeyGui.AddText("Center w" Gui_width, "-----------------------------------------------------------------------------------------------")
+        hotkeyGui.AddText("Center w" Gui_width, "--------------------------------------------------------------------")
 
         configList := [{
             config: "hotkey_CN",

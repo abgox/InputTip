@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.19.0
+;@AHK2Exe-SetVersion 2.20.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,31 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.19.0"
+currentVersion := "2.20.0"
+
+if (!FileExist("InputTip.ini")) {
+    confirmGui := Gui("AlwaysOnTop OwnDialogs")
+    confirmGui.SetFont("s12", "微软雅黑")
+    confirmGui.AddText(, "您第一次启动了 InputTip.exe`n默认会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 `"关于`"，前往官网或项目中查看)")
+    confirmGui.Show("Hide")
+    confirmGui.GetPos(, , &Gui_width)
+    confirmGui.Destroy()
+
+    confirmGui := Gui("AlwaysOnTop OwnDialogs")
+    confirmGui.SetFont("s12", "微软雅黑")
+    confirmGui.AddText(, "您第一次启动了 InputTip.exe`n默认会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 `"关于`"，前往官网或项目中查看)")
+    confirmGui.AddText(, "您是否希望 InputTip.exe 修改鼠标样式?")
+    confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click",(*){
+        writeIni("changeCursor", 1)
+        Run(A_ScriptFullPath)
+    })
+    confirmGui.AddButton("w" Gui_width, "不要修改").OnEvent("Click",(*){
+        writeIni("changeCursor", 0)
+        Run(A_ScriptFullPath)
+    })
+    confirmGui.Show()
+}
+
 ignoreUpdate := readIni("ignoreUpdate", 0)
 if (!ignoreUpdate) {
     checkVersion(currentVersion, "v2")
@@ -63,7 +87,7 @@ try {
 }
 
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
-changeCursor := readIni("changeCursor", 1)
+changeCursor := readIni("changeCursor", 0)
 showSymbol := readIni("showSymbol", 1)
 showPic := readIni("showPic", 1)
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
@@ -1595,14 +1619,11 @@ makeTrayMenu() {
         aboutGui.AddText("Center w" Gui_width, "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.AddText(, "当前版本: " currentVersion)
         aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
-        aboutGui.AddText("xs", "官网:")
-        aboutGui.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
-        aboutGui.AddText("xs", "Github:")
-        aboutGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
-        aboutGui.AddText("xs", "Gitee: :")
-        aboutGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+        aboutGui.AddLink("xs", '官网: <a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
+        aboutGui.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
+        aboutGui.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
         aboutGui.AddText("xs", "---------------------------------------------------------------------")
-        aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
+        aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
         aboutGui.AddPicture("yp w222 h-1", "InputTipSymbol\default\offer.png")
         aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", (*) {
             aboutGui.Destroy()

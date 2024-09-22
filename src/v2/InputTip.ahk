@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.20.0
+;@AHK2Exe-SetVersion 2.20.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.20.0"
+currentVersion := "2.20.1"
 
 if (!FileExist("InputTip.ini")) {
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
@@ -814,7 +814,7 @@ makeTrayMenu() {
         }
         tab.UseTab(2)
         configGui.AddText(, "你可以从以下任意可用地址中获取设置鼠标样式文件夹的相关说明:")
-        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义光标样式">https://inputtip.pages.dev/v2/#自定义光标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义光标样式">https://github.com/abgox/InputTip#自定义光标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义光标样式">https://gitee.com/abgox/InputTip#自定义光标样式</a>`n' line)
+        configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义鼠标样式">https://inputtip.pages.dev/v2/#自定义鼠标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义鼠标样式">https://github.com/abgox/InputTip#自定义鼠标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义鼠标样式">https://gitee.com/abgox/InputTip#自定义鼠标样式</a>`n' line)
         configGui.AddButton("w" Gui_width, "设置中文状态鼠标样式").OnEvent("Click", (*) {
             if (!changeCursor) {
                 MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")

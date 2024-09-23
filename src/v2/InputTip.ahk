@@ -1,6 +1,6 @@
-#Requires AutoHotkey >v2.0
+#Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.5
+;@AHK2Exe-SetVersion 2.21.7
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.5"
+currentVersion := "2.21.7"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -42,14 +42,16 @@ if (!FileExist("InputTip.ini")) {
     confirmGui.SetFont("s12", "微软雅黑")
     confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 `"关于`"，前往官网或项目中查看)")
     confirmGui.AddText(, "您是否希望 InputTip.exe 修改鼠标样式?")
-    confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click", (*) {
+    confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click", yes)
+    yes(*) {
         writeIni("changeCursor", 1)
         Run(A_ScriptFullPath)
-    })
-    confirmGui.AddButton("w" Gui_width, "不要修改").OnEvent("Click", (*) {
+    }
+    confirmGui.AddButton("w" Gui_width, "不要修改").OnEvent("Click", no)
+    no(*) {
         writeIni("changeCursor", 0)
         Run(A_ScriptFullPath)
-    })
+    }
     confirmGui.Show()
 }
 
@@ -84,7 +86,7 @@ try {
 try {
     symbolType := IniRead("InputTip.ini", "config-v2", "symbolType")
 } catch {
-    showPic := 1, showSymbol := 0, showChar := 0
+    showPic := 0, showSymbol := 1, showChar := 0
     try {
         showPic := IniRead("InputTip.ini", "config-v2", "showPic")
     }
@@ -105,7 +107,7 @@ try {
 
 isStartUp := readIni("isStartUp", 0)
 changeCursor := readIni("changeCursor", 0)
-symbolType := readIni("symbolType", 1)
+symbolType := readIni("symbolType", 2)
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
 CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
 EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
@@ -384,9 +386,10 @@ if (changeCursor) {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 if (exe_name != lastWindow) {
                     needHide := 0
-                    SetTimer((*) {
+                    SetTimer(timer, HideSymbolDelay)
+                    timer(*) {
                         global needHide := 1
-                    }, HideSymbolDelay)
+                    }
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (InStr(app_CN, "," exe_name ",")) {
@@ -519,9 +522,10 @@ if (changeCursor) {
                 exe_name := ProcessGetName(WinGetPID("A"))
                 if (exe_name != lastWindow) {
                     needHide := 0
-                    SetTimer((*) {
+                    SetTimer(timer2, HideSymbolDelay)
+                    timer2(*) {
                         global needHide := 1
-                    }, HideSymbolDelay)
+                    }
                     WinWaitActive("ahk_exe" exe_name)
                     lastWindow := exe_name
                     if (InStr(app_CN, "," exe_name ",")) {
@@ -648,7 +652,8 @@ TipShow(type) {
 }
 makeTrayMenu() {
     A_TrayMenu.Delete()
-    A_TrayMenu.Add("开机自启动", (item, *) {
+    A_TrayMenu.Add("开机自启动", fn_startup)
+    fn_startup(item, *) {
         flag := A_TrayMenu.ToggleCheck(item)
         writeIni("isStartUp", flag)
         if (flag) {
@@ -656,7 +661,7 @@ makeTrayMenu() {
         } else {
             FileDelete(A_Startup "\InputTip.lnk")
         }
-    })
+    }
 
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")
@@ -669,14 +674,16 @@ makeTrayMenu() {
         A_TrayMenu.Check("开机自启动")
         RegDelete(HKEY_startup, A_ScriptName)
     }
-    A_TrayMenu.Add("忽略更新", (item, *) {
+    A_TrayMenu.Add("忽略更新", fn_ignore_update)
+    fn_ignore_update(item, *) {
         writeIni("ignoreUpdate", A_TrayMenu.ToggleCheck(item))
-    })
+    }
     ignoreUpdate ? A_TrayMenu.Check("忽略更新") : 0
     sub := Menu()
     list := ["模式1", "模式2", "模式3", "模式4"]
     for v in list {
-        sub.Add(v, (item, index, *) {
+        sub.Add(v, fn_mode)
+        fn_mode(item, index, *) {
             mode := readIni("mode", 1, "InputMethod")
             msgGui := Gui("AlwaysOnTop +OwnDialogs")
             msgGui.SetFont("s10", "微软雅黑")
@@ -694,18 +701,20 @@ makeTrayMenu() {
             }
             msgGui.AddText(, "模式相关信息请查看以下任意地址:")
             msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
-            msgGui.AddButton("xs w" Gui_width + msgGui.MarginX * 2, "确认").OnEvent("Click", (*) {
+            msgGui.AddButton("xs w" Gui_width + msgGui.MarginX * 2, "确认").OnEvent("Click", yes)
+            yes(*) {
                 msgGui.Destroy()
                 writeIni("mode", index, "InputMethod")
                 fn_restart()
-            })
+            }
             msgGui.Show()
-        })
+        }
     }
     A_TrayMenu.Add("设置输入法", sub)
     sub.Check("模式" mode)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("更改配置", (*) {
+    A_TrayMenu.Add("更改配置", fn_config)
+    fn_config(*) {
         line := "-----------------------------------------------------------------------------------------------"
         size := A_ScreenHeight < 1000 ? "s10" : "s12"
         configGui := Gui("OwnDialogs")
@@ -750,7 +759,8 @@ makeTrayMenu() {
         for v in cursorDirlist {
             btnGui := configGui.AddButton("w" Gui_width, "设置" v.label)
             btnGui.data := v
-            btnGui.OnEvent("Click", (item, *) {
+            btnGui.OnEvent("Click", fn_btn)
+            fn_btn(item, *) {
                 if (!changeCursor) {
                     MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
                     return
@@ -780,9 +790,10 @@ makeTrayMenu() {
                     DirCopy(dir, A_ScriptDir "\InputTipCursor\" item.data.folder, 1)
                     MsgBox("鼠标样式文件夹修改成功!")
                 }
-            })
+            }
         }
-        configGui.AddButton("w" Gui_width, "下载鼠标样式包").OnEvent("Click", (*) {
+        configGui.AddButton("w" Gui_width, "下载鼠标样式包").OnEvent("Click", fn_package)
+        fn_package(*) {
             dlGui := Gui("AlwaysOnTop OwnDialogs", "下载鼠标样式包")
             dlGui.SetFont("s12", "微软雅黑")
             dlGui.AddText("Center h30", "从以下任意可用地址中下载鼠标样式包:")
@@ -795,7 +806,7 @@ makeTrayMenu() {
             close(*) {
                 dlGui.Destroy()
             }
-        })
+        }
         tab.UseTab(3)
         configGui.AddText("Section", "- 图片符号通过加载图片实现，你可以通过替换图片来自定义任何符号，不一定是圆点符号`n    - 你可以用自己喜欢的符号图片、或者自己制作符号图片来替换`n    - 唯一限制: 图片必须是 .png 类型的图片`n- 如果在特定状态下，你不想显示图片符号，把 InputTipSymbol 目录下对应的图片删除即可`n    - 中文状态: CN.png`n    - 英文状态: EN.png`n    - 大写锁定: Caps.png`n- 如果后悔了，从 InputTipSymbol 目录下的 default 目录中把对应的默认图片复制回来即可`n" line)
 
@@ -875,12 +886,14 @@ makeTrayMenu() {
         for i, v in list {
             btnGui := configGui.AddButton("w" Gui_width, v)
             btnGui.data := i - 1
-            btnGui.OnEvent("Click", (item, *) {
+            btnGui.OnEvent("Click", fn_btn2)
+            fn_btn2(item, *) {
                 writeIni("border_type", item.data)
                 fn_restart()
-            })
+            }
         }
-        configGui.AddButton("w" Gui_width, "自定义样式边框").OnEvent("Click", (*) {
+        configGui.AddButton("w" Gui_width, "自定义样式边框").OnEvent("Click", fn_custom_border)
+        fn_custom_border(*) {
             configGui.Destroy()
             customGui := Gui("AlwaysOnTop OwnDialogs")
             customGui.SetFont("s12", "微软雅黑")
@@ -936,7 +949,8 @@ makeTrayMenu() {
                 isFirst := !isFirst
                 customGui.AddEdit("v" v.config " yp w150 " v.options, %v.config%)
             }
-            customGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", (*) {
+            customGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes2)
+            yes2(*) {
                 list := [configList[1], configList[2], configList[3], configList[4]]
                 isValid := 1
                 for v in list {
@@ -969,9 +983,9 @@ makeTrayMenu() {
                     }
                     fn_restart()
                 }
-            })
+            }
             customGui.Show()
-        })
+        }
         tab.UseTab(6)
         symbolCharConfig := [{
             config: "font_family",
@@ -1015,7 +1029,8 @@ makeTrayMenu() {
         configGui.AddLink(, '<a href="https://color.adobe.com/zh/create/color-wheel">https://color.adobe.com/zh/create/color-wheel</a>')
         configGui.AddLink(, '<a href="https://colordesigner.io/color-palette-builder">https://colordesigner.io/color-palette-builder</a>')
         tab.UseTab(0)
-        configGui.AddButton(" w" Gui_width + configGui.MarginX * 2, "确认").OnEvent("Click", (*) {
+        configGui.AddButton(" w" Gui_width + configGui.MarginX * 2, "确认").OnEvent("Click", yes3)
+        yes3(*) {
             isValid := 1
 
             list := symbolBlockColorConfig.Clone()
@@ -1076,14 +1091,15 @@ makeTrayMenu() {
                 writeIni("changeCursor", configGui.Submit().changeCursor - 1)
                 fn_restart()
             }
-        })
+        }
         configGui.Show()
-    })
+    }
     sub1 := Menu()
     fn_common(tipList, addFn) {
         hideGui := Gui("AlwaysOnTop +OwnDialogs")
         hideGui.SetFont("s12", "微软雅黑")
-        hideGui.AddButton("", tipList[2]).OnEvent("Click", (*) {
+        hideGui.AddButton("", tipList[2]).OnEvent("Click", fn_common_1)
+        fn_common_1(*) {
             hideGui.Destroy()
             show()
             show() {
@@ -1101,7 +1117,8 @@ makeTrayMenu() {
                 addGui.AddText(, tipList[4])
 
                 LV := addGui.AddListView("r8 NoSortHdr Sort Grid w" Gui_width, ["应用", "标题"])
-                LV.OnEvent("DoubleClick", (LV, RowNumber) {
+                LV.OnEvent("DoubleClick", fn_double_click)
+                fn_double_click(LV, RowNumber) {
                     addGui.Hide()
                     RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
                     confirmGui := Gui("AlwaysOnTop +OwnDialogs")
@@ -1114,7 +1131,8 @@ makeTrayMenu() {
                     confirmGui := Gui("AlwaysOnTop +OwnDialogs")
                     confirmGui.SetFont("s12", "微软雅黑")
                     confirmGui.AddText(, tipList[6] RowText tipList[7])
-                    confirmGui.AddButton("xs w" Gui_width, "确认添加").OnEvent("Click", (*) {
+                    confirmGui.AddButton("xs w" Gui_width, "确认添加").OnEvent("Click", yes)
+                    yes(*) {
                         addGui.Destroy()
                         confirmGui.Destroy()
                         value := readIni(tipList[1], "")
@@ -1136,9 +1154,9 @@ makeTrayMenu() {
                             writeIni(tipList[1], result RowText)
                         }
                         show()
-                    })
+                    }
                     confirmGui.Show()
-                })
+                }
                 value := readIni(tipList[1], "")
                 value := SubStr(value, -1) = "," ? value : value ","
                 temp := ""
@@ -1154,7 +1172,8 @@ makeTrayMenu() {
                     }
                 }
                 DetectHiddenWindows 1
-                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程，你可以点击此按钮手动添加进程").OnEvent("Click", (*) {
+                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程，你可以点击此按钮手动添加进程").OnEvent("Click", fn_add_by_hand)
+                fn_add_by_hand(*) {
                     g := Gui("AlwaysOnTop OwnDialogs")
                     g.SetFont("s12", "微软雅黑")
                     g.AddText(, "- 进程名称应该是 xxx.exe 这样的格式，例如: QQ.exe`n- 每一次只能添加一个")
@@ -1168,7 +1187,8 @@ makeTrayMenu() {
                     g.AddText(, "- 进程名称应该是 xxx.exe 这样的格式，例如: QQ.exe`n- 每一次只能添加一个")
                     g.AddText(, "进程名称: ")
                     g.AddEdit("yp vexe_name", "")
-                    g.AddButton("xs w" Gui_width, "确认添加").OnEvent("Click", (*) {
+                    g.AddButton("xs w" Gui_width, "确认添加").OnEvent("Click", yes2)
+                    yes2(*) {
                         exe_name := g.Submit().exe_name
                         value := readIni(tipList[1], "")
                         valueArr := StrSplit(value, ",")
@@ -1189,15 +1209,16 @@ makeTrayMenu() {
                             writeIni(tipList[1], result exe_name)
                         }
                         g.Destroy()
-                    })
+                    }
                     g.Show()
-                })
+                }
                 LV.ModifyCol(1, "Auto")
                 addGui.OnEvent("Close", fn_restart)
                 addGui.Show()
             }
-        })
-        hideGui.AddButton("xs", tipList[3]).OnEvent("Click", (*) {
+        }
+        hideGui.AddButton("xs", tipList[3]).OnEvent("Click", fn_common_2)
+        fn_common_2(*) {
             hideGui.Destroy()
             show()
             show() {
@@ -1218,7 +1239,8 @@ makeTrayMenu() {
                     rmGui.AddText(, tipList[9])
                     rmGui.AddText(, tipList[8])
                     LV := rmGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用"])
-                    LV.OnEvent("DoubleClick", (LV, RowNumber) {
+                    LV.OnEvent("DoubleClick", fn_double_click)
+                    fn_double_click(LV, RowNumber) {
                         rmGui.Hide()
                         RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
                         confirmGui := Gui("AlwaysOnTop +OwnDialogs")
@@ -1256,7 +1278,7 @@ makeTrayMenu() {
                             }
                             show()
                         }
-                    })
+                    }
                     temp := ","
                     for v in valueArr {
                         if (Trim(v) && !InStr(temp, "," v ",")) {
@@ -1282,10 +1304,11 @@ makeTrayMenu() {
                     rmGui.Show()
                 }
             }
-        })
+        }
         hideGui.Show()
     }
-    sub1.Add("自动切换中文状态", (*) {
+    sub1.Add("自动切换中文状态", fn_switch_CN)
+    fn_switch_CN(*) {
         fn_common(
             [
                 "app_CN",
@@ -1326,8 +1349,9 @@ makeTrayMenu() {
                 writeIni("app_Caps", SubStr(result, 2))
             }
         }
-    })
-    sub1.Add("自动切换英文状态", (*) {
+    }
+    sub1.Add("自动切换英文状态", fn_switch_EN)
+    fn_switch_EN(*) {
         fn_common(
             [
                 "app_EN",
@@ -1369,8 +1393,9 @@ makeTrayMenu() {
                 writeIni("app_Caps", SubStr(result, 2))
             }
         }
-    })
-    sub1.Add("自动切换大写锁定状态", (*) {
+    }
+    sub1.Add("自动切换大写锁定状态", fn_switch_Caps)
+    fn_switch_Caps(*) {
         fn_common(
             [
                 "app_Caps",
@@ -1412,9 +1437,10 @@ makeTrayMenu() {
                 writeIni("app_EN", SubStr(result, 2))
             }
         }
-    })
+    }
     A_TrayMenu.Add("设置自动切换", sub1)
-    A_TrayMenu.Add("设置强制切换快捷键", (*) {
+    A_TrayMenu.Add("设置强制切换快捷键", fn_switch_key)
+    fn_switch_key(*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
         hotkeyGui.AddText(, "--------------------------------------------------------------------")
@@ -1453,7 +1479,8 @@ makeTrayMenu() {
             hotkeyGui.AddHotkey("yp v" v.config, StrReplace(value, "#", ""))
             hotkeyGui.AddCheckbox("yp v" v.with, "Win 键").Value := InStr(value, "#")
         }
-        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", (*) {
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
+        yes(*) {
             for v in configList {
                 if (hotkeyGui.Submit().%v.with%) {
                     key := "#" hotkeyGui.Submit().%v.config%
@@ -1463,14 +1490,15 @@ makeTrayMenu() {
                 writeIni(v.config, key)
             }
             fn_restart()
-        })
+        }
         tab.UseTab(2)
         hotkeyGui.AddText("Section", "- 你首先应该点击下方的手动输入快捷键相关帮助")
         for v in configList {
             hotkeyGui.AddText("xs", v.tip ": ")
             hotkeyGui.AddEdit("yp w300 v" v.config "2", readIni(v.config, ''))
         }
-        hotkeyGui.AddButton("xs w" Gui_width, "快捷键手动输入的相关帮助").OnEvent("Click", (*) {
+        hotkeyGui.AddButton("xs w" Gui_width, "快捷键手动输入的相关帮助").OnEvent("Click", fn_key_help)
+        fn_key_help(*) {
             helpGui := Gui("AlwaysOnTop OwnDialogs")
             helpGui.SetFont("s12", "微软雅黑")
             helpGui.AddText(, "--------------------------------------------------------------------------------------------")
@@ -1516,17 +1544,19 @@ makeTrayMenu() {
                 LV.Add("", k[1], k[2])
             }
             helpGui.Show()
-        })
-        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", (*) {
+        }
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
+        yse(*) {
             for v in configList {
                 key := hotkeyGui.Submit().%v.config "2"%
                 writeIni(v.config, key)
             }
             fn_restart()
-        })
+        }
         hotkeyGui.Show()
-    })
-    A_TrayMenu.Add("指定隐藏符号的应用", (*) {
+    }
+    A_TrayMenu.Add("指定隐藏符号的应用", fn_hide_app)
+    fn_hide_app(*) {
         fn_common(
             [
                 "app_hide_state",
@@ -1545,8 +1575,9 @@ makeTrayMenu() {
         )
         fn(*) {
         }
-    })
-    A_TrayMenu.Add("关于", (*) {
+    }
+    A_TrayMenu.Add("关于", fn_about)
+    fn_about(*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
@@ -1567,18 +1598,20 @@ makeTrayMenu() {
         aboutGui.AddText("xs", "---------------------------------------------------------------------")
         aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
         aboutGui.AddPicture("yp w" 330 * 150 / A_ScreenDPI " h-1", "InputTipSymbol\default\offer.png")
-        aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", (*) {
+        aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", fn_close)
+        fn_close(*) {
             aboutGui.Destroy()
-        })
+        }
         aboutGui.Show()
-    })
+    }
     A_TrayMenu.Add("重启", fn_restart)
     fn_restart(*) {
         Run(A_ScriptFullPath)
     }
-    A_TrayMenu.Add("退出", (*) {
+    A_TrayMenu.Add("退出", fn_exit)
+    fn_exit(*) {
         ExitApp()
-    })
+    }
     isColor(v) {
         v := StrReplace(v, "#", "")
         colorList := ",red,blue,green,yellow,purple,gray,black,white,"
@@ -1605,12 +1638,15 @@ replaceEnvVariables(str) {
     return str
 }
 
+/**
+ * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
+ */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
     disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,wps.exe,"
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,aegisub32.exe,aegisub64.exe,aegisub.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
     Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,Acrobat.exe,"
     if (InStr(disable_lsit, "," exe_name ",")) {

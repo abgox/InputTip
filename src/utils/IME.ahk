@@ -1,11 +1,8 @@
-/*
-@link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
-@Example
-; 获取当前输入法输入模式
-f1::ToolTip IME.GetInputMode()
-; 切换当前输入法输入模式
-f2::IME.SetInputMode(!IME.GetInputMode())
-*/
+/**
+ * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
+ * @example IME.GetInputMode() ; 获取当前输入法输入模式
+ * @example IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
+ */
 class IME {
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
         if !this.GetOpenStatus(hwnd) {

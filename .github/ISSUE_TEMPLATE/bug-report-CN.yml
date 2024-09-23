@@ -35,6 +35,14 @@ body:
       multiple: true
     validations:
       required: true
+  - type: input
+    id: exe
+    attributes:
+      label: 哪一个软件出现了问题?软件进程名叫什么？(比如：QQ.exe)
+      description: |
+        你可以在 `任务管理器` 中找到出现问题的软件进程，右键点击进程名，点击 `打开文件所在的位置` 找到软件的运行进程 exe 文件。
+    validations:
+      required: true
   - type: textarea
     id: steps-to-reproduce
     attributes:

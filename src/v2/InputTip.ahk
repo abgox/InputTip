@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.3
+;@AHK2Exe-SetVersion 2.21.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.3"
+currentVersion := "2.21.5"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -408,7 +408,9 @@ if (changeCursor) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
-                    DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+                    try {
+                        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+                    }
                     canShowSymbol := GetCaretPosEx(&left, &top)
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -541,7 +543,9 @@ if (changeCursor) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
-                    DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+                    try {
+                        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+                    }
                     canShowSymbol := GetCaretPosEx(&left, &top)
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -1606,7 +1610,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,wps.exe,"
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
     Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,Acrobat.exe,"
     if (InStr(disable_lsit, "," exe_name ",")) {

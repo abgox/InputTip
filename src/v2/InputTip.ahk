@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.1
+;@AHK2Exe-SetVersion 2.21.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.1"
+currentVersion := "2.21.3"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -1546,6 +1546,8 @@ makeTrayMenu() {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
+        aboutGui.AddPicture("yp w" 330 * 150 / A_ScreenDPI " h-1", "InputTipSymbol\default\offer.png")
         aboutGui.Show("Hide")
         aboutGui.GetPos(, , &Gui_width)
         aboutGui.Destroy()
@@ -1560,7 +1562,7 @@ makeTrayMenu() {
         aboutGui.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
         aboutGui.AddText("xs", "---------------------------------------------------------------------")
         aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
-        aboutGui.AddPicture("yp w222 h-1", "InputTipSymbol\default\offer.png")
+        aboutGui.AddPicture("yp w" 330 * 150 / A_ScreenDPI " h-1", "InputTipSymbol\default\offer.png")
         aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", (*) {
             aboutGui.Destroy()
         })
@@ -1601,12 +1603,12 @@ replaceEnvVariables(str) {
 
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
-    disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,"
+    disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,wps.exe,"
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
     MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
-    Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,"
+    Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,Acrobat.exe,"
     if (InStr(disable_lsit, "," exe_name ",")) {
         return 0
     } else if (InStr(Wpf_list, "," exe_name ",")) {

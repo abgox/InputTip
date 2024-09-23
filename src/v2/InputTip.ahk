@@ -1,6 +1,6 @@
 #Requires AutoHotkey >v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.0
+;@AHK2Exe-SetVersion 2.21.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.0"
+currentVersion := "2.21.1"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -1601,12 +1601,12 @@ replaceEnvVariables(str) {
 
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
-
     disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,"
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
+    Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,"
     if (InStr(disable_lsit, "," exe_name ",")) {
         return 0
     } else if (InStr(Wpf_list, "," exe_name ",")) {
@@ -1630,8 +1630,13 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             return 1
         }
     }
+    else if (InStr(Hook_list_avoid_err, "," exe_name ",")) {
+        if (getCaretPosFromHook(0)) {
+            return 1
+        }
+    }
     else {
-        if (getCaretPosFromHook()) {
+        if (getCaretPosFromHook(1)) {
             return 1
         }
     }
@@ -1804,18 +1809,18 @@ end:
         return false
     }
 
-    getCaretPosFromHook() {
+    getCaretPosFromHook(flag) {
         static WM_GET_CARET_POS := DllCall("RegisterWindowMessageW", "str", "WM_GET_CARET_POS", "uint")
         if !tid := DllCall("GetWindowThreadProcessId", "ptr", hwnd, "ptr*", &pid := 0, "uint")
             return false
-
-        ; ! 导致许多应用崩溃/自动输入/删除内容的源头
-        ; Update caret position
-        ; try {
-        ;     SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
-        ; }
-        ; !
-
+        if (flag) {
+            ; ! 部分应用会因为它触发意外错误
+            ; ! 如: 崩溃，自动输入/删除等
+            ; Update caret position
+            try {
+                SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
+            }
+        }
         ; PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ
         if !hProcess := DllCall("OpenProcess", "uint", 1082, "int", false, "uint", pid, "ptr")
             return false

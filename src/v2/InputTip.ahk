@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.7
+;@AHK2Exe-SetVersion 2.21.9
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.7"
+currentVersion := "2.21.9"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -1646,9 +1646,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,wps.exe,"
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,aegisub32.exe,aegisub64.exe,aegisub.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,aegisub32.exe,aegisub64.exe,aegisub.exe,PandaOCR.exe,PandaOCR.Pro.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
     Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,Acrobat.exe,"
+
     if (InStr(disable_lsit, "," exe_name ",")) {
         return 0
     } else if (InStr(Wpf_list, "," exe_name ",")) {

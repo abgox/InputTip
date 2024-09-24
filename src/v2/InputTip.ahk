@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.10
+;@AHK2Exe-SetVersion 2.21.11
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.10"
+currentVersion := "2.21.11"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -263,7 +263,9 @@ curMap := {
 if (!DirExist("InputTipCursor")) {
     FileExist("InputTipCursor.zip") ? 0 : FileInstall("InputTipCursor.zip", "InputTipCursor.zip", 1)
     RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipCursor.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
-    FileDelete("InputTipCursor.zip")
+    try {
+        FileDelete("InputTipCursor.zip")
+    }
 } else {
     noList := [], dirList := ["CN", "CN_Default", "EN", "EN_Default", "Caps", "Caps_Default"]
     for dir in dirList {
@@ -277,8 +279,12 @@ if (!DirExist("InputTipCursor")) {
         for dir in noList {
             dirCopy(A_AppData "\abgox-InputTipCursor-temp\InputTipCursor\" dir, "InputTipCursor\" dir)
         }
-        DirDelete(A_AppData "\abgox-InputTipCursor-temp", 1)
-        FileDelete("InputTipCursor.zip")
+        try {
+            DirDelete(A_AppData "\abgox-InputTipCursor-temp", 1)
+        }
+        try {
+            FileDelete("InputTipCursor.zip")
+        }
     }
 }
 for p in ["EN", "CN", "Caps"] {
@@ -308,7 +314,9 @@ fileList := ["CN", "EN", "Caps"]
 if (!DirExist("InputTipSymbol")) {
     FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
     RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_ScriptDir "'", , "Hide")
-    FileDelete("InputTipSymbol.zip")
+    try {
+        FileDelete("InputTipSymbol.zip")
+    }
 } else {
     noList := []
     for f in fileList {
@@ -320,8 +328,12 @@ if (!DirExist("InputTipSymbol")) {
         FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
         RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
         dirCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\default", "InputTipSymbol\default", 1)
-        DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
-        FileDelete("InputTipSymbol.zip")
+        try {
+            DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
+        }
+        try {
+            FileDelete("InputTipSymbol.zip")
+        }
     }
 }
 for f in fileList {
@@ -659,7 +671,9 @@ makeTrayMenu() {
         if (flag) {
             FileCopy(A_ScriptDir "\InputTip.lnk", A_Startup, 1)
         } else {
-            FileDelete(A_Startup "\InputTip.lnk")
+            try {
+                FileDelete(A_Startup "\InputTip.lnk")
+            }
         }
     }
 

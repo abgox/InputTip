@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.9
+;@AHK2Exe-SetVersion 2.21.10
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.9"
+currentVersion := "2.21.10"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -710,7 +710,7 @@ makeTrayMenu() {
             msgGui.Show()
         }
     }
-    A_TrayMenu.Add("设置输入法", sub)
+    A_TrayMenu.Add("设置输入法模式", sub)
     sub.Check("模式" mode)
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
@@ -724,7 +724,7 @@ makeTrayMenu() {
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
 
-        configGui := Gui("OwnDialogs", "InputTip v2 - 更改配置")
+        configGui := Gui("OwnDialogs", "InputTip - 更改配置")
         configGui.SetFont(size, "微软雅黑")
         tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本符号", "配色网站"])
         tab.UseTab(1)
@@ -1172,7 +1172,7 @@ makeTrayMenu() {
                     }
                 }
                 DetectHiddenWindows 1
-                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程，你可以点击此按钮手动添加进程").OnEvent("Click", fn_add_by_hand)
+                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程？你可以点击此按钮手动添加进程").OnEvent("Click", fn_add_by_hand)
                 fn_add_by_hand(*) {
                     g := Gui("AlwaysOnTop OwnDialogs")
                     g.SetFont("s12", "微软雅黑")
@@ -1439,11 +1439,11 @@ makeTrayMenu() {
         }
     }
     A_TrayMenu.Add("设置自动切换", sub1)
-    A_TrayMenu.Add("设置强制切换快捷键", fn_switch_key)
+    A_TrayMenu.Add("设置快捷键", fn_switch_key)
     fn_switch_key(*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "--------------------------------------------------------------------")
+        hotkeyGui.AddText(, "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键`n- 你首先应该点击下方的手动输入快捷键相关帮助")
         hotkeyGui.Show("Hide")
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
@@ -1451,10 +1451,10 @@ makeTrayMenu() {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置强制切换输入法状态的快捷键")
         hotkeyGui.SetFont("s12", "微软雅黑")
 
-        tab := hotkeyGui.AddTab3(, ["设置快捷键", "手动输入快捷键"])
+        tab := hotkeyGui.AddTab3(, ["设置组合快捷键", "手动输入快捷键"])
         tab.UseTab(1)
         hotkeyGui.AddText("Section", "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-        hotkeyGui.AddText("Center w" Gui_width, "--------------------------------------------------------------------")
+        hotkeyGui.AddText("w" Gui_width, "-------------------------------------------------------------------------------------")
 
         configList := [{
             config: "hotkey_CN",
@@ -1492,7 +1492,7 @@ makeTrayMenu() {
             fn_restart()
         }
         tab.UseTab(2)
-        hotkeyGui.AddText("Section", "- 你首先应该点击下方的手动输入快捷键相关帮助")
+        hotkeyGui.AddText("Section", "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键`n- 你首先应该点击下方的手动输入快捷键相关帮助")
         for v in configList {
             hotkeyGui.AddText("xs", v.tip ": ")
             hotkeyGui.AddEdit("yp w300 v" v.config "2", readIni(v.config, ''))
@@ -1510,12 +1510,12 @@ makeTrayMenu() {
             helpGui.SetFont("s12", "微软雅黑")
             helpGui.AddText(, "- 你首先要清楚以下符号和按键之间的对应关系`n- ^ 表示 Ctrl， + 表示 Shift， # 表示 Win, ! 表示 Alt`n- 下面有一些常见的快捷键组合对应列表，相信你看了就知道大概需要如何输入你想要的快捷键了`n- 需要注意: 如果你输入的快捷键中有 #，# 必须放在最前面，比如 #^Space")
             key_list := [
-                ["LShift", "左侧 Shift (单独使用)，组合其他按键时需要使用 +"],
-                ["RShift", "右侧 Shift (单独使用)，组合其他按键时需要使用 +"],
-                ["LAlt", "左侧 Alt (单独使用)，组合其他按键时需要使用 !"],
-                ["RAlt", "右侧 Alt (单独使用)，组合其他按键时需要使用 !"],
-                ["LCtrl", "左侧 Ctrl (单独使用)，组合其他按键时需要使用 ^"],
-                ["RCtrl", "右侧 Ctrl (单独使用)，组合其他按键时需要使用 ^"],
+                ; ["LShift", "左侧 Shift (单独使用)，组合其他按键时需要使用 +"],
+                ; ["RShift", "右侧 Shift (单独使用)，组合其他按键时需要使用 +"],
+                ; ["LAlt", "左侧 Alt (单独使用)，组合其他按键时需要使用 !"],
+                ; ["RAlt", "右侧 Alt (单独使用)，组合其他按键时需要使用 !"],
+                ; ["LCtrl", "左侧 Ctrl (单独使用)，组合其他按键时需要使用 ^"],
+                ; ["RCtrl", "右侧 Ctrl (单独使用)，组合其他按键时需要使用 ^"],
                 ["^Space", "Ctrl + Space(空格键)"],
                 ["<^Space", "左侧的 Ctrl + Space"],
                 [">^Space", "右侧的 Ctrl + Space"],
@@ -1576,11 +1576,12 @@ makeTrayMenu() {
         fn(*) {
         }
     }
+    A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
     fn_about(*) {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
-        aboutGui.AddText("", "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText("", "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
         aboutGui.AddPicture("yp w" 330 * 150 / A_ScreenDPI " h-1", "InputTipSymbol\default\offer.png")
         aboutGui.Show("Hide")
@@ -1589,7 +1590,7 @@ makeTrayMenu() {
 
         aboutGui := Gui("AlwaysOnTop OwnDialogs", "InputTip.exe - 关于")
         aboutGui.SetFont("s12", "微软雅黑")
-        aboutGui.AddText("Center w" Gui_width, "InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        aboutGui.AddText("Center w" Gui_width, "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具")
         aboutGui.AddText(, "当前版本: " currentVersion)
         aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
         aboutGui.AddLink("xs", '官网: <a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
@@ -1646,9 +1647,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,wps.exe,"
     Wpf_list := ",powershell_ise.exe,"
     UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,aegisub32.exe,aegisub64.exe,aegisub.exe,PandaOCR.exe,PandaOCR.Pro.exe,"
+    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,aegisub32.exe,aegisub64.exe,aegisub.exe,PandaOCR.exe,PandaOCR.Pro.exe,VStart6.exe,"
     Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
-    Hook_list_avoid_err := ",ONENOTE.EXE,dbeaver.exe,mspaint.exe,Obsidian.exe,Acrobat.exe,"
+    ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
+    Hook_list_with_dll := ",WeChat.exe,"
 
     if (InStr(disable_lsit, "," exe_name ",")) {
         return 0
@@ -1673,13 +1675,13 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             return 1
         }
     }
-    else if (InStr(Hook_list_avoid_err, "," exe_name ",")) {
-        if (getCaretPosFromHook(0)) {
+    else if (InStr(Hook_list_with_dll, "," exe_name ",")) {
+        if (getCaretPosFromHook(1)) {
             return 1
         }
     }
     else {
-        if (getCaretPosFromHook(1)) {
+        if (getCaretPosFromHook(0)) {
             return 1
         }
     }
@@ -1857,8 +1859,8 @@ end:
         if !tid := DllCall("GetWindowThreadProcessId", "ptr", hwnd, "ptr*", &pid := 0, "uint")
             return false
         if (flag) {
-            ; ! 部分应用会因为它触发意外错误
-            ; ! 如: 崩溃，自动输入/删除等
+            ; ! 有兼容性问题的 dll 调用，部分应用会因为它触发意外错误
+            ; ! 如: 崩溃，自动复制/输入/删除/等
             ; Update caret position
             try {
                 SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION

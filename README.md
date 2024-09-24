@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">✨<a href="https://inputtip.pages.dev/">InputTip v2</a>✨</h1>
+  <h1 align="center">✨<a href="https://inputtip.pages.dev/">InputTip</a>✨</h1>
 </p>
 
 <p align="center">
@@ -44,8 +44,7 @@
   - 如果你的网络环境无法访问它，请查看 [项目仓库中的版本更新日志](./src/v2/CHANGELOG.md)
 - [一些常见的使用问题(FAQ)，如果有使用问题，你应该先查看它](https://inputtip.pages.dev/FAQ/)
 
-> - [点击这里查看 v1 版本](./src/v1/README.md)
->   - 此版本已经没啥用了
+> - [点击这里查看 v1 老版本](./src/v1/README.md) (此版本已经没啥用了，不再更新)
 
 ### 演示
 

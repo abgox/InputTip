@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
-;@AHK2Exe-SetName InputTip v2
-;@AHK2Exe-SetVersion 2.21.11
+;@AHK2Exe-SetName InputTip
+;@AHK2Exe-SetVersion 2.22.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
-;@AHK2Exe-SetDescription InputTip v2 - 一个输入法状态(中文/英文/大写锁定)提示工具
+;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
 ;@Ahk2Exe-SetCopyright Copyright (c) 2024-present abgox
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource InputTipCursor.zip
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.21.11"
+currentVersion := "2.22.0"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -45,12 +45,12 @@ if (!FileExist("InputTip.ini")) {
     confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click", yes)
     yes(*) {
         writeIni("changeCursor", 1)
-        Run(A_ScriptFullPath)
+        fn_restart()
     }
     confirmGui.AddButton("w" Gui_width, "不要修改").OnEvent("Click", no)
     no(*) {
         writeIni("changeCursor", 0)
-        Run(A_ScriptFullPath)
+        fn_restart()
     }
     confirmGui.Show()
 }
@@ -59,7 +59,6 @@ ignoreUpdate := readIni("ignoreUpdate", 0)
 if (!ignoreUpdate) {
     checkVersion(currentVersion, "v2")
 }
-
 try {
     mode := IniRead("InputTip.ini", "InputMethod", "mode")
 } catch {
@@ -74,14 +73,14 @@ try {
     writeIni("mode", mode, "InputMethod")
 }
 
-try {
-    for v in ["ApplicationFrameHost.exe"] {
-        app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
-        if (!InStr(app_hide_state, v)) {
-            writeIni("app_hide_state", app_hide_state (app_hide_state ? "," : "") v)
-        }
-    }
-}
+; try {
+;     for v in [] {
+;         app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
+;         if (!InStr(app_hide_state, v)) {
+;             writeIni("app_hide_state", app_hide_state (app_hide_state ? ":" : "") v)
+;         }
+;     }
+; }
 
 try {
     symbolType := IniRead("InputTip.ini", "config-v2", "symbolType")
@@ -106,6 +105,7 @@ try {
 }
 
 isStartUp := readIni("isStartUp", 0)
+enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
 changeCursor := readIni("changeCursor", 0)
 symbolType := readIni("symbolType", 2)
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
@@ -122,10 +122,34 @@ pic_offset_y := readIni('pic_offset_y', -20)
 pic_symbol_width := readIni('pic_symbol_width', 9)
 pic_symbol_height := readIni('pic_symbol_height', 9)
 ; 隐藏方块符号
-app_hide_state := "," readIni('app_hide_state', 'Taskmgr.exe,explorer.exe,StartMenuExperienceHost.exe') ","
-app_CN := "," readIni('app_CN', '') ","
-app_EN := "," readIni('app_EN', '') ","
-app_Caps := "," readIni('app_Caps', '') ","
+app_hide_state := readIni('app_hide_state', '')
+if (InStr(app_hide_state, "exe,")) {
+    app_hide_state := StrReplace(app_hide_state, ",", ":")
+    writeIni('app_hide_state', app_hide_state)
+}
+app_hide_state := ":" app_hide_state ":"
+
+app_CN := readIni('app_CN', '')
+if (InStr(app_CN, "exe,")) {
+    app_CN := StrReplace(app_CN, ",", ":")
+    writeIni('app_CN', app_CN)
+}
+app_CN := ":" app_CN ":"
+
+app_EN := readIni('app_EN', '')
+if (InStr(app_EN, "exe,")) {
+    app_EN := StrReplace(app_EN, ",", ":")
+    writeIni('app_EN', app_EN)
+}
+app_EN := ":" app_EN ":"
+
+app_Caps := readIni('app_Caps', '')
+if (InStr(app_Caps, "exe,")) {
+    app_Caps := StrReplace(app_Caps, ",", ":")
+    writeIni('app_Caps', app_Caps)
+}
+app_Caps := ":" app_Caps ":"
+
 hotkey_CN := readIni('hotkey_CN', '')
 hotkey_EN := readIni('hotkey_EN', '')
 hotkey_Caps := readIni('hotkey_Caps', '')
@@ -146,6 +170,8 @@ borderWidth := (symbol_width + border_margin_left + border_margin_right) * A_Scr
 borderHeight := (symbol_height + border_margin_top + border_margin_bottom) * A_ScreenDPI / 96
 borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI / 96
 borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI / 96
+
+screenList := getScreenInfo()
 
 ; 文本符号相关的配置
 font_family := readIni('font_family', '微软雅黑')
@@ -309,7 +335,7 @@ for v in info {
         }
     }
 }
-showPicList := ","
+showPicList := ":"
 fileList := ["CN", "EN", "Caps"]
 if (!DirExist("InputTipSymbol")) {
     FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
@@ -335,10 +361,21 @@ if (!DirExist("InputTipSymbol")) {
             FileDelete("InputTipSymbol.zip")
         }
     }
+    if(enableJetBrainsSupport && !FileExist("InputTipSymbol\InputTip.JAB.JetBrains.exe")){
+        FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
+        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
+        FileCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\InputTip.JAB.JetBrains.exe", "InputTipSymbol\", 1)
+        try {
+            DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
+        }
+        try {
+            FileDelete("InputTipSymbol.zip")
+        }
+    }
 }
 for f in fileList {
     if (FileExist("InputTipSymbol\" f ".png")) {
-        showPicList .= f ","
+        showPicList .= f ":"
     }
 }
 
@@ -390,30 +427,43 @@ lastWindow := ""
 lastState := state
 needHide := 1
 exe_name := ""
+
+; JetBrains 系列 IDE,在特定进程中进行，在主进程中忽略
+JetBrains_list := ":WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:idea64.exe:DataSpell64.exe:"
+
+if (enableJetBrainsSupport) {
+    Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+}
+
 if (changeCursor) {
     if (symbolType) {
         while 1 {
             is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
-                if (exe_name != lastWindow) {
-                    needHide := 0
-                    SetTimer(timer, HideSymbolDelay)
-                    timer(*) {
-                        global needHide := 1
-                    }
-                    WinWaitActive("ahk_exe" exe_name)
-                    lastWindow := exe_name
-                    if (InStr(app_CN, "," exe_name ",")) {
-                        switch_CN()
-                    } else if (InStr(app_EN, "," exe_name ",")) {
-                        switch_EN()
-                    } else if (InStr(app_Caps, "," exe_name ",")) {
-                        switch_Caps()
-                    }
-                }
-                is_hide_state := InStr(app_hide_state, "," exe_name ",")
             }
+            if (InStr(JetBrains_list, ":" exe_name ":")) {
+                TipGui.Hide()
+                Sleep(50)
+                continue
+            }
+            if (exe_name != lastWindow) {
+                needHide := 0
+                SetTimer(timer, HideSymbolDelay)
+                timer(*) {
+                    global needHide := 1
+                }
+                WinWaitActive("ahk_exe" exe_name)
+                lastWindow := exe_name
+                if (InStr(app_CN, ":" exe_name ":")) {
+                    switch_CN()
+                } else if (InStr(app_EN, ":" exe_name ":")) {
+                    switch_EN()
+                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                    switch_Caps()
+                }
+            }
+            is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 continue
@@ -427,6 +477,7 @@ if (changeCursor) {
                         DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
                     }
                     canShowSymbol := GetCaretPosEx(&left, &top)
+                    canShowSymbol := canShowSymbol && left
                 }
                 if (GetKeyState("CapsLock", "T")) {
                     if (state = 2) {
@@ -484,16 +535,20 @@ if (changeCursor) {
         while 1 {
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
-                if (exe_name != lastWindow) {
-                    WinWaitActive("ahk_exe" exe_name)
-                    lastWindow := exe_name
-                    if (InStr(app_CN, "," exe_name ",")) {
-                        switch_CN()
-                    } else if (InStr(app_EN, "," exe_name ",")) {
-                        switch_EN()
-                    } else if (InStr(app_Caps, "," exe_name ",")) {
-                        switch_Caps()
-                    }
+            }
+            if (InStr(JetBrains_list, ":" exe_name ":")) {
+                Sleep(50)
+                continue
+            }
+            if (exe_name != lastWindow) {
+                WinWaitActive("ahk_exe" exe_name)
+                lastWindow := exe_name
+                if (InStr(app_CN, ":" exe_name ":")) {
+                    switch_CN()
+                } else if (InStr(app_EN, ":" exe_name ":")) {
+                    switch_EN()
+                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                    switch_Caps()
                 }
             }
             if (A_TimeIdle < 500) {
@@ -532,24 +587,29 @@ if (changeCursor) {
             is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
-                if (exe_name != lastWindow) {
-                    needHide := 0
-                    SetTimer(timer2, HideSymbolDelay)
-                    timer2(*) {
-                        global needHide := 1
-                    }
-                    WinWaitActive("ahk_exe" exe_name)
-                    lastWindow := exe_name
-                    if (InStr(app_CN, "," exe_name ",")) {
-                        switch_CN()
-                    } else if (InStr(app_EN, "," exe_name ",")) {
-                        switch_EN()
-                    } else if (InStr(app_Caps, "," exe_name ",")) {
-                        switch_Caps()
-                    }
-                }
-                is_hide_state := InStr(app_hide_state, "," exe_name ",")
             }
+            if (InStr(JetBrains_list, ":" exe_name ":")) {
+                TipGui.Hide()
+                Sleep(50)
+                continue
+            }
+            if (exe_name != lastWindow) {
+                needHide := 0
+                SetTimer(timer2, HideSymbolDelay)
+                timer2(*) {
+                    global needHide := 1
+                }
+                WinWaitActive("ahk_exe" exe_name)
+                lastWindow := exe_name
+                if (InStr(app_CN, ":" exe_name ":")) {
+                    switch_CN()
+                } else if (InStr(app_EN, ":" exe_name ":")) {
+                    switch_EN()
+                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                    switch_Caps()
+                }
+            }
+            is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 continue
@@ -563,6 +623,7 @@ if (changeCursor) {
                         DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
                     }
                     canShowSymbol := GetCaretPosEx(&left, &top)
+                    canShowSymbol := canShowSymbol && left
                 }
                 if (GetKeyState("CapsLock", "T")) {
                     if (state = 2) {
@@ -621,10 +682,12 @@ TipShow(type) {
     switch symbolType {
         case 1:
         {
-            if (InStr(showPicList, "," type ",")) {
+            if (InStr(showPicList, ":" type ":")) {
                 try {
                     TipGuiPic.Value := "InputTipSymbol/" type ".png"
-                    TipGui.Show("NA x" left + pic_offset_x "y" top + pic_offset_y)
+                    try {
+                        TipGui.Show("NA x" left + pic_offset_x "y" top + pic_offset_y)
+                    }
                 } catch {
                     TipGui.Hide()
                 }
@@ -636,8 +699,10 @@ TipShow(type) {
         {
             if (border_type = 4) {
                 if (TipGui.BackColor) {
-                    borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
-                    TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
+                    try {
+                        borderGui.Show("NA w" borderWidth "h" borderHeight "x" left + offset_x "y" top + offset_y)
+                        TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + borderOffsetX "y" top + borderOffsetY)
+                    }
                 } else {
                     borderGui.Hide()
                     TipGui.Hide()
@@ -645,7 +710,9 @@ TipShow(type) {
                 return
             }
             if (TipGui.BackColor) {
-                TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + offset_x "y" top + offset_y)
+                try {
+                    TipGui.Show("NA w" symbolWidth "h" symbolHeight "x" left + offset_x "y" top + offset_y)
+                }
             } else {
                 TipGui.Hide()
             }
@@ -654,7 +721,9 @@ TipShow(type) {
         {
             if (%type "_Text"%) {
                 TipGuiText.Value := %type "_Text"%
-                TipGui.Show("NA x" left + offset_x "y" top + offset_y)
+                try {
+                    TipGui.Show("NA x" left + offset_x "y" top + offset_y)
+                }
             } else {
                 TipGui.Hide()
             }
@@ -666,17 +735,17 @@ makeTrayMenu() {
     A_TrayMenu.Delete()
     A_TrayMenu.Add("开机自启动", fn_startup)
     fn_startup(item, *) {
-        flag := A_TrayMenu.ToggleCheck(item)
-        writeIni("isStartUp", flag)
-        if (flag) {
+        global isStartUp := !isStartUp
+        if (isStartUp) {
             FileCopy(A_ScriptDir "\InputTip.lnk", A_Startup, 1)
         } else {
             try {
                 FileDelete(A_Startup "\InputTip.lnk")
             }
         }
+        writeIni("isStartUp", isStartUp)
+        A_TrayMenu.ToggleCheck(item)
     }
-
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")
     }
@@ -690,7 +759,9 @@ makeTrayMenu() {
     }
     A_TrayMenu.Add("忽略更新", fn_ignore_update)
     fn_ignore_update(item, *) {
-        writeIni("ignoreUpdate", A_TrayMenu.ToggleCheck(item))
+        global ignoreUpdate := !ignoreUpdate
+        writeIni("ignoreUpdate", ignoreUpdate)
+        A_TrayMenu.ToggleCheck(item)
     }
     ignoreUpdate ? A_TrayMenu.Check("忽略更新") : 0
     sub := Menu()
@@ -1150,7 +1221,7 @@ makeTrayMenu() {
                         addGui.Destroy()
                         confirmGui.Destroy()
                         value := readIni(tipList[1], "")
-                        valueArr := StrSplit(value, ",")
+                        valueArr := StrSplit(value, ":")
                         result := ""
                         is_exist := 0
                         for v in valueArr {
@@ -1158,7 +1229,7 @@ makeTrayMenu() {
                                 is_exist := 1
                             }
                             if (Trim(v)) {
-                                result .= v ","
+                                result .= v ":"
                             }
                         }
                         if (is_exist) {
@@ -1172,15 +1243,15 @@ makeTrayMenu() {
                     confirmGui.Show()
                 }
                 value := readIni(tipList[1], "")
-                value := SubStr(value, -1) = "," ? value : value ","
+                value := SubStr(value, -1) = ":" ? value : value ":"
                 temp := ""
                 DetectHiddenWindows 0
                 for v in WinGetList() {
                     try {
                         exe_name := ProcessGetName(WinGetPID("ahk_id " v))
                         title := WinGetTitle("ahk_id " v)
-                        if (!InStr(temp, exe_name ",") && !InStr(value, exe_name ",")) {
-                            temp .= exe_name ","
+                        if (!InStr(temp, exe_name ":") && !InStr(value, exe_name ":")) {
+                            temp .= exe_name ":"
                             LV.Add(, exe_name, WinGetTitle("ahk_id " v))
                         }
                     }
@@ -1205,7 +1276,7 @@ makeTrayMenu() {
                     yes2(*) {
                         exe_name := g.Submit().exe_name
                         value := readIni(tipList[1], "")
-                        valueArr := StrSplit(value, ",")
+                        valueArr := StrSplit(value, ":")
                         result := ""
                         is_exist := 0
                         for v in valueArr {
@@ -1213,7 +1284,7 @@ makeTrayMenu() {
                                 is_exist := 1
                             }
                             if (Trim(v)) {
-                                result .= v ","
+                                result .= v ":"
                             }
                         }
                         if (is_exist) {
@@ -1237,7 +1308,7 @@ makeTrayMenu() {
             show()
             show() {
                 value := readIni(tipList[1], "")
-                valueArr := StrSplit(value, ",")
+                valueArr := StrSplit(value, ":")
 
                 rmGui := Gui("AlwaysOnTop OwnDialogs")
                 rmGui.SetFont("s12", "微软雅黑")
@@ -1273,7 +1344,7 @@ makeTrayMenu() {
                             rmGui.Destroy()
                             confirmGui.Destroy()
                             value := readIni(tipList[1], "")
-                            valueArr := StrSplit(value, ",")
+                            valueArr := StrSplit(value, ":")
                             is_exist := 0
                             result := ""
                             for v in valueArr {
@@ -1281,7 +1352,7 @@ makeTrayMenu() {
                                     is_exist := 1
                                 } else {
                                     if (Trim(v)) {
-                                        result .= "," v
+                                        result .= ":" v
                                     }
                                 }
                             }
@@ -1293,11 +1364,11 @@ makeTrayMenu() {
                             show()
                         }
                     }
-                    temp := ","
+                    temp := ":"
                     for v in valueArr {
-                        if (Trim(v) && !InStr(temp, "," v ",")) {
+                        if (Trim(v) && !InStr(temp, ":" v ":")) {
                             LV.Add(, v)
-                            temp .= v ","
+                            temp .= v ":"
                         }
                     }
                     LV.ModifyCol(1, "Auto")
@@ -1339,25 +1410,25 @@ makeTrayMenu() {
             ], fn
         )
         fn(RowText) {
-            value_EN := "," readIni("app_EN", "") ","
-            value_Caps := "," readIni("app_Caps", "") ","
-            if (InStr(value_EN, "," RowText ",")) {
-                valueArr := StrSplit(value_EN, ",")
+            value_EN := ":" readIni("app_EN", "") ":"
+            value_Caps := ":" readIni("app_Caps", "") ":"
+            if (InStr(value_EN, ":" RowText ":")) {
+                valueArr := StrSplit(value_EN, ":")
                 result := ""
                 for v in valueArr {
                     if (v != RowText && Trim(v)) {
-                        result .= "," v
+                        result .= ":" v
                     }
                 }
                 writeIni("app_EN", SubStr(result, 2))
             }
 
-            if (InStr(value_Caps, "," RowText ",")) {
-                valueArr := StrSplit(value_Caps, ",")
+            if (InStr(value_Caps, ":" RowText ":")) {
+                valueArr := StrSplit(value_Caps, ":")
                 result := ""
                 for v in valueArr {
                     if (v != RowText && Trim(v)) {
-                        result .= "," v
+                        result .= ":" v
                     }
                 }
                 writeIni("app_Caps", SubStr(result, 2))
@@ -1383,25 +1454,25 @@ makeTrayMenu() {
             fn
         )
         fn(RowText) {
-            value_CN := "," readIni("app_CN", "") ","
-            value_Caps := "," readIni("app_Caps", "") ","
-            if (InStr(value_CN, "," RowText ",")) {
-                valueArr := StrSplit(value_CN, ",")
+            value_CN := ":" readIni("app_CN", "") ":"
+            value_Caps := ":" readIni("app_Caps", "") ":"
+            if (InStr(value_CN, ":" RowText ":")) {
+                valueArr := StrSplit(value_CN, ":")
                 result := ""
                 for v in valueArr {
                     if (v != RowText && Trim(v)) {
-                        result .= "," v
+                        result .= ":" v
                     }
                 }
                 writeIni("app_CN", SubStr(result, 2))
             }
 
-            if (InStr(value_Caps, "," RowText ",")) {
-                valueArr := StrSplit(value_Caps, ",")
+            if (InStr(value_Caps, ":" RowText ":")) {
+                valueArr := StrSplit(value_Caps, ":")
                 result := ""
                 for v in valueArr {
                     if (v != RowText && Trim(v)) {
-                        result .= "," v
+                        result .= ":" v
                     }
                 }
                 writeIni("app_Caps", SubStr(result, 2))
@@ -1427,25 +1498,25 @@ makeTrayMenu() {
             fn
         )
         fn(RowText) {
-            value_CN := "," readIni("app_CN", "") ","
-            value_EN := "," readIni("app_EN", "") ","
-            if (InStr(value_CN, "," RowText ",")) {
-                valueArr := StrSplit(value_CN, ",")
+            value_CN := ":" readIni("app_CN", "") ":"
+            value_EN := ":" readIni("app_EN", "") ":"
+            if (InStr(value_CN, ":" RowText ":")) {
+                valueArr := StrSplit(value_CN, ":")
                 result := ""
                 for v in valueArr {
                     if (v != RowText && Trim(v)) {
-                        result .= "," v
+                        result .= ":" v
                     }
                 }
                 writeIni("app_CN", SubStr(result, 2))
             }
 
-            if (InStr(value_EN, "," RowText ",")) {
-                valueArr := StrSplit(value_EN, ",")
+            if (InStr(value_EN, ":" RowText ":")) {
+                valueArr := StrSplit(value_EN, ":")
                 result := ""
                 for v in valueArr {
                     if (v != RowText && Trim(v)) {
-                        result .= "," v
+                        result .= ":" v
                     }
                 }
                 writeIni("app_EN", SubStr(result, 2))
@@ -1467,7 +1538,7 @@ makeTrayMenu() {
 
         tab := hotkeyGui.AddTab3(, ["设置组合快捷键", "手动输入快捷键"])
         tab.UseTab(1)
-        hotkeyGui.AddText("Section", "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
+        hotkeyGui.AddText("Section", "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键`n- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
         hotkeyGui.AddText("w" Gui_width, "-------------------------------------------------------------------------------------")
 
         configList := [{
@@ -1590,6 +1661,101 @@ makeTrayMenu() {
         fn(*) {
         }
     }
+    A_TrayMenu.Add("启用 JetBrains IDE 支持", fn_JetBrains)
+    fn_JetBrains(item, *) {
+        global enableJetBrainsSupport := !enableJetBrainsSupport
+        if (enableJetBrainsSupport) {
+            RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+            showMsg(["已经启用 JetBrains IDE 支持", "你还需要开启 Java Access Bridge 并重启 InputTip，就可以在 JetBrains 系列 IDE 中使用 InputTip 了。", "具体操作步骤，请查看以下网址:", '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>'])
+        }
+        writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
+        A_TrayMenu.ToggleCheck(item)
+        if (!enableJetBrainsSupport) {
+            fn_restart()
+        }
+    }
+    enableJetBrainsSupport ? A_TrayMenu.Check("启用 JetBrains IDE 支持") : 0
+    A_TrayMenu.Add("设置特殊偏移量", fn_offset)
+    fn_offset(*) {
+        offsetGui := Gui("AlwaysOnTop OwnDialogs")
+        offsetGui.SetFont("s12", "微软雅黑")
+        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己手动的通过调整对应屏幕的偏移量，使其正确显示`n- 注意: 你需要先开启 Java Access Bridge，具体操作步骤，请查看以下网址:")
+        offsetGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
+        offsetGui.Show("Hide")
+        offsetGui.GetPos(, , &Gui_width)
+        offsetGui.Destroy()
+
+        offsetGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置特殊偏移量")
+        offsetGui.SetFont("s12", "微软雅黑")
+        tab := offsetGui.AddTab3("", ["JetBrains IDE"])
+        tab.UseTab(1)
+        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己通过手动调整对应屏幕的偏移量，使其正确显示`n- 你可以通过以下链接了解如何在 JetBrains 系列 IDE 中使用 InputTip :")
+        offsetGui.AddLink(, '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
+        offsetGui.AddButton("w" Gui_width, "设置 JetBrains 系列 IDE 的副屏偏移量").OnEvent("Click", JetBrains_offset)
+
+        JetBrains_offset(*) {
+            offsetGui.Destroy()
+            JetBrainsGui := Gui("AlwaysOnTop OwnDialogs", "InputTip.exe - 设置 JetBrains 系列 IDE 的副屏偏移量")
+            JetBrainsGui.SetFont("s12", "微软雅黑")
+            screenList := getScreenInfo()
+            JetBrainsGui.AddText(, "你需要通过屏幕坐标信息判断具体是哪一块屏幕`n - 假设你有两块屏幕，主屏幕在左侧，副屏幕在右侧`n - 那么副屏幕的左上角 X 坐标一定大于主屏幕的右下角 X 坐标`n - 以此判断以下屏幕哪一块是右侧的屏幕")
+            pages := []
+            for v in screenList {
+                pages.push("屏幕 " v.num)
+            }
+            tab := JetBrainsGui.AddTab3("", pages)
+            for v in screenList {
+                tab.UseTab(v.num)
+                if (v.num = v.main) {
+                    JetBrainsGui.AddText(, "这是主屏幕(主显示器)")
+                } else {
+                    JetBrainsGui.AddText(, "这是副屏幕(副显示器)")
+                }
+
+                JetBrainsGui.AddText(, "屏幕坐标信息: 左上角(" v.left ", " v.top ")，右下角(" v.right ", " v.bottom ")")
+
+                x := 0, y := 0
+                try {
+                    x := IniRead("InputTip.ini", "config-v2", "offset_JetBrains_x_" v.num)
+                }
+                try {
+                    y := IniRead("InputTip.ini", "config-v2", "offset_JetBrains_y_" v.num)
+                }
+
+                JetBrainsGui.AddText(, "水平方向的偏移量: ")
+                JetBrainsGui.AddEdit("voffset_JetBrains_x_" v.num " yp w100", x)
+                JetBrainsGui.AddText("yp", "垂直方向的偏移量: ")
+                JetBrainsGui.AddEdit("voffset_JetBrains_y_" v.num " yp w100", y)
+            }
+            tab.UseTab(0)
+            JetBrainsGui.AddButton("w" Gui_width, "确定").OnEvent("Click", save)
+            save(*) {
+                isValid:= 1
+                for v in screenList {
+                    x := JetBrainsGui.Submit().%"offset_JetBrains_x_" v.num%
+                    if (!IsNumber(x)) {
+                        showMsg(["配置错误!", "它应该是一个数字。"])
+                        isValid := 0
+                    } else {
+                        writeIni("offset_JetBrains_x_" v.num, x)
+                    }
+                    y := JetBrainsGui.Submit().%"offset_JetBrains_y_" v.num%
+                    if (!IsNumber(y)) {
+                        showMsg(["配置错误!", "它应该是一个数字。"])
+                        isValid:= 0
+                    } else {
+                        writeIni("offset_JetBrains_x_" v.num, y)
+                    }
+                }
+                if(isValid){
+                    fn_restart()
+                }
+            }
+            JetBrainsGui.Show()
+        }
+        offsetGui.Show()
+    }
+
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
     fn_about(*) {
@@ -1620,17 +1786,14 @@ makeTrayMenu() {
         aboutGui.Show()
     }
     A_TrayMenu.Add("重启", fn_restart)
-    fn_restart(*) {
-        Run(A_ScriptFullPath)
-    }
     A_TrayMenu.Add("退出", fn_exit)
     fn_exit(*) {
         ExitApp()
     }
     isColor(v) {
         v := StrReplace(v, "#", "")
-        colorList := ",red,blue,green,yellow,purple,gray,black,white,"
-        if (InStr(colorList, "," v ",")) {
+        colorList := ":red:blue:green:yellow:purple:gray:black:white:"
+        if (InStr(colorList, ":" v ":")) {
             return 1
         }
         if (StrLen(v) > 8) {
@@ -1644,6 +1807,14 @@ makeTrayMenu() {
     }
 }
 
+fn_restart(*) {
+    RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
+    if (enableJetBrainsSupport) {
+        Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+    }
+    Run(A_ScriptFullPath)
+}
+
 replaceEnvVariables(str) {
     while RegExMatch(str, "%\w+%", &match) {
         env := match[]
@@ -1654,34 +1825,66 @@ replaceEnvVariables(str) {
 }
 
 /**
+ * 获取到屏幕信息
+ * @returns {Array} 一个数组 [{num:1,left:0,top:0,right:0,bottom:0}]
+ */
+getScreenInfo() {
+    list := []
+    MonitorCount := MonitorGetCount()
+    MonitorPrimary := MonitorGetPrimary()
+    Loop MonitorCount
+    {
+        MonitorGet A_Index, &L, &T, &R, &B
+        MonitorGetWorkArea A_Index, &WL, &WT, &WR, &WB
+        list.Push({
+            main: MonitorPrimary,
+            count: MonitorCount,
+            num: A_Index,
+            left: L,
+            top: T,
+            right: R,
+            bottom: B
+        })
+    }
+    return list
+}
+isWhichScreen(screenList) {
+    MouseGetPos(&x, &y)
+    for v in screenList {
+        if (x >= v.left && x <= v.right && y >= v.top && y <= v.bottom) {
+            return v
+        }
+    }
+}
+
+/**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
-    disable_lsit := ",wetype_update.exe,AnLink.exe,Notepad--.exe,wps.exe,"
-    Wpf_list := ",powershell_ise.exe,"
-    UIA_list := ",WINWORD.EXE,WindowsTerminal.exe,wt.exe,OneCommander.exe,YoudaoDict.exe,"
-    MSAA_list := ",EXCEL.EXE,DingTalk.exe,Notepad.exe,Notepad3.exe,QQ.exe,firefox.exe,Quicker.exe,skylark.exe,aegisub32.exe,aegisub64.exe,aegisub.exe,PandaOCR.exe,PandaOCR.Pro.exe,VStart6.exe,"
-    Gui_UIA_list := ",POWERPNT.EXE,Notepad++.exe,"
+    disable_lsit := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:"
+    Wpf_list := ":powershell_ise.exe:"
+    UIA_list := ":WINWORD.EXE:WindowsTerminal.exe:wt.exe:OneCommander.exe:YoudaoDict.exe:Mempad.exe:Taskmgr.exe:"
+    MSAA_list := ":EXCEL.EXE:DingTalk.exe:Notepad.exe:Notepad3.exe:QQ.exe:firefox.exe:Quicker.exe:skylark.exe:aegisub32.exe:aegisub64.exe:aegisub.exe:PandaOCR.exe:PandaOCR.Pro.exe:VStart6.exe:TIM.exe:PowerToys.PowerLauncher.exe:"
+    ACC_list := ":explorer.exe:ApplicationFrameHost.exe:"
+    Gui_UIA_list := ":POWERPNT.EXE:Notepad++.exe:"
     ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
-    Hook_list_with_dll := ",WeChat.exe,"
+    Hook_list_with_dll := ":WeChat.exe:"
 
-    if (InStr(disable_lsit, "," exe_name ",")) {
+    if (InStr(disable_lsit, ":" exe_name ":")) {
         return 0
-    } else if (InStr(Wpf_list, "," exe_name ",")) {
-        if (getCaretPosFromWpfCaret()) {
-            return 1
-        }
-    } else if (InStr(UIA_list, "," exe_name ",")) {
+    }
+    else if (InStr(UIA_list, ":" exe_name ":")) {
         if (getCaretPosFromUIA()) {
             return 1
         }
     }
-    else if (InStr(MSAA_list, "," exe_name ",")) {
+    else if (InStr(MSAA_list, ":" exe_name ":")) {
         if (getCaretPosFromMSAA()) {
             return 1
         }
-    } else if (InStr(Gui_UIA_list, "," exe_name ",")) {
+    }
+    else if (InStr(Gui_UIA_list, ":" exe_name ":")) {
         if (getCaretPosFromGui(&hwnd := 0)) {
             return 1
         }
@@ -1689,8 +1892,13 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             return 1
         }
     }
-    else if (InStr(Hook_list_with_dll, "," exe_name ",")) {
+    else if (InStr(Hook_list_with_dll, ":" exe_name ":")) {
         if (getCaretPosFromHook(1)) {
+            return 1
+        }
+    }
+    else if (InStr(Wpf_list, ":" exe_name ":")) {
+        if (getCaretPosFromWpfCaret()) {
             return 1
         }
     }
@@ -2003,6 +2211,23 @@ end:
                 }
             }
             return res
+        }
+    }
+
+    getCaretPosFromACC() {
+        static _ := DllCall("LoadLibrary", "Str", "oleacc", "Ptr")
+        try {
+            idObject := 0xFFFFFFF8 ; OBJID_CARET
+            if DllCall("oleacc\AccessibleObjectFromWindow", "ptr", WinExist("A"), "uint", idObject &= 0xFFFFFFFF
+                , "ptr", -16 + NumPut("int64", idObject == 0xFFFFFFF0 ? 0x46000000000000C0 : 0x719B3800AA000C81, NumPut("int64", idObject == 0xFFFFFFF0 ? 0x0000000000020400 : 0x11CF3C3D618736E0, IID := Buffer(16)))
+                , "ptr*", oAcc := ComValue(9, 0)) = 0 {
+                x := Buffer(4), y := Buffer(4), w := Buffer(4), h := Buffer(4)
+                oAcc.accLocation(ComValue(0x4003, x.ptr, 1), ComValue(0x4003, y.ptr, 1), ComValue(0x4003, w.ptr, 1), ComValue(0x4003, h.ptr, 1), 0)
+                left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int"), right := NumGet(w, 0, "int"), bottom := NumGet(h, 0, "int")
+                if (left | top) != 0
+                    return 0
+                return 1
+            }
         }
     }
 

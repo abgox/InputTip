@@ -8,9 +8,9 @@ showMsg(msgList) {
     g := Gui("AlwaysOnTop OwnDialogs")
     g.SetFont("s12", "微软雅黑")
     g.MarginX := 0
-    g.AddText("yp", "")
+    g.AddLink("yp", "")
     for item in msgList {
-        g.AddText("xs", item)
+        g.AddLink("xs", item)
     }
     g.Show("Hide")
     g.GetPos(, , &Gui_width)
@@ -19,7 +19,7 @@ showMsg(msgList) {
     g := Gui("AlwaysOnTop OwnDialogs")
     g.SetFont("s12", "微软雅黑")
     for item in msgList {
-        g.AddText("w" Gui_width, item)
+        g.AddLink("w" Gui_width, item)
     }
     g.AddButton("w" Gui_width, "确定").OnEvent("Click",fn_close)
     fn_close(*){

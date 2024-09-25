@@ -109,6 +109,20 @@
 4. 打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 任务，删除它
    - 其实不删除也没事，它不会造成任何影响，不过既然不再使用 `InputTip`，还是删除为好
 
+### 如何在 JetBrains 系列 IDE 中使用 InputTip
+
+1. [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
+2. 命令行中运行以下命令，打开 Java Access Bridge (java 访问桥)
+
+```cmd
+  jabswitch -enable
+```
+
+> [!TIP]
+> 如果你有多块屏幕，在副屏上，会有非常大的坐标偏差
+>
+> 你需要通过 `托盘菜单` => `设置特殊偏移量` => `设置 JetBrains 系列 IDE 的副屏偏移量` 手动调整
+
 ### 关于符号
 
 #### 图片符号

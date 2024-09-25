@@ -4,6 +4,12 @@
 
 - 没有特别说明的版本都是修复问题
 
+## 2.22.0
+
+- 兼容 JetBrains IDE 系列产品
+  - [如何在 JetBrains IDE 系列产品中使用 `InputTip`](../../README.md#如何在-jetbrains-系列-ide-中使用-inputtip)
+  - [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
+
 ## 2.21.7
 
 - 此版本将 `AutoHotkey` 从 `v2.1-alpha` 退回到 `v2.0`

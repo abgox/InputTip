@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.22.1
+;@AHK2Exe-SetVersion 2.22.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.22.1"
+currentVersion := "2.22.2"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -1862,7 +1862,7 @@ isWhichScreen(screenList) {
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     hwnd := getHwnd()
-    disable_lsit := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:"
+    disable_lsit := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:ShareX.exe:clipdiary-portable.exe:"
     Wpf_list := ":powershell_ise.exe:"
     UIA_list := ":WINWORD.EXE:WindowsTerminal.exe:wt.exe:OneCommander.exe:YoudaoDict.exe:Mempad.exe:Taskmgr.exe:"
     MSAA_list := ":EXCEL.EXE:DingTalk.exe:Notepad.exe:Notepad3.exe:QQ.exe:firefox.exe:Quicker.exe:skylark.exe:aegisub32.exe:aegisub64.exe:aegisub.exe:PandaOCR.exe:PandaOCR.Pro.exe:VStart6.exe:TIM.exe:PowerToys.PowerLauncher.exe:Foxmail.exe:"

@@ -106,10 +106,12 @@
 2. 退出 `InputTip.exe`
    - 如果修改了鼠标样式，退出软件时，会尝试进行恢复，但可能无法完全恢复，如果想完全恢复到以前的鼠标样式，需要重启电脑
 3. 删除以上所有文件或目录
-4. 打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 任务，删除它
+4. 打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 和 `abgox.InputTip.JAB.JetBrains` 任务，删除它
    - 其实不删除也没事，它不会造成任何影响，不过既然不再使用 `InputTip`，还是删除为好
 
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
+
+> [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 
 1. [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
 2. 命令行中运行以下命令，打开 Java Access Bridge (java 访问桥)

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.22.2
+;@AHK2Exe-SetVersion 2.22.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,12 +23,12 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.22.2"
+currentVersion := "2.22.3"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
 }
-RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "' A_ScriptFullPath '";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
 
 if (!FileExist("InputTip.ini")) {
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
@@ -1665,7 +1665,7 @@ makeTrayMenu() {
     fn_JetBrains(item, *) {
         global enableJetBrainsSupport := !enableJetBrainsSupport
         if (enableJetBrainsSupport) {
-            RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+            RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
             showMsg(["已经启用 JetBrains IDE 支持", "你还需要开启 Java Access Bridge 并重启 InputTip，就可以在 JetBrains 系列 IDE 中使用 InputTip 了。", "具体操作步骤，请查看以下网址:", '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>'])
         }
         writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
@@ -1771,15 +1771,31 @@ makeTrayMenu() {
         aboutGui := Gui("AlwaysOnTop OwnDialogs", "InputTip.exe - 关于")
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("Center w" Gui_width, "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具")
+        tab:= aboutGui.AddTab3("", ["关于项目", "参考项目"])
+        tab.UseTab(1)
         aboutGui.AddText(, "当前版本: " currentVersion)
-        aboutGui.AddText("xs", "获取更多信息，你应该查看 : ")
+        aboutGui.AddText("Section", "获取更多信息，你应该查看 : ")
         aboutGui.AddLink("xs", '官网: <a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
         aboutGui.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
         aboutGui.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
-        aboutGui.AddText("xs", "---------------------------------------------------------------------")
+        aboutGui.AddText("xs", "--------------------------------------------------------------------------")
         aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
         aboutGui.AddPicture("yp w" 330 * 150 / A_ScreenDPI " h-1", "InputTipSymbol\default\offer.png")
-        aboutGui.AddButton("xs w" Gui_width, "关闭").OnEvent("Click", fn_close)
+        tab.UseTab(2)
+        aboutGui.AddText("Section", "参考并借鉴了以下项目 : ")
+        aboutGui.AddLink("xs", '<a href="https://github.com/aardio/ImTip">ImTip - aardio</a>')
+        aboutGui.AddLink("xs", '<a href="https://github.com/flyinclouds/KBLAutoSwitch">KBLAutoSwitch - flyinclouds</a>')
+        aboutGui.AddLink("xs", '- 更改鼠标样式的功能参考了以上两个开源项目')
+        aboutGui.AddLink("xs", '--------------------------------------------------------------------------')
+        aboutGui.AddLink("xs", '<a href="https://github.com/Tebayaki/AutoHotkeyScripts">AutoHotkeyScripts - Tebayaki</a>')
+        aboutGui.AddLink("xs", '<a href="https://github.com/yakunins/language-indicator">language-indicator - yakunins</a>')
+        aboutGui.AddLink("xs", '<a href="https://github.com/Autumn-one/RedDot">RedDot - Autumn-one(木瓜太香)</a>')
+        aboutGui.AddLink("xs", '- 输入光标处显示符号功能和输入法兼容参考以上两个开源项目以及 RedDot')
+        aboutGui.AddLink("xs", '- RedDot 这个帖子，也让我获取到了不少有用的信息')
+        aboutGui.AddLink("xs", '- 可以说，没有 RedDot，InputTip 不会这么快实现输入光标处显示符号')
+        aboutGui.AddLink("xs", '--------------------------------------------------------------------------')
+        tab.UseTab(0)
+        aboutGui.AddButton("Section w" Gui_width, "关闭").OnEvent("Click", fn_close)
         fn_close(*) {
             aboutGui.Destroy()
         }
@@ -1788,6 +1804,7 @@ makeTrayMenu() {
     A_TrayMenu.Add("重启", fn_restart)
     A_TrayMenu.Add("退出", fn_exit)
     fn_exit(*) {
+        RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
         ExitApp()
     }
     isColor(v) {

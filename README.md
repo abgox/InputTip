@@ -246,6 +246,16 @@
   3.  点击 `设置输入法`
   4.  从这几个模式中选择一个可用的模式
 
+### 参考项目
+
+- [ImTip - aardio](https://github.com/aardio/ImTip)
+- [KBLAutoSwitch - flyinclouds](https://github.com/flyinclouds/KBLAutoSwitch)
+- [AutoHotkeyScripts - Tebayaki](https://github.com/Tebayaki/AutoHotkeyScripts)
+- [language-indicator - yakunins](https://github.com/yakunins/language-indicator)
+- [RedDot - Autumn-one(木瓜太香)](https://github.com/Autumn-one/RedDot)
+  - `InputTip` 最初([InputTip v1](./src/v1/README.md))在鼠标附近显示符号，后来 [InputTip v2](./) 版本通过不同的鼠标样式来区分
+  - 而之后在输入光标处显示色块，通过颜色区分的思路设计来自于 [RedDot - Autumn-one(木瓜太香)](https://github.com/Autumn-one/RedDot)
+
 ### 赞赏支持
 
 ![赞赏支持](https://abgox.pages.dev/support.png)

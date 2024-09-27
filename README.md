@@ -113,12 +113,11 @@
 
 > [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 
-1. [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
-2. 命令行中运行以下命令，打开 Java Access Bridge (java 访问桥)
-
+- 命令行中运行以下命令，打开 Java Access Bridge (java 访问桥)
 ```cmd
   jabswitch -enable
 ```
+- 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
 
 > [!TIP]
 > 如果你有多块屏幕，在副屏上，会有非常大的坐标偏差

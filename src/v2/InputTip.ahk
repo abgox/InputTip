@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.22.5
+;@AHK2Exe-SetVersion 2.23.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.22.5"
+currentVersion := "2.23.0"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -1171,7 +1171,7 @@ makeTrayMenu() {
     fn_switch_key(*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键`n- 你首先应该点击下方的手动输入快捷键相关帮助")
+        hotkeyGui.AddText(, "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键")
         hotkeyGui.Show("Hide")
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
@@ -1179,10 +1179,44 @@ makeTrayMenu() {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置强制切换输入法状态的快捷键")
         hotkeyGui.SetFont("s12", "微软雅黑")
 
-        tab := hotkeyGui.AddTab3(, ["设置组合快捷键", "手动输入快捷键"])
+        tab := hotkeyGui.AddTab3(, ["设置单键", "设置组合快捷键", "手动输入快捷键"])
         tab.UseTab(1)
-        hotkeyGui.AddText("Section", "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键`n- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-        hotkeyGui.AddText("w" Gui_width, "-------------------------------------------------------------------------------------")
+        hotkeyGui.AddText("Section", "- LShift 指的是左侧的 Shift 键，RShift 指的是右侧的 Shift 键，以此类推`n- 如果要移除快捷键，请选择「无」`n-------------------------------------------------------------------------------------")
+
+        singleHotKeylist := [{
+            tip: "强制切换到中文状态",
+            config: "single_hotkey_CN",
+        }, {
+            tip: "强制切换到英文状态",
+            config: "single_hotkey_EN",
+        }, {
+            tip: "强制切换到大写锁定",
+            config: "single_hotkey_Caps",
+        }
+        ]
+        for v in singleHotKeylist {
+            hotkeyGui.AddText("xs", v.tip ": ")
+            DownList := hotkeyGui.AddDropDownList("yp v" v.config, ["无", "LShift", "RShift", "LCtrl", "RCtrl", "LAlt", "RAlt", "Esc"])
+            DownList.Text := Trim(StrReplace(StrReplace(readIni(StrReplace(v.config, "single_", " "), ""), "~", ""), "Up", ""))
+            if (!DownList.Value) {
+                DownList.Value := 1
+            }
+        }
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", confirm)
+        confirm(*) {
+            for v in singleHotKeylist {
+                value := hotkeyGui.Submit().%v.config%
+                if (value = "无") {
+                    key := ""
+                } else {
+                    key := "~" value " Up"
+                }
+                writeIni(StrReplace(v.config, "single_", " "), key)
+            }
+            fn_restart()
+        }
+        tab.UseTab(2)
+        hotkeyGui.AddText("Section", "- 当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键`n- 使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键`n-------------------------------------------------------------------------------------")
 
         configList := [{
             config: "hotkey_CN",
@@ -1219,8 +1253,8 @@ makeTrayMenu() {
             }
             fn_restart()
         }
-        tab.UseTab(2)
-        hotkeyGui.AddText("Section", "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键`n- 你首先应该点击下方的手动输入快捷键相关帮助")
+        tab.UseTab(3)
+        hotkeyGui.AddText("Section", "- 你首先应该点击下方的 「快捷键手动输入的相关帮助」按钮")
         for v in configList {
             hotkeyGui.AddText("xs", v.tip ": ")
             hotkeyGui.AddEdit("yp w300 v" v.config "2", readIni(v.config, ''))
@@ -1760,7 +1794,7 @@ makeTrayMenu() {
             fn_restart()
         }
     }
-    if(enableJetBrainsSupport){
+    if (enableJetBrainsSupport) {
         A_TrayMenu.Check("启用 JetBrains IDE 支持")
         Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
     }

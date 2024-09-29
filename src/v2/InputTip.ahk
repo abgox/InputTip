@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.22.4
+;@AHK2Exe-SetVersion 2.22.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.22.4"
+currentVersion := "2.22.5"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -701,7 +701,7 @@ TipShow(type) {
         }
         case 3:
         {
-            if (%type "_Text"%) {
+            if (TipGui.BackColor && %type "_Text"%) {
                 TipGuiText.Value := %type "_Text"%
                 try {
                     TipGui.Show("NA x" left + offset_x "y" top + offset_y)
@@ -783,7 +783,7 @@ makeTrayMenu() {
     fn_hide_app(*) {
         fn_common({
             config: "app_hide_state",
-            text: "什么是「符号显示黑名单」？`n- 如果应用在「符号显示黑名单」中，当处于此应用窗口中时，InputTip 不会显示符号`n- 如果部分应用出现了一些奇怪的bug，你可以临时将此应用添加到「符号显示黑名单」中",
+            text: "什么是「符号显示黑名单」？`n- 如果应用在「符号显示黑名单」中，当处于此应用窗口中时，InputTip 不会显示符号`n  - 符号: 图片符号、方块符号、文本符号`n- 如果部分应用出现了一些奇怪的bug，你可以临时将此应用添加到「符号显示黑名单」中",
             btn1: "添加应用到「符号显示黑名单」中",
             btn1_text1: "双击应用程序，将其添加到「符号显示黑名单」中`n- 添加后，当处于此应用窗口中时，InputTip 不再显示符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
             btn1_text2: "以下是当前系统正在运行的应用程序列表",
@@ -807,14 +807,14 @@ makeTrayMenu() {
         size := A_ScreenHeight < 1000 ? "s10" : "s12"
         configGui := Gui("OwnDialogs")
         configGui.SetFont(size, "微软雅黑")
-        configGui.AddText(, "输入框中的值是当前生效的值`n-------------------------------------------------------------------------------------------")
+        configGui.AddText(, "-------------------------------------------------------------------------------------------")
         configGui.Show("Hide")
         configGui.GetPos(, , &Gui_width)
         configGui.Destroy()
 
         configGui := Gui("OwnDialogs", "InputTip - 更改配置")
         configGui.SetFont(size, "微软雅黑")
-        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "方块符号边框", "文本符号", "配色网站"])
+        tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号", "配色网站"])
         tab.UseTab(1)
 
         configGui.AddText("Section", "在更改配置前，你应该首先阅读一下项目的 README，相当于软件的说明书")
@@ -968,32 +968,22 @@ makeTrayMenu() {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w150 " v.options, %v.config%)
         }
-        tab.UseTab(5)
-        configGui.AddText(, "目前可以使用三种样式`n- 样式1: 普通边框`n- 样式2: 带有凹陷边缘的边框`n- 样式3: 与样式2相比，差别不大，更细一点`n建议可以都尝试一下，然后选择自己喜欢的样式，也可以自定义样式边框`n" line)
-        list := ["去掉边框样式", "设置为样式1", "设置为样式2", "设置为样式3"]
-        for i, v in list {
-            btnGui := configGui.AddButton("w" Gui_width, v)
-            btnGui.data := i - 1
-            btnGui.OnEvent("Click", fn_btn2)
-            fn_btn2(item, *) {
-                writeIni("border_type", item.data)
-                fn_restart()
-            }
-        }
-        configGui.AddButton("w" Gui_width, "自定义样式边框").OnEvent("Click", fn_custom_border)
+        symbolStyle := ["无", "样式1", "样式2", "样式3", "自定义"]
+        configGui.AddText("xs", "边框样式: ")
+        configGui.AddDropDownList("AltSubmit vborder_type" " yp w150 ", symbolStyle).Value := readIni("border_type", "") + 1
+        configGui.AddButton("yp", "自定义样式边框").OnEvent("Click", fn_custom_border)
         fn_custom_border(*) {
             configGui.Destroy()
             customGui := Gui("AlwaysOnTop OwnDialogs")
             customGui.SetFont("s12", "微软雅黑")
-            customGui.AddText("", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
+            customGui.AddText("", "注意: 如果使用了文本字符，自定义边框样式不会生效`n-----------------------------------------------------------------------------------")
             customGui.Show("Hide")
             customGui.GetPos(, , &Gui_width)
             customGui.Destroy()
 
             customGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 自定义方块符号样式边框")
             customGui.SetFont("s12", "微软雅黑")
-            customGui.AddText("", "输入框中的值是当前生效的值`n-----------------------------------------------------------------------------------")
-
+            customGui.AddText("", "注意: 如果使用了文本字符，自定义边框样式不会生效`n-----------------------------------------------------------------------------------")
             configList := [{
                 config: "border_margin_left",
                 options: "Number",
@@ -1027,14 +1017,8 @@ makeTrayMenu() {
                 options: "Number",
                 tip: "边框的透明度"
             }]
-            isFirst := 1
             for v in configList {
-                if (isFirst) {
-                    customGui.AddText("xs", v.tip ": ")
-                } else {
-                    customGui.AddText("yp x" Gui_width / 2, v.tip ": ")
-                }
-                isFirst := !isFirst
+                customGui.AddText("xs", v.tip ": ")
                 customGui.AddEdit("v" v.config " yp w150 " v.options, %v.config%)
             }
             customGui.AddButton("xs w" Gui_width, "确认").OnEvent("Click", yes2)
@@ -1074,7 +1058,7 @@ makeTrayMenu() {
             }
             customGui.Show()
         }
-        tab.UseTab(6)
+        tab.UseTab(5)
         symbolCharConfig := [{
             config: "font_family",
             options: "",
@@ -1110,7 +1094,7 @@ makeTrayMenu() {
             configGui.AddText("xs", v.tip ": ")
             configGui.AddEdit("v" v.config " yp w150 " v.options, %v.config%)
         }
-        tab.UseTab(7)
+        tab.UseTab(6)
         configGui.AddText(, "- 对于颜色相关的配置，建议使用16进制的颜色值`n- 不过由于没有调色板，可能并不好设置`n- 建议使用以下配色网站(也可以自己去找)，找到喜欢的颜色，复制16进制值`n- 显示的颜色以最终渲染的颜色效果为准")
         configGui.AddLink(, '<a href="https://colorhunt.co">https://colorhunt.co</a>')
         configGui.AddLink(, '<a href="https://materialui.co/colors">https://materialui.co/colors</a>')
@@ -1177,6 +1161,7 @@ makeTrayMenu() {
                 writeIni("HideSymbolDelay", configGui.Submit().HideSymbolDelay)
                 writeIni("symbolType", configGui.Submit().symbolType - 1)
                 writeIni("changeCursor", configGui.Submit().changeCursor - 1)
+                writeIni("border_type", configGui.Submit().border_type - 1)
                 fn_restart()
             }
         }
@@ -1775,7 +1760,10 @@ makeTrayMenu() {
             fn_restart()
         }
     }
-    enableJetBrainsSupport ? A_TrayMenu.Check("启用 JetBrains IDE 支持") : 0
+    if(enableJetBrainsSupport){
+        A_TrayMenu.Check("启用 JetBrains IDE 支持")
+        Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+    }
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)

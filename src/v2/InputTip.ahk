@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.23.0
+;@AHK2Exe-SetVersion 2.23.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.23.0"
+currentVersion := "2.23.2"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -91,7 +91,7 @@ try {
     writeIni("symbolType", symbolType)
 }
 
-mode := readIni("mode", 2)
+mode := readIni("mode", 2, "InputMethod")
 isStartUp := readIni("isStartUp", 0)
 enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
 changeCursor := readIni("changeCursor", 0)
@@ -361,7 +361,7 @@ for f in fileList {
     }
 }
 
-state := 1, old_state := '', old_left := '', old_top := '', left := 0, top := 0
+state := 0, old_state := '', old_left := '', old_top := '', left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 
 if (symbolType = 1) {
@@ -369,7 +369,7 @@ if (symbolType = 1) {
     TipGui.BackColor := "000000"
     WinSetTransColor("000000", TipGui)
     TipGui.Opt("-LastFound")
-    TipGuiPic := TipGui.AddPicture("w" picSymbolWidth " h" picSymbolHeight, "InputTipSymbol\default\CN.png")
+    TipGuiPic := TipGui.AddPicture("w" picSymbolWidth " h" picSymbolHeight, "InputTipSymbol\default\EN.png")
     CN_color := "000000"
     EN_color := "000000"
     Caps_color := "000000"
@@ -389,7 +389,7 @@ if (symbolType = 1) {
         TipGui.MarginX := 0, TipGui.MarginY := 0
         TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
 
-        TipGuiText := TipGui.AddText("w" Gui_width, CN_Text)
+        TipGuiText := TipGui.AddText("w" Gui_width, EN_Text)
     }
     WinSetTransparent(transparent)
     switch border_type {
@@ -398,12 +398,12 @@ if (symbolType = 1) {
         case 3: TipGui.Opt("-LastFound +e0x00020000")
         default: TipGui.Opt("-LastFound")
     }
-    TipGui.BackColor := CN_color
+    TipGui.BackColor := EN_color
 }
 borderGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 WinSetTransparent(border_transparent)
 borderGui.Opt("-LastFound")
-borderGui.BackColor := border_color_CN
+borderGui.BackColor := border_color_EN
 
 lastWindow := ""
 lastState := state
@@ -1197,8 +1197,12 @@ makeTrayMenu() {
         for v in singleHotKeylist {
             hotkeyGui.AddText("xs", v.tip ": ")
             DownList := hotkeyGui.AddDropDownList("yp v" v.config, ["无", "LShift", "RShift", "LCtrl", "RCtrl", "LAlt", "RAlt", "Esc"])
-            DownList.Text := Trim(StrReplace(StrReplace(readIni(StrReplace(v.config, "single_", " "), ""), "~", ""), "Up", ""))
-            if (!DownList.Value) {
+            try {
+                DownList.Text := Trim(StrReplace(StrReplace(readIni(StrReplace(v.config, "single_", " "), ""), "~", ""), "Up", ""))
+                if (!DownList.Value) {
+                    DownList.Value := 1
+                }
+            } catch {
                 DownList.Value := 1
             }
         }
@@ -1307,8 +1311,8 @@ makeTrayMenu() {
             }
             helpGui.Show()
         }
-        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
-        yse(*) {
+        hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes2)
+        yes2(*) {
             for v in configList {
                 key := hotkeyGui.Submit().%v.config "2"%
                 writeIni(v.config, key)

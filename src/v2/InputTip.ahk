@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.23.3
+;@AHK2Exe-SetVersion 2.23.4
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.23.3"
+currentVersion := "2.23.4"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -413,10 +413,6 @@ exe_name := ""
 ; JetBrains 系列 IDE,在特定进程中进行，在主进程中忽略
 JetBrains_list := ":WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:idea64.exe:DataSpell64.exe:"
 
-if (enableJetBrainsSupport) {
-    Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-}
-
 if (changeCursor) {
     if (symbolType) {
         while 1 {
@@ -795,7 +791,7 @@ makeTrayMenu() {
             btn2_text3: "是否要将 ",
             btn2_text4: " 移除？`n移除后，当处于此应用窗口中时，InputTip 会显示符号",
         },
-            fn
+        fn
         )
         fn(*) {
         }
@@ -935,8 +931,7 @@ makeTrayMenu() {
             options: "",
             tip: "大写锁定时方块符号的颜色",
             colors: ["green", "#B1FF91", "#96ED89", "#66BB6A", "#8BC34A", "#45BF55", "#43A047", "#2E7D32", "#33691E"]
-        }
-        ]
+        }]
         symbolBlockConfig := [{
             config: "transparent",
             options: "Number",
@@ -957,8 +952,7 @@ makeTrayMenu() {
             config: "symbol_width",
             options: "",
             tip: "方块符号的宽度"
-        }
-        ]
+        }]
         configGui.AddText("Section", "- 对于不同状态时方块符号的颜色设置，可以留空，留空表示不显示对应的方块符号`n" line)
         for v in symbolBlockColorConfig {
             configGui.AddText("xs", v.tip ": ")
@@ -1087,8 +1081,7 @@ makeTrayMenu() {
             config: "Caps_Text",
             options: "",
             tip: "大写锁定时显示的文本字符"
-        }
-        ]
+        }]
         configGui.AddText("Section", "- 不同状态下的背景颜色以及偏移量由方块符号配置中的相关配置决定`n- 对于不同状态时显示的文本字符设置，可以留空，留空表示不显示对应的文本字符`n" line)
         for v in symbolCharConfig {
             configGui.AddText("xs", v.tip ": ")
@@ -1192,8 +1185,7 @@ makeTrayMenu() {
         }, {
             tip: "强制切换到大写锁定",
             config: "single_hotkey_Caps",
-        }
-        ]
+        }]
         for v in singleHotKeylist {
             hotkeyGui.AddText("xs", v.tip ": ")
             DownList := hotkeyGui.AddDropDownList("yp v" v.config, ["无", "LShift", "RShift", "LCtrl", "RCtrl", "LAlt", "RAlt", "Esc"])
@@ -1302,8 +1294,7 @@ makeTrayMenu() {
                 ["!PgDn", "Alt + ↓"],
                 ["!Tab", "Alt + Tab"],
                 ["!Esc", "Alt + Esc"],
-                ["!Enter", "Alt + Enter"]
-            ]
+                ["!Enter", "Alt + Enter"]]
             LV := helpGui.AddListView("r10 NoSortHdr Grid w" Gui_width, ["你需要输入的值", "实际会生效的快捷键"])
             helpGui.AddLink(, '点击链接，查看完整按键映射列表: <a href="https://wyagd001.github.io/v2/docs/KeyList.htm#general">https://wyagd001.github.io/v2/docs/KeyList.htm#general</a>')
             for k in key_list {
@@ -1322,6 +1313,7 @@ makeTrayMenu() {
         hotkeyGui.Show()
     }
     sub1 := Menu()
+    need_restart := 0
     fn_common(tipList, addFn) {
         hideGui := Gui("AlwaysOnTop +OwnDialogs")
         hideGui.SetFont("s12", "微软雅黑")
@@ -1388,6 +1380,7 @@ makeTrayMenu() {
                         } else {
                             addFn(RowText)
                             writeIni(tipList.config, result RowText)
+                            need_restart := 1
                         }
                         show()
                     }
@@ -1443,13 +1436,14 @@ makeTrayMenu() {
                         } else {
                             addFn(exe_name)
                             writeIni(tipList.config, result exe_name)
+                            need_restart := 1
                         }
                         g.Destroy()
                     }
                     g.Show()
                 }
                 LV.ModifyCol(1, "Auto")
-                addGui.OnEvent("Close", fn_restart)
+                addGui.OnEvent("Close", fn_close)
                 addGui.Show()
             }
         }
@@ -1509,6 +1503,7 @@ makeTrayMenu() {
                             }
                             if (is_exist) {
                                 writeIni(tipList.config, SubStr(result, 2))
+                                need_restart := 1
                             } else {
                                 MsgBox(RowText " 不存在或已经移除!", , "0x1000")
                             }
@@ -1523,7 +1518,7 @@ makeTrayMenu() {
                         }
                     }
                     LV.ModifyCol(1, "Auto")
-                    rmGui.OnEvent("Close", fn_restart)
+                    rmGui.OnEvent("Close", fn_close)
                     rmGui.Show()
                 } else {
                     rmGui.SetFont("s14", "微软雅黑")
@@ -1535,13 +1530,22 @@ makeTrayMenu() {
                     rmGui := Gui("AlwaysOnTop OwnDialogs")
                     rmGui.SetFont("s12", "微软雅黑")
                     rmGui.AddText("Center w" Gui_width, "当前没有可以移除的应用")
-                    rmGui.AddButton("w" Gui_width, "确定").OnEvent("Click", fn_restart)
-                    rmGui.OnEvent("Close", fn_restart)
+                    rmGui.AddButton("w" Gui_width, "确定").OnEvent("Click", fn_close)
+                    rmGui.OnEvent("Close", fn_close)
+                    fn_close(*){
+                        rmGui.Destroy()
+                    }
                     rmGui.Show()
                 }
             }
         }
         hideGui.Show()
+        fn_close(*) {
+            if (need_restart) {
+                fn_restart()
+            }
+            need_restart := 0
+        }
     }
     sub1.Add("自动切换中文状态", fn_switch_CN)
     fn_switch_CN(*) {
@@ -1602,7 +1606,7 @@ makeTrayMenu() {
             btn2_text3: "是否要将 ",
             btn2_text4: " 移除？`n移除后，当从其他应用首次切换到此应用中，InputTip 不会再自动切换到英文状态",
         },
-            fn
+        fn
         )
         fn(RowText) {
             value_CN := ":" readIni("app_CN", "") ":"
@@ -1646,7 +1650,7 @@ makeTrayMenu() {
             btn2_text3: "是否要将 ",
             btn2_text4: " 移除？`n移除后，当从其他应用首次切换到此应用中，InputTip 不会再自动切换到大写锁定状态",
         },
-            fn
+        fn
         )
         fn(RowText) {
             value_CN := ":" readIni("app_CN", "") ":"
@@ -1761,7 +1765,7 @@ makeTrayMenu() {
         writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
         A_TrayMenu.ToggleCheck(item)
         if (enableJetBrainsSupport) {
-            RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+            Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
             FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
             RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
             FileCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\InputTip.JAB.JetBrains.exe", "InputTipSymbol\", 1)
@@ -1787,7 +1791,11 @@ makeTrayMenu() {
             jGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddLink(, '<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddLink(, '<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-            jGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", fn_restart)
+            jGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", confirm)
+            confirm(*) {
+                Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+                jGui.Destroy()
+            }
             jGui.Show()
         } else {
             RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
@@ -1795,7 +1803,6 @@ makeTrayMenu() {
             try {
                 FileDelete("InputTipSymbol\InputTip.JAB.JetBrains.exe")
             }
-            fn_restart()
         }
     }
     if (enableJetBrainsSupport) {
@@ -1873,10 +1880,6 @@ makeTrayMenu() {
 }
 
 fn_restart(*) {
-    RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
-    if (enableJetBrainsSupport) {
-        Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-    }
     Run(A_ScriptFullPath)
 }
 
@@ -2285,8 +2288,8 @@ end:
         try {
             idObject := 0xFFFFFFF8 ; OBJID_CARET
             if DllCall("oleacc\AccessibleObjectFromWindow", "ptr", WinExist("A"), "uint", idObject &= 0xFFFFFFFF
-                , "ptr", -16 + NumPut("int64", idObject == 0xFFFFFFF0 ? 0x46000000000000C0 : 0x719B3800AA000C81, NumPut("int64", idObject == 0xFFFFFFF0 ? 0x0000000000020400 : 0x11CF3C3D618736E0, IID := Buffer(16)))
-                , "ptr*", oAcc := ComValue(9, 0)) = 0 {
+            , "ptr", -16 + NumPut("int64", idObject == 0xFFFFFFF0 ? 0x46000000000000C0 : 0x719B3800AA000C81, NumPut("int64", idObject == 0xFFFFFFF0 ? 0x0000000000020400 : 0x11CF3C3D618736E0, IID := Buffer(16)))
+            , "ptr*", oAcc := ComValue(9, 0)) = 0 {
                 x := Buffer(4), y := Buffer(4), w := Buffer(4), h := Buffer(4)
                 oAcc.accLocation(ComValue(0x4003, x.ptr, 1), ComValue(0x4003, y.ptr, 1), ComValue(0x4003, w.ptr, 1), ComValue(0x4003, h.ptr, 1), 0)
                 left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int"), right := NumGet(w, 0, "int"), bottom := NumGet(h, 0, "int")

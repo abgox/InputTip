@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.23.4
+;@AHK2Exe-SetVersion 2.23.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -23,12 +23,15 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.23.4"
+currentVersion := "2.23.5"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
 }
-RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+
+try {
+    Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+}
 
 if (!FileExist("InputTip.ini")) {
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
@@ -68,28 +71,6 @@ if (!ignoreUpdate) {
 ;         }
 ;     }
 ; }
-
-try {
-    symbolType := IniRead("InputTip.ini", "config-v2", "symbolType")
-} catch {
-    showPic := 0, showSymbol := 1, showChar := 0
-    try {
-        showPic := IniRead("InputTip.ini", "config-v2", "showPic")
-    }
-    try {
-        showSymbol := IniRead("InputTip.ini", "config-v2", "showSymbol")
-    }
-    try {
-        showChar := IniRead("InputTip.ini", "config-v2", "showChar")
-    }
-    symbolType := 0
-    if (showPic) {
-        symbolType := 1
-    } else if (showSymbol) {
-        symbolType := showChar ? 3 : 2
-    }
-    writeIni("symbolType", symbolType)
-}
 
 mode := readIni("mode", 2, "InputMethod")
 isStartUp := readIni("isStartUp", 0)
@@ -451,9 +432,6 @@ if (changeCursor) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
-                    try {
-                        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
-                    }
                     canShowSymbol := GetCaretPosEx(&left, &top)
                     canShowSymbol := canShowSymbol && left
                 }
@@ -597,9 +575,6 @@ if (changeCursor) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
-                    try {
-                        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
-                    }
                     canShowSymbol := GetCaretPosEx(&left, &top)
                     canShowSymbol := canShowSymbol && left
                 }
@@ -1532,7 +1507,7 @@ makeTrayMenu() {
                     rmGui.AddText("Center w" Gui_width, "当前没有可以移除的应用")
                     rmGui.AddButton("w" Gui_width, "确定").OnEvent("Click", fn_close)
                     rmGui.OnEvent("Close", fn_close)
-                    fn_close(*){
+                    fn_close(*) {
                         rmGui.Destroy()
                     }
                     rmGui.Show()
@@ -1765,7 +1740,9 @@ makeTrayMenu() {
         writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
         A_TrayMenu.ToggleCheck(item)
         if (enableJetBrainsSupport) {
-            Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+            try {
+                Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+            }
             FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
             RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
             FileCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\InputTip.JAB.JetBrains.exe", "InputTipSymbol\", 1)
@@ -1929,6 +1906,9 @@ isWhichScreen(screenList) {
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
+    try {
+        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+    }
     hwnd := getHwnd()
     disable_lsit := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:ShareX.exe:clipdiary-portable.exe:"
     Wpf_list := ":powershell_ise.exe:"

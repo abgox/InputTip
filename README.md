@@ -83,8 +83,8 @@
 
   1. 点击 `托盘菜单` => `设置鼠标样式`
   2. 选择包含 `.cur` 或 `.ani` 文件的文件夹
-     - 比如默认的中文鼠标样式文件夹: `InputTipCursor\CN_Default`
-     - 直接选择 `InputTipCursor` 目录下的 `CN_Default`/`EN_Default`/`Caps_Default` 文件夹即可快速重置为默认的中文/英文/大写锁定状态时的鼠标样式
+     - 比如默认的中文鼠标样式文件夹: `InputTipCursor\default\CN`
+     - 直接选择 `InputTipCursor\default` 目录下的 `CN`/`EN`/`Caps` 文件夹即可快速重置为默认的中文/英文/大写锁定状态时的鼠标样式
   3. 点击 `托盘菜单` => `重启`
 
   - [点击下载一些可以直接使用的鼠标样式](https://inputtip.pages.dev/releases/v2/cursorStyle.zip)
@@ -113,13 +113,19 @@
 
 > [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 
-- 命令行中运行以下命令，打开 Java Access Bridge (java 访问桥)
+1. 打开 Java Access Bridge (java 访问桥)
 
-```cmd
-  jabswitch -enable
-```
+   - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
 
-- 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
+   ```cmd
+     jabswitch -enable
+   ```
+
+2. 点击 `托盘菜单` => `启用 JetBrains IDE 支持`
+   - 会在 `InputTip.exe` 同级目录下生成 `InputTip.JAB.JetBrains.exe`
+   - 它由 `InputTip.exe` 控制，不需要手动启动/终止
+3. 点击 `托盘菜单` => `添加 JetBrains IDE 应用`，确保你使用的 JetBrains IDE 应用已经添加
+4. 重启 `InputTip.exe`
 
 > [!TIP]
 > 如果你有多块屏幕，在副屏上，会有非常大的坐标偏差
@@ -164,12 +170,12 @@
 
 ### 自定义鼠标样式
 
-- `InputTip.exe` 启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `CN`、`CN_Default`、`EN`、`EN_Default`、`Caps`、`Caps_Default` 六个文件夹
+- `InputTip.exe` 启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `CN`、`EN`、`Caps`、`default` 四个文件夹
   - **这六个文件夹都不能手动修改**
   - `CN`、`EN`、`Caps` 用于实时加载中文/英文/大写锁定状态的鼠标样式
     - 当设置鼠标样式时，会相对应的复制到 `CN`、`EN`、`Caps` 文件夹中
       - 如何设置鼠标样式: `托盘菜单` => `更改配置` => `鼠标样式` => `设置中文状态鼠标样式`/`设置英文状态鼠标样式`/`设置大写锁定鼠标样式`
-  - `CN_Default`、`EN_Default`、`Caps_Default` 用于存放中文/英文/大写锁定状态的 **默认** 鼠标样式
+  - `default` 用于存放中文/英文/大写锁定状态的 **默认** 鼠标样式
 
 1. 你需要在 `InputTipCursor` 目录下创建一个文件夹
 

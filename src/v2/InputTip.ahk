@@ -1,13 +1,14 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.23.5
+;@AHK2Exe-SetVersion 2.24.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
-;@Ahk2Exe-SetCopyright Copyright (c) 2024-present abgox
+;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 ;@Ahk2Exe-UpdateManifest 1
 ;@Ahk2Exe-AddResource InputTipCursor.zip
 ;@Ahk2Exe-AddResource InputTipSymbol.zip
+;@Ahk2Exe-AddResource InputTip.JAB.JetBrains.exe
 #SingleInstance Force
 Persistent
 ListLines 0
@@ -23,39 +24,55 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.23.5"
+currentVersion := "2.24.0"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
 }
 
 try {
-    Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+    Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
 }
 
-if (!FileExist("InputTip.ini")) {
+isContinue := 0
+
+if (FileExist("InputTip.ini")) {
+    c:= IniRead("InputTip.ini", "config-v2")
+    if (InStr(c,"isStartUp") && !InStr(c, "JetBrains_list")) {
+        writeIni("JetBrains_list", "WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:Idea64.exe:DataSpell64.exe")
+    }
+} else {
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
     confirmGui.SetFont("s12", "微软雅黑")
-    confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 `"关于`"，前往官网或项目中查看)")
+    confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
     confirmGui.Show("Hide")
     confirmGui.GetPos(, , &Gui_width)
     confirmGui.Destroy()
 
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
     confirmGui.SetFont("s12", "微软雅黑")
-    confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 `"关于`"，前往官网或项目中查看)")
+    confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
     confirmGui.AddText(, "您是否希望 InputTip.exe 修改鼠标样式?")
     confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click", yes)
     yes(*) {
         writeIni("changeCursor", 1)
-        fn_restart()
+        isContinue := 1
+        Run(A_ScriptFullPath)
     }
     confirmGui.AddButton("w" Gui_width, "不要修改").OnEvent("Click", no)
     no(*) {
         writeIni("changeCursor", 0)
-        fn_restart()
+        isContinue := 1
+        Run(A_ScriptFullPath)
+    }
+    confirmGui.OnEvent("Close", fn_exit)
+    fn_exit(*){
+        ExitApp()
     }
     confirmGui.Show()
+    while (!isContinue){
+        Sleep(500)
+    }
 }
 
 ignoreUpdate := readIni("ignoreUpdate", 0)
@@ -63,18 +80,10 @@ if (!ignoreUpdate) {
     checkVersion(currentVersion, "v2")
 }
 
-; try {
-;     for v in [] {
-;         app_hide_state := IniRead("InputTip.ini", "config-v2", "app_hide_state")
-;         if (!InStr(app_hide_state, v)) {
-;             writeIni("app_hide_state", app_hide_state (app_hide_state ? ":" : "") v)
-;         }
-;     }
-; }
-
 mode := readIni("mode", 2, "InputMethod")
 isStartUp := readIni("isStartUp", 0)
 enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
+JetBrains_list := ":" readIni("JetBrains_list", "") ":"
 changeCursor := readIni("changeCursor", 0)
 symbolType := readIni("symbolType", 2)
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
@@ -258,20 +267,20 @@ curMap := {
 cursor_temp_zip := A_Temp "\abgox-InputTipCursor-temp.zip"
 cursor_temp_dir := A_Temp "\abgox-InputTipCursor-temp"
 if (!DirExist("InputTipCursor")) {
-    FileExist("InputTipCursor.zip") ? 0 : FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
+    FileExist(cursor_temp_zip) ? 0 : FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
     RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
     try {
-        FileDelete(symbol_temp_zip)
+        FileDelete(cursor_temp_zip)
     }
 } else {
-    noList := [], dirList := ["CN", "CN_Default", "EN", "EN_Default", "Caps", "Caps_Default"]
+    noList := [], dirList := ["CN", "EN", "Caps", "default"]
     for dir in dirList {
         if (!DirExist("InputTipCursor\" dir)) {
             noList.push(dir)
         }
     }
     if (noList.length > 0) {
-        FileExist("InputTipCursor.zip") ? 0 : FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
+        FileExist(cursor_temp_zip) ? 0 : FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
         RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" cursor_temp_dir "'", , "Hide")
         for dir in noList {
             dirCopy(cursor_temp_dir "\InputTipCursor\" dir, "InputTipCursor\" dir)
@@ -312,7 +321,7 @@ fileList := ["CN", "EN", "Caps"]
 symbol_temp_zip := A_Temp "\abgox-InputTipSymbol-temp.zip"
 symbol_temp_dir := A_Temp "\abgox-InputTipSymbol-temp"
 if (!DirExist("InputTipSymbol")) {
-    FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
+    FileExist(symbol_temp_zip) ? 0 : FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
     RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
     try {
         FileDelete(symbol_temp_zip)
@@ -325,7 +334,7 @@ if (!DirExist("InputTipSymbol")) {
         }
     }
     if (noList.length > 0 || !FileExist("InputTipSymbol\default\offer.png")) {
-        FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
+        FileExist(symbol_temp_zip) ? 0 : FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
         RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" symbol_temp_dir "'", , "Hide")
         dirCopy(symbol_temp_dir "\InputTipSymbol\default", "InputTipSymbol\default", 1)
         try {
@@ -391,13 +400,9 @@ lastState := state
 needHide := 1
 exe_name := ""
 
-; JetBrains 系列 IDE,在特定进程中进行，在主进程中忽略
-JetBrains_list := ":WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:idea64.exe:DataSpell64.exe:"
-
 if (changeCursor) {
     if (symbolType) {
         while 1 {
-            is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
             }
@@ -406,6 +411,7 @@ if (changeCursor) {
                 Sleep(50)
                 continue
             }
+            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer, HideSymbolDelay)
@@ -540,7 +546,6 @@ if (changeCursor) {
 } else {
     if (symbolType) {
         while 1 {
-            is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
             }
@@ -549,6 +554,7 @@ if (changeCursor) {
                 Sleep(50)
                 continue
             }
+            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer2, HideSymbolDelay)
@@ -725,20 +731,29 @@ makeTrayMenu() {
             mode := readIni("mode", 1, "InputMethod")
             msgGui := Gui("AlwaysOnTop +OwnDialogs")
             msgGui.SetFont("s10", "微软雅黑")
-            msgGui.AddLink("", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
+            msgGui.AddText(,"------------------------------------------------------------------------------------------------------------")
             msgGui.Show("Hide")
             msgGui.GetPos(, , &Gui_width)
             msgGui.Destroy()
 
+            modeInfo:=[
+                "-「模式1」和「模式2」都是通用的输入法模式`n- 和「模式2」相比，「模式1」兼容的输入法和应用窗口少一点，但识别输入法状态更稳定一点",
+                "-「模式1」和「模式2」都是通用的输入法模式`n- 和「模式1」相比，「模式2」兼容的输入法和应用窗口更多，但有极小概率出现状态识别错误`n- 如果在某个应用窗口中出现识别错误，请尝试重启这个应用窗口",
+                "-「模式3」: 主要用于讯飞输入法`n- 如果你使用的输入法其他模式都无法识别，你才应该尝试「模式3」",
+                "-「模式4」: 主要用于手心输入法`n- 如果你使用的输入法其他模式都无法识别，你才应该尝试「模式4」"
+            ]
+
             msgGui := Gui("AlwaysOnTop +OwnDialogs", A_ScriptName " - 模式切换")
             msgGui.SetFont("s12", "微软雅黑")
             if (mode != index) {
-                msgGui.AddText("", "是否要从 模式" mode " 切换到 模式" index " ?`n----------------------------------------------")
+                msgGui.AddText("", "是否要从 「模式" mode "」 切换到 「模式" index "」?`n--------------------------------------------------------------------------------------------------")
+                msgGui.AddText(, modeInfo[index])
             } else {
-                msgGui.AddText("", "当前正在使用 模式" index "`n----------------------------------------------")
+                msgGui.AddText(, "当前正在使用 「模式" index "」`n--------------------------------------------------------------------------------------------------")
+                msgGui.AddText(, modeInfo[index])
             }
             msgGui.AddText(, "模式相关信息请查看以下任意地址:")
-            msgGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`n<a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`n<a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
+            msgGui.AddLink("xs", '官网: <a href="https://inputtip.pages.dev/v2/#兼容情况">https://inputtip.pages.dev/v2/#兼容情况</a>`nGithub: <a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip#兼容情况</a>`nGitee: <a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip#兼容情况</a>')
             msgGui.AddButton("xs w" Gui_width + msgGui.MarginX * 2, "确认").OnEvent("Click", yes)
             yes(*) {
                 msgGui.Destroy()
@@ -770,6 +785,16 @@ makeTrayMenu() {
         )
         fn(*) {
         }
+    }
+    A_TrayMenu.Add()
+    A_TrayMenu.Add("暂停软件运行", fn_pause)
+    fn_pause(item, *) {
+        A_TrayMenu.ToggleCheck(item)
+        Pause(-1)
+    }
+    A_TrayMenu.Add("打开软件所在目录", fn_open_dir)
+    fn_open_dir(*) {
+        Run("explorer.exe /select," A_ScriptFullPath)
     }
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
@@ -1443,7 +1468,7 @@ makeTrayMenu() {
                 if (valueArr.Length > 0) {
                     rmGui.AddText(, tipList.btn2_text1)
                     rmGui.AddText(, tipList.btn2_text2)
-                    LV := rmGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用"])
+                    LV := rmGui.AddListView("r10 NoSortHdr Sort Grid w" Gui_width, ["应用程序"])
                     LV.OnEvent("DoubleClick", fn_double_click)
                     fn_double_click(LV, RowNumber) {
                         rmGui.Hide()
@@ -1507,9 +1532,6 @@ makeTrayMenu() {
                     rmGui.AddText("Center w" Gui_width, "当前没有可以移除的应用")
                     rmGui.AddButton("w" Gui_width, "确定").OnEvent("Click", fn_close)
                     rmGui.OnEvent("Close", fn_close)
-                    fn_close(*) {
-                        rmGui.Destroy()
-                    }
                     rmGui.Show()
                 }
             }
@@ -1517,9 +1539,8 @@ makeTrayMenu() {
         hideGui.Show()
         fn_close(*) {
             if (need_restart) {
-                fn_restart()
+                fn_restart(1)
             }
-            need_restart := 0
         }
     }
     sub1.Add("自动切换中文状态", fn_switch_CN)
@@ -1740,17 +1761,9 @@ makeTrayMenu() {
         writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
         A_TrayMenu.ToggleCheck(item)
         if (enableJetBrainsSupport) {
+            FileExist("InputTip.JAB.JetBrains.exe") ? 0 : FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
             try {
-                Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTipSymbol\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$task = New-ScheduledTask -Action $action -Principal $principal;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
-            }
-            FileExist("InputTipSymbol.zip") ? 0 : FileInstall("InputTipSymbol.zip", "InputTipSymbol.zip", 1)
-            RunWait("powershell -NoProfile -Command Expand-Archive -Path '" A_ScriptDir "\InputTipSymbol.zip' -DestinationPath '" A_AppData "\abgox-InputTipSymbol-temp'", , "Hide")
-            FileCopy(A_AppData "\abgox-InputTipSymbol-temp\InputTipSymbol\InputTip.JAB.JetBrains.exe", "InputTipSymbol\", 1)
-            try {
-                DirDelete(A_AppData "\abgox-InputTipSymbol-temp", 1)
-            }
-            try {
-                FileDelete("InputTipSymbol.zip")
+                RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
             }
 
             jGui := Gui("AlwaysOnTop OwnDialogs")
@@ -1763,28 +1776,53 @@ makeTrayMenu() {
 
             jGui := Gui("AlwaysOnTop OwnDialogs")
             jGui.SetFont("s12", "微软雅黑")
-            jGui.AddText(, "已成功启用 JetBrains IDE 支持，你还需要开启 Java Access Bridge 并重启 InputTip")
+            jGui.AddText(, "已成功启用 JetBrains IDE 支持，你还需要进行以下步骤:")
+            jGui.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保你使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip")
             jGui.AddText(, "具体操作步骤，请查看以下任意网址:")
             jGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddLink(, '<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddLink(, '<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", confirm)
             confirm(*) {
-                Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+                fn_contorl_JetBrains(1)
                 jGui.Destroy()
             }
             jGui.Show()
         } else {
-            RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
-            RunWait('powershell -NoProfile -Command Unregister-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -Confirm:$false', , "Hide")
+            RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains -Force', , "Hide")
+            Run('powershell -NoProfile -Command Unregister-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -Confirm:$false', , "Hide")
             try {
-                FileDelete("InputTipSymbol\InputTip.JAB.JetBrains.exe")
+                FileDelete("InputTip.JAB.JetBrains.exe")
             }
+        }
+    }
+    A_TrayMenu.Add("添加 JetBrains IDE 应用", fn_add_JetBrains)
+    fn_add_JetBrains(*) {
+        fn_common({
+            config: "JetBrains_list",
+            text: "当勾选「启用 JetBrains IDE 支持」后，你需要确保你使用的 JetBrains IDE 已经被添加",
+            btn1: "添加 JetBrains 系列 IDE 应用程序",
+            btn1_text1: "双击应用程序进程进行添加`n- 你只应该添加 JetBrains 系列 IDE 应用程序进程`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
+            btn1_text2: "以下是当前系统正在运行的应用程序列表",
+            btn1_text3: "是否要添加  ",
+            btn1_text4: " ？`n注意: 如果此应用程序进程不是 JetBrains 系列 IDE 应用程序，你不应该添加它",
+            btn2: "移除 JetBrains 系列 IDE 应用程序",
+            btn2_text1: "双击应用程序进程进行移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
+            btn2_text2: "以下是已添加的 JetBrains 系列 IDE 应用程序列表(如果有其他应用，需立即移除)",
+            btn2_text3: "是否要将 ",
+            btn2_text4: " 移除？",
+        },
+        fn
+        )
+        fn(*) {
         }
     }
     if (enableJetBrainsSupport) {
         A_TrayMenu.Check("启用 JetBrains IDE 支持")
-        Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+        try {
+            RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+        }
+        fn_contorl_JetBrains(1)
     }
 
     A_TrayMenu.Add()
@@ -1836,7 +1874,7 @@ makeTrayMenu() {
     A_TrayMenu.Add("重启", fn_restart)
     A_TrayMenu.Add("退出", fn_exit)
     fn_exit(*) {
-        RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
+        fn_contorl_JetBrains(0)
         ExitApp()
     }
     isColor(v) {
@@ -1856,7 +1894,21 @@ makeTrayMenu() {
     }
 }
 
-fn_restart(*) {
+/**
+ * @param runOrStop 1: Run; 0:Stop
+ */
+fn_contorl_JetBrains(runOrStop) {
+    if (runOrStop) {
+        Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+    } else {
+        Run('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains -Force', , "Hide")
+    }
+}
+
+fn_restart(flag := 0, *) {
+    if (flag || enableJetBrainsSupport) {
+        fn_contorl_JetBrains(0)
+    }
     Run(A_ScriptFullPath)
 }
 
@@ -1916,7 +1968,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     ; MSAA 可能有符号残留
     MSAA_list := ":EXCEL.EXE:DingTalk.exe:Notepad.exe:Notepad3.exe:Quicker.exe:skylark.exe:aegisub32.exe:aegisub64.exe:aegisub.exe:PandaOCR.exe:PandaOCR.Pro.exe:VStart6.exe:TIM.exe:PowerToys.PowerLauncher.exe:Foxmail.exe:"
     ACC_list := ":explorer.exe:ApplicationFrameHost.exe:"
-    Gui_UIA_list := ":POWERPNT.EXE:Notepad++.exe:firefox.exe:"
+    Gui_UIA_list := ":POWERPNT.EXE:Notepad++.exe:firefox.exe:devenv.exe:"
     ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
     Hook_list_with_dll := ":WeChat.exe:"
 

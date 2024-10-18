@@ -55,8 +55,8 @@ checkVersion(currentVersion, whichVersion) {
                     try {
                         Download("https://inputtip.pages.dev/releases/" whichVersion "/InputTip.exe", A_AppData "\abgox-InputTip.exe")
                         try {
-                            RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains', , "Hide")
-                            FileDelete("InputTipSymbol/InputTip.JAB.JetBrains.exe")
+                            RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains -Force', , "Hide")
+                            FileDelete("InputTip.JAB.JetBrains.exe")
                         }
                         Run("powershell -NoProfile -Command Start-Sleep -Seconds 3;Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
                         ExitApp()

@@ -4,6 +4,14 @@
 
 - 没有特别说明的版本都是修复问题
 
+## 2.24.0
+
+- 在托盘菜单中，添加 `暂停软件运行`、 `打开软件所在目录` 和 `添加 JetBrains IDE 应用`
+- 将 `InputTipCursor` 下的 `CN_Default`、`EN_Default`、`Caps_Default` 放入 `default` 目录下
+- JetBrains IDE 支持所需要的 `InputTip.JAB.JetBrains.exe` 现在和 `InputTip.exe` 放在同一目录下，不再放入 `InputTipSymbol` 目录中
+- 修复了当电脑没有连接电源时，无法正常自启动的问题
+- 其他的修复和优化
+
 ## 2.23.0
 
 - 在托盘菜单的 `设置快捷键` 中，添加 `设置单键`

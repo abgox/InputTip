@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip.JAB.JetBrains
 ;@AHK2Exe-SetDescription InputTip(JetBrains 进程) - 一个输入法状态(中文/英文/大写锁定)提示工具
-;@Ahk2Exe-SetCopyright Copyright (c) 2024-present abgox
+;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 #SingleInstance Force
 #NoTrayIcon
 Persistent
@@ -23,7 +23,7 @@ SetStoreCapsLockMode 0
  * @param {String} path 配置文件的路径
  * @returns {String} 配置文件中的值
  */
-readIni(key, default, section := "Config-v2", path := "../InputTip.ini") {
+readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
     try {
         return IniRead(path, section, key)
     } catch {
@@ -33,6 +33,7 @@ readIni(key, default, section := "Config-v2", path := "../InputTip.ini") {
 }
 
 mode := readIni("mode", 2, "InputMethod")
+JetBrains_list := ":" readIni("JetBrains_list", "") ":"
 changeCursor := readIni("changeCursor", 0)
 symbolType := readIni("symbolType", 2)
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
@@ -69,8 +70,8 @@ picSymbolWidth := pic_symbol_width * A_ScreenDPI / 96
 picSymbolHeight := pic_symbol_height * A_ScreenDPI / 96
 borderWidth := (symbol_width + border_margin_left + border_margin_right) * A_ScreenDPI / 96
 borderHeight := (symbol_height + border_margin_top + border_margin_bottom) * A_ScreenDPI / 96
-borderOffsetX := offset_x + border_margin_left * A_ScreenDPI / 96 * A_ScreenDPI / 96
-borderOffsetY := offset_y + border_margin_top * A_ScreenDPI / 96 * A_ScreenDPI / 96
+borderOffsetX := offset_x + border_margin_left * (A_ScreenDPI / 96) ** 2
+borderOffsetY := offset_y + border_margin_top * (A_ScreenDPI / 96) ** 2
 
 screenList := getScreenInfo()
 
@@ -178,7 +179,7 @@ curMap := {
 }
 
 for p in ["EN", "CN", "Caps"] {
-    Loop Files, "..\InputTipCursor\" p "\*.*" {
+    Loop Files, "InputTipCursor\" p "\*.*" {
         n := StrUpper(SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4))
         for v in info {
             if (v.type = n) {
@@ -215,7 +216,7 @@ if (symbolType = 1) {
     TipGui.BackColor := "000000"
     WinSetTransColor("000000", TipGui)
     TipGui.Opt("-LastFound")
-    TipGuiPic := TipGui.AddPicture("w" picSymbolWidth " h" picSymbolHeight, "default\CN.png")
+    TipGuiPic := TipGui.AddPicture("w" picSymbolWidth " h" picSymbolHeight, "InputTipSymbol\default\EN.png")
     CN_color := "000000"
     EN_color := "000000"
     Caps_color := "000000"
@@ -235,7 +236,7 @@ if (symbolType = 1) {
         TipGui.MarginX := 0, TipGui.MarginY := 0
         TipGui.SetFont('s' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight, font_family)
 
-        TipGuiText := TipGui.AddText("w" Gui_width, CN_Text)
+        TipGuiText := TipGui.AddText("w" Gui_width, EN_Text)
     }
     WinSetTransparent(transparent)
     switch border_type {
@@ -244,25 +245,21 @@ if (symbolType = 1) {
         case 3: TipGui.Opt("-LastFound +e0x00020000")
         default: TipGui.Opt("-LastFound")
     }
-    TipGui.BackColor := CN_color
+    TipGui.BackColor := EN_color
 }
 borderGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 WinSetTransparent(border_transparent)
 borderGui.Opt("-LastFound")
-borderGui.BackColor := border_color_CN
+borderGui.BackColor := border_color_EN
 
 lastWindow := ""
 lastState := state
 needHide := 1
 exe_name := ""
 
-; JetBrains 系列 IDE,在特定进程中进行，在主进程中忽略
-JetBrains_list := ":WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:idea64.exe:DataSpell64.exe:"
-
 if (changeCursor) {
     if (symbolType) {
         while 1 {
-            is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
             }
@@ -271,6 +268,7 @@ if (changeCursor) {
                 Sleep(50)
                 continue
             }
+            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer, HideSymbolDelay)
@@ -288,7 +286,6 @@ if (changeCursor) {
                 }
             }
             is_hide_state := InStr(app_hide_state, ":" exe_name ":")
-
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 continue
@@ -298,14 +295,11 @@ if (changeCursor) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
-                    try {
-                        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
-                    }
                     GetCaretPosFromJetBrains(&left, &top)
                     canShowSymbol := left
                     try {
-                        left += IniRead("../InputTip.ini", "config-v2", "offset_JetBrains_x_" isWhichScreen(screenList).num)
-                        top += IniRead("../InputTip.ini", "config-v2", "offset_JetBrains_y_" isWhichScreen(screenList).num)
+                        left += IniRead("InputTip.ini", "config-v2", "offset_JetBrains_x_" isWhichScreen(screenList).num)
+                        top += IniRead("InputTip.ini", "config-v2", "offset_JetBrains_y_" isWhichScreen(screenList).num)
                     }
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -413,7 +407,6 @@ if (changeCursor) {
 } else {
     if (symbolType) {
         while 1 {
-            is_hide_state := 0
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
             }
@@ -422,6 +415,7 @@ if (changeCursor) {
                 Sleep(50)
                 continue
             }
+            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer2, HideSymbolDelay)
@@ -439,7 +433,6 @@ if (changeCursor) {
                 }
             }
             is_hide_state := InStr(app_hide_state, ":" exe_name ":")
-
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 continue
@@ -449,14 +442,11 @@ if (changeCursor) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
-                    try {
-                        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
-                    }
                     GetCaretPosFromJetBrains(&left, &top)
                     canShowSymbol := left
                     try {
-                        left += IniRead("../InputTip.ini", "config-v2", "offset_JetBrains_x_" isWhichScreen(screenList).num)
-                        top += IniRead("../InputTip.ini", "config-v2", "offset_JetBrains_y_" isWhichScreen(screenList).num)
+                        left += IniRead("InputTip.ini", "config-v2", "offset_JetBrains_x_" isWhichScreen(screenList).num)
+                        top += IniRead("InputTip.ini", "config-v2", "offset_JetBrains_y_" isWhichScreen(screenList).num)
                     }
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -553,7 +543,7 @@ TipShow(type) {
         }
         case 3:
         {
-            if (%type "_Text"%) {
+            if (TipGui.BackColor && %type "_Text"%) {
                 TipGuiText.Value := %type "_Text"%
                 try {
                     TipGui.Show("NA x" left + offset_x "y" top + offset_y)

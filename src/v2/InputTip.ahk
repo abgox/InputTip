@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.24.0
+;@AHK2Exe-SetVersion 2.24.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -24,7 +24,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.24.0"
+currentVersion := "2.24.1"
 
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
@@ -37,8 +37,8 @@ try {
 isContinue := 0
 
 if (FileExist("InputTip.ini")) {
-    c:= IniRead("InputTip.ini", "config-v2")
-    if (InStr(c,"isStartUp") && !InStr(c, "JetBrains_list")) {
+    c := IniRead("InputTip.ini", "config-v2")
+    if (InStr(c, "isStartUp") && !InStr(c, "JetBrains_list")) {
         writeIni("JetBrains_list", "WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:Idea64.exe:DataSpell64.exe")
     }
 } else {
@@ -66,11 +66,11 @@ if (FileExist("InputTip.ini")) {
         Run(A_ScriptFullPath)
     }
     confirmGui.OnEvent("Close", fn_exit)
-    fn_exit(*){
+    fn_exit(*) {
         ExitApp()
     }
     confirmGui.Show()
-    while (!isContinue){
+    while (!isContinue) {
         Sleep(500)
     }
 }
@@ -264,10 +264,27 @@ curMap := {
     ARROW: "Arrow", IBEAM: "IBeam", WAIT: "Wait", CROSS: "Crosshair", UPARROW: "UpArrow", SIZENWSE: "SizeNWSE", SIZENESW: "SizeNESW", SIZEWE: "SizeWE", SIZENS: "SizeNS", SIZEALL: "SizeAll", NO: "No", HAND: "Hand", APPSTARTING: "AppStarting", HELP: "Help", PIN: "Pin", PERSON: "Person", PEN: "NWPen"
 }
 
+waitFileInstall(path, isExit := 1) {
+    t := 0
+    while (!FileExist(path)) {
+        if (t > 30) {
+            MsgBox("软件相关文件释放失败!", , "0x10")
+            if (isExit) {
+                ExitApp()
+            } else {
+                break
+            }
+        }
+        t++
+        Sleep(1000)
+    }
+}
+
 cursor_temp_zip := A_Temp "\abgox-InputTipCursor-temp.zip"
 cursor_temp_dir := A_Temp "\abgox-InputTipCursor-temp"
 if (!DirExist("InputTipCursor")) {
-    FileExist(cursor_temp_zip) ? 0 : FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
+    FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
+    waitFileInstall(cursor_temp_zip)
     RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
     try {
         FileDelete(cursor_temp_zip)
@@ -280,7 +297,8 @@ if (!DirExist("InputTipCursor")) {
         }
     }
     if (noList.length > 0) {
-        FileExist(cursor_temp_zip) ? 0 : FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
+        FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
+        waitFileInstall(cursor_temp_zip)
         RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" cursor_temp_dir "'", , "Hide")
         for dir in noList {
             dirCopy(cursor_temp_dir "\InputTipCursor\" dir, "InputTipCursor\" dir)
@@ -321,7 +339,8 @@ fileList := ["CN", "EN", "Caps"]
 symbol_temp_zip := A_Temp "\abgox-InputTipSymbol-temp.zip"
 symbol_temp_dir := A_Temp "\abgox-InputTipSymbol-temp"
 if (!DirExist("InputTipSymbol")) {
-    FileExist(symbol_temp_zip) ? 0 : FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
+    FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
+    waitFileInstall(symbol_temp_zip)
     RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
     try {
         FileDelete(symbol_temp_zip)
@@ -334,7 +353,8 @@ if (!DirExist("InputTipSymbol")) {
         }
     }
     if (noList.length > 0 || !FileExist("InputTipSymbol\default\offer.png")) {
-        FileExist(symbol_temp_zip) ? 0 : FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
+        FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
+        waitFileInstall(symbol_temp_zip)
         RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" symbol_temp_dir "'", , "Hide")
         dirCopy(symbol_temp_dir "\InputTipSymbol\default", "InputTipSymbol\default", 1)
         try {
@@ -731,12 +751,12 @@ makeTrayMenu() {
             mode := readIni("mode", 1, "InputMethod")
             msgGui := Gui("AlwaysOnTop +OwnDialogs")
             msgGui.SetFont("s10", "微软雅黑")
-            msgGui.AddText(,"------------------------------------------------------------------------------------------------------------")
+            msgGui.AddText(, "------------------------------------------------------------------------------------------------------------")
             msgGui.Show("Hide")
             msgGui.GetPos(, , &Gui_width)
             msgGui.Destroy()
 
-            modeInfo:=[
+            modeInfo := [
                 "-「模式1」和「模式2」都是通用的输入法模式`n- 和「模式2」相比，「模式1」兼容的输入法和应用窗口少一点，但识别输入法状态更稳定一点",
                 "-「模式1」和「模式2」都是通用的输入法模式`n- 和「模式1」相比，「模式2」兼容的输入法和应用窗口更多，但有极小概率出现状态识别错误`n- 如果在某个应用窗口中出现识别错误，请尝试重启这个应用窗口",
                 "-「模式3」: 主要用于讯飞输入法`n- 如果你使用的输入法其他模式都无法识别，你才应该尝试「模式3」",
@@ -1761,15 +1781,16 @@ makeTrayMenu() {
         writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
         A_TrayMenu.ToggleCheck(item)
         if (enableJetBrainsSupport) {
-            FileExist("InputTip.JAB.JetBrains.exe") ? 0 : FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+            waitFileInstall("InputTip.JAB.JetBrains.exe", 0)
+
             try {
                 RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
             }
 
             jGui := Gui("AlwaysOnTop OwnDialogs")
             jGui.SetFont("s12", "微软雅黑")
-            jGui.AddText(, "已成功启用 JetBrains IDE 支持")
-            jGui.AddLink(, '<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
+            jGui.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保你使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip")
             jGui.Show("Hide")
             jGui.GetPos(, , &Gui_width)
             jGui.Destroy()

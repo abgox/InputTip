@@ -602,6 +602,9 @@ if (changeCursor) {
                     TipGui.Hide()
                 } else {
                     canShowSymbol := GetCaretPosEx(&left, &top)
+                    if !canShowSymbol{
+                        TipGui.Hide()
+                    }
                     canShowSymbol := canShowSymbol && left
                 }
                 if (GetKeyState("CapsLock", "T")) {
@@ -1974,6 +1977,35 @@ isWhichScreen(screenList) {
         }
     }
 }
+/**
+* XXX: 确保文本光标位置合法，处于屏幕和活动窗口工作区域范围内。
+* NOTE: 1. 并不能检测内部Text控件的X、Y、W、H。
+*       2. 没有按比例计算。
+* TODO: 按比例计算
+* @param X: 文本光标 X 坐标
+* @param Y: 文本光标 Y 坐标
+* @returns 1: 合法; 0: 不合法
+*/
+checkCaretPosRight(&X?,&Y?){
+    if WinExist("A")
+    {
+       WinGetClientPos &CX, &CY, &CW, &CH ; CX活动窗口工作区域左上角X坐标，CY~Y坐标；CW~宽度，CH~高度
+       if X <= 0 || Y <= 0 || X < CX || (X-CX) > CW || Y < CY || (Y-CY) > CH || X >= A_ScreenWidth-5 || Y >= A_ScreenHeight-10{
+           ; X：要显示的tip的X坐标；Y：~Y坐标
+           ; X<CX：小于活动窗口宽度
+           ; (X-CX) > CW：超过活动窗口宽度
+           ; Y<CY：小于活动窗口高度
+           ; (Y-CY) > CH：超过活动窗口高度
+           ; (X >= A_ScreenWidth-5 && Y >= A_ScreenHeight-10)：不超过屏幕
+           return 0
+       }else{
+           return 1
+       }
+    }else{
+        return 0
+    }
+}
+
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
@@ -1998,35 +2030,35 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     }
     else if (InStr(UIA_list, ":" exe_name ":")) {
         if (getCaretPosFromUIA()) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
     }
     else if (InStr(MSAA_list, ":" exe_name ":")) {
         if (getCaretPosFromMSAA()) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
     }
     else if (InStr(Gui_UIA_list, ":" exe_name ":")) {
         if (getCaretPosFromGui(&hwnd := 0)) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
         if (getCaretPosFromUIA()) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
     }
     else if (InStr(Hook_list_with_dll, ":" exe_name ":")) {
         if (getCaretPosFromHook(1)) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
     }
     else if (InStr(Wpf_list, ":" exe_name ":")) {
         if (getCaretPosFromWpfCaret()) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
     }
     else {
         if (getCaretPosFromHook(0)) {
-            return 1
+            return checkCaretPosRight(&left, &top)
         }
     }
     return 0

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.24.1
+;@AHK2Exe-SetVersion 2.24.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -24,16 +24,19 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.24.1"
+currentVersion := "2.24.2"
 
+; 生成特殊的快捷方式，它会通过任务计划程序启动
 if (!FileExist("InputTip.lnk")) {
     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
 }
 
+; 生成任务计划程序
 try {
     Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
 }
 
+; 用于在 GUI 展示时阻塞进程
 isContinue := 0
 
 if (FileExist("InputTip.ini")) {
@@ -75,17 +78,30 @@ if (FileExist("InputTip.ini")) {
     }
 }
 
+; 忽略更新
 ignoreUpdate := readIni("ignoreUpdate", 0)
 if (!ignoreUpdate) {
     checkVersion(currentVersion, "v2")
 }
 
+; 输入法模式
 mode := readIni("mode", 2, "InputMethod")
+; 开机自启动
 isStartUp := readIni("isStartUp", 0)
+; 启用 JetBrains 支持
 enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
+; JetBrains 应用列表
 JetBrains_list := ":" readIni("JetBrains_list", "") ":"
+; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)
+/*
+符号类型
+    1: 图片符号
+    2: 方块符号
+    3: 文本符号
+*/
 symbolType := readIni("symbolType", 2)
+; 在多少毫秒后隐藏符号，0 表示永不隐藏
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
 CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
 EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
@@ -99,7 +115,7 @@ pic_offset_x := readIni('pic_offset_x', 5)
 pic_offset_y := readIni('pic_offset_y', -20)
 pic_symbol_width := readIni('pic_symbol_width', 9)
 pic_symbol_height := readIni('pic_symbol_height', 9)
-; 隐藏方块符号
+; 应用列表: 需要隐藏符号
 app_hide_state := readIni('app_hide_state', '')
 if (InStr(app_hide_state, "exe,")) {
     app_hide_state := StrReplace(app_hide_state, ",", ":")
@@ -107,6 +123,7 @@ if (InStr(app_hide_state, "exe,")) {
 }
 app_hide_state := ":" app_hide_state ":"
 
+; 应用列表: 自动切换到中文
 app_CN := readIni('app_CN', '')
 if (InStr(app_CN, "exe,")) {
     app_CN := StrReplace(app_CN, ",", ":")
@@ -114,6 +131,7 @@ if (InStr(app_CN, "exe,")) {
 }
 app_CN := ":" app_CN ":"
 
+; 应用列表: 自动切换到英文
 app_EN := readIni('app_EN', '')
 if (InStr(app_EN, "exe,")) {
     app_EN := StrReplace(app_EN, ",", ":")
@@ -121,6 +139,7 @@ if (InStr(app_EN, "exe,")) {
 }
 app_EN := ":" app_EN ":"
 
+; 应用列表: 自动切换到大写锁定
 app_Caps := readIni('app_Caps', '')
 if (InStr(app_Caps, "exe,")) {
     app_Caps := StrReplace(app_Caps, ",", ":")
@@ -128,9 +147,19 @@ if (InStr(app_Caps, "exe,")) {
 }
 app_Caps := ":" app_Caps ":"
 
+; 中文快捷键
 hotkey_CN := readIni('hotkey_CN', '')
+; 英文快捷键
 hotkey_EN := readIni('hotkey_EN', '')
+; 大写锁定快捷键
 hotkey_Caps := readIni('hotkey_Caps', '')
+/*
+边框样式
+    1: 样式1
+    2: 样式2
+    3: 样式3
+    4: 自定义
+*/
 border_type := readIni('border_type', 1)
 border_color_CN := StrReplace(readIni('border_color_CN', 'yellow'), '#', '')
 border_color_EN := StrReplace(readIni('border_color_EN', 'yellow'), '#', '')
@@ -208,6 +237,7 @@ switch_Caps(*) {
 
 makeTrayMenu()
 
+; 鼠标样式相关信息
 info := [{
     ; 普通选择
     type: "ARROW", value: "32512", origin: "", CN: "", EN: "", Caps: ""
@@ -268,7 +298,7 @@ waitFileInstall(path, isExit := 1) {
     t := 0
     while (!FileExist(path)) {
         if (t > 30) {
-            MsgBox("软件相关文件释放失败!", , "0x10")
+            MsgBox("软件相关文件释放失败!", , "0x1000 0x10")
             if (isExit) {
                 ExitApp()
             } else {
@@ -280,12 +310,21 @@ waitFileInstall(path, isExit := 1) {
     }
 }
 
+errAndExit() {
+    MsgBox("软件相关文件释放失败!", , "0x1000 0x10")
+    ExitApp()
+}
+
 cursor_temp_zip := A_Temp "\abgox-InputTipCursor-temp.zip"
 cursor_temp_dir := A_Temp "\abgox-InputTipCursor-temp"
 if (!DirExist("InputTipCursor")) {
     FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
     waitFileInstall(cursor_temp_zip)
-    RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
+    try {
+        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
+    } catch {
+        errAndExit()
+    }
     try {
         FileDelete(cursor_temp_zip)
     }
@@ -299,7 +338,11 @@ if (!DirExist("InputTipCursor")) {
     if (noList.length > 0) {
         FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
         waitFileInstall(cursor_temp_zip)
-        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" cursor_temp_dir "'", , "Hide")
+        try {
+            RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" cursor_temp_dir "'", , "Hide")
+        } catch {
+            errAndExit()
+        }
         for dir in noList {
             dirCopy(cursor_temp_dir "\InputTipCursor\" dir, "InputTipCursor\" dir)
         }
@@ -326,11 +369,7 @@ for v in info {
         v.origin := replaceEnvVariables(RegRead("HKEY_CURRENT_USER\Control Panel\Cursors", curMap.%v.type%))
     }
     if (v.EN = "" || v.CN = "" || v.Caps = "") {
-        if (v.origin) {
-            v.EN := v.CN := v.Caps := v.origin
-        } else {
-            v.EN := v.CN := v.Caps := ""
-        }
+        v.EN := v.CN := v.Caps := v.origin
     }
 }
 showPicList := ":"
@@ -341,7 +380,11 @@ symbol_temp_dir := A_Temp "\abgox-InputTipSymbol-temp"
 if (!DirExist("InputTipSymbol")) {
     FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
     waitFileInstall(symbol_temp_zip)
-    RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
+    try {
+        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
+    } catch {
+        errAndExit()
+    }
     try {
         FileDelete(symbol_temp_zip)
     }
@@ -355,7 +398,11 @@ if (!DirExist("InputTipSymbol")) {
     if (noList.length > 0 || !FileExist("InputTipSymbol\default\offer.png")) {
         FileInstall("InputTipSymbol.zip", symbol_temp_zip, 1)
         waitFileInstall(symbol_temp_zip)
-        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" symbol_temp_dir "'", , "Hide")
+        try {
+            RunWait("powershell -NoProfile -Command Expand-Archive -Path '" symbol_temp_zip "' -DestinationPath '" symbol_temp_dir "'", , "Hide")
+        } catch {
+            errAndExit()
+        }
         dirCopy(symbol_temp_dir "\InputTipSymbol\default", "InputTipSymbol\default", 1)
         try {
             DirDelete(symbol_temp_dir, 1)
@@ -1980,7 +2027,7 @@ isWhichScreen(screenList) {
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     try {
-        DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
+        DllCall("SetThreadDpiAwarenessContext", "ptr", -2, "ptr")
     }
     hwnd := getHwnd()
     disable_lsit := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:ShareX.exe:clipdiary-portable.exe:"

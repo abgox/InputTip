@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.24.2
+;@AHK2Exe-SetVersion 2.25.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -24,16 +24,25 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.24.2"
+currentVersion := "2.25.0"
 
-; 生成特殊的快捷方式，它会通过任务计划程序启动
-if (!FileExist("InputTip.lnk")) {
-    FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", "InputTip.lnk", , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
-}
+filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
-; 生成任务计划程序
-try {
-    Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+filelnk := filename ".lnk"
+
+; 注册表: 开机自启动
+HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+
+if (A_IsCompiled) {
+    ; 生成特殊的快捷方式，它会通过任务计划程序启动
+    if (!FileExist(filelnk)) {
+        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", filelnk, , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
+    }
+
+    ; 生成任务计划程序
+    try {
+        Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+    }
 }
 
 ; 用于在 GUI 展示时阻塞进程
@@ -768,30 +777,68 @@ makeTrayMenu() {
     ignoreUpdate ? A_TrayMenu.Check("忽略更新") : 0
     A_TrayMenu.Add("开机自启动", fn_startup)
     fn_startup(item, *) {
-        global isStartUp := !isStartUp
         if (isStartUp) {
-            FileCopy(A_ScriptDir "\InputTip.lnk", A_Startup, 1)
-        } else {
             try {
-                FileDelete(A_Startup "\InputTip.lnk")
+                FileDelete(A_Startup "\" filelnk)
             }
+            try {
+                RegDelete(HKEY_startup, A_ScriptName)
+            }
+            A_TrayMenu.Uncheck(item)
+            global isStartUp := 0
+            writeIni("isStartUp", isStartUp)
+        } else {
+            startUpGui := Gui("AlwaysOnTop +OwnDialogs", "设置开机自启动")
+            startUpGui.SetFont("s12", "微软雅黑")
+            startUpGui.AddText(, "当前有多种方式设置开机自启动，请选择有效的方式 :`n`n1. 通过「任务计划程序」`n2. 通过软件快捷方式`n3. 通过添加「注册表」`n`n「任务计划程序」可以避免管理员授权窗口(UAC)的干扰，但部分用户无法生效")
+            startUpGui.Show("Hide")
+            startUpGui.GetPos(, , &Gui_width)
+            startUpGui.Destroy()
+
+            startUpGui := Gui("AlwaysOnTop +OwnDialogs", "设置开机自启动")
+            startUpGui.SetFont("s12", "微软雅黑")
+            startUpGui.AddLink(, '详情: <a href="https://inputtip.pages.dev/FAQ/#关于开机自启动">https://inputtip.pages.dev/FAQ/#关于开机自启动</a>')
+            startUpGui.AddLink(, "当前有多种方式设置开机自启动，请选择有效的方式 :`n`n1. 通过「任务计划程序」`n2. 通过软件快捷方式`n3. 通过添加「注册表」`n`n「任务计划程序」可以避免管理员授权窗口(UAC)的干扰，但部分用户无法生效")
+            startUpGui.AddButton("w" Gui_width, "使用「任务计划程序」").OnEvent("Click", fn_startUp_task)
+            fn_startUp_task(*) {
+                global isStartUp := 1
+                FileCopy(A_ScriptDir "\" filelnk, A_Startup, 1)
+                fn_handle()
+            }
+            startUpGui.AddButton("w" Gui_width, "使用软件快捷方式").OnEvent("Click", fn_startUp_lnk)
+            fn_startUp_lnk(*) {
+                global isStartUp := 2
+                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" filelnk, , , , A_ScriptFullPath, , , 7)
+                fn_handle()
+            }
+            startUpGui.AddButton("w" Gui_width, "使用「注册表」").OnEvent("Click", fn_startUp_reg)
+            fn_startUp_reg(*) {
+                global isStartUp := 3
+                try {
+                    RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+                    A_TrayMenu.ToggleCheck(item)
+                    fn_handle()
+                } catch {
+                    MsgBox("添加注册表失败!", , "0x1000 0x10")
+                }
+            }
+            fn_handle() {
+                startUpGui.Destroy()
+                if (isStartUp) {
+                    A_TrayMenu.Check(item)
+                } else {
+                    A_TrayMenu.Uncheck(item)
+                }
+                writeIni("isStartUp", isStartUp)
+            }
+            startUpGui.Show()
         }
-        writeIni("isStartUp", isStartUp)
-        A_TrayMenu.ToggleCheck(item)
     }
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")
     }
-    try {
-        HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
-        path_exe := RegRead(HKEY_startup, A_ScriptName)
-        writeIni("isStartUp", 1)
-        FileCopy(A_ScriptDir "\InputTip.lnk", A_Startup, 1)
-        A_TrayMenu.Check("开机自启动")
-        RegDelete(HKEY_startup, A_ScriptName)
-    }
     sub := Menu()
-    list := ["模式1", "模式2", "模式3", "模式4"]
+    list := ["模式1 - 通用", "模式2 - 通用", "模式3 - 讯飞输入法", "模式4 - 手心输入法"]
     for v in list {
         sub.Add(v, fn_mode)
         fn_mode(item, index, *) {
@@ -831,7 +878,7 @@ makeTrayMenu() {
         }
     }
     A_TrayMenu.Add("设置输入法模式", sub)
-    sub.Check("模式" mode)
+    sub.Check(list[mode])
     A_TrayMenu.Add("符号显示黑名单", fn_hide_app)
     fn_hide_app(*) {
         fn_common({
@@ -857,6 +904,7 @@ makeTrayMenu() {
     A_TrayMenu.Add("暂停软件运行", fn_pause)
     fn_pause(item, *) {
         A_TrayMenu.ToggleCheck(item)
+        TipGui.Hide()
         Pause(-1)
     }
     A_TrayMenu.Add("打开软件所在目录", fn_open_dir)

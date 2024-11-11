@@ -11,6 +11,9 @@
     <a href="https://github.com/abgox/InputTip/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/abgox/InputTip" alt="license" />
     </a>
+    <a href="https://inputtip.pages.dev/releases/v2/version.json">
+        <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Finputtip.pages.dev%2Freleases%2Fv2%2Fversion.json&query=%24.version&prefix=v&label=version" alt="version" />
+    </a>
     <a href="https://img.shields.io/github/languages/code-size/abgox/InputTip.svg">
         <img src="https://img.shields.io/github/languages/code-size/abgox/InputTip.svg" alt="code size" />
     </a>
@@ -31,7 +34,7 @@
 ### 介绍
 
 - 基于 `AutoHotKey` 编写
-- 一个输入法状态(中文/英文/大写锁定)提示工具
+- 一个实时的输入法状态(中文/英文/大写锁定)提示工具
 
   - 根据输入法状态改变鼠标样式
     - [样式可以自定义](#自定义鼠标样式)

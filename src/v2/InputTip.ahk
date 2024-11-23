@@ -10,6 +10,8 @@
 ;@Ahk2Exe-AddResource InputTipSymbol.zip
 ;@Ahk2Exe-AddResource InputTip.JAB.JetBrains.exe
 #SingleInstance Force
+TraySetIcon("favicon.ico", 1) ;*Jona 修改图标
+
 Persistent
 ListLines 0
 KeyHistory 0

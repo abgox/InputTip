@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.25.1
+;@AHK2Exe-SetVersion 2.26.0
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -24,7 +24,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.25.1"
+currentVersion := "2.26.0"
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
@@ -95,6 +95,7 @@ if (A_IsCompiled && !ignoreUpdate) {
 
 ; 输入法模式
 mode := readIni("mode", 2, "InputMethod")
+delay := readIni("delay", 50)
 ; 开机自启动
 isStartUp := readIni("isStartUp", 0)
 ; 启用 JetBrains 支持
@@ -484,7 +485,7 @@ if (changeCursor) {
             }
             if (InStr(JetBrains_list, ":" exe_name ":")) {
                 TipGui.Hide()
-                Sleep(50)
+                Sleep(delay)
                 continue
             }
             is_hide_state := 0
@@ -535,7 +536,7 @@ if (changeCursor) {
                     old_left := left
                     old_top := top
                     old_state := state
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 try {
@@ -543,7 +544,7 @@ if (changeCursor) {
                     v := state = 1 ? "CN" : "EN"
                 } catch {
                     TipGui.Hide()
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 if (state != old_state) {
@@ -567,7 +568,7 @@ if (changeCursor) {
                     }
                 }
             }
-            Sleep(50)
+            Sleep(delay)
         }
     } else {
         while 1 {
@@ -575,7 +576,7 @@ if (changeCursor) {
                 exe_name := ProcessGetName(WinGetPID("A"))
             }
             if (InStr(JetBrains_list, ":" exe_name ":")) {
-                Sleep(50)
+                Sleep(delay)
                 continue
             }
             if (exe_name != lastWindow) {
@@ -596,14 +597,14 @@ if (changeCursor) {
                         state := 2
                     }
                     old_state := state
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 try {
                     state := isCN(mode)
                     v := state = 1 ? "CN" : "EN"
                 } catch {
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 if (state != old_state) {
@@ -611,7 +612,7 @@ if (changeCursor) {
                     old_state := state
                 }
             }
-            Sleep(50)
+            Sleep(delay)
         }
     }
     show(type) {
@@ -627,7 +628,7 @@ if (changeCursor) {
             }
             if (InStr(JetBrains_list, ":" exe_name ":")) {
                 TipGui.Hide()
-                Sleep(50)
+                Sleep(delay)
                 continue
             }
             is_hide_state := 0
@@ -677,7 +678,7 @@ if (changeCursor) {
                     old_left := left
                     old_top := top
                     old_state := state
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 try {
@@ -685,7 +686,7 @@ if (changeCursor) {
                     v := state = 1 ? "CN" : "EN"
                 } catch {
                     TipGui.Hide()
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 if (state != old_state) {
@@ -708,7 +709,7 @@ if (changeCursor) {
                     }
                 }
             }
-            Sleep(50)
+            Sleep(delay)
         }
     }
 }
@@ -934,24 +935,28 @@ makeTrayMenu() {
 
         configGui.AddText("Section", "在更改配置前，您应该首先阅读一下项目的 README，相当于软件的说明书")
         configGui.AddText("xs", "您可以点击以下相关网址中查看软件源代码、使用说明文档等详细内容：")
-        configGui.AddLink("xs", '1. 官网: <a href="https://inputtip.pages.dev/v2/">https://inputtip.pages.dev/v2/</a>')
-        configGui.AddLink("xs", '2. Github: <a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
-        configGui.AddLink("xs", '3. Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
-        configGui.AddLink("xs", '4. 常见问题: <a href="https://inputtip.pages.dev/FAQ/">https://inputtip.pages.dev/FAQ/</a>')
+        configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/">文档官网</a>')
+        configGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">Github</a>')
+        configGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        configGui.AddLink("yp", '<a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>')
         configGui.AddText("xs", line)
         configGui.AddText("xs", "相关的显示设置：")
         configGui.AddText("xs", "1. 要不要修改鼠标样式: ")
-        configGui.AddDropDownList("w" Gui_width / 2 " yp AltSubmit vchangeCursor Choose" changeCursor + 1, ["不修改鼠标样式，保持原本的鼠标样式", "要修改鼠标样式，随输入法状态而变化"])
+        configGui.AddDropDownList("w" Gui_width / 2 " yp AltSubmit vchangeCursor Choose" changeCursor + 1, ["不要修改鼠标样式，保持原本的鼠标样式", "需要修改鼠标样式，随输入法状态而变化"])
         configGui.addText("xs", "2. 在输入光标附近显示什么类型的符号: ")
         configGui.AddDropDownList("yp AltSubmit vsymbolType Choose" symbolType + 1, ["不显示符号", "显示图片符号", "显示方块符号", "显示文本符号"])
-        configGui.AddText("xs", "3. 符号在多少毫秒后隐藏(0 表示永不隐藏):")
-        configGui.AddEdit("vHideSymbolDelay" " yp w150 Number", HideSymbolDelay)
-        configGui.AddText("xs", "(符号隐藏后，当前应用中的任何鼠标操作都不会再显示，直到下一次键盘操作或切换应用)")
+        configGui.AddText("xs", "3. 无操作时，符号在多少毫秒后隐藏:")
+        configGui.AddEdit("vHideSymbolDelay yp w150 Number", HideSymbolDelay)
+        configGui.AddEdit("xs r2 Disabled", "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号`n符号隐藏后，下次键盘操作或切换软件窗口会再次显示符号)")
+        configGui.AddText("xs", "4. 每多少毫秒后更新符号的显示位置和状态:")
+        configGui.AddEdit("vDelay yp w150 Number", delay)
+        ; configGui.AddUpDown("Range1-500", delay)
+        configGui.AddEdit("xs r1 Disabled", "(单位：毫秒，默认为 50 毫秒；值越小，响应越快，性能越差，根据电脑性能适当调整)")
 
         tab.UseTab(2)
         configGui.AddText(, "您可以点击以下任意网址获取设置鼠标样式文件夹的相关说明:`n(您应该先了解相关说明，然后点击下方按钮进行设置)")
         configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义鼠标样式">https://inputtip.pages.dev/v2/#自定义鼠标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义鼠标样式">https://github.com/abgox/InputTip#自定义鼠标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义鼠标样式">https://gitee.com/abgox/InputTip#自定义鼠标样式</a>`n' line)
-        cursorDirlist := [{
+        cursorDirList := [{
             label: "中文状态鼠标样式",
             folder: "CN",
         }, {
@@ -961,7 +966,7 @@ makeTrayMenu() {
             label: "大写锁定鼠标样式",
             folder: "Caps",
         }]
-        for v in cursorDirlist {
+        for v in cursorDirList {
             btnGui := configGui.AddButton("w" Gui_width, "设置" v.label)
             btnGui.data := v
             btnGui.OnEvent("Click", fn_btn)
@@ -1274,6 +1279,7 @@ makeTrayMenu() {
                 for item in symbolCharConfig {
                     writeIni(item.config, configGui.Submit().%item.config%)
                 }
+                writeIni("delay", configGui.Submit().delay)
                 writeIni("HideSymbolDelay", configGui.Submit().HideSymbolDelay)
                 writeIni("symbolType", configGui.Submit().symbolType - 1)
                 writeIni("changeCursor", configGui.Submit().changeCursor - 1)
@@ -1287,7 +1293,7 @@ makeTrayMenu() {
     fn_switch_key(*) {
         hotkeyGui := Gui("AlwaysOnTop OwnDialogs")
         hotkeyGui.SetFont("s12", "微软雅黑")
-        hotkeyGui.AddText(, "- 目前直接设置单键，如 LShfit,会直接导致原按键功能失效，请设置组合快捷键")
+        hotkeyGui.AddText(, "- 目前直接设置单键，如 LShift,会直接导致原按键功能失效，请设置组合快捷键")
         hotkeyGui.Show("Hide")
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
@@ -1863,7 +1869,7 @@ makeTrayMenu() {
             jGui.AddLink(, '<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", confirm)
             confirm(*) {
-                fn_contorl_JetBrains(1)
+                fn_control_JetBrains(1)
                 jGui.Destroy()
             }
             jGui.Show()
@@ -1901,7 +1907,7 @@ makeTrayMenu() {
         try {
             RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
         }
-        fn_contorl_JetBrains(1)
+        fn_control_JetBrains(1)
     }
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
@@ -1956,7 +1962,7 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("退出", fn_exit)
     fn_exit(*) {
-        fn_contorl_JetBrains(0)
+        fn_control_JetBrains(0)
         ExitApp()
     }
     isColor(v) {
@@ -1979,7 +1985,7 @@ makeTrayMenu() {
 /**
  * @param runOrStop 1: Run; 0:Stop
  */
-fn_contorl_JetBrains(runOrStop) {
+fn_control_JetBrains(runOrStop) {
     if (runOrStop) {
         Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
     } else {
@@ -1989,7 +1995,7 @@ fn_contorl_JetBrains(runOrStop) {
 
 fn_restart(flag := 0, *) {
     if (flag || enableJetBrainsSupport) {
-        fn_contorl_JetBrains(0)
+        fn_control_JetBrains(0)
     }
     Run(A_ScriptFullPath)
 }
@@ -2044,7 +2050,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         DllCall("SetThreadDpiAwarenessContext", "ptr", -2, "ptr")
     }
     hwnd := getHwnd()
-    disable_lsit := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:ShareX.exe:clipdiary-portable.exe:"
+    disable_list := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:ShareX.exe:clipdiary-portable.exe:"
     Wpf_list := ":powershell_ise.exe:"
     UIA_list := ":WINWORD.EXE:WindowsTerminal.exe:wt.exe:OneCommander.exe:YoudaoDict.exe:Mempad.exe:Taskmgr.exe:"
     ; MSAA 可能有符号残留
@@ -2054,40 +2060,36 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
     Hook_list_with_dll := ":WeChat.exe:"
 
-    if (InStr(disable_lsit, ":" exe_name ":")) {
+    if (InStr(disable_list, ":" exe_name ":")) {
         return 0
     }
     else if (InStr(UIA_list, ":" exe_name ":")) {
-        if (getCaretPosFromUIA()) {
-            return 1
-        }
+        return getCaretPosFromUIA()
     }
     else if (InStr(MSAA_list, ":" exe_name ":")) {
-        if (getCaretPosFromMSAA()) {
-            return 1
-        }
+        return getCaretPosFromMSAA()
     }
     else if (InStr(Gui_UIA_list, ":" exe_name ":")) {
         if (getCaretPosFromGui(&hwnd := 0)) {
             return 1
         }
-        if (getCaretPosFromUIA()) {
-            return 1
-        }
+        return getCaretPosFromUIA()
     }
     else if (InStr(Hook_list_with_dll, ":" exe_name ":")) {
-        if (getCaretPosFromHook(1)) {
-            return 1
-        }
+        return getCaretPosFromHook(1)
     }
     else if (InStr(Wpf_list, ":" exe_name ":")) {
-        if (getCaretPosFromWpfCaret()) {
-            return 1
-        }
+        return getCaretPosFromWpfCaret()
     }
     else {
         if (getCaretPosFromHook(0)) {
             return 1
+        }
+        functions := [getCaretPosFromMSAA, getCaretPosFromUIA]
+        for fn in functions {
+            if (fn()) {
+                return 1
+            }
         }
     }
     return 0

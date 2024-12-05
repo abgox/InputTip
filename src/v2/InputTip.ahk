@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.26.0
+;@AHK2Exe-SetVersion 2.26.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -24,7 +24,7 @@ SetStoreCapsLockMode 0
 #Include ..\utils\showMsg.ahk
 #Include ..\utils\checkVersion.ahk
 
-currentVersion := "2.26.0"
+currentVersion := "2.26.1"
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
@@ -508,6 +508,7 @@ if (changeCursor) {
             is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
+                Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
@@ -651,6 +652,7 @@ if (changeCursor) {
             is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
+                Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
@@ -951,7 +953,7 @@ makeTrayMenu() {
         configGui.AddText("xs", "4. 每多少毫秒后更新符号的显示位置和状态:")
         configGui.AddEdit("vDelay yp w150 Number", delay)
         ; configGui.AddUpDown("Range1-500", delay)
-        configGui.AddEdit("xs r1 Disabled", "(单位：毫秒，默认为 50 毫秒；值越小，响应越快，性能越差，根据电脑性能适当调整)")
+        configGui.AddEdit("xs r1 Disabled", "(单位：毫秒，默认为 50 毫秒；值越小，响应越快，性能消耗越大，根据电脑性能适当调整)")
 
         tab.UseTab(2)
         configGui.AddText(, "您可以点击以下任意网址获取设置鼠标样式文件夹的相关说明:`n(您应该先了解相关说明，然后点击下方按钮进行设置)")

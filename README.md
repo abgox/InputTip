@@ -63,6 +63,18 @@
 
 ### 使用
 
+> [!NOTE]
+>
+> - 因为以下原因，可能无法正常运行 `InputTip.exe`
+>   - 没有管理员权限
+>   - 杀毒软件或防火墙阻止了 `InputTip.exe` 运行
+>   - ...
+> - 你可以尝试以下方案:
+>   1. 克隆项目仓库到本地
+>   2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
+>   3. 直接运行项目中的 `InputTip.ahk` 文件
+>      - `src\v2\InputTip.ahk`
+
 - [下载](https://inputtip.pages.dev/releases/v2/InputTip.exe) 并运行 `InputTip.exe` 即可
 
   - 如果此下载链接无法打开，你也可以在项目的 Releases 页面下载

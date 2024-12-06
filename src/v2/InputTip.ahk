@@ -63,15 +63,15 @@ if (FileExist("InputTip.ini")) {
 } else {
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
     confirmGui.SetFont("s12", "微软雅黑")
-    confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
+    confirmGui.AddText(, A_ScriptName " 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
     confirmGui.Show("Hide")
     confirmGui.GetPos(, , &Gui_width)
     confirmGui.Destroy()
 
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
     confirmGui.SetFont("s12", "微软雅黑")
-    confirmGui.AddText(, "InputTip.exe 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
-    confirmGui.AddText(, "您是否希望 InputTip.exe 修改鼠标样式?")
+    confirmGui.AddText(, A_ScriptName " 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
+    confirmGui.AddText(, "您是否希望 " A_ScriptName " 修改鼠标样式?")
     confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click", yes)
     yes(*) {
         writeIni("changeCursor", 1)
@@ -1051,7 +1051,7 @@ makeTrayMenu() {
             btnGui.OnEvent("Click", fn_btn)
             fn_btn(item, *) {
                 if (!changeCursor) {
-                    MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", "InputTip.exe - 错误！", "0x10 0x1000")
+                    MsgBox("请先在配置中将 是否更改鼠标样式 设置为 1，再进行此操作。", A_ScriptName " - 错误！", "0x10 0x1000")
                     return
                 }
                 dir := FileSelect("D", A_ScriptDir "\InputTipCursor", "选择一个文件夹作为" item.data.label " (不能是 CN/EN/Caps 文件夹)")
@@ -1066,7 +1066,7 @@ makeTrayMenu() {
                     }
                 }
                 if (!hasFile) {
-                    MsgBox("您应该选择一个包含鼠标样式文件的文件夹。`n鼠标样式文件: 后缀名为 .cur 或 .ani 的文件", "InputTip.exe - 选择文件夹错误！", "0x10 0x1000")
+                    MsgBox("您应该选择一个包含鼠标样式文件的文件夹。`n鼠标样式文件: 后缀名为 .cur 或 .ani 的文件", A_ScriptName " - 选择文件夹错误！", "0x10 0x1000")
                     return
                 }
                 dir_name := StrSplit(dir, "\")[-1]
@@ -1858,7 +1858,7 @@ makeTrayMenu() {
 
         JetBrains_offset(*) {
             offsetGui.Destroy()
-            JetBrainsGui := Gui("AlwaysOnTop OwnDialogs", "InputTip.exe - 设置 JetBrains 系列 IDE 的副屏偏移量")
+            JetBrainsGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置 JetBrains 系列 IDE 的副屏偏移量")
             JetBrainsGui.SetFont("s12", "微软雅黑")
             screenList := getScreenInfo()
             JetBrainsGui.AddText(, "您需要通过屏幕坐标信息判断具体是哪一块屏幕`n - 假设您有两块屏幕，主屏幕在左侧，副屏幕在右侧`n - 那么副屏幕的左上角 X 坐标一定大于主屏幕的右下角 X 坐标`n - 以此判断以下屏幕哪一块是右侧的屏幕")
@@ -1995,7 +1995,7 @@ makeTrayMenu() {
         aboutGui.GetPos(, , &Gui_width)
         aboutGui.Destroy()
 
-        aboutGui := Gui("AlwaysOnTop OwnDialogs", "InputTip.exe - v" currentVersion)
+        aboutGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - v" currentVersion)
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText("Center w" Gui_width, "InputTip - 一个输入法状态(中文/英文/大写锁定)实时提示工具")
         tab := aboutGui.AddTab3("w" Gui_width + aboutGui.MarginX * 2, ["关于项目", "赞赏支持", "参考项目"])

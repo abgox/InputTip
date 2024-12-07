@@ -12,7 +12,17 @@
  * 这个函数会创建一个临时的 Gui，用来获取窗口的位置和大小，一般使用默认值就足够了，如果需要修改字体配置等，可以传入一个类似的新函数
  * @returns 返回 Gui 对象
  */
-createGui(fn, tempFn := (list) {
+createGui(fn, tempFn := _createGuiTempFn
+) {
+    list := []
+    for v in fn(0, 0, 0, 0) {
+        list.Push({ type: v.Type, text: v.Text })
+    }
+    info := tempFn(list)
+    return fn(info.x, info.y, info.w, info.h)
+}
+
+_createGuiTempFn(list) {
     g := Gui("AlwaysOnTop +OwnDialogs")
     g.SetFont("s12", "微软雅黑")
     for v in list {
@@ -22,12 +32,4 @@ createGui(fn, tempFn := (list) {
     g.GetPos(&x, &y, &w, &h)
     g.Destroy()
     return { x: x, y: y, w: w, h: h }
-}
-) {
-    list := []
-    for v in fn(0, 0, 0, 0) {
-        list.Push({ type: v.Type, text: v.Text })
-    }
-    info := tempFn(list)
-    return fn(info.x, info.y, info.w, info.h)
 }

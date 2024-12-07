@@ -100,7 +100,8 @@ if (!ignoreUpdate) {
     if (A_IsCompiled) {
         checkVersion(currentVersion, "v2", updateConfirm)
         updateConfirm(whichVersion, newVersion, currentVersion) {
-            createGui((x, y, w, h) {
+            createGui(fn).Show()
+            fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 版本更新")
                 g.SetFont("s12", "微软雅黑")
                 g.AddText(, "InputTip " whichVersion " 有新版本了!")
@@ -144,12 +145,13 @@ if (!ignoreUpdate) {
                     showMsg(["忽略版本更新成功!", "即使有新版本下次启动时也不会再提示更新!", "如果你在使用过程中有任何问题，你需要确定当前是否为最新版本!", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 `"关于`" 中找到"])
                 }
                 return g
-            }).Show()
+            }
         }
     } else {
         checkVersion(currentVersion, "v2", updatePrompt)
         updatePrompt(whichVersion, newVersion, currentVersion) {
-            createGui((x, y, w, h) {
+            createGui(fn).Show()
+            fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop OwnDialogs")
                 g.SetFont("s12", "微软雅黑")
                 g.AddText(, "- 您正在通过项目源代码启动 InputTip`n- 当前 InputTip 有了新版本 v" currentVersion " > v" newVersion "`n- 请自行使用 git pull 获取最新的代码更改")
@@ -167,7 +169,7 @@ if (!ignoreUpdate) {
                     showMsg(["忽略版本更新成功!", "即使有新版本下次启动时也不会再提示更新!", "如果你在使用过程中有任何问题，你需要确定当前是否为最新版本!", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 `"关于`" 中找到"])
                 }
                 return g
-            }).Show()
+            }
         }
     }
 }
@@ -870,7 +872,8 @@ makeTrayMenu() {
             global isStartUp := 0
             writeIni("isStartUp", isStartUp)
         } else {
-            createGui((x, y, w, h) {
+            createGui(fn).Show()
+            fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop +OwnDialogs", "设置开机自启动")
                 g.SetFont("s12", "微软雅黑")
                 g.AddLink(, '详情: <a href="https://inputtip.pages.dev/FAQ/#关于开机自启动">https://inputtip.pages.dev/FAQ/#关于开机自启动</a>')
@@ -917,7 +920,7 @@ makeTrayMenu() {
                     writeIni("isStartUp", isStartUp)
                 }
                 return g
-            }).Show()
+            }
         }
     }
     if (isStartUp) {
@@ -929,7 +932,8 @@ makeTrayMenu() {
         sub.Add(v, fn_mode)
         fn_mode(item, index, *) {
             mode := readIni("mode", 1, "InputMethod")
-            createGui((x, y, w, h) {
+            createGui(fn).Show()
+            fn(x, y, w, h) {
                 modeInfo := [
                     "1.「模式1」和「模式2」都是通用的输入法模式`n2. 和「模式2」相比，「模式1」兼容的输入法和应用窗口少一点，但识别输入法状态更稳定一点",
                     "1.「模式1」和「模式2」都是通用的输入法模式`n2. 和「模式1」相比，「模式2」兼容的输入法和应用窗口更多，但有极小概率出现状态识别错误`n3. 如果在某个应用窗口中出现识别错误，请尝试重启这个应用窗口",
@@ -958,7 +962,7 @@ makeTrayMenu() {
                     fn_restart()
                 }
                 return g
-            }).Show()
+            }
         }
     }
     A_TrayMenu.Add("设置输入法模式", sub)

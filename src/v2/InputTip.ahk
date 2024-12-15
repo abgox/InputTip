@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.26.2
+;@AHK2Exe-SetVersion 2.26.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -27,7 +27,7 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\createGui.ahk
 #Include .\utils\checkVersion.ahk
 
-currentVersion := "2.26.2"
+currentVersion := "2.26.3"
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
@@ -71,7 +71,7 @@ if (FileExist("InputTip.ini")) {
     confirmGui := Gui("AlwaysOnTop OwnDialogs")
     confirmGui.SetFont("s12", "微软雅黑")
     confirmGui.AddText(, A_ScriptName " 会根据不同的输入法状态(中英文/大写锁定)修改鼠标样式`n(更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看)")
-    confirmGui.AddText(, "您是否希望 " A_ScriptName " 修改鼠标样式?")
+    confirmGui.AddText(, "你是否希望 " A_ScriptName " 修改鼠标样式?")
     confirmGui.AddButton("w" Gui_width, "确认修改").OnEvent("Click", yes)
     yes(*) {
         writeIni("changeCursor", 1)
@@ -116,7 +116,7 @@ if (!ignoreUpdate) {
                     try {
                         Download("https://inputtip.pages.dev/releases/" whichVersion "/InputTip.exe", A_AppData "\abgox-InputTip.exe")
                         try {
-                            RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains -Force', , "Hide")
+                            RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
                             FileDelete("InputTip.JAB.JetBrains.exe")
                         }
                         Run("powershell -NoProfile -Command Start-Sleep -Seconds 3;Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
@@ -154,7 +154,7 @@ if (!ignoreUpdate) {
             fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop OwnDialogs")
                 g.SetFont("s12", "微软雅黑")
-                g.AddText(, "- 您正在通过项目源代码启动 InputTip`n- 当前 InputTip 有了新版本 v" currentVersion " > v" newVersion "`n- 请自行使用 git pull 获取最新的代码更改")
+                g.AddText(, "- 你正在通过项目源代码启动 InputTip`n- 当前 InputTip 有了新版本 v" currentVersion " > v" newVersion "`n- 请自行使用 git pull 获取最新的代码更改")
                 g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip</a>`nGitee: <a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip</a>')
                 g.AddButton("w" w, "确定").OnEvent("Click", fn_exit)
                 fn_exit(*) {
@@ -569,7 +569,6 @@ if (changeCursor) {
                 Sleep(delay)
                 continue
             }
-            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer, HideSymbolDelay)
@@ -713,7 +712,6 @@ if (changeCursor) {
                 Sleep(delay)
                 continue
             }
-            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer2, HideSymbolDelay)
@@ -937,8 +935,8 @@ makeTrayMenu() {
                 modeInfo := [
                     "1.「模式1」和「模式2」都是通用的输入法模式`n2. 和「模式2」相比，「模式1」兼容的输入法和应用窗口少一点，但识别输入法状态更稳定一点",
                     "1.「模式1」和「模式2」都是通用的输入法模式`n2. 和「模式1」相比，「模式2」兼容的输入法和应用窗口更多，但有极小概率出现状态识别错误`n3. 如果在某个应用窗口中出现识别错误，请尝试重启这个应用窗口",
-                    "1.「模式3」: 主要用于讯飞输入法`n2. 如果您使用的输入法其他模式都无法识别，您才应该尝试「模式3」",
-                    "1.「模式4」: 主要用于手心输入法`n2. 如果您使用的输入法其他模式都无法识别，您才应该尝试「模式4」"
+                    "1.「模式3」: 主要用于讯飞输入法`n2. 如果你使用的输入法其他模式都无法识别，你才应该尝试「模式3」",
+                    "1.「模式4」: 主要用于手心输入法`n2. 如果你使用的输入法其他模式都无法识别，你才应该尝试「模式4」"
                 ]
 
                 g := Gui("AlwaysOnTop +OwnDialogs", A_ScriptName " - 模式切换")
@@ -971,7 +969,7 @@ makeTrayMenu() {
     fn_hide_app(*) {
         fn_common({
             config: "app_hide_state",
-            text: "什么是「符号显示黑名单」？`n- 如果应用在「符号显示黑名单」中，当处于此应用窗口中时，InputTip 不会显示符号`n  - 符号: 图片符号、方块符号、文本符号`n- 如果部分应用出现了一些奇怪的bug，您可以临时将此应用添加到「符号显示黑名单」中",
+            text: "什么是「符号显示黑名单」？`n- 如果应用在「符号显示黑名单」中，当处于此应用窗口中时，InputTip 不会显示符号`n  - 符号: 图片符号、方块符号、文本符号`n- 如果部分应用出现了一些奇怪的bug，你可以临时将此应用添加到「符号显示黑名单」中",
             btn1: "添加应用到「符号显示黑名单」中",
             btn1_text1: "双击应用程序，将其添加到「符号显示黑名单」中`n- 添加后，当处于此应用窗口中时，InputTip 不再显示符号`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
             btn1_text2: "以下是当前系统正在运行的应用程序列表",
@@ -1016,8 +1014,8 @@ makeTrayMenu() {
         tab := configGui.AddTab3(, ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号", "配色网站"])
         tab.UseTab(1)
 
-        configGui.AddText("Section", "在更改配置前，您应该首先阅读一下项目的 README，相当于软件的说明书")
-        configGui.AddText("xs", "您可以点击以下相关网址中查看软件源代码、使用说明文档等详细内容：")
+        configGui.AddText("Section", "在更改配置前，你应该首先阅读一下项目的 README，相当于软件的说明书")
+        configGui.AddText("xs", "你可以点击以下相关网址中查看软件源代码、使用说明文档等详细内容：")
         configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/">文档官网</a>')
         configGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">Github</a>')
         configGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">Gitee</a>')
@@ -1037,7 +1035,7 @@ makeTrayMenu() {
         configGui.AddEdit("xs r1 Disabled", "(单位：毫秒，默认为 50 毫秒；值越小，响应越快，性能消耗越大，根据电脑性能适当调整)")
 
         tab.UseTab(2)
-        configGui.AddText(, "您可以点击以下任意网址获取设置鼠标样式文件夹的相关说明:`n(您应该先了解相关说明，然后点击下方按钮进行设置)")
+        configGui.AddText(, "你可以点击以下任意网址获取设置鼠标样式文件夹的相关说明:`n(你应该先了解相关说明，然后点击下方按钮进行设置)")
         configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义鼠标样式">https://inputtip.pages.dev/v2/#自定义鼠标样式</a>`n<a href="https://github.com/abgox/InputTip#自定义鼠标样式">https://github.com/abgox/InputTip#自定义鼠标样式</a>`n<a href="https://gitee.com/abgox/InputTip#自定义鼠标样式">https://gitee.com/abgox/InputTip#自定义鼠标样式</a>`n' line)
         cursorDirList := [{
             label: "中文状态鼠标样式",
@@ -1070,7 +1068,7 @@ makeTrayMenu() {
                     }
                 }
                 if (!hasFile) {
-                    MsgBox("您应该选择一个包含鼠标样式文件的文件夹。`n鼠标样式文件: 后缀名为 .cur 或 .ani 的文件", A_ScriptName " - 选择文件夹错误！", "0x10 0x1000")
+                    MsgBox("你应该选择一个包含鼠标样式文件的文件夹。`n鼠标样式文件: 后缀名为 .cur 或 .ani 的文件", A_ScriptName " - 选择文件夹错误！", "0x10 0x1000")
                     return
                 }
                 dir_name := StrSplit(dir, "\")[-1]
@@ -1101,7 +1099,7 @@ makeTrayMenu() {
             }
         }
         tab.UseTab(3)
-        configGui.AddText("Section", "- 图片符号通过加载图片实现，您可以通过替换图片来自定义任何符号，不一定是圆点符号`n    - 您可以用自己喜欢的符号图片、或者自己制作符号图片来替换`n    - 唯一限制: 图片必须是 .png 类型的图片`n- 如果在特定状态下，您不想显示图片符号，把 InputTipSymbol 目录下对应的图片删除即可`n    - 中文状态: CN.png`n    - 英文状态: EN.png`n    - 大写锁定: Caps.png`n- 如果后悔了，从 InputTipSymbol 目录下的 default 目录中把对应的默认图片复制回来即可`n" line)
+        configGui.AddText("Section", "- 图片符号通过加载图片实现，你可以通过替换图片来自定义任何符号，不一定是球形符号`n    - 你可以用自己喜欢的符号图片、或者自己制作符号图片来替换`n    - 唯一限制: 图片必须是 .png 类型的图片`n- 如果在特定状态下，你不想显示图片符号，把 InputTipSymbol 目录下对应的图片删除即可`n    - 中文状态: CN.png`n    - 英文状态: EN.png`n    - 大写锁定: Caps.png`n- 如果后悔了，从 InputTipSymbol 目录下的 default 目录中把对应的默认图片复制回来即可`n" line)
 
         symbolPicConfig := [{
             config: "pic_offset_x",
@@ -1566,7 +1564,7 @@ makeTrayMenu() {
                     }
                 }
                 DetectHiddenWindows 1
-                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程？您可以点击此按钮手动添加进程").OnEvent("Click", fn_add_by_hand)
+                addGui.AddButton("xs w" Gui_width, "没有找到需要添加的进程？你可以点击此按钮手动添加进程").OnEvent("Click", fn_add_by_hand)
                 fn_add_by_hand(*) {
                     g := Gui("AlwaysOnTop OwnDialogs")
                     g.SetFont("s12", "微软雅黑")
@@ -1688,7 +1686,7 @@ makeTrayMenu() {
                 } else {
                     rmGui.SetFont("s14", "微软雅黑")
                     rmGui.AddText(, "当前没有可以移除的应用")
-                    rmgui.Show("Hide")
+                    rmGui.Show("Hide")
                     rmGui.GetPos(, , &Gui_width)
                     rmGui.Destroy()
 
@@ -1844,7 +1842,7 @@ makeTrayMenu() {
     fn_offset(*) {
         offsetGui := Gui("AlwaysOnTop OwnDialogs")
         offsetGui.SetFont("s12", "微软雅黑")
-        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己手动的通过调整对应屏幕的偏移量，使其正确显示`n- 注意: 您需要先开启 Java Access Bridge，具体操作步骤，请查看以下网址:")
+        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己手动的通过调整对应屏幕的偏移量，使其正确显示`n- 注意: 你需要先开启 Java Access Bridge，具体操作步骤，请查看以下网址:")
         offsetGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
         offsetGui.Show("Hide")
         offsetGui.GetPos(, , &Gui_width)
@@ -1854,7 +1852,7 @@ makeTrayMenu() {
         offsetGui.SetFont("s12", "微软雅黑")
         tab := offsetGui.AddTab3("", ["JetBrains IDE"])
         tab.UseTab(1)
-        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己通过手动调整对应屏幕的偏移量，使其正确显示`n- 您可以通过以下链接了解如何在 JetBrains 系列 IDE 中使用 InputTip :")
+        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己通过手动调整对应屏幕的偏移量，使其正确显示`n- 你可以通过以下链接了解如何在 JetBrains 系列 IDE 中使用 InputTip :")
         offsetGui.AddLink(, '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
         btn := offsetGui.AddButton("w" Gui_width, "设置 JetBrains 系列 IDE 的副屏偏移量")
         btn.Focus()
@@ -1865,7 +1863,7 @@ makeTrayMenu() {
             JetBrainsGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置 JetBrains 系列 IDE 的副屏偏移量")
             JetBrainsGui.SetFont("s12", "微软雅黑")
             screenList := getScreenInfo()
-            JetBrainsGui.AddText(, "您需要通过屏幕坐标信息判断具体是哪一块屏幕`n - 假设您有两块屏幕，主屏幕在左侧，副屏幕在右侧`n - 那么副屏幕的左上角 X 坐标一定大于主屏幕的右下角 X 坐标`n - 以此判断以下屏幕哪一块是右侧的屏幕")
+            JetBrainsGui.AddText(, "你需要通过屏幕坐标信息判断具体是哪一块屏幕`n - 假设你有两块屏幕，主屏幕在左侧，副屏幕在右侧`n - 那么副屏幕的左上角 X 坐标一定大于主屏幕的右下角 X 坐标`n - 以此判断以下屏幕哪一块是右侧的屏幕")
             pages := []
             for v in screenList {
                 pages.push("屏幕 " v.num)
@@ -1933,15 +1931,15 @@ makeTrayMenu() {
 
             jGui := Gui("AlwaysOnTop OwnDialogs")
             jGui.SetFont("s12", "微软雅黑")
-            jGui.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保您使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip")
+            jGui.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保你使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip")
             jGui.Show("Hide")
             jGui.GetPos(, , &Gui_width)
             jGui.Destroy()
 
             jGui := Gui("AlwaysOnTop OwnDialogs")
             jGui.SetFont("s12", "微软雅黑")
-            jGui.AddText(, "已成功启用 JetBrains IDE 支持，您还需要进行以下步骤:")
-            jGui.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保您使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip")
+            jGui.AddText(, "已成功启用 JetBrains IDE 支持，你还需要进行以下步骤:")
+            jGui.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保你使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip")
             jGui.AddText(, "具体操作步骤，请查看以下任意网址:")
             jGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
             jGui.AddLink(, '<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
@@ -1953,11 +1951,13 @@ makeTrayMenu() {
             }
             jGui.Show()
         } else {
-            RunWait('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains -Force', , "Hide")
-            if (A_IsAdmin) {
-                Run('powershell -NoProfile -Command Unregister-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -Confirm:$false', , "Hide")
-                try {
-                    FileDelete("InputTip.JAB.JetBrains.exe")
+            try {
+                RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+                if (A_IsAdmin) {
+                    Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
+                    try {
+                        FileDelete("InputTip.JAB.JetBrains.exe")
+                    }
                 }
             }
         }
@@ -1966,12 +1966,12 @@ makeTrayMenu() {
     fn_add_JetBrains(*) {
         fn_common({
             config: "JetBrains_list",
-            text: "当勾选「启用 JetBrains IDE 支持」后，您需要确保您使用的 JetBrains IDE 已经被添加",
+            text: "当勾选「启用 JetBrains IDE 支持」后，你需要确保你使用的 JetBrains IDE 已经被添加",
             btn1: "添加 JetBrains 系列 IDE 应用程序",
-            btn1_text1: "双击应用程序进程进行添加`n- 您只应该添加 JetBrains 系列 IDE 应用程序进程`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
+            btn1_text1: "双击应用程序进程进行添加`n- 你只应该添加 JetBrains 系列 IDE 应用程序进程`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
             btn1_text2: "以下是当前系统正在运行的应用程序列表",
             btn1_text3: "是否要添加  ",
-            btn1_text4: " ？`n注意: 如果此应用程序进程不是 JetBrains 系列 IDE 应用程序，您不应该添加它",
+            btn1_text4: " ？`n注意: 如果此应用程序进程不是 JetBrains 系列 IDE 应用程序，你不应该添加它",
             btn2: "移除 JetBrains 系列 IDE 应用程序",
             btn2_text1: "双击应用程序进程进行移除`n- 此菜单会循环触发，除非点击右上角的 x 退出，退出后所有的修改才生效",
             btn2_text2: "以下是已添加的 JetBrains 系列 IDE 应用程序列表(如果有其他应用，需立即移除)",
@@ -1993,7 +1993,7 @@ makeTrayMenu() {
         aboutGui := Gui("AlwaysOnTop OwnDialogs")
         aboutGui.SetFont("s12", "微软雅黑")
         aboutGui.AddText(, "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具")
-        aboutGui.AddText(, "如果 InputTip 对您有所帮助，`n您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持!`n希望 InputTip 能一直帮助您!")
+        aboutGui.AddLink(, '- 因为实现简单，就是去掉 v1 中方块符号的文字，加上不同的背景颜色')
         aboutGui.AddPicture("w365 h-1", "InputTipSymbol\default\offer.png")
         aboutGui.Show("Hide")
         aboutGui.GetPos(, , &Gui_width)
@@ -2010,23 +2010,28 @@ makeTrayMenu() {
         aboutGui.AddEdit("yp ReadOnly", 'abgox')
         aboutGui.AddText("xs", 'QQ 账号: ')
         aboutGui.AddEdit("yp ReadOnly", '1151676611')
-        aboutGui.AddText("xs", 'QQ 群聊: ')
+        aboutGui.AddText("xs", 'QQ 群聊(交流反馈): ')
         aboutGui.AddEdit("yp ReadOnly", '451860327')
         aboutGui.AddText("xs", "------------------------------------------------------------------")
         aboutGui.AddLink("xs", '1. 官网: <a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
         aboutGui.AddLink("xs", '2. Github: <a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
         aboutGui.AddLink("xs", '3. Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
         tab.UseTab(2)
-        aboutGui.AddText("Section", "如果 InputTip 对您有所帮助，您也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持！希望 InputTip 能一直帮助您！")
+        aboutGui.AddText("Section", "如果 InputTip 对你有所帮助，你也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持！希望 InputTip 能一直帮助你！")
         aboutGui.AddPicture("w432 h-1", "InputTipSymbol\default\offer.png")
         tab.UseTab(3)
-        aboutGui.AddText("Section", "参考并借鉴了以下项目 : ")
-        aboutGui.AddLink("xs", '<a href="https://github.com/aardio/ImTip">ImTip - aardio</a>')
-        aboutGui.AddLink("xs", '<a href="https://github.com/flyinclouds/KBLAutoSwitch">KBLAutoSwitch - flyinclouds</a>')
-        aboutGui.AddLink("xs", '<a href="https://github.com/Tebayaki/AutoHotkeyScripts">AutoHotkeyScripts - Tebayaki</a>')
-        aboutGui.AddLink("xs", '<a href="https://github.com/yakunins/language-indicator">language-indicator - yakunins</a>')
-        aboutGui.AddLink("xs", '<a href="https://github.com/Autumn-one/RedDot">RedDot - Autumn-one(木瓜太香)</a>')
-        aboutGui.AddLink("xs", '- 在输入光标处显示色块，通过颜色区分这个思路设计的早期借鉴')
+        aboutGui.AddLink("Section", '1. <a href="https://github.com/aardio/ImTip">ImTip - aardio</a>')
+        aboutGui.AddLink("xs", '2. <a href="https://github.com/flyinclouds/KBLAutoSwitch">KBLAutoSwitch - flyinclouds</a>')
+        aboutGui.AddLink("xs", '3. <a href="https://github.com/Tebayaki/AutoHotkeyScripts">AutoHotkeyScripts - Tebayaki</a>')
+        aboutGui.AddLink("xs", '4. <a href="https://github.com/Autumn-one/RedDot">RedDot - Autumn-one</a>')
+        aboutGui.AddLink("xs", '5. <a href="https://github.com/yakunins/language-indicator">language-indicator - yakunins</a>')
+        aboutGui.AddLink("xs", '- InputTip v1 是在鼠标附近显示带文字的方块符号')
+        aboutGui.AddLink("xs", '- InputTip v2 默认通过不同颜色的鼠标样式来区分')
+        aboutGui.AddLink("xs", '- 后来参照了 <a href="https://github.com/Autumn-one/RedDot">RedDot</a> 和 <a href="https://github.com/yakunins/language-indicator">language-indicator</a> 的设计')
+        aboutGui.AddLink("xs", '- 因为实现很简单，就是去掉 v1 中方块符号的文字，加上不同的背景颜色')
+
+
+
         tab.UseTab(0)
         btn := aboutGui.AddButton("Section w" Gui_width + aboutGui.MarginX * 2, "关闭")
         btn.Focus()
@@ -2069,12 +2074,12 @@ fn_control_JetBrains(runOrStop) {
             try {
                 RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
             }
-            Run('C:\Windows\System32\schtasks.exe /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
         } else {
             Run(A_ScriptDir "\InputTip.JAB.JetBrains.exe", , "Hide")
         }
     } else {
-        Run('powershell -NoProfile -Command Stop-Process -Name InputTip.JAB.JetBrains -Force', , "Hide")
+        RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
     }
 }
 
@@ -2489,8 +2494,8 @@ end:
         try {
             idObject := 0xFFFFFFF8 ; OBJID_CARET
             if DllCall("oleacc\AccessibleObjectFromWindow", "ptr", WinExist("A"), "uint", idObject &= 0xFFFFFFFF
-            , "ptr", -16 + NumPut("int64", idObject == 0xFFFFFFF0 ? 0x46000000000000C0 : 0x719B3800AA000C81, NumPut("int64", idObject == 0xFFFFFFF0 ? 0x0000000000020400 : 0x11CF3C3D618736E0, IID := Buffer(16)))
-            , "ptr*", oAcc := ComValue(9, 0)) = 0 {
+                , "ptr", -16 + NumPut("int64", idObject == 0xFFFFFFF0 ? 0x46000000000000C0 : 0x719B3800AA000C81, NumPut("int64", idObject == 0xFFFFFFF0 ? 0x0000000000020400 : 0x11CF3C3D618736E0, IID := Buffer(16)))
+                , "ptr*", oAcc := ComValue(9, 0)) = 0 {
                 x := Buffer(4), y := Buffer(4), w := Buffer(4), h := Buffer(4)
                 oAcc.accLocation(ComValue(0x4003, x.ptr, 1), ComValue(0x4003, y.ptr, 1), ComValue(0x4003, w.ptr, 1), ComValue(0x4003, h.ptr, 1), 0)
                 left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int"), right := NumGet(w, 0, "int"), bottom := NumGet(h, 0, "int")

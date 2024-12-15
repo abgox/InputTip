@@ -31,21 +31,33 @@ class IME {
     }
 
     static GetOpenStatus(hwnd := this.GetFocusedWindow()) {
-        DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x5, "ptr", 0, "uint", 0, "uint", 200, "ptr*", &status := 0)
-        return status
+        try {
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x5, "ptr", 0, "uint", 0, "uint", 200, "ptr*", &status := 0)
+            return status
+        } catch {
+            return 0
+        }
     }
 
     static SetOpenStatus(status, hwnd := this.GetFocusedWindow()) {
-        DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x6, "ptr", status, "uint", 0, "uint", 200, "ptr*", 0)
+        try {
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x6, "ptr", status, "uint", 0, "uint", 200, "ptr*", 0)
+        }
     }
 
     static GetConversionMode(hwnd := this.GetFocusedWindow()) {
-        DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x1, "ptr", 0, "uint", 0, "uint", 200, "ptr*", &mode := 0)
-        return mode
+        try {
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x1, "ptr", 0, "uint", 0, "uint", 200, "ptr*", &mode := 0)
+            return mode
+        } catch {
+            return 0
+        }
     }
 
     static SetConversionMode(mode, hwnd := this.GetFocusedWindow()) {
-        DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x2, "ptr", mode, "uint", 0, "uint", 200, "ptr*", 0)
+        try {
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x2, "ptr", mode, "uint", 0, "uint", 200, "ptr*", 0)
+        }
     }
 
     static GetKeyboardLayout(hwnd := this.GetFocusedWindow()) {
@@ -101,12 +113,16 @@ isCN(mode) {
         {
             ; 中文: 1
             ; 英文: 0
-            return SendMessage(
-                0x283,    ; Message : WM_IME_CONTROL
-                0x005,    ; wParam  : IMC_GETCONVERSIONMODE
-                0,    ; lParam  ： (NoArgs)
-                , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-            )
+            try {
+                return SendMessage(
+                    0x283,    ; Message : WM_IME_CONTROL
+                    0x005,    ; wParam  : IMC_GETCONVERSIONMODE
+                    0,    ; lParam  ： (NoArgs)
+                    , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
+                )
+            } catch {
+                return 0
+            }
         }
         case 2:
         {
@@ -118,23 +134,31 @@ isCN(mode) {
         {
             ; 中文: 2
             ; 英文: 1
-            return 2 = SendMessage(
-                0x283,    ; Message : WM_IME_CONTROL
-                0x005,    ; wParam  : IMC_GETCONVERSIONMODE
-                0,    ; lParam  ： (NoArgs)
-                , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-            )
+            try {
+                return 2 = SendMessage(
+                    0x283,    ; Message : WM_IME_CONTROL
+                    0x005,    ; wParam  : IMC_GETCONVERSIONMODE
+                    0,    ; lParam  ： (NoArgs)
+                    , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
+                )
+            } catch {
+                return 1
+            }
         }
         case 4:
         {
             ; 中文:1025
             ; 英文:1
-            return 1025 = SendMessage(
-                0x283,    ; Message : WM_IME_CONTROL
-                0x001,    ; wParam  : IMC_GETOPENSTATUS
-                0,    ; lParam  ： (NoArgs)
-                , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-            )
+            try {
+                return 1025 = SendMessage(
+                    0x283,    ; Message : WM_IME_CONTROL
+                    0x001,    ; wParam  : IMC_GETOPENSTATUS
+                    0,    ; lParam  ： (NoArgs)
+                    , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
+                )
+            } catch {
+                return 1
+            }
         }
         default: return 0
     }

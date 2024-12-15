@@ -2,6 +2,7 @@
 ;@AHK2Exe-SetName InputTip.JAB.JetBrains
 ;@AHK2Exe-SetDescription InputTip(JetBrains 进程) - 一个输入法状态(中文/英文/大写锁定)提示工具
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
+;@Ahk2Exe-SetMainIcon ..\favicon.ico
 #SingleInstance Force
 #NoTrayIcon
 Persistent

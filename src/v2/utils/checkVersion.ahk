@@ -2,9 +2,9 @@
  * 检查版本更新
  * @param currentVersion 当前版本号
  * @param {"v1" | "v2"} whichVersion 哪一个版本(v1/v2)
- * @param do 版本检查完成后的回调函数
+ * @param callback 版本检查完成后的回调函数
  */
-checkVersion(currentVersion, whichVersion, do) {
+checkVersion(currentVersion, whichVersion, callback) {
     try {
         req := ComObject("Msxml2.XMLHTTP")
         ; 异步请求
@@ -35,7 +35,7 @@ checkVersion(currentVersion, whichVersion, do) {
             }
             newVersion := StrReplace(StrReplace(StrReplace(req.responseText, "`r", ""), "`n", ""), "v", "")
             if (req.status == 200 && compareVersion(newVersion, currentVersion) > 0) {
-                do(whichVersion,newVersion, currentVersion)
+                callback(whichVersion, newVersion, currentVersion)
             }
         }
     }

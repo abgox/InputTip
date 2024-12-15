@@ -75,7 +75,14 @@
 >   3. 直接运行项目中的 `InputTip.ahk` 文件
 >      - `src\v2\InputTip.ahk`
 
-- [下载](https://inputtip.pages.dev/releases/v2/InputTip.exe) 并运行 `InputTip.exe` 即可
+> [!warning]
+>
+> - 软件中使用到了 `powershell`，请确保你的电脑环境中有 `powershell`
+> - 现在的 Windows，都内置了 `powershell`，但总有一些特殊环境没有，可能导致运行报错
+> - 如何确认是否有 `powershell`？
+>   - 打开 `cmd` 输入 `powershell` 回车，如果出现报错，说明没有 `powershell`
+
+- **[下载](https://inputtip.pages.dev/releases/v2/InputTip.exe) 并运行 `InputTip.exe` 即可**
 
   - 如果此下载链接无法打开，你也可以在项目的 Releases 页面下载
   - 推荐做法: 新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它
@@ -122,7 +129,7 @@
    - 如果修改了鼠标样式，退出软件时，会尝试进行恢复，但可能无法完全恢复，如果想完全恢复到以前的鼠标样式，需要重启电脑
 3. 删除以上所有文件或目录
 4. 打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 和 `abgox.InputTip.JAB.JetBrains` 任务，删除它
-   - 其实不删除也没事，它不会造成任何影响，不过既然不再使用 `InputTip`，还是删除为好
+   - 也可以忽略，它们不会造成任何影响，但尽量删除，让电脑更清洁
 
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
 
@@ -140,7 +147,8 @@
    - 会在 `InputTip.exe` 同级目录下生成 `InputTip.JAB.JetBrains.exe`
    - 它由 `InputTip.exe` 控制，不需要手动启动/终止
 3. 点击 `托盘菜单` => `添加 JetBrains IDE 应用`，确保你使用的 JetBrains IDE 应用已经添加
-4. 重启 `InputTip.exe`
+4. 重启 `InputTip.exe` 和 JetBrains IDE 应用
+5. 如果没有生效，可能需要重启电脑
 
 > [!TIP]
 > 如果你有多块屏幕，在副屏上，会有非常大的坐标偏差
@@ -279,9 +287,10 @@
 - [KBLAutoSwitch - flyinclouds](https://github.com/flyinclouds/KBLAutoSwitch)
 - [AutoHotkeyScripts - Tebayaki](https://github.com/Tebayaki/AutoHotkeyScripts)
 - [language-indicator - yakunins](https://github.com/yakunins/language-indicator)
-- [RedDot - Autumn-one(木瓜太香)](https://github.com/Autumn-one/RedDot)
-  - `InputTip` 最初([InputTip v1](./src/v1/README.md))在鼠标附近显示符号，后来 [InputTip v2](./) 版本通过不同的鼠标样式来区分
-  - 而之后在输入光标处显示色块，通过颜色区分的思路设计来自于 [RedDot - Autumn-one(木瓜太香)](https://github.com/Autumn-one/RedDot)
+- [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot)
+  - `InputTip` 最初 [InputTip v1](./src/v1/README.md) 在鼠标附近显示带文字的方块符号，后来 [InputTip v2](./) 版本默认通过不同颜色的鼠标样式来区分
+  - 之后看到了 [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot) 和 [language-indicator - yakunins](https://github.com/yakunins/language-indicator) 的设计，通过不同颜色加上小符号来判断不同输入法状态
+  - InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](./src/v1/README.md) 中带文字的方块符号，去掉文字，加上不同的背景颜色
 
 ### 赞赏支持
 

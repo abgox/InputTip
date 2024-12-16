@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.26.3
+;@AHK2Exe-SetVersion 2.26.5
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -10,6 +10,7 @@
 ;@Ahk2Exe-AddResource InputTipSymbol.zip
 ;@Ahk2Exe-AddResource InputTip.JAB.JetBrains.exe
 #SingleInstance Force
+#Warn All, Off
 Persistent
 ListLines 0
 KeyHistory 0
@@ -27,7 +28,7 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\createGui.ahk
 #Include .\utils\checkVersion.ahk
 
-currentVersion := "2.26.3"
+currentVersion := "2.26.5"
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
@@ -207,36 +208,16 @@ pic_offset_y := readIni('pic_offset_y', -20)
 pic_symbol_width := readIni('pic_symbol_width', 9)
 pic_symbol_height := readIni('pic_symbol_height', 9)
 ; 应用列表: 需要隐藏符号
-app_hide_state := readIni('app_hide_state', '')
-if (InStr(app_hide_state, "exe,")) {
-    app_hide_state := StrReplace(app_hide_state, ",", ":")
-    writeIni('app_hide_state', app_hide_state)
-}
-app_hide_state := ":" app_hide_state ":"
+app_hide_state := ":" readIni('app_hide_state', '') ":"
 
 ; 应用列表: 自动切换到中文
-app_CN := readIni('app_CN', '')
-if (InStr(app_CN, "exe,")) {
-    app_CN := StrReplace(app_CN, ",", ":")
-    writeIni('app_CN', app_CN)
-}
-app_CN := ":" app_CN ":"
+app_CN := ":" readIni('app_CN', '') ":"
 
 ; 应用列表: 自动切换到英文
-app_EN := readIni('app_EN', '')
-if (InStr(app_EN, "exe,")) {
-    app_EN := StrReplace(app_EN, ",", ":")
-    writeIni('app_EN', app_EN)
-}
-app_EN := ":" app_EN ":"
+app_EN := ":" readIni('app_EN', '') ":"
 
 ; 应用列表: 自动切换到大写锁定
-app_Caps := readIni('app_Caps', '')
-if (InStr(app_Caps, "exe,")) {
-    app_Caps := StrReplace(app_Caps, ",", ":")
-    writeIni('app_Caps', app_Caps)
-}
-app_Caps := ":" app_Caps ":"
+app_Caps := ":" readIni('app_Caps', '') ":"
 
 ; 中文快捷键
 hotkey_CN := readIni('hotkey_CN', '')
@@ -463,7 +444,7 @@ for v in info {
         v.EN := v.CN := v.Caps := v.origin
     }
 }
-showPicList := ":"
+
 fileList := ["CN", "EN", "Caps"]
 
 symbol_temp_zip := A_Temp "\abgox-InputTipSymbol-temp.zip"
@@ -503,9 +484,20 @@ if (!DirExist("InputTipSymbol")) {
         }
     }
 }
-for f in fileList {
-    if (FileExist("InputTipSymbol\" f ".png")) {
-        showPicList .= f ":"
+picList := {
+    EN: '',
+    CN: '',
+    Caps: ''
+}
+loop files "InputTipSymbol\*" {
+    if(InStr(A_LoopFileName,"EN.png")){
+        picList.EN := A_LoopFilePath
+    }
+    if(InStr(A_LoopFileName,"CN.png")){
+        picList.CN := A_LoopFilePath
+    }
+    if(InStr(A_LoopFileName,"Caps.png")){
+        picList.Caps := A_LoopFilePath
     }
 }
 
@@ -799,9 +791,9 @@ TipShow(type) {
     switch symbolType {
         case 1:
         {
-            if (InStr(showPicList, ":" type ":")) {
+            if (picList.%type%) {
                 try {
-                    TipGuiPic.Value := "InputTipSymbol/" type ".png"
+                    TipGuiPic.Value := picList.%type%
                     try {
                         TipGui.Show("NA x" left + pic_offset_x "y" top + pic_offset_y)
                     }
@@ -2029,8 +2021,6 @@ makeTrayMenu() {
         aboutGui.AddLink("xs", '- InputTip v2 默认通过不同颜色的鼠标样式来区分')
         aboutGui.AddLink("xs", '- 后来参照了 <a href="https://github.com/Autumn-one/RedDot">RedDot</a> 和 <a href="https://github.com/yakunins/language-indicator">language-indicator</a> 的设计')
         aboutGui.AddLink("xs", '- 因为实现很简单，就是去掉 v1 中方块符号的文字，加上不同的背景颜色')
-
-
 
         tab.UseTab(0)
         btn := aboutGui.AddButton("Section w" Gui_width + aboutGui.MarginX * 2, "关闭")

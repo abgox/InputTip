@@ -1,9 +1,11 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip.JAB.JetBrains
+;@AHK2Exe-SetLanguage 0x0804
 ;@AHK2Exe-SetDescription InputTip(JetBrains 进程) - 一个输入法状态(中文/英文/大写锁定)提示工具
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 #SingleInstance Force
+#Warn All, Off
 #NoTrayIcon
 Persistent
 ListLines 0
@@ -34,6 +36,7 @@ readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
 }
 
 mode := readIni("mode", 2, "InputMethod")
+delay := readIni("delay", 50)
 JetBrains_list := ":" readIni("JetBrains_list", "") ":"
 changeCursor := readIni("changeCursor", 0)
 symbolType := readIni("symbolType", 2)
@@ -194,18 +197,23 @@ for v in info {
         v.origin := replaceEnvVariables(RegRead("HKEY_CURRENT_USER\Control Panel\Cursors", curMap.%v.type%))
     }
     if (v.EN = "" || v.CN = "" || v.Caps = "") {
-        if (v.origin) {
-            v.EN := v.CN := v.Caps := v.origin
-        } else {
-            v.EN := v.CN := v.Caps := ""
-        }
+        v.EN := v.CN := v.Caps := v.origin
     }
 }
-showPicList := ":"
-fileList := ["CN", "EN", "Caps"]
-for f in fileList {
-    if (FileExist(f ".png")) {
-        showPicList .= f ":"
+picList := {
+    EN: '',
+    CN: '',
+    Caps: ''
+}
+loop files "InputTipSymbol\*" {
+    if(InStr(A_LoopFileName,"EN.png")){
+        picList.EN := A_LoopFilePath
+    }
+    if(InStr(A_LoopFileName,"CN.png")){
+        picList.CN := A_LoopFilePath
+    }
+    if(InStr(A_LoopFileName,"Caps.png")){
+        picList.Caps := A_LoopFilePath
     }
 }
 
@@ -266,10 +274,9 @@ if (changeCursor) {
             }
             if (!InStr(JetBrains_list, ":" exe_name ":")) {
                 TipGui.Hide()
-                Sleep(50)
+                Sleep(delay)
                 continue
             }
-            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer, HideSymbolDelay)
@@ -289,6 +296,7 @@ if (changeCursor) {
             is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
+                Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
@@ -321,7 +329,7 @@ if (changeCursor) {
                     old_left := left
                     old_top := top
                     old_state := state
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 try {
@@ -329,7 +337,7 @@ if (changeCursor) {
                     v := state = 1 ? "CN" : "EN"
                 } catch {
                     TipGui.Hide()
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 if (state != old_state) {
@@ -353,7 +361,7 @@ if (changeCursor) {
                     }
                 }
             }
-            Sleep(50)
+            Sleep(delay)
         }
     } else {
         while 1 {
@@ -361,7 +369,7 @@ if (changeCursor) {
                 exe_name := ProcessGetName(WinGetPID("A"))
             }
             if (!InStr(JetBrains_list, ":" exe_name ":")) {
-                Sleep(50)
+                Sleep(delay)
                 continue
             }
             if (exe_name != lastWindow) {
@@ -382,14 +390,14 @@ if (changeCursor) {
                         state := 2
                     }
                     old_state := state
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 try {
                     state := isCN(mode)
                     v := state = 1 ? "CN" : "EN"
                 } catch {
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 if (state != old_state) {
@@ -397,7 +405,7 @@ if (changeCursor) {
                     old_state := state
                 }
             }
-            Sleep(50)
+            Sleep(delay)
         }
     }
     show(type) {
@@ -413,10 +421,9 @@ if (changeCursor) {
             }
             if (!InStr(JetBrains_list, ":" exe_name ":")) {
                 TipGui.Hide()
-                Sleep(50)
+                Sleep(delay)
                 continue
             }
-            is_hide_state := 0
             if (exe_name != lastWindow) {
                 needHide := 0
                 SetTimer(timer2, HideSymbolDelay)
@@ -436,6 +443,7 @@ if (changeCursor) {
             is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
+                Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
@@ -467,7 +475,7 @@ if (changeCursor) {
                     old_left := left
                     old_top := top
                     old_state := state
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 try {
@@ -475,7 +483,7 @@ if (changeCursor) {
                     v := state = 1 ? "CN" : "EN"
                 } catch {
                     TipGui.Hide()
-                    Sleep(50)
+                    Sleep(delay)
                     continue
                 }
                 if (state != old_state) {
@@ -498,7 +506,7 @@ if (changeCursor) {
                     }
                 }
             }
-            Sleep(50)
+            Sleep(delay)
         }
     }
 }
@@ -507,9 +515,9 @@ TipShow(type) {
     switch symbolType {
         case 1:
         {
-            if (InStr(showPicList, ":" type ":")) {
+            if (picList.%type%) {
                 try {
-                    TipGuiPic.Value := "InputTipSymbol/" type ".png"
+                    TipGuiPic.Value := picList.%type%
                     try {
                         TipGui.Show("NA x" left + pic_offset_x "y" top + pic_offset_y)
                     }

@@ -35,30 +35,58 @@ readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
     }
 }
 
+; 输入法模式
 mode := readIni("mode", 2, "InputMethod")
 delay := readIni("delay", 50)
+; JetBrains 应用列表
 JetBrains_list := ":" readIni("JetBrains_list", "") ":"
+; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)
+CN_cursor := readIni("CN_cursor", "InputTipCursor\default\CN")
+EN_cursor := readIni("EN_cursor", "InputTipCursor\default\EN")
+Caps_cursor := readIni("Caps_cursor", "InputTipCursor\default\Caps")
+/*
+符号类型
+    1: 图片符号
+    2: 方块符号
+    3: 文本符号
+*/
 symbolType := readIni("symbolType", 2)
+; 在多少毫秒后隐藏符号，0 表示永不隐藏
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
 CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
 EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
 Caps_color := StrReplace(readIni("Caps_color", "green"), '#', '')
 transparent := readIni('transparent', 222)
 offset_x := readIni('offset_x', 10)
-offset_y := readIni('offset_y', -10)
-symbol_width := readIni('symbol_width', 7)
-symbol_height := readIni('symbol_height', 7)
-pic_offset_x := readIni('pic_offset_x', 5)
-pic_offset_y := readIni('pic_offset_y', -20)
+offset_y := readIni('offset_y', -15)
+symbol_width := readIni('symbol_width', 6)
+symbol_height := readIni('symbol_height', 6)
+
+CN_pic := readIni("CN_pic", "InputTipSymbol\default\CN.png")
+EN_pic := readIni("EN_pic", "InputTipSymbol\default\EN.png")
+Caps_pic := readIni("Caps_pic", "InputTipSymbol\default\Caps.png")
+pic_offset_x := readIni('pic_offset_x', -22)
+pic_offset_y := readIni('pic_offset_y', -40)
 pic_symbol_width := readIni('pic_symbol_width', 9)
 pic_symbol_height := readIni('pic_symbol_height', 9)
-; 隐藏方块符号
+; 应用列表: 需要隐藏符号
 app_hide_state := ":" readIni('app_hide_state', '') ":"
+
+; 应用列表: 自动切换到中文
 app_CN := ":" readIni('app_CN', '') ":"
+; 应用列表: 自动切换到英文
 app_EN := ":" readIni('app_EN', '') ":"
+; 应用列表: 自动切换到大写锁定
 app_Caps := ":" readIni('app_Caps', '') ":"
 
+/*
+边框样式
+    1: 样式1
+    2: 样式2
+    3: 样式3
+    4: 自定义
+*/
 border_type := readIni('border_type', 1)
 border_color_CN := StrReplace(readIni('border_color_CN', 'yellow'), '#', '')
 border_color_EN := StrReplace(readIni('border_color_EN', 'yellow'), '#', '')
@@ -126,6 +154,7 @@ switch_Caps(*) {
     }
 }
 
+; 鼠标样式相关信息
 info := [{
     ; 普通选择
     type: "ARROW", value: "32512", origin: "", CN: "", EN: "", Caps: ""
@@ -181,13 +210,18 @@ info := [{
 curMap := {
     ARROW: "Arrow", IBEAM: "IBeam", WAIT: "Wait", CROSS: "Crosshair", UPARROW: "UpArrow", SIZENWSE: "SizeNWSE", SIZENESW: "SizeNESW", SIZEWE: "SizeWE", SIZENS: "SizeNS", SIZEALL: "SizeAll", NO: "No", HAND: "Hand", APPSTARTING: "AppStarting", HELP: "Help", PIN: "Pin", PERSON: "Person", PEN: "NWPen"
 }
+cursor_dir := {
+    EN: EN_cursor,
+    CN: CN_cursor,
+    Caps: Caps_cursor
+}
 
-for p in ["EN", "CN", "Caps"] {
-    Loop Files, "InputTipCursor\" p "\*.*" {
+for key in cursor_dir.OwnProps() {
+    Loop Files cursor_dir.%key% "\*.*" {
         n := StrUpper(SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4))
         for v in info {
             if (v.type = n) {
-                v.%p% := A_LoopFileFullPath
+                v.%key% := A_LoopFileFullPath
             }
         }
     }
@@ -196,28 +230,9 @@ for v in info {
     try {
         v.origin := replaceEnvVariables(RegRead("HKEY_CURRENT_USER\Control Panel\Cursors", curMap.%v.type%))
     }
-    if (v.EN = "" || v.CN = "" || v.Caps = "") {
-        v.EN := v.CN := v.Caps := v.origin
-    }
-}
-picList := {
-    EN: '',
-    CN: '',
-    Caps: ''
-}
-loop files "InputTipSymbol\*" {
-    if(InStr(A_LoopFileName,"EN.png")){
-        picList.EN := A_LoopFilePath
-    }
-    if(InStr(A_LoopFileName,"CN.png")){
-        picList.CN := A_LoopFilePath
-    }
-    if(InStr(A_LoopFileName,"Caps.png")){
-        picList.Caps := A_LoopFilePath
-    }
 }
 
-state := 1, old_state := '', old_left := '', old_top := '', left := 0, top := 0
+state := 0, old_state := '', old_left := '', old_top := '', left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
 
 if (symbolType = 1) {
@@ -410,7 +425,9 @@ if (changeCursor) {
     }
     show(type) {
         for v in info {
-            DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
+            if (v.%type%) {
+                DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
+            }
         }
     }
 } else {
@@ -515,9 +532,9 @@ TipShow(type) {
     switch symbolType {
         case 1:
         {
-            if (picList.%type%) {
+            if (%type "_pic"%) {
                 try {
-                    TipGuiPic.Value := picList.%type%
+                    TipGuiPic.Value := %type "_pic"%
                     try {
                         TipGui.Show("NA x" left + pic_offset_x "y" top + pic_offset_y)
                     }

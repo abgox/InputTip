@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.27.0
+;@AHK2Exe-SetVersion 2.27.1
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -28,7 +28,7 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\createGui.ahk
 #Include .\utils\checkVersion.ahk
 
-currentVersion := "2.27.0"
+currentVersion := "2.27.1"
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
@@ -180,7 +180,14 @@ if (!ignoreUpdate) {
             fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop OwnDialogs")
                 g.SetFont("s12", "微软雅黑")
-                g.AddText(, "- 你正在通过项目源代码启动 InputTip`n- 当前 InputTip 有了新版本 v" currentVersion " > v" newVersion "`n- 请自行使用 git pull 获取最新的代码更改")
+                g.AddText(, "- 你正在通过项目源代码启动 InputTip")
+                g.AddText(, "- 当前 InputTip 有了新版本")
+                g.AddText("yp cRed","v" currentVersion)
+                g.AddText("yp ",">")
+                g.AddText("yp cRed","v" newVersion)
+                g.AddText("xs", "- 请自行使用")
+                g.AddText("yp cRed", "git pull")
+                g.AddText("yp", "获取最新的代码更改")
                 g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip#兼容情况">https://github.com/abgox/InputTip</a>`nGitee: <a href="https://gitee.com/abgox/InputTip#兼容情况">https://gitee.com/abgox/InputTip</a>')
                 g.AddButton("w" w, "确定").OnEvent("Click", fn_exit)
                 fn_exit(*) {
@@ -1884,13 +1891,13 @@ makeTrayMenu() {
         tab.UseTab(1)
         offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己通过手动调整对应屏幕的偏移量，使其正确显示`n- 你可以通过以下链接了解如何在 JetBrains 系列 IDE 中使用 InputTip :")
         offsetGui.AddLink(, '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-        btn := offsetGui.AddButton("w" Gui_width, "设置 JetBrains 系列 IDE 的副屏偏移量")
+        btn := offsetGui.AddButton("w" Gui_width, "设置 JetBrains 系列 IDE 的偏移量")
         btn.Focus()
         btn.OnEvent("Click", JetBrains_offset)
 
         JetBrains_offset(*) {
             offsetGui.Destroy()
-            JetBrainsGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置 JetBrains 系列 IDE 的副屏偏移量")
+            JetBrainsGui := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 设置 JetBrains 系列 IDE 的偏移量")
             JetBrainsGui.SetFont("s12", "微软雅黑")
             screenList := getScreenInfo()
             JetBrainsGui.AddText(, "你需要通过屏幕坐标信息判断具体是哪一块屏幕`n - 假设你有两块屏幕，主屏幕在左侧，副屏幕在右侧`n - 那么副屏幕的左上角 X 坐标一定大于主屏幕的右下角 X 坐标`n - 以此判断以下屏幕哪一块是右侧的屏幕")
@@ -1939,7 +1946,7 @@ makeTrayMenu() {
                         showMsg(["配置错误!", "它应该是一个数字。"])
                         isValid := 0
                     } else {
-                        writeIni("offset_JetBrains_x_" v.num, y)
+                        writeIni("offset_JetBrains_y_" v.num, y)
                     }
                 }
                 if (isValid) {

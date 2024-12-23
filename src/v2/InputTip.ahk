@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetName InputTip
-;@AHK2Exe-SetVersion 2.27.1
+;@AHK2Exe-SetVersion 2.27.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon ..\favicon.ico
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
@@ -22,13 +22,14 @@ SetStoreCapsLockMode 0
 A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具"
 
 #Include .\utils\verifyFile.ahk
+#Include .\utils\appList.ahk
 #Include .\utils\ini.ahk
 #Include ..\utils\IME.ahk
 #Include ..\utils\showMsg.ahk
 #Include .\utils\createGui.ahk
 #Include .\utils\checkVersion.ahk
 
-currentVersion := "2.27.1"
+currentVersion := "2.27.2"
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 
@@ -182,9 +183,9 @@ if (!ignoreUpdate) {
                 g.SetFont("s12", "微软雅黑")
                 g.AddText(, "- 你正在通过项目源代码启动 InputTip")
                 g.AddText(, "- 当前 InputTip 有了新版本")
-                g.AddText("yp cRed","v" currentVersion)
-                g.AddText("yp ",">")
-                g.AddText("yp cRed","v" newVersion)
+                g.AddText("yp cRed", "v" currentVersion)
+                g.AddText("yp ", ">")
+                g.AddText("yp cRed", "v" newVersion)
                 g.AddText("xs", "- 请自行使用")
                 g.AddText("yp cRed", "git pull")
                 g.AddText("yp", "获取最新的代码更改")
@@ -425,7 +426,6 @@ errAndExit() {
 }
 
 cursor_temp_zip := A_Temp "\abgox-InputTipCursor-temp.zip"
-cursor_temp_dir := A_Temp "\abgox-InputTipCursor-temp"
 if (!DirExist("InputTipCursor") || !DirExist("InputTipCursor\default")) {
     FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
     waitFileInstall(cursor_temp_zip)
@@ -462,6 +462,17 @@ for v in info {
 
 state := 0, old_state := '', old_left := '', old_top := '', left := 0, top := 0
 TipGui := Gui("-Caption AlwaysOnTop ToolWindow LastFound")
+
+appList := {
+    disable: ":" arrJoin(disable_list, ":") ":",
+    wpf: ":" arrJoin(Wpf_list, ":") ":",
+    UIA: ":" arrJoin(UIA_list, ":") ":",
+    MSAA: ":" arrJoin(MSAA_list, ":") ":",
+    GUI_UIA: ":" arrJoin(Gui_UIA_list, ":") ":",
+    Hook_with_dll: ":" arrJoin(Hook_list_with_dll, ":") ":"
+}
+; ACC_list := ":explorer.exe:ApplicationFrameHost.exe:"
+
 
 if (symbolType = 1) {
     ; 图片字符
@@ -508,14 +519,20 @@ lastWindow := ""
 lastState := state
 needHide := 1
 exe_name := ""
+exe_str := "::"
 
 if (changeCursor) {
     if (symbolType) {
         while 1 {
+            if (isMouseOver("ahk_class Shell_TrayWnd")) {
+                Sleep(delay)
+                continue
+            }
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                exe_str := ":" exe_name ":"
             }
-            if (InStr(JetBrains_list, ":" exe_name ":")) {
+            if (InStr(JetBrains_list, exe_str)) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
@@ -528,22 +545,21 @@ if (changeCursor) {
                 }
                 WinWaitActive("ahk_exe" exe_name)
                 lastWindow := exe_name
-                if (InStr(app_CN, ":" exe_name ":")) {
+                if (InStr(app_CN, exe_str)) {
                     switch_CN()
-                } else if (InStr(app_EN, ":" exe_name ":")) {
+                } else if (InStr(app_EN, exe_str)) {
                     switch_EN()
-                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                } else if (InStr(app_Caps, exe_str)) {
                     switch_Caps()
                 }
             }
-            is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
-                if (is_hide_state) {
+                if (InStr(app_hide_state, exe_str)) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
@@ -604,21 +620,26 @@ if (changeCursor) {
         }
     } else {
         while 1 {
+            if (isMouseOver("ahk_class Shell_TrayWnd")) {
+                Sleep(delay)
+                continue
+            }
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                exe_str := ":" exe_name ":"
             }
-            if (InStr(JetBrains_list, ":" exe_name ":")) {
+            if (InStr(JetBrains_list, exe_str)) {
                 Sleep(delay)
                 continue
             }
             if (exe_name != lastWindow) {
                 WinWaitActive("ahk_exe" exe_name)
                 lastWindow := exe_name
-                if (InStr(app_CN, ":" exe_name ":")) {
+                if (InStr(app_CN, exe_str)) {
                     switch_CN()
-                } else if (InStr(app_EN, ":" exe_name ":")) {
+                } else if (InStr(app_EN, exe_str)) {
                     switch_EN()
-                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                } else if (InStr(app_Caps, exe_str)) {
                     switch_Caps()
                 }
             }
@@ -657,10 +678,15 @@ if (changeCursor) {
 } else {
     if (symbolType) {
         while 1 {
+            if (isMouseOver("ahk_class Shell_TrayWnd")) {
+                Sleep(delay)
+                continue
+            }
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                exe_str := ":" exe_name ":"
             }
-            if (InStr(JetBrains_list, ":" exe_name ":")) {
+            if (InStr(JetBrains_list, exe_str)) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
@@ -673,22 +699,21 @@ if (changeCursor) {
                 }
                 WinWaitActive("ahk_exe" exe_name)
                 lastWindow := exe_name
-                if (InStr(app_CN, ":" exe_name ":")) {
+                if (InStr(app_CN, exe_str)) {
                     switch_CN()
-                } else if (InStr(app_EN, ":" exe_name ":")) {
+                } else if (InStr(app_EN, exe_str)) {
                     switch_EN()
-                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                } else if (InStr(app_Caps, exe_str)) {
                     switch_Caps()
                 }
             }
-            is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
-                if (is_hide_state) {
+                if (InStr(app_hide_state, exe_str)) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
@@ -2105,6 +2130,11 @@ hasChildDir(path) {
     }
 }
 
+isMouseOver(WinTitle) {
+    MouseGetPos , , &Win
+    return WinExist(WinTitle " ahk_id " Win)
+}
+
 /**
  * @param runOrStop 1: Run; 0:Stop
  */
@@ -2172,6 +2202,14 @@ isWhichScreen(screenList) {
     }
 }
 
+arrJoin(arr, separator := ",") {
+    res := ""
+    for i, v in arr {
+        res .= i = arr.Length ? v : v separator
+    }
+    return res
+}
+
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
@@ -2180,35 +2218,26 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         DllCall("SetThreadDpiAwarenessContext", "ptr", -2, "ptr")
     }
     hwnd := getHwnd()
-    disable_list := ":StartMenuExperienceHost.exe:wetype_update.exe:AnLink.exe:wps.exe:PotPlayer.exe:PotPlayer64.exe:PotPlayerMini.exe:PotPlayerMini64.exe:HBuilderX.exe:ShareX.exe:clipdiary-portable.exe:"
-    Wpf_list := ":powershell_ise.exe:"
-    UIA_list := ":WINWORD.EXE:WindowsTerminal.exe:wt.exe:OneCommander.exe:YoudaoDict.exe:Mempad.exe:Taskmgr.exe:"
-    ; MSAA 可能有符号残留
-    MSAA_list := ":EXCEL.EXE:DingTalk.exe:Notepad.exe:Notepad3.exe:Quicker.exe:skylark.exe:aegisub32.exe:aegisub64.exe:aegisub.exe:PandaOCR.exe:PandaOCR.Pro.exe:VStart6.exe:TIM.exe:PowerToys.PowerLauncher.exe:Foxmail.exe:"
-    ; ACC_list := ":explorer.exe:ApplicationFrameHost.exe:"
-    Gui_UIA_list := ":POWERPNT.EXE:Notepad++.exe:firefox.exe:devenv.exe:WeMeetApp.exe:"
-    ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
-    Hook_list_with_dll := ":WeChat.exe:"
 
-    if (InStr(disable_list, ":" exe_name ":")) {
+    if (InStr(appList.disable, exe_str)) {
         return 0
     }
-    else if (InStr(UIA_list, ":" exe_name ":")) {
+    else if (InStr(appList.UIA, exe_str)) {
         return getCaretPosFromUIA()
     }
-    else if (InStr(MSAA_list, ":" exe_name ":")) {
+    else if (InStr(appList.MSAA, exe_str)) {
         return getCaretPosFromMSAA()
     }
-    else if (InStr(Gui_UIA_list, ":" exe_name ":")) {
+    else if (InStr(appList.GUI_UIA, exe_str)) {
         if (getCaretPosFromGui(&hwnd := 0)) {
             return 1
         }
         return getCaretPosFromUIA()
     }
-    else if (InStr(Hook_list_with_dll, ":" exe_name ":")) {
+    else if (InStr(appList.Hook_with_dll, exe_str)) {
         return getCaretPosFromHook(1)
     }
-    else if (InStr(Wpf_list, ":" exe_name ":")) {
+    else if (InStr(appList.wpf, exe_str)) {
         return getCaretPosFromWpfCaret()
     }
     else {

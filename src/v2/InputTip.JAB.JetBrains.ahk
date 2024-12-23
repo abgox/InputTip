@@ -280,14 +280,20 @@ lastWindow := ""
 lastState := state
 needHide := 1
 exe_name := ""
+exe_str := "::"
 
 if (changeCursor) {
     if (symbolType) {
         while 1 {
+            if (isMouseOver("ahk_class Shell_TrayWnd")) {
+                Sleep(delay)
+                continue
+            }
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                exe_str := ":" exe_name ":"
             }
-            if (!InStr(JetBrains_list, ":" exe_name ":")) {
+            if (!InStr(JetBrains_list, exe_str)) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
@@ -300,22 +306,21 @@ if (changeCursor) {
                 }
                 WinWaitActive("ahk_exe" exe_name)
                 lastWindow := exe_name
-                if (InStr(app_CN, ":" exe_name ":")) {
+                if (InStr(app_CN, exe_str)) {
                     switch_CN()
-                } else if (InStr(app_EN, ":" exe_name ":")) {
+                } else if (InStr(app_EN, exe_str)) {
                     switch_EN()
-                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                } else if (InStr(app_Caps, exe_str)) {
                     switch_Caps()
                 }
             }
-            is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
-                if (is_hide_state) {
+                if (InStr(app_hide_state, exe_str)) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
@@ -380,21 +385,26 @@ if (changeCursor) {
         }
     } else {
         while 1 {
+            if (isMouseOver("ahk_class Shell_TrayWnd")) {
+                Sleep(delay)
+                continue
+            }
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                exe_str := ":" exe_name ":"
             }
-            if (!InStr(JetBrains_list, ":" exe_name ":")) {
+            if (!InStr(JetBrains_list, exe_str)) {
                 Sleep(delay)
                 continue
             }
             if (exe_name != lastWindow) {
                 WinWaitActive("ahk_exe" exe_name)
                 lastWindow := exe_name
-                if (InStr(app_CN, ":" exe_name ":")) {
+                if (InStr(app_CN, exe_str)) {
                     switch_CN()
-                } else if (InStr(app_EN, ":" exe_name ":")) {
+                } else if (InStr(app_EN, exe_str)) {
                     switch_EN()
-                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                } else if (InStr(app_Caps, exe_str)) {
                     switch_Caps()
                 }
             }
@@ -433,10 +443,15 @@ if (changeCursor) {
 } else {
     if (symbolType) {
         while 1 {
+            if (isMouseOver("ahk_class Shell_TrayWnd")) {
+                Sleep(delay)
+                continue
+            }
             try {
                 exe_name := ProcessGetName(WinGetPID("A"))
+                exe_str := ":" exe_name ":"
             }
-            if (!InStr(JetBrains_list, ":" exe_name ":")) {
+            if (!InStr(JetBrains_list, exe_str)) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
@@ -449,22 +464,21 @@ if (changeCursor) {
                 }
                 WinWaitActive("ahk_exe" exe_name)
                 lastWindow := exe_name
-                if (InStr(app_CN, ":" exe_name ":")) {
+                if (InStr(app_CN, exe_str)) {
                     switch_CN()
-                } else if (InStr(app_EN, ":" exe_name ":")) {
+                } else if (InStr(app_EN, exe_str)) {
                     switch_EN()
-                } else if (InStr(app_Caps, ":" exe_name ":")) {
+                } else if (InStr(app_Caps, exe_str)) {
                     switch_Caps()
                 }
             }
-            is_hide_state := InStr(app_hide_state, ":" exe_name ":")
             if (needHide && HideSymbolDelay && A_TimeIdleKeyboard > HideSymbolDelay) {
                 TipGui.Hide()
                 Sleep(delay)
                 continue
             }
             if (A_TimeIdle < 500) {
-                if (is_hide_state) {
+                if (InStr(app_hide_state, exe_str)) {
                     canShowSymbol := 0
                     TipGui.Hide()
                 } else {
@@ -580,6 +594,11 @@ TipShow(type) {
         }
         default: return
     }
+}
+
+isMouseOver(WinTitle) {
+    MouseGetPos , , &Win
+    return WinExist(WinTitle " ahk_id " Win)
 }
 
 replaceEnvVariables(str) {

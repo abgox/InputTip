@@ -39,15 +39,17 @@
   - 根据输入法状态改变鼠标样式
     - [样式可以自定义](#自定义鼠标样式)
     - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)，默认中文状态为红色，英文状态为蓝色，大写锁定为绿色
+      - 在 [更多已适配的鼠标样式](https://inputtip.pages.dev/download/extra) 中有提供它们的左手镜像版本
   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
   - 根据不同应用自动切换不同的输入法状态(英文/中文/大写锁定)
   - 快捷键强制切换输入法状态
 
-- [版本更新日志](https://inputtip.pages.dev/v2/changelog)
-  - 如果你的网络环境无法访问它，请查看 [项目仓库中的版本更新日志](./src/v2/CHANGELOG.md)
+- [版本更新日志](./src/v2/CHANGELOG.md)
 - [一些常见的使用问题(FAQ)，如果有使用问题，你应该先查看它](https://inputtip.pages.dev/FAQ/)
 
 > - [点击这里查看 v1 老版本](./src/v1/README.md) (此版本已经没啥用了，不再更新)
+
+**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**
 
 ### 演示
 
@@ -56,7 +58,7 @@
 ---
 
 <details>
-<summary>点击查看一个使用方块符号的有趣配置</summary>
+<summary>一个使用方块符号的有趣配置</summary>
 <img style="width: 70%;" src="https://inputtip.pages.dev/releases/v2/config-demo.png" />
 <img style="width: 70%;" src="https://inputtip.pages.dev/releases/v2/config-demo.gif" />
 </details>
@@ -82,17 +84,19 @@
 > - 如何确认是否有 `powershell`？
 >   - 打开 `cmd` 输入 `powershell` 回车，如果出现报错，说明没有 `powershell`
 
-- **[下载](https://inputtip.pages.dev/releases/v2/InputTip.exe) 并运行 `InputTip.exe` 即可**
+- **[下载](https://inputtip.pages.dev/download) 并运行 `InputTip.exe` 即可**
 
-  - 如果此下载链接无法打开，你也可以在项目的 Releases 页面下载
+  - 你也可以在项目的 Releases 页面下载
   - 推荐做法: 新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它
     - 因为运行 `InputTip.exe` 后，会产生以下文件或文件夹
       - `InputTipCursor` 鼠标样式文件夹
       - `InputTipSymbol` 图片符号文件夹
       - `InputTip.ini` 配置文件
       - `InputTip.lnk` 快捷方式
+        - 通过任务计划程序生成的特殊快捷方式
         - 运行此快捷方式不会弹出 `UAC` 权限提示窗口
-    - 这样做的话，所有相关的文件或文件夹都在同一个目录中，方便管理
+        - 此快捷方式被删除后，会随着 `InputTip.exe` 启动重新生成
+    - **这样做的话，所有相关的文件或文件夹都在同一个目录中，方便管理**
 
 - 关于 `UAC` 权限提示窗口
 
@@ -103,13 +107,12 @@
 
 - 设置鼠标样式
 
+  > [更多已适配的鼠标样式](https://inputtip.pages.dev/download/extra)
+
   1. 点击 `托盘菜单` => `更改配置` => `鼠标样式`
   2. 选择或输入包含 `.cur` 或 `.ani` 文件的文件夹目录路径
      - 比如默认的中文鼠标样式文件夹目录路径: `InputTipCursor\default\CN`
   3. 点击 `确认`
-
-  - [点击下载一些可以直接使用的鼠标样式](https://inputtip.pages.dev/releases/v2/cursorStyle.zip)
-    - 这是一个压缩包，需要将其解压，放入 `InputTipCursor` 目录下，然后进行上述步骤即可
 
 > [!Warning]
 >
@@ -146,9 +149,10 @@
 
 1. 取消 `开机自启动`: 点击 `托盘菜单` => `设置` => `开机自启动`
 2. 退出 `InputTip.exe`
-   - 如果修改了鼠标样式，退出软件时，会尝试进行恢复，但可能无法完全恢复，如果想完全恢复到以前的鼠标样式，需要重启电脑
+   - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为否，会尝试进行恢复
+   - 如果未完全恢复，请根据弹窗提示信息进行操作
 3. 删除以上所有文件或目录
-4. 打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 和 `abgox.InputTip.JAB.JetBrains` 任务，删除它
+4. 打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 和 `abgox.InputTip.JAB.JetBrains` 任务，删除它们
    - 也可以忽略，它们不会造成任何影响，但尽量删除，让电脑更清洁
 
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
@@ -164,10 +168,14 @@
    ```
 
 2. 点击 `托盘菜单` => `启用 JetBrains IDE 支持`
+
    - 会在 `InputTip.exe` 同级目录下生成 `InputTip.JAB.JetBrains.exe`
    - 它由 `InputTip.exe` 控制，不需要手动启动/终止
+
 3. 点击 `托盘菜单` => `添加 JetBrains IDE 应用`，确保你使用的 JetBrains IDE 应用已经添加
-4. 重启 `InputTip.exe` 和 JetBrains IDE 应用
+
+4. 重启 JetBrains IDE 应用
+
 5. 如果没有生效，可能需要重启电脑
 
 > [!TIP]
@@ -215,7 +223,9 @@
 1. 你需要在 `InputTipCursor` 目录下创建一个文件夹
 
    - 文件夹中只能包含鼠标样式文件(后缀名为 `.cur` 或 `.ani`)
+
    - 必须使用以下表格中的文件名(大小写都可以)
+
    - 每个文件都不是必须的，但建议至少添加 `Arrow`，`IBeam`，`Hand`
 
      | 文件名(类型) |              说明               |
@@ -255,21 +265,15 @@
 >
 > 这里的兼容情况也仅供参考，实际情况可能有所不同，你应该自行尝试
 >
-> 建议尝试的顺序是 `模式2 - 通用` > `模式1 - 通用` > `模式3 - 讯飞输入法` > `模式4 - 手心输入法`
+> 如果是讯飞输入法或手心输入法，直接使用对应模式即可
+>
+> 建议尝试的顺序是 `通用模式` > `自定义`
 >
 > [输入法模式的已知问题](https://inputtip.pages.dev/FAQ/#输入法模式的已知问题)
 
 - 已知可用的输入法(通过模式切换兼容)
 
-  - `模式1 - 通用`:
-    - **微信**输入法
-    - **搜狗**(五笔)输入法
-    - **QQ**输入法
-    - **微软**拼音
-    - **冰凌**(五笔)输入法
-    - **小鹤音形**输入法(使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成)
-      - 使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成的输入法都可用
-  - `模式2 - 通用`(默认):
+  - `通用模式`(默认):
 
     - **微信**输入法
     - **搜狗**(五笔)输入法
@@ -284,16 +288,18 @@
     - **微软仓颉**输入法
     - **小小**输入法
 
-  - `模式3 - 讯飞输入法`
+  - `讯飞输入法`
     - **讯飞**输入法
-  - `模式4 - 手心输入法`
+  - `手心输入法`
     - **手心**输入法
+  - `自定义`
+    - [关于设置输入法模式中的自定义](https://inputtip.pages.dev/FAQ/#关于设置输入法模式中的自定义)
 
 - 如何进行模式切换
   1.  运行 `InputTip.exe` 后，在底部任务栏右侧找到软件托盘图标
   2.  `鼠标右击` 软件托盘图标
-  3.  点击 `设置输入法模式`
-  4.  从这几个模式中选择一个可用的模式
+  3.  点击 `设置输入法模式` => `1. 当前输入法模式`
+  4.  选择一个可用的模式
 
 ### 参考项目
 

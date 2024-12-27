@@ -10,7 +10,7 @@ readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
     try {
         return IniRead(path, section, key)
     } catch {
-        IniWrite(default, path, section, key)
+        IniWrite('"' default '"', path, section, key)
         return default
     }
 }
@@ -22,5 +22,5 @@ readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
  * @param {String} path 配置文件的路径
  */
 writeIni(key, value, section := "Config-v2", path := "InputTip.ini") {
-    IniWrite(value, path, section, key)
+    IniWrite('"' value '"', path, section, key)
 }

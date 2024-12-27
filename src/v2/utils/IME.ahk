@@ -1,14 +1,46 @@
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
- * @example IME.GetInputMode() ; 获取当前输入法输入模式
- * @example IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
+ * @Tip 有所修改，外部必须提供变量 checkTimeout,statusModeEN,conversionModeEN
+ * @example
+ * statusModeEN := 0 ; 英文状态时的状态码
+ * conversionModeEN := 0 ; 英文状态时的转换码
+ * checkTimeout := 1000 ; 超时时间 单位：毫秒
+ * IME.GetInputMode() ; 获取当前输入法输入模式
+ * IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
  */
 class IME {
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if !this.GetOpenStatus(hwnd) {
-            return false
+        if (statusModeEN = "") {
+            if !this.GetOpenStatus(hwnd) {
+                return {
+                    code: 0,
+                    isCN: 0
+                }
+            }
+        } else {
+            return {
+                code: 0,
+                isCN: !(InStr(statusModeEN, ":" this.GetOpenStatus(hwnd) ":"))
+            }
         }
-        return this.GetConversionMode(hwnd) & 1
+        if (conversionModeEN = "") {
+            return {
+                code: this.GetConversionMode(hwnd),
+                isCN: this.GetConversionMode(hwnd) & 1
+            }
+        } else {
+            return {
+                code: this.GetConversionMode(hwnd),
+                isCN: !(InStr(conversionModeEN, ":" this.GetConversionMode(hwnd) ":"))
+            }
+        }
+    }
+
+    static CheckInputMode(hwnd := this.GetFocusedWindow()) {
+        return {
+            statusMode: this.GetOpenStatus(hwnd),
+            conversionMode: this.GetConversionMode(hwnd)
+        }
     }
 
     static SetInputMode(mode, hwnd := this.GetFocusedWindow()) {
@@ -32,7 +64,7 @@ class IME {
 
     static GetOpenStatus(hwnd := this.GetFocusedWindow()) {
         try {
-            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x5, "ptr", 0, "uint", 0, "uint", 200, "ptr*", &status := 0)
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x5, "ptr", 0, "uint", 0, "uint", checkTimeout, "ptr*", &status := 0)
             return status
         } catch {
             return 0
@@ -41,13 +73,13 @@ class IME {
 
     static SetOpenStatus(status, hwnd := this.GetFocusedWindow()) {
         try {
-            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x6, "ptr", status, "uint", 0, "uint", 200, "ptr*", 0)
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x6, "ptr", status, "uint", 0, "uint", checkTimeout, "ptr*", 0)
         }
     }
 
     static GetConversionMode(hwnd := this.GetFocusedWindow()) {
         try {
-            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x1, "ptr", 0, "uint", 0, "uint", 200, "ptr*", &mode := 0)
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x1, "ptr", 0, "uint", 0, "uint", checkTimeout, "ptr*", &mode := 0)
             return mode
         } catch {
             return 0
@@ -56,7 +88,7 @@ class IME {
 
     static SetConversionMode(mode, hwnd := this.GetFocusedWindow()) {
         try {
-            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x2, "ptr", mode, "uint", 0, "uint", 200, "ptr*", 0)
+            DllCall("SendMessageTimeoutW", "ptr", DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", hwnd, "ptr"), "uint", 0x283, "ptr", 0x2, "ptr", mode, "uint", 0, "uint", checkTimeout, "ptr*", 0)
         }
     }
 
@@ -104,62 +136,45 @@ class IME {
 /**
  * 判断当前输入法状态是否为中文
  * 需要: DetectHiddenWindows 1
- * @param {1 | 2 | 3 | 4} mode 使用的模式
  * @returns {Boolean} 输入法是否为中文
  */
-isCN(mode) {
-    switch mode {
-        case 1:
-        {
-            ; 中文: 1
-            ; 英文: 0
-            try {
-                return SendMessage(
-                    0x283,    ; Message : WM_IME_CONTROL
-                    0x005,    ; wParam  : IMC_GETCONVERSIONMODE
-                    0,    ; lParam  ： (NoArgs)
-                    , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-                )
-            } catch {
-                return 0
-            }
-        }
-        case 2:
-        {
-            ; 中文: 1
-            ; 英文: 0
-            return IME.GetInputMode()
-        }
-        case 3:
-        {
-            ; 中文: 2
-            ; 英文: 1
-            try {
-                return 2 = SendMessage(
-                    0x283,    ; Message : WM_IME_CONTROL
-                    0x005,    ; wParam  : IMC_GETCONVERSIONMODE
-                    0,    ; lParam  ： (NoArgs)
-                    , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-                )
-            } catch {
-                return 1
-            }
-        }
-        case 4:
-        {
-            ; 中文:1025
-            ; 英文:1
-            try {
-                return 1025 = SendMessage(
-                    0x283,    ; Message : WM_IME_CONTROL
-                    0x001,    ; wParam  : IMC_GETOPENSTATUS
-                    0,    ; lParam  ： (NoArgs)
-                    , "ahk_id " DllCall("imm32\ImmGetDefaultIMEWnd", "Uint", WinGetID("A"), "Uint") ; Control ： (Window)
-                )
-            } catch {
-                return 1
-            }
-        }
-        default: return 0
+isCN() {
+    return IME.GetInputMode().isCN
+}
+
+/**
+ * 将输入法状态切换为中文
+ */
+switch_CN(*) {
+    if (GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+    if (!isCN()) {
+        IME.SetInputMode(1)
+    }
+    if (!isCN()) {
+        SendInput("{Shift}")
+    }
+}
+/**
+ * 将输入法状态切换为英文
+ */
+switch_EN(*) {
+    if (GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
+    }
+    if (isCN()) {
+        IME.SetInputMode(0)
+    }
+    if (isCN()) {
+        SendInput("{Shift}")
+    }
+}
+/**
+ * 将输入法状态切换为大写锁定
+ */
+switch_Caps(*) {
+    if (!GetKeyState("CapsLock", "T")) {
+        SendInput("{CapsLock}")
     }
 }

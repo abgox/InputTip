@@ -24,10 +24,10 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\verifyFile.ahk
 #Include .\utils\appList.ahk
 #Include .\utils\ini.ahk
-#Include ..\utils\IME.ahk
-#Include ..\utils\showMsg.ahk
+#Include .\utils\IME.ahk
+#Include .\utils\show-msg.ahk
 #Include .\utils\createGui.ahk
-#Include .\utils\checkVersion.ahk
+#Include .\utils\check-version.ahk
 
 currentVersion := "2.27.2"
 

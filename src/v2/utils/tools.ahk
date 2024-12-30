@@ -58,3 +58,12 @@ isWhichScreen(screenList) {
         }
     }
 }
+
+; 从字符串中提取出数字，可以带负号
+returnNumber(value) {
+    if (value = "" || !(value ~= "\d")) {
+        return 0
+    }
+    RegExMatch(value, "(-?\d+)", &numbers)
+    return numbers[1]
+}

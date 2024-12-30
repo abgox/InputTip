@@ -6,44 +6,50 @@ updateDelay() {
             if (HideSymbolDelay = 0) {
                 SetTimer(, 0)
             }
-            _delay := HideSymbolDelay < 150 ? 150 : HideSymbolDelay
             if (GetKeyState("LButton", "P")) {
                 needHide := 0
-                needShow := 1
                 isWait := 1
-                SetTimer(_timer, -_delay)
+                SetTimer(_timer, -HideSymbolDelay)
                 _timer() {
-                    global isWait := 0
+                    isWait := 0
                 }
             }
             if (!isWait) {
-                if (A_TimeIdleKeyboard >= _delay - delay) {
+                if (A_TimeIdleKeyboard >= HideSymbolDelay - delay) {
                     needHide := 1
                     hideSymbol()
                 } else {
                     needHide := 0
-                    needShow := 1
                 }
             }
         }
     }
 }
 
-loadCursor(type) {
+loadCursor(type, change := 0) {
+    static lastType := ""
     if (changeCursor) {
-        for v in cursorInfo {
-            if (v.%type%) {
-                DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
+        if (type != lastType || change) {
+            for v in cursorInfo {
+                if (v.%type%) {
+                    DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
+                }
             }
+            lastType := type
         }
     }
 }
-loadSymbol(type, change) {
+loadSymbol(type, left, top) {
     global lastType
-    global lastGui
+    static old_top := 0
+    static old_left := 0
 
-    if (!canShowSymbol) {
-        hideSymbol()
+    if (type = lastType && left = old_left && top = old_top) {
+        return
+    }
+
+    hideSymbol()
+    if (!symbolType || !canShowSymbol) {
         return
     }
 
@@ -55,32 +61,21 @@ loadSymbol(type, change) {
     } else if (symbolType = 3) {
         showConfig .= "x" left + offset_x "y" top + offset_y
     }
+    if (symbolGui.%type%) {
+        symbolGui.%type%.Show(showConfig)
+    }
 
-    if (change) {
-        for v in ["CN", "EN", "Caps"] {
-            if (type != v) {
-                if (symbolGui.%v%) {
-                    symbolGui.%v%.Hide()
-                }
-            }
-        }
-        if (symbolGui.%type%) {
-            symbolGui.%type%.Show(showConfig)
-        }
-        lastGui := symbolGui.%type%
-        lastType := type
-    } else {
-        if (lastGui) {
-            lastGui.Show(showConfig)
+    lastType := type
+    old_top := top
+    old_left := left
+}
+hideSymbol(init := 1) {
+    for v in ["CN", "EN", "Caps"] {
+        try {
+            symbolGui.%v%.Hide()
         }
     }
-}
-hideSymbol() {
-    if (symbolType) {
-        for v in ["CN", "EN", "Caps"] {
-            if (symbolGui.%v%) {
-                symbolGui.%v%.Hide()
-            }
-        }
+    if (init) {
+        global lastType := ""
     }
 }

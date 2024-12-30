@@ -29,9 +29,10 @@ while 1 {
     Sleep(delay)
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
+        needShow := 1
         if (symbolType) {
             if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol()
+                hideSymbol(0)
                 continue
             }
         }
@@ -40,65 +41,38 @@ while 1 {
             exe_str := ":" exe_name ":"
         } catch {
             hideSymbol()
-            continue
+            needShow := 0
         }
-
         if (symbolType) {
             if (needSkip(exe_str)) {
                 hideSymbol()
+                lastWindow := exe_name
+                lastType := ""
                 continue
             }
         }
-
-        if (!symbolType || isMouseOver("ahk_class Shell_TrayWnd")) {
+        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd") || InStr(app_hide_state, exe_str)) {
             hideSymbol()
-            canShowSymbol := 0
-        } else {
-            if (needHide) {
-                hideSymbol()
-                continue
-            }
-            if (InStr(app_hide_state, exe_str)) {
-                canShowSymbol := 0
-                hideSymbol()
-            } else {
-                canShowSymbol := returnCanShowSymbol(&left, &top)
-            }
+            needShow := 0
         }
         if (GetKeyState("CapsLock", "T")) {
-            if (state = 2) {
-                if (left != old_left || top != old_top) {
-                    loadSymbol("Caps", 0)
-                }
-            } else {
-                state := 2
-                loadCursor("Caps")
-                loadSymbol("Caps", 1)
+            loadCursor("Caps")
+            if (needShow) {
+                canShowSymbol := returnCanShowSymbol(&left, &top)
+                loadSymbol("Caps", left, top)
             }
-            old_left := left
-            old_top := top
-            old_state := state
             continue
         }
         try {
-            state := isCN()
-            v := state ? "CN" : "EN"
+            v := isCN() ? "CN" : "EN"
         } catch {
             hideSymbol()
             continue
         }
-        if (state != old_state) {
-            loadCursor(v)
-            loadSymbol(v, 1)
-            old_state := state
-        }
-        if (symbolType) {
-            if (needShow || left != old_left || top != old_top) {
-                old_left := left
-                old_top := top
-                loadSymbol(v, 0)
-                needShow := 0
-            }
+        loadCursor(v)
+        if (needShow) {
+            canShowSymbol := returnCanShowSymbol(&left, &top)
+            loadSymbol(v, left, top)
         }
     }
 }

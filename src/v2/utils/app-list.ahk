@@ -1,3 +1,5 @@
+; TODO: 后续可以考虑做一个网络同步
+; 默认使用这些应用列表，如果远程有更改，用远程覆盖本地
 disable_list := [
     ; 规避任务栏和开始菜单中的显示问题
     "ShellExperienceHost.exe",
@@ -19,6 +21,9 @@ disable_list := [
     "ShareX.exe",
     ;
     "clipdiary-portable.exe",
+    ; 微软远程桌面，与 InputTip 冲突，输入时会导致其挂掉
+    ; 有的有问题，有的没问题
+    ; "mstsc.exe",
 ]
 
 Wpf_list := [

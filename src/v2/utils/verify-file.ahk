@@ -61,6 +61,7 @@ checkIni() {
             writeIni("JetBrains_list", "WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:Idea64.exe:DataSpell64.exe")
         }
     } else {
+        isContinue := true
         createGui(fn1).Show()
         fn1(x, y, w, h) {
             warning := "注意：请谨慎选择，如果是误点了确定，恢复默认的鼠标样式需要以下额外步骤或者重启系统`n1. 点击「托盘菜单」=>「更改配置」`n2. 修改其中「1. 要不要修改鼠标样式」的值`n3. 「系统设置」=>「其他鼠标设置」=> 先更改为另一个鼠标样式方案，再改回你之前使用的方案"
@@ -86,21 +87,27 @@ checkIni() {
                     g.AddText("cRed", warning)
                     g.AddButton("xs cRed w" bw, "【是】对，我很确定").OnEvent("Click", yes)
                     yes(*) {
+                        g.Destroy()
                         writeIni("changeCursor", 1)
-                        Run(A_ScriptFullPath)
+                        global changeCursor := 1
+                        isContinue := false
                     }
                     g.AddButton("w" bw, "【否】不，我点错了").OnEvent("Click", no)
                     no(*) {
+                        g.Destroy()
                         writeIni("changeCursor", 0)
-                        Run(A_ScriptFullPath)
+                        global changeCursor := 0
+                        isContinue := false
                     }
                     return g
                 }
             }
             g.AddButton("w" bw, "【否】不，保留默认样式").OnEvent("Click", no)
             no(*) {
+                g.Destroy()
                 writeIni("changeCursor", 0)
-                Run(A_ScriptFullPath)
+                global changeCursor := 0
+                isContinue := false
             }
             g.OnEvent("Close", fn_exit)
             fn_exit(*) {
@@ -108,7 +115,7 @@ checkIni() {
             }
             return g
         }
-        while (1) {
+        while (isContinue) {
             Sleep(500)
         }
     }

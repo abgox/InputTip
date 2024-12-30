@@ -27,6 +27,13 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
 ; GUI 控件(gui control)
 gc := {}
 
+; 配置菜单的字体大小
+
+fz := "s12"
+if (A_ScreenHeight < 1000 || A_ScreenWidth < 2000) {
+    fz := "s10"
+}
+
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
     ; 生成特殊的快捷方式，它会通过任务计划程序启动
@@ -48,11 +55,11 @@ checkIni() ; 检查配置文件
 ; 检查更新
 ignoreUpdate := readIni("ignoreUpdate", 0)
 
+#Include .\utils\var.ahk
+
 checkUpdate()
 
 checkUpdateDone()
-
-#Include .\utils\var.ahk
 
 cursorDir := readIni("cursorDir", "")
 picDir := readIni("picDir", ":")
@@ -97,20 +104,28 @@ updateKey() {
         key.init := 0
         ; 注册强制切换输入法状态的快捷键
         if (hotkey_CN) {
-            Hotkey(hotkey_CN, switch_CN)
-            key.hotkey_CN .= hotkey_CN ":"
+            try {
+                Hotkey(hotkey_CN, switch_CN)
+                key.hotkey_CN .= hotkey_CN ":"
+            }
         }
         if (hotkey_EN) {
-            Hotkey(hotkey_EN, switch_EN)
-            key.hotkey_EN := hotkey_EN ":"
+            try {
+                Hotkey(hotkey_EN, switch_EN)
+                key.hotkey_EN := hotkey_EN ":"
+            }
         }
         if (hotkey_Caps) {
-            Hotkey(hotkey_Caps, switch_Caps)
-            key.hotkey_Caps := hotkey_Caps ":"
+            try {
+                Hotkey(hotkey_Caps, switch_Caps)
+                key.hotkey_Caps := hotkey_Caps ":"
+            }
         }
         if (hotkey_Pause) {
-            Hotkey(hotkey_Pause, pauseApp)
-            key.hotkey_Pause := hotkey_Pause ":"
+            try {
+                Hotkey(hotkey_Pause, pauseApp)
+                key.hotkey_Pause := hotkey_Pause ":"
+            }
         }
     } else {
         for v in ["CN", "EN", "Caps", "Pause"] {
@@ -123,35 +138,43 @@ updateKey() {
             }
         }
         if (hotkey_CN) {
-            if (InStr(key.hotkey_CN, ":" hotkey_CN ":")) {
-                Hotkey(hotkey_CN, "On")
-            } else {
-                Hotkey(hotkey_CN, switch_CN)
-                key.hotkey_CN .= hotkey_CN ":"
+            try {
+                if (InStr(key.hotkey_CN, ":" hotkey_CN ":")) {
+                    Hotkey(hotkey_CN, "On")
+                } else {
+                    Hotkey(hotkey_CN, switch_CN)
+                    key.hotkey_CN .= hotkey_CN ":"
+                }
             }
         }
         if (hotkey_EN) {
-            if (InStr(key.hotkey_EN, ":" hotkey_EN ":")) {
-                Hotkey(hotkey_EN, "On")
-            } else {
-                Hotkey(hotkey_EN, switch_EN)
-                key.hotkey_EN .= hotkey_EN ":"
+            try {
+                if (InStr(key.hotkey_EN, ":" hotkey_EN ":")) {
+                    Hotkey(hotkey_EN, "On")
+                } else {
+                    Hotkey(hotkey_EN, switch_EN)
+                    key.hotkey_EN .= hotkey_EN ":"
+                }
             }
         }
         if (hotkey_Caps) {
-            if (InStr(key.hotkey_Caps, ":" hotkey_Caps ":")) {
-                Hotkey(hotkey_Caps, "On")
-            } else {
-                Hotkey(hotkey_Caps, switch_Caps)
-                key.hotkey_Caps .= hotkey_Caps ":"
+            try {
+                if (InStr(key.hotkey_Caps, ":" hotkey_Caps ":")) {
+                    Hotkey(hotkey_Caps, "On")
+                } else {
+                    Hotkey(hotkey_Caps, switch_Caps)
+                    key.hotkey_Caps .= hotkey_Caps ":"
+                }
             }
         }
         if (hotkey_Pause) {
-            if (InStr(key.hotkey_Pause, ":" hotkey_Pause ":")) {
-                Hotkey(hotkey_Pause, "On")
-            } else {
-                Hotkey(hotkey_Pause, pauseApp)
-                key.hotkey_Pause .= hotkey_Pause ":"
+            try {
+                if (InStr(key.hotkey_Pause, ":" hotkey_Pause ":")) {
+                    Hotkey(hotkey_Pause, "On")
+                } else {
+                    Hotkey(hotkey_Pause, pauseApp)
+                    key.hotkey_Pause .= hotkey_Pause ":"
+                }
             }
         }
     }
@@ -172,9 +195,10 @@ while 1 {
     Sleep(delay)
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
+        needShow := 1
         if (symbolType) {
             if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol()
+                hideSymbol(0)
                 continue
             }
         }
@@ -183,88 +207,65 @@ while 1 {
             exe_str := ":" exe_name ":"
         } catch {
             hideSymbol()
-            continue
+            needShow := 0
         }
         if (exe_name != lastWindow) {
             WinWaitActive("ahk_exe " exe_name)
+            lastType := ""
             lastWindow := exe_name
             if (InStr(app_CN, exe_str)) {
                 switch_CN()
                 if (isCN()) {
-                    lastGui := symbolGui.CN
-                    loadCursor("CN")
+                    loadCursor("CN", 1)
+                    canShowSymbol := returnCanShowSymbol(&left, &top)
+                    loadSymbol("CN", left, top)
                 }
             } else if (InStr(app_EN, exe_str)) {
                 switch_EN()
                 if (!isCN()) {
-                    lastGui := symbolGui.EN
-                    loadCursor("EN")
+                    loadCursor("EN", 1)
+                    canShowSymbol := returnCanShowSymbol(&left, &top)
+                    loadSymbol("EN", left, top)
                 }
             } else if (InStr(app_Caps, exe_str)) {
                 switch_Caps()
                 if (GetKeyState("CapsLock", "T")) {
-                    lastGui := symbolGui.Caps
-                    loadCursor("Caps")
+                    loadCursor("Caps", 1)
+                    canShowSymbol := returnCanShowSymbol(&left, &top)
+                    loadSymbol("Caps", left, top)
                 }
             }
         }
-
         if (symbolType) {
             if (needSkip(exe_str)) {
                 hideSymbol()
+                lastWindow := exe_name
+                lastType := ""
                 continue
             }
         }
-
-        if (!symbolType || isMouseOver("ahk_class Shell_TrayWnd")) {
+        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd") || InStr(app_hide_state, exe_str)) {
             hideSymbol()
-            canShowSymbol := 0
-        } else {
-            if (needHide) {
-                hideSymbol()
-                continue
-            }
-            if (InStr(app_hide_state, exe_str)) {
-                canShowSymbol := 0
-                hideSymbol()
-            } else {
-                canShowSymbol := returnCanShowSymbol(&left, &top)
-            }
+            needShow := 0
         }
         if (GetKeyState("CapsLock", "T")) {
-            if (state = 2) {
-                if (left != old_left || top != old_top) {
-                    loadSymbol("Caps", 0)
-                }
-            } else {
-                state := 2
-                loadCursor("Caps")
-                loadSymbol("Caps", 1)
+            loadCursor("Caps")
+            if (needShow) {
+                canShowSymbol := returnCanShowSymbol(&left, &top)
+                loadSymbol("Caps", left, top)
             }
-            old_left := left
-            old_top := top
-            old_state := state
             continue
         }
         try {
-            state := isCN()
-            v := state ? "CN" : "EN"
+            v := isCN() ? "CN" : "EN"
         } catch {
             hideSymbol()
             continue
         }
-        if (state != old_state) {
-            loadCursor(v)
-            loadSymbol(v, 1)
-            old_state := state
-        }
-        if (symbolType) {
-            if (needShow || left != old_left || top != old_top) {
-                old_left := left
-                old_top := top
-                loadSymbol(v, 0)
-                needShow := 0
-            }
+        loadCursor(v)
+        if (needShow) {
+            canShowSymbol := returnCanShowSymbol(&left, &top)
+            loadSymbol(v, left, top)
         }
     }
 }

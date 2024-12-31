@@ -144,29 +144,35 @@ isCN() {
 
 /**
  * 将输入法状态切换为中文
+ * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
  */
 switch_CN(*) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
-    if (!isCN()) {
-        IME.SetInputMode(1)
+    if (!useShift) {
+        if (isCN()) {
+            IME.SetInputMode(1)
+        }
     }
-    if (!isCN()) {
+    if (!GetKeyState("Shift", "P") && !isCN()) {
         SendInput("{Shift}")
     }
 }
 /**
  * 将输入法状态切换为英文
+ * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
  */
 switch_EN(*) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
-    if (isCN()) {
-        IME.SetInputMode(0)
+    if (!useShift) {
+        if (isCN()) {
+            IME.SetInputMode(0)
+        }
     }
-    if (isCN()) {
+    if (!GetKeyState("Shift", "P") && isCN()) {
         SendInput("{Shift}")
     }
 }

@@ -1,3 +1,103 @@
+updateDelay()
+
+while 1 {
+    Sleep(delay)
+    ; 正在使用鼠标或有键盘操作
+    if (A_TimeIdle < leaveDelay) {
+        needShow := 1
+        if (symbolType) {
+            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
+                hideSymbol()
+                continue
+            }
+        }
+        try {
+            exe_name := ProcessGetName(WinGetPID("A"))
+            exe_str := ":" exe_name ":"
+        } catch {
+            hideSymbol()
+            needShow := 0
+        }
+        if (symbolType) {
+            if (needSkip(exe_str)) {
+                hideSymbol()
+                lastSymbol := ""
+                lastCursor := ""
+                lastWindow := ""
+                continue
+            }
+            if (useWhiteList) {
+                if (!InStr(app_show_state, exe_str)) {
+                    hideSymbol()
+                    needShow := 0
+                }
+            } else {
+                if (InStr(app_hide_state, exe_str)) {
+                    hideSymbol()
+                    needShow := 0
+                }
+            }
+        }
+        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd")) {
+            hideSymbol()
+            needShow := 0
+        }
+        if (exe_name != lastWindow) {
+            WinWaitActive("ahk_exe " exe_name)
+            lastSymbol := ""
+            lastCursor := ""
+            lastWindow := exe_name
+            if (InStr(app_CN, exe_str)) {
+                switch_CN()
+                if (isCN()) {
+                    loadCursor("CN", 1)
+                    if (needShow) {
+                        canShowSymbol := returnCanShowSymbol(&left, &top)
+                        loadSymbol("CN", left, top)
+                    }
+                }
+            } else if (InStr(app_EN, exe_str)) {
+                switch_EN()
+                if (!isCN()) {
+                    loadCursor("EN", 1)
+                    if (needShow) {
+                        canShowSymbol := returnCanShowSymbol(&left, &top)
+                        loadSymbol("EN", left, top)
+                    }
+                }
+            } else if (InStr(app_Caps, exe_str)) {
+                switch_Caps()
+                if (GetKeyState("CapsLock", "T")) {
+                    loadCursor("Caps", 1)
+                    if (needShow) {
+                        canShowSymbol := returnCanShowSymbol(&left, &top)
+                        loadSymbol("Caps", left, top)
+                    }
+                }
+            }
+        }
+        if (GetKeyState("CapsLock", "T")) {
+            loadCursor("Caps")
+            if (needShow) {
+                canShowSymbol := returnCanShowSymbol(&left, &top)
+                loadSymbol("Caps", left, top)
+            }
+            continue
+        }
+        try {
+            v := isCN() ? "CN" : "EN"
+        } catch {
+            hideSymbol()
+            continue
+        }
+        loadCursor(v)
+        if (needShow) {
+            canShowSymbol := returnCanShowSymbol(&left, &top)
+            loadSymbol(v, left, top)
+        }
+    }
+}
+
 updateDelay() {
     if (HideSymbolDelay) {
         SetTimer(timer, 25)
@@ -25,26 +125,25 @@ updateDelay() {
         }
     }
 }
-
 loadCursor(type, change := 0) {
-    static lastType := ""
+    global lastCursor
     if (changeCursor) {
-        if (type != lastType || change) {
+        if (type != lastCursor || change) {
             for v in cursorInfo {
                 if (v.%type%) {
                     DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
                 }
             }
-            lastType := type
+            lastCursor := type
         }
     }
 }
 loadSymbol(type, left, top) {
-    global lastType
+    global lastSymbol
     static old_top := 0
     static old_left := 0
 
-    if (type = lastType && left = old_left && top = old_top) {
+    if (type = lastSymbol && left = old_left && top = old_top) {
         return
     }
 
@@ -52,7 +151,6 @@ loadSymbol(type, left, top) {
     if (!symbolType || !canShowSymbol) {
         return
     }
-
     showConfig := "NA "
     if (symbolType = 1) {
         showConfig .= "x" left + pic_offset_x "y" top + pic_offset_y
@@ -65,17 +163,15 @@ loadSymbol(type, left, top) {
         symbolGui.%type%.Show(showConfig)
     }
 
-    lastType := type
+    lastSymbol := type
     old_top := top
     old_left := left
 }
-hideSymbol(init := 1) {
+hideSymbol() {
     for v in ["CN", "EN", "Caps"] {
         try {
             symbolGui.%v%.Hide()
         }
     }
-    if (init) {
-        global lastType := ""
-    }
+    global lastSymbol := ""
 }

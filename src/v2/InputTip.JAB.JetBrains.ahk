@@ -8,7 +8,6 @@
 #Include .\utils\ini.ahk
 #Include .\utils\var.ahk
 #Include .\utils\tools.ahk
-#Include .\utils\show.ahk
 
 needSkip(exe_str) {
     return !InStr(JetBrains_list, exe_str)
@@ -23,59 +22,7 @@ returnCanShowSymbol(&left, &top) {
     return left
 }
 
-updateDelay()
-
-while 1 {
-    Sleep(delay)
-    ; 正在使用鼠标或有键盘操作
-    if (A_TimeIdle < leaveDelay) {
-        needShow := 1
-        if (symbolType) {
-            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol(0)
-                continue
-            }
-        }
-        try {
-            exe_name := ProcessGetName(WinGetPID("A"))
-            exe_str := ":" exe_name ":"
-        } catch {
-            hideSymbol()
-            needShow := 0
-        }
-        if (symbolType) {
-            if (needSkip(exe_str)) {
-                hideSymbol()
-                lastWindow := exe_name
-                lastType := ""
-                continue
-            }
-        }
-        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd") || InStr(app_hide_state, exe_str)) {
-            hideSymbol()
-            needShow := 0
-        }
-        if (GetKeyState("CapsLock", "T")) {
-            loadCursor("Caps")
-            if (needShow) {
-                canShowSymbol := returnCanShowSymbol(&left, &top)
-                loadSymbol("Caps", left, top)
-            }
-            continue
-        }
-        try {
-            v := isCN() ? "CN" : "EN"
-        } catch {
-            hideSymbol()
-            continue
-        }
-        loadCursor(v)
-        if (needShow) {
-            canShowSymbol := returnCanShowSymbol(&left, &top)
-            loadSymbol(v, left, top)
-        }
-    }
-}
+#Include .\utils\show.ahk
 
 /**
  * Gets the position of the caret with UIA, Acc or CaretGetPos.

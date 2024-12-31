@@ -41,6 +41,12 @@ conversionModeEN := readIni("conversionModeEN", "", "InputMethod")
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
 
+; 是否使用 Shift 键切换输入法状态
+useShift := readIni("useShift", 1)
+
+; 是否启用白名单
+useWhiteList := readIni("useWhiteList", 1)
+
 ; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)
 
@@ -139,7 +145,7 @@ for v in cursorInfo {
 updateSymbol(1)
 
 left := 0, top := 0
-lastWindow := "", lastType := ""
+lastWindow := "", lastSymbol := "", lastCursor := ""
 
 needHide := 0
 exe_name := ""
@@ -375,6 +381,10 @@ updateList(init := 0) {
     }
     ; 应用列表: 符号显示黑名单
     app_hide_state := ":" readIni('app_hide_state', '') ":"
+
+    ; 应用列表: 符号显示白名单
+    app_show_state := ":" readIni('app_show_state', '') ":"
+
     ; 应用列表: 自动切换到中文
     app_CN := ":" readIni('app_CN', '') ":"
     ; 应用列表: 自动切换到英文

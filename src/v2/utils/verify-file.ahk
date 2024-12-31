@@ -66,7 +66,7 @@ checkIni() {
         fn1(x, y, w, h) {
             warning := "注意：请谨慎选择，如果是误点了确定，恢复默认的鼠标样式需要以下额外步骤或者重启系统`n1. 点击「托盘菜单」=>「更改配置」`n2. 修改其中「1. 要不要修改鼠标样式」的值`n3. 「系统设置」=>「其他鼠标设置」=> 先更改为另一个鼠标样式方案，再改回你之前使用的方案"
 
-            g := Gui("AlwaysOnTop OwnDialogs")
+            g := Gui("AlwaysOnTop")
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
@@ -80,7 +80,7 @@ checkIni() {
                 g.Destroy()
                 createGui(fn).Show()
                 fn(x, y, w, h) {
-                    g := Gui("AlwaysOnTop OwnDialogs")
+                    g := Gui("AlwaysOnTop")
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
@@ -117,6 +117,28 @@ checkIni() {
         }
         while (isContinue) {
             Sleep(500)
+        }
+        createGui(fn2).Show()
+        fn2(x, y, w, h) {
+            warning := "注意：请谨慎选择，如果是误点了确定，恢复默认的鼠标样式需要以下额外步骤或者重启系统`n1. 点击「托盘菜单」=>「更改配置」`n2. 修改其中「1. 要不要修改鼠标样式」的值`n3. 「系统设置」=>「其他鼠标设置」=> 先更改为另一个鼠标样式方案，再改回你之前使用的方案"
+
+            g := Gui("AlwaysOnTop")
+            g.SetFont(fz, "微软雅黑")
+            bw := w - g.MarginX * 2
+
+            g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
+            g.AddText("cRed", "白名单机制: 只有在白名单中的应用进程窗口会显示符号。")
+            g.AddText(, "建议立即添加应用进程到白名单中")
+            g.AddButton("w" bw, "【是】现在就添加应用进程").OnEvent("Click", add_white_list)
+            g.AddButton("w" bw, "【否】不了，等一下再添加").OnEvent("Click", no)
+            add_white_list(*) {
+                g.Destroy()
+                fn_white_list()
+            }
+            no(*) {
+                g.Destroy()
+            }
+            return g
         }
     }
 }

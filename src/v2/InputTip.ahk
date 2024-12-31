@@ -14,7 +14,6 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\tray-menu.ahk
 
 #Include .\utils\tools.ahk
-#Include .\utils\show.ahk
 #Include .\utils\app-list.ahk
 #Include .\utils\verify-file.ahk
 
@@ -80,103 +79,34 @@ getDir() {
 
 makeTrayMenu() ; 生成托盘菜单
 
-updateKey()
+; XXX: 快捷键修改后，必须重启再生效，不重启动态修改 Hotkey 会存在问题
+; 中文快捷键
+hotkey_CN := readIni('hotkey_CN', '')
+; 英文快捷键
+hotkey_EN := readIni('hotkey_EN', '')
+; 大写锁定快捷键
+hotkey_Caps := readIni('hotkey_Caps', '')
+; 软件启停快捷键
+hotkey_Pause := readIni('hotkey_Pause', '')
 
-; 更新热键配置
-updateKey() {
-    static key := {
-        init: 1,
-        hotkey_CN: ":",
-        hotkey_EN: ":",
-        hotkey_Caps: ":",
-        hotkey_Pause: ":",
+if (hotkey_CN) {
+    try {
+        Hotkey(hotkey_CN, switch_CN)
     }
-    ; 中文快捷键
-    global hotkey_CN := readIni('hotkey_CN', '')
-    ; 英文快捷键
-    global hotkey_EN := readIni('hotkey_EN', '')
-    ; 大写锁定快捷键
-    global hotkey_Caps := readIni('hotkey_Caps', '')
-    ; 软件启停快捷键
-    global hotkey_Pause := readIni('hotkey_Pause', '')
-
-    if (key.init) {
-        key.init := 0
-        ; 注册强制切换输入法状态的快捷键
-        if (hotkey_CN) {
-            try {
-                Hotkey(hotkey_CN, switch_CN)
-                key.hotkey_CN .= hotkey_CN ":"
-            }
-        }
-        if (hotkey_EN) {
-            try {
-                Hotkey(hotkey_EN, switch_EN)
-                key.hotkey_EN := hotkey_EN ":"
-            }
-        }
-        if (hotkey_Caps) {
-            try {
-                Hotkey(hotkey_Caps, switch_Caps)
-                key.hotkey_Caps := hotkey_Caps ":"
-            }
-        }
-        if (hotkey_Pause) {
-            try {
-                Hotkey(hotkey_Pause, pauseApp)
-                key.hotkey_Pause := hotkey_Pause ":"
-            }
-        }
-    } else {
-        for v in ["CN", "EN", "Caps", "Pause"] {
-            for item in StrSplit(key.%"hotkey_" v%, ":") {
-                if (item) {
-                    try {
-                        Hotkey(item, "Off")
-                    }
-                }
-            }
-        }
-        if (hotkey_CN) {
-            try {
-                if (InStr(key.hotkey_CN, ":" hotkey_CN ":")) {
-                    Hotkey(hotkey_CN, "On")
-                } else {
-                    Hotkey(hotkey_CN, switch_CN)
-                    key.hotkey_CN .= hotkey_CN ":"
-                }
-            }
-        }
-        if (hotkey_EN) {
-            try {
-                if (InStr(key.hotkey_EN, ":" hotkey_EN ":")) {
-                    Hotkey(hotkey_EN, "On")
-                } else {
-                    Hotkey(hotkey_EN, switch_EN)
-                    key.hotkey_EN .= hotkey_EN ":"
-                }
-            }
-        }
-        if (hotkey_Caps) {
-            try {
-                if (InStr(key.hotkey_Caps, ":" hotkey_Caps ":")) {
-                    Hotkey(hotkey_Caps, "On")
-                } else {
-                    Hotkey(hotkey_Caps, switch_Caps)
-                    key.hotkey_Caps .= hotkey_Caps ":"
-                }
-            }
-        }
-        if (hotkey_Pause) {
-            try {
-                if (InStr(key.hotkey_Pause, ":" hotkey_Pause ":")) {
-                    Hotkey(hotkey_Pause, "On")
-                } else {
-                    Hotkey(hotkey_Pause, pauseApp)
-                    key.hotkey_Pause .= hotkey_Pause ":"
-                }
-            }
-        }
+}
+if (hotkey_EN) {
+    try {
+        Hotkey(hotkey_EN, switch_EN)
+    }
+}
+if (hotkey_Caps) {
+    try {
+        Hotkey(hotkey_Caps, switch_Caps)
+    }
+}
+if (hotkey_Pause) {
+    try {
+        Hotkey(hotkey_Pause, pauseApp)
     }
 }
 
@@ -189,87 +119,7 @@ returnCanShowSymbol(&left, &top) {
     return res && left
 }
 
-updateDelay()
-
-while 1 {
-    Sleep(delay)
-    ; 正在使用鼠标或有键盘操作
-    if (A_TimeIdle < leaveDelay) {
-        needShow := 1
-        if (symbolType) {
-            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol(0)
-                continue
-            }
-        }
-        try {
-            exe_name := ProcessGetName(WinGetPID("A"))
-            exe_str := ":" exe_name ":"
-        } catch {
-            hideSymbol()
-            needShow := 0
-        }
-        if (exe_name != lastWindow) {
-            WinWaitActive("ahk_exe " exe_name)
-            lastType := ""
-            lastWindow := exe_name
-            if (InStr(app_CN, exe_str)) {
-                switch_CN()
-                if (isCN()) {
-                    loadCursor("CN", 1)
-                    canShowSymbol := returnCanShowSymbol(&left, &top)
-                    loadSymbol("CN", left, top)
-                }
-            } else if (InStr(app_EN, exe_str)) {
-                switch_EN()
-                if (!isCN()) {
-                    loadCursor("EN", 1)
-                    canShowSymbol := returnCanShowSymbol(&left, &top)
-                    loadSymbol("EN", left, top)
-                }
-            } else if (InStr(app_Caps, exe_str)) {
-                switch_Caps()
-                if (GetKeyState("CapsLock", "T")) {
-                    loadCursor("Caps", 1)
-                    canShowSymbol := returnCanShowSymbol(&left, &top)
-                    loadSymbol("Caps", left, top)
-                }
-            }
-        }
-        if (symbolType) {
-            if (needSkip(exe_str)) {
-                hideSymbol()
-                lastWindow := exe_name
-                lastType := ""
-                continue
-            }
-        }
-        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd") || InStr(app_hide_state, exe_str)) {
-            hideSymbol()
-            needShow := 0
-        }
-        if (GetKeyState("CapsLock", "T")) {
-            loadCursor("Caps")
-            if (needShow) {
-                canShowSymbol := returnCanShowSymbol(&left, &top)
-                loadSymbol("Caps", left, top)
-            }
-            continue
-        }
-        try {
-            v := isCN() ? "CN" : "EN"
-        } catch {
-            hideSymbol()
-            continue
-        }
-        loadCursor(v)
-        if (needShow) {
-            canShowSymbol := returnCanShowSymbol(&left, &top)
-            loadSymbol(v, left, top)
-        }
-    }
-}
-
+#Include .\utils\show.ahk
 
 /**
  * - 用于创建 Gui 对象。
@@ -283,7 +133,7 @@ while 1 {
  * @example
  * createGui(fn).Show()
  * fn(x,y,w,h){
- *   g := Gui("AlwaysOnTop OwnDialogs")
+ *   g := Gui("AlwaysOnTop")
  *   g.SetFont("s12", "微软雅黑")
  *   g.AddText(, "这是一个示例，4个形参不能省略")
  *   g.AddButton("w" w,"确定")
@@ -307,7 +157,7 @@ createGui(fn) {
  * showMsg(["Hello`nWorld", "test"])
  */
 showMsg(msgList, btnText := "确定") {
-    g := Gui("AlwaysOnTop OwnDialogs")
+    g := Gui("AlwaysOnTop")
     g.SetFont(fz, "微软雅黑")
     g.MarginX := 0
     g.AddLink("yp", "")
@@ -318,7 +168,7 @@ showMsg(msgList, btnText := "确定") {
     g.GetPos(, , &Gui_width)
     g.Destroy()
 
-    g := Gui("AlwaysOnTop OwnDialogs")
+    g := Gui("AlwaysOnTop")
     g.SetFont(fz, "微软雅黑")
     for item in msgList {
         g.AddLink("w" Gui_width, item)

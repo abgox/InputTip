@@ -85,7 +85,7 @@ checkUpdate() {
             updateConfirm(newVersion, url) {
                 createGui(fn).Show()
                 fn(x, y, w, h) {
-                    g := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 版本更新")
+                    g := Gui("AlwaysOnTop", A_ScriptName " - 版本更新")
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText(, "InputTip 有版本更新: ")
@@ -132,7 +132,7 @@ checkUpdate() {
                         if (!done) {
                             createGui(fn).Show()
                             fn(x, y, w, h) {
-                                g := Gui("AlwaysOnTop OwnDialogs")
+                                g := Gui("AlwaysOnTop")
                                 g.SetFont(fz, "微软雅黑")
                                 bw := w - g.MarginX * 2
                                 g.AddText("cRed", "InputTip 新版本下载错误!")
@@ -174,7 +174,7 @@ checkUpdate() {
             updatePrompt(newVersion, url) {
                 createGui(fn).Show()
                 fn(x, y, w, h) {
-                    g := Gui("AlwaysOnTop OwnDialogs")
+                    g := Gui("AlwaysOnTop")
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText(, "- 你正在通过项目源代码启动 InputTip")
@@ -216,7 +216,7 @@ checkUpdateDone() {
     if (FileExist(A_AppData "\.abgox-InputTip-update-version.txt")) {
         createGui(fn).Show()
         fn(x, y, w, h) {
-            g := Gui("AlwaysOnTop OwnDialogs", A_ScriptName " - 版本更新完成")
+            g := Gui("AlwaysOnTop", A_ScriptName " - 版本更新完成")
             g.SetFont(fz, "微软雅黑")
             g.AddText(, "版本更新完成，当前版本: ")
             g.AddText("yp cRed", currentVersion)

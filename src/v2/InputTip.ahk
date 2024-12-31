@@ -191,7 +191,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     }
     hwnd := getHwnd()
 
-    if (InStr(appList.disable, exe_str)) {
+    if (InStr(appList.disable, exe_str) && !useWhiteList) {
         return 0
     }
     else if (InStr(appList.UIA, exe_str)) {

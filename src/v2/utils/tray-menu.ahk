@@ -86,7 +86,7 @@ makeTrayMenu() {
         fn(x, y, w, h) {
             global statusModeEN, conversionModeEN, mode, checkTimeout, gc
 
-            g := Gui("AlwaysOnTop", A_ScriptName "- 设置输入法模式")
+            g := Gui("AlwaysOnTop", "InputTip - 设置输入法模式")
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
@@ -314,7 +314,7 @@ makeTrayMenu() {
     fn_bw_list(*) {
         createGui(fn).Show()
         fn(x, y, w, h) {
-            g := Gui("AlwaysOnTop", A_ScriptName "- 设置符号显示的黑/白名单")
+            g := Gui("AlwaysOnTop", "InputTip - 设置符号显示的黑/白名单")
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
@@ -330,32 +330,31 @@ makeTrayMenu() {
                 global useWhiteList := value
                 restartJetBrains()
             }
-            g.AddButton("xs w" bw, "设置「白」名单").OnEvent("Click", fn_white_list)
-            g.AddButton("xs w" bw, "设置「黑」名单").OnEvent("Click", fn_black_list)
-            fn_black_list(*) {
+            g.AddButton("xs w" bw, "设置「白」名单").OnEvent("Click", set_white_list)
+            set_white_list(*) {
+                g.Destroy()
+                fn_white_list()
+            }
+            g.AddButton("xs w" bw, "设置「黑」名单").OnEvent("Click", set_black_list)
+            set_black_list(*) {
+                g.Destroy()
                 fn_common({
                     config: "app_hide_state",
-                    tip: "1. 点击上方的 「关于」查看",
-                    tip2: "「符号显示黑名单」",
-                    tip3: "的相关说明。",
-                    about: "什么是「符号显示白名单」？`n`n1. 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n2. 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n3. 建议使用白名单机制，最好少用黑名单机制。",
-                    addTopText: "2. 双击应用进程，即可将其添加到「符号显示黑名单」中`n3. 添加后，黑名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
-                    addList: "以下列表是当前正在运行的应用进程",
-                    addList1: "以下列表是当前正在运行的应用进程",
+                    tab: ["管理黑名单", "关于"],
+                    tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
+                    list: "符号显示黑名单",
+                    about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到 「符号显示黑名单」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将其移除。`n`n- 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n- 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n- 建议使用白名单机制，最好少用黑名单机制。',
                     addConfirm: "是否要将",
                     addConfirm2: "添加到「符号显示黑名单」中？",
                     addConfirm3: "添加后，黑名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
-                    rmTopText: "2. 双击应用进程，将其从「符号显示黑名单」中移除`n3. 移除后，黑名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",
-                    rmList: "以下列表是「符号显示黑名单」",
                     rmConfirm: "是否要将",
                     rmConfirm2: "从「符号显示黑名单」中移除？",
                     rmConfirm3: "移除后，黑名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",
                 },
                 fn
                 )
-                fn(info) {
-                    writeIni("app_hide_state", info.newValue)
-                    global app_hide_state := ":" info.newValue ":"
+                fn(value) {
+                    global app_hide_state := ":" value ":"
                     restartJetBrains()
                 }
             }
@@ -373,7 +372,7 @@ makeTrayMenu() {
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
 
-        hotkeyGui := Gui("AlwaysOnTop", A_ScriptName " - 设置暂停/运行快捷键的快捷键")
+        hotkeyGui := Gui("AlwaysOnTop", "InputTip - 设置暂停/运行快捷键的快捷键")
         hotkeyGui.SetFont(fz, "微软雅黑")
 
         tab := hotkeyGui.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
@@ -995,7 +994,7 @@ makeTrayMenu() {
             }
         }
     }
-    A_TrayMenu.Add("设置快捷键", fn_switch_key)
+    A_TrayMenu.Add("设置状态切换快捷键", fn_switch_key)
     fn_switch_key(*) {
         hotkeyGui := Gui("AlwaysOnTop")
         hotkeyGui.SetFont(fz, "微软雅黑")
@@ -1004,7 +1003,7 @@ makeTrayMenu() {
         hotkeyGui.GetPos(, , &Gui_width)
         hotkeyGui.Destroy()
 
-        hotkeyGui := Gui("AlwaysOnTop", A_ScriptName " - 设置强制切换输入法状态的快捷键")
+        hotkeyGui := Gui("AlwaysOnTop", "InputTip - 设置强制切换输入法状态的快捷键")
         hotkeyGui.SetFont(fz, "微软雅黑")
 
         tab := hotkeyGui.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
@@ -1184,168 +1183,292 @@ makeTrayMenu() {
         }
         hotkeyGui.Show()
     }
-    sub1 := Menu()
-    sub1.Add("自动切换到中文状态", fn_switch_CN)
-    fn_switch_CN(*) {
-        fn_common({
-            config: "app_CN",
-            tip: "1. 点击上方的 「关于」查看",
-            tip2: "「自动切换中文状态的应用列表」",
-            tip3: "的相关说明。",
-            about: "什么是「自动切换中文状态的应用列表」？`n`n1. 如果应用在此列表中，当此应用窗口激活时，会尝试将输入法切换到中文状态`n2. 三个自动切换的应用列表(中文/英文/大写)，不会冲突，始终以最新的添加为主",
-            addTopText: "2. 双击应用进程，即可将其添加到「自动切换中文状态的应用列表」中。`n3. 双击每一行的任意位置都可以，然后根据后续提示操作。",
-            addList: "以下列表是当前正在运行的应用进程",
-            addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
-            addConfirm: "是否要将",
-            addConfirm2: "添加到「自动切换中文状态的应用列表」中？",
-            addConfirm3: "添加后，当此应用窗口激活时，会自动尝试将输入法切换到中文状态",
-            rmTopText: "2. 双击应用进程，即可将其移除。`n3. 双击每一行的任意位置都可以，然后根据后续提示操作。",
-            rmList: "以下列表中是「自动切换中文状态的应用列表」",
-            rmConfirm: "是否要将",
-            rmConfirm2: "从「自动切换中文状态的应用列表」中移除？",
-            rmConfirm3: "移除后，当此应用窗口激活时，不会再自动尝试将输入法切换到中文状态",
-        }, fn
-        )
-        fn(info) {
-            value_EN := ":" readIni("app_EN", "") ":"
-            value_Caps := ":" readIni("app_Caps", "") ":"
-            if (InStr(value_EN, ":" info.RowText ":")) {
-                valueArr := StrSplit(value_EN, ":")
-                result := ""
-                for v in valueArr {
-                    if (v != info.RowText && Trim(v)) {
-                        result .= ":" v
+    A_TrayMenu.Add("指定窗口自动切换状态", fn_window)
+    fn_window(*) {
+        show()
+        show(deep := "") {
+            createGui(fn).Show()
+            fn(x, y, w, h) {
+                g := Gui("AlwaysOnTop")
+                g.SetFont(fz, "微软雅黑")
+                bw := w - g.MarginX * 2
+
+                tab := g.AddTab3("-Wrap", ["管理自动切换", "关于"])
+                tab.UseTab(1)
+                g.AddLink("Section cRed", "你首先应该点击上方的 「关于」查看具体的操作说明。")
+                gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题"])
+                gc.LV_add.OnEvent("DoubleClick", fn_add)
+                fn_add(LV, RowNumber) {
+                    handleClick(LV, RowNumber, "add")
+                }
+                res := []
+                for v in ["app_CN", "app_EN", "app_Caps"] {
+                    res.Push(readIni(v, ""))
+                }
+                res := ":" arrJoin(res, ":") ":"
+                temp := ":"
+                DetectHiddenWindows deep
+                gc.LV_add.Opt("-Redraw")
+                for v in WinGetList() {
+                    try {
+                        exe_name := ProcessGetName(WinGetPID("ahk_id " v))
+                        title := WinGetTitle("ahk_id " v)
+                        if (!InStr(temp, ":" exe_name ":") && !InStr(res, ":" exe_name ":")) {
+                            temp .= exe_name ":"
+                            gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v))
+                        }
                     }
                 }
-                writeIni("app_EN", SubStr(result, 2))
-                global app_EN := ":" readIni("app_EN", "") ":"
-            }
+                gc.LV_add.Opt("+Redraw")
+                DetectHiddenWindows 1
 
-            if (InStr(value_Caps, ":" info.RowText ":")) {
-                valueArr := StrSplit(value_Caps, ":")
-                result := ""
-                for v in valueArr {
-                    if (v != info.RowText && Trim(v)) {
-                        result .= ":" v
+                addItem(state) {
+                    gc.%"LV_" state%.Opt("-Redraw")
+                    valueArr := StrSplit(readIni("app_" state, ""), ":")
+                    temp := ":"
+                    for v in valueArr {
+                        if (Trim(v) && !InStr(temp, ":" v ":")) {
+                            gc.%"LV_" state%.Add(, v)
+                            temp .= v ":"
+                        }
+                    }
+                    gc.%"LV_" state%.Opt("+Redraw")
+                }
+
+                if (CN_color) {
+                    c := "c" StrReplace(CN_color, "#")
+                } else {
+                    c := ""
+                }
+                try {
+                    gc.LV_CN := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换中文"])
+                } catch {
+                    gc.LV_CN := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换中文"])
+                }
+                addItem("CN")
+                gc.LV_CN.ModifyCol(1, "AutoHdr")
+                gc.LV_CN.OnEvent("DoubleClick", fn_CN)
+                fn_CN(LV, RowNumber) {
+                    handleClick(LV, RowNumber, "CN")
+                }
+                if (EN_color) {
+                    c := "c" StrReplace(EN_color, "#")
+                } else {
+                    c := ""
+                }
+                try {
+                    gc.LV_EN := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换英文"])
+                } catch {
+                    gc.LV_EN := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换英文"])
+                }
+                addItem("EN")
+                gc.LV_EN.ModifyCol(1, "AutoHdr")
+                gc.LV_EN.OnEvent("DoubleClick", fn_EN)
+                fn_EN(LV, RowNumber) {
+                    handleClick(LV, RowNumber, "EN")
+                }
+                if (Caps_color) {
+                    c := "c" StrReplace(Caps_color, "#")
+                } else {
+                    c := ""
+                }
+                try {
+                    gc.LV_Caps := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换大写锁定"])
+                } catch {
+                    gc.LV_Caps := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换大写锁定"])
+                }
+                addItem("Caps")
+                gc.LV_Caps.ModifyCol(1, "AutoHdr")
+                gc.LV_Caps.OnEvent("DoubleClick", fn_Caps)
+                fn_Caps(LV, RowNumber) {
+                    handleClick(LV, RowNumber, "Caps")
+                }
+
+                handleClick(LV, RowNumber, from) {
+                    RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
+                    createGui(fn).Show()
+                    fn(x, y, w, h) {
+                        _handle(to) {
+                            g_1.Destroy()
+                            gc.%"LV_" from%.Delete(RowNumber)
+                            config := "app_" from
+                            value := readIni(config, "")
+                            res := ""
+                            for v in StrSplit(value, ":") {
+                                if (Trim(v) && v != RowText) {
+                                    res .= ":" v
+                                }
+                            }
+                            writeIni(config, SubStr(res, 2))
+
+                            gc.%"LV_" to%.Add(, RowText)
+                            config := "app_" to
+                            value := readIni(config, "")
+                            if (value) {
+                                writeIni(config, value ":" RowText)
+                            } else {
+                                writeIni(config, RowText)
+                            }
+                            global app_CN := ":" readIni('app_CN', '') ":"
+                            global app_EN := ":" readIni('app_EN', '') ":"
+                            global app_Caps := ":" readIni('app_Caps', '') ":"
+                        }
+                        g_1 := Gui("AlwaysOnTop")
+                        g_1.SetFont(fz, "微软雅黑")
+                        bw := w - g_1.MarginX * 2
+
+                        g_1.AddLink(, "要将进程")
+                        g_1.AddLink("yp cRed", RowText)
+                        g_1.AddLink("yp", "添加到哪一个自动切换列表中？")
+                        fn_CN(*) {
+                            _handle("CN")
+                        }
+                        fn_EN(*) {
+                            _handle("EN")
+                        }
+                        fn_Caps(*) {
+                            _handle("Caps")
+                        }
+
+                        switch from {
+                            case "add":
+                            {
+                                g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
+                                g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
+                                g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
+                            }
+                            case "CN":
+                            {
+                                g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
+                                g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
+                                g_1.AddButton("xs w" bw, "将其移除").OnEvent("Click", fn_rm)
+                            }
+                            case "EN":
+                            {
+                                g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
+                                g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
+                                g_1.AddButton("xs w" bw, "将其移除").OnEvent("Click", fn_rm)
+                            }
+                            case "Caps":
+                            {
+                                g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
+                                g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
+                                g_1.AddButton("xs w" bw, "将其移除").OnEvent("Click", fn_rm)
+                            }
+                        }
+                        fn_rm(*) {
+                            g_1.Destroy()
+                            LV.Delete(RowNumber)
+                            try {
+                                gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
+                            } catch {
+                                gc.LV_add.Add(, RowText)
+                            }
+                            config := "app_" from
+                            value := readIni(config, "")
+                            result := ""
+                            for v in StrSplit(value, ":") {
+                                if (Trim(v) && v != RowText) {
+                                    result .= ":" v
+                                }
+                            }
+                            writeIni(config, SubStr(result, 2))
+
+                            global app_CN := ":" readIni('app_CN', '') ":"
+                            global app_EN := ":" readIni('app_EN', '') ":"
+                            global app_Caps := ":" readIni('app_Caps', '') ":"
+                        }
+                        g_1.AddButton("xs w" bw, "取消操作").OnEvent("Click", no)
+                        no(*) {
+                            g_1.Destroy()
+                        }
+                        return g_1
                     }
                 }
-                writeIni("app_Caps", SubStr(result, 2))
-                global app_Caps := ":" readIni("app_Caps", "") ":"
-            }
 
-            writeIni("app_CN", info.newValue)
-            global app_CN := ":" info.newValue ":"
-            restartJetBrains()
+                g.AddButton("xs w" bw / 2, "手动添加进程").OnEvent("Click", fn_add_by_hand)
+                fn_add_by_hand(*) {
+                    addApp("xxx.exe")
+                    addApp(v) {
+                        createGui(fn).Show()
+                        fn(x, y, w, h) {
+                            g_2 := Gui("AlwaysOnTop", "InputTip - 手动添加进程")
+                            g_2.SetFont(fz, "微软雅黑")
+                            bw := w - g_2.MarginX * 2
+                            g_2.AddText(, "1. 进程名称应该是")
+                            g_2.AddText("yp cRed", "xxx.exe")
+                            g_2.AddText("yp", "这样的格式")
+                            g_2.AddText("xs", "2. 每一次只能添加一个")
+                            g_2.AddText("xs", "进程名称: ")
+                            g_2.AddEdit("yp vexe_name", "").Value := v
+
+                            g_2.AddButton("xs w" bw, "添加到「自动切换中文」").OnEvent("Click", fn_CN)
+                            g_2.AddButton("xs w" bw, "添加到「自动切换英文」").OnEvent("Click", fn_EN)
+                            g_2.AddButton("xs w" bw, "添加到「自动切换大写锁定」").OnEvent("Click", fn_Caps)
+                            fn_CN(*) {
+                                _handle("CN")
+                            }
+                            fn_EN(*) {
+                                _handle("EN")
+                            }
+                            fn_Caps(*) {
+                                _handle("Caps")
+                            }
+
+                            _handle(to) {
+                                exe_name := g_2.Submit().exe_name
+                                if (!RegExMatch(exe_name, "^.+\.\w{3}$")) {
+                                    createGui(fn).Show()
+                                    fn(x, y, w, h) {
+                                        g_2 := Gui("AlwaysOnTop")
+                                        g_2.SetFont(fz, "微软雅黑")
+                                        bw := w - g_2.MarginX * 2
+                                        g_2.AddText(, "进程名称不符合格式要求，请重新输入")
+                                        g_2.AddButton("w" bw, "我知道了").OnEvent("click", close)
+                                        close(*) {
+                                            g_2.Destroy()
+                                            addApp(exe_name)
+                                        }
+                                        return g_2
+                                    }
+                                    return
+                                }
+                                gc.%"LV_" to%.Add(, exe_name)
+                                config := "app_" to
+                                value := readIni(config, "")
+                                if (value) {
+                                    writeIni(config, value ":" exe_name)
+                                } else {
+                                    writeIni(config, exe_name)
+                                }
+                                global app_CN := ":" readIni('app_CN', '') ":"
+                                global app_EN := ":" readIni('app_EN', '') ":"
+                                global app_Caps := ":" readIni('app_Caps', '') ":"
+                            }
+                            return g_2
+                        }
+                    }
+                }
+                if (deep) {
+                    g.AddButton("yp w" bw / 2, "显示更少进程(仅包含已经打开的窗口)").OnEvent("Click", fn_less_window)
+                    fn_less_window(*) {
+                        g.Destroy()
+                        show("")
+                    }
+                } else {
+                    g.AddButton("yp w" bw / 2, "显示更多进程(包含后台和隐藏窗口)").OnEvent("Click", fn_more_window)
+                    fn_more_window(*) {
+                        g.Destroy()
+                        show(1)
+                    }
+                }
+                gc.LV_add.ModifyCol(1, "AutoHdr")
+                tab.UseTab(2)
+                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将其移除或者添加到其他列表中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
+                return g
+            }
         }
     }
-    sub1.Add("自动切换到英文状态", fn_switch_EN)
-    fn_switch_EN(*) {
-        fn_common({
-            config: "app_EN",
-            tip: "1. 点击上方的 「关于」查看",
-            tip2: "「自动切换英文状态的应用列表」",
-            tip3: "的相关说明。",
-            about: "什么是「自动切换英文状态的应用列表」？`n`n1. 如果应用在此列表中，当此应用窗口激活时，会尝试将输入法切换到英文状态`n2. 三个自动切换的应用列表(中文/英文/大写)，不会冲突，始终以最新的添加为主",
-            addTopText: "2. 双击应用进程，即可将其添加到「自动切换英文状态的应用列表」中。`n3. 双击每一行的任意位置都可以，然后根据后续提示操作。",
-            addList: "以下列表是当前正在运行的应用进程",
-            addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
-            addConfirm: "是否要将",
-            addConfirm2: "添加到「自动切换英文状态的应用列表」中？",
-            addConfirm3: "添加后，当此应用窗口激活时，会自动尝试将输入法切换到英文状态",
-            rmTopText: "2. 双击应用进程，即可将其移除。`n3. 双击每一行的任意位置都可以，然后根据后续提示操作。",
-            rmList: "以下列表中是「自动切换英文状态的应用列表」",
-            rmConfirm: "是否要将",
-            rmConfirm2: "从「自动切换英文状态的应用列表」中移除？",
-            rmConfirm3: "移除后，当此应用窗口激活时，不会再自动尝试将输入法切换到英文状态",
-        },
-        fn
-        )
-        fn(info) {
-            value_CN := ":" readIni("app_CN", "") ":"
-            value_Caps := ":" readIni("app_Caps", "") ":"
-            if (InStr(value_CN, ":" info.RowText ":")) {
-                valueArr := StrSplit(value_CN, ":")
-                result := ""
-                for v in valueArr {
-                    if (v != info.RowText && Trim(v)) {
-                        result .= ":" v
-                    }
-                }
-                writeIni("app_CN", SubStr(result, 2))
-                global app_CN := ":" readIni("app_CN", "") ":"
-            }
-
-            if (InStr(value_Caps, ":" info.RowText ":")) {
-                valueArr := StrSplit(value_Caps, ":")
-                result := ""
-                for v in valueArr {
-                    if (v != info.RowText && Trim(v)) {
-                        result .= ":" v
-                    }
-                }
-                writeIni("app_Caps", SubStr(result, 2))
-                global app_Caps := ":" readIni("app_Caps", "") ":"
-            }
-
-            writeIni("app_EN", info.newValue)
-            global app_EN := ":" info.newValue ":"
-            restartJetBrains()
-        }
-    }
-    sub1.Add("自动切换到大写锁定", fn_switch_Caps)
-    fn_switch_Caps(*) {
-        fn_common({
-            config: "app_Caps",
-            tip: "1. 点击上方的 「关于」查看",
-            tip2: "「自动切换大写锁定的应用列表」",
-            tip3: "的相关说明。",
-            about: "什么是「自动切换大写锁定的应用列表」？`n`n1. 如果应用在此列表中，当此应用窗口激活时，会尝试将输入法切换到大写锁定`n2. 三个自动切换的应用列表(中文/英文/大写)，不会冲突，始终以最新的添加为主",
-            addTopText: "2. 双击应用进程，即可将其添加到「自动切换大写锁定的应用列表」中。`n3. 双击每一行的任意位置都可以，然后根据后续提示操作。",
-            addList: "以下列表是当前正在运行的应用进程",
-            addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
-            addConfirm: "是否要将",
-            addConfirm2: "添加到「自动切换大写锁定的应用列表」中？",
-            addConfirm3: "添加后，当此应用窗口激活时，会自动尝试将输入法切换到大写锁定",
-            rmTopText: "2. 双击应用进程，即可将其移除。`n3. 双击每一行的任意位置都可以，然后根据后续提示操作。",
-            rmList: "以下列表中是「自动切换大写锁定的应用列表」",
-            rmConfirm: "是否要将",
-            rmConfirm2: "从「自动切换大写锁定的应用列表」中移除？",
-            rmConfirm3: "移除后，当此应用窗口激活时，不会再自动尝试将输入法切换到大写锁定",
-        },
-        fn
-        )
-        fn(info) {
-            value_CN := ":" readIni("app_CN", "") ":"
-            value_EN := ":" readIni("app_EN", "") ":"
-            if (InStr(value_CN, ":" info.RowText ":")) {
-                valueArr := StrSplit(value_CN, ":")
-                result := ""
-                for v in valueArr {
-                    if (v != info.RowText && Trim(v)) {
-                        result .= ":" v
-                    }
-                }
-                writeIni("app_CN", SubStr(result, 2))
-                global app_CN := ":" readIni("app_CN", "") ":"
-            }
-            if (InStr(value_EN, ":" info.RowText ":")) {
-                valueArr := StrSplit(value_EN, ":")
-                result := ""
-                for v in valueArr {
-                    if (v != info.RowText && Trim(v)) {
-                        result .= ":" v
-                    }
-                }
-                writeIni("app_EN", SubStr(result, 2))
-                global app_EN := ":" readIni("app_EN", "") ":"
-            }
-
-            writeIni("app_Caps", info.newValue)
-            global app_Caps := ":" info.newValue ":"
-            restartJetBrains()
-        }
-    }
-    A_TrayMenu.Add("设置自动切换", sub1)
     A_TrayMenu.Add("设置特殊偏移量", fn_offset)
     fn_offset(*) {
         offsetGui := Gui("AlwaysOnTop")
@@ -1356,7 +1479,7 @@ makeTrayMenu() {
         offsetGui.GetPos(, , &Gui_width)
         offsetGui.Destroy()
 
-        offsetGui := Gui("AlwaysOnTop", A_ScriptName " - 设置特殊偏移量")
+        offsetGui := Gui("AlwaysOnTop", "InputTip - 设置特殊偏移量")
         offsetGui.SetFont(fz, "微软雅黑")
         tab := offsetGui.AddTab3("-Wrap", ["JetBrains IDE"])
         tab.UseTab(1)
@@ -1368,7 +1491,7 @@ makeTrayMenu() {
 
         JetBrains_offset(*) {
             offsetGui.Destroy()
-            JetBrainsGui := Gui("AlwaysOnTop", A_ScriptName " - 设置 JetBrains 系列 IDE 的偏移量")
+            JetBrainsGui := Gui("AlwaysOnTop", "InputTip - 设置 JetBrains 系列 IDE 的偏移量")
             JetBrainsGui.SetFont(fz, "微软雅黑")
             screenList := getScreenInfo()
             JetBrainsGui.AddText(, "你需要通过屏幕坐标信息判断具体是哪一块屏幕`n`n - 假设你有两块屏幕，主屏幕在左侧，另一块屏幕在右侧`n - 那么另一块屏幕的左上角 X 坐标一定大于主屏幕的右下角 X 坐标`n - 以此判断以下屏幕哪一块是右侧的屏幕")
@@ -1459,10 +1582,10 @@ makeTrayMenu() {
     fn_add_JetBrains(*) {
         fn_common({
             config: "JetBrains_list",
-            tip: "1. 当勾选",
-            tip2: "「启用 JetBrains IDE 支持」",
-            tip3: "后，请确保 JetBrains IDE 已经被添加。",
-            about: '- 首先你需要添加 JetBrains 系列 IDE 应用程序进程。`n- 然后勾选「启用 JetBrains IDE 支持」，就可以在这些应用中使用 InputTip。`n- 如果未生效，你需要检查以下步骤是否完成:`n  1. 开启 Java Access Bridge`n  2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保 JetBrains IDE 已经添加`n  3. 重启你正在使用的 JetBrains IDE`n  4. 如果没有生效，请重启电脑。`n`n相关链接: `n`n<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
+            tab: ["管理 JetBrains IDE 应用", "关于"],
+            tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
+            list: "JetBrains IDE 应用列表",
+            about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「JetBrains IDE 应用进程列表」。`n- 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n- 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将其移除。`n- 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n- 如果未生效，请检查是否完成所有操作步骤。`n`n操作步骤相关链接: `n`n<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
             addTopText: "2. 双击应用进程进行添加`n3. 如果有非 JetBrains 系列 IDE 应用进程被意外添加，请立即移除`n4. 白名单机制下，还需要再添加到白名单中才会有效。",
             addList: "以下列表是当前正在运行的应用进程",
             addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
@@ -1477,9 +1600,8 @@ makeTrayMenu() {
         },
         fn
         )
-        fn(info) {
-            writeIni("JetBrains_list", info.newValue)
-            global JetBrains_list := ":" readIni("JetBrains_list", "") ":"
+        fn(value) {
+            global JetBrains_list := ":" value ":"
             restartJetBrains()
         }
     }
@@ -1499,7 +1621,7 @@ makeTrayMenu() {
         aboutGui.GetPos(, , &Gui_width)
         aboutGui.Destroy()
 
-        aboutGui := Gui("AlwaysOnTop", A_ScriptName " - v" currentVersion)
+        aboutGui := Gui("AlwaysOnTop", "InputTip - v" currentVersion)
         aboutGui.SetFont(fz, "微软雅黑")
         aboutGui.AddText("Center w" Gui_width, "InputTip - 一个输入法状态(中文/英文/大写锁定)实时提示工具")
         tab := aboutGui.AddTab3("-Wrap", ["关于项目", "赞赏支持", "参考项目", "其他项目"])
@@ -1567,16 +1689,49 @@ fn_common(tipList, handleFn) {
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
-            tab := g.AddTab3("-Wrap", ["添加应用", "移除应用", "关于"])
+            tab := g.AddTab3("-Wrap", tipList.tab)
             tab.UseTab(1)
-            g.AddLink("Section", tipList.tip)
-            g.AddLink("yp cRed", tipList.tip2)
-            g.AddLink("yp", tipList.tip3)
-            g.AddLink("xs", tipList.addTopText)
-            g.AddLink(, tipList.%"addList" deep%)
-            gc.addLV := g.AddListView("-Multi r9 NoSortHdr Sort Grid w" bw, ["应用进程", "窗口标题"])
-            gc.addLV.OnEvent("DoubleClick", fn_double_click)
+            g.AddLink("Section cRed", tipList.tip)
+            gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题"])
+            gc.LV_add.OnEvent("DoubleClick", fn_double_click)
             fn_double_click(LV, RowNumber) {
+                handleClick(LV, RowNumber, "add", tipList)
+            }
+            value := readIni(tipList.config, "")
+            value := SubStr(value, -1) = ":" ? value : value ":"
+            temp := ""
+            DetectHiddenWindows deep
+            gc.LV_add.Opt("-Redraw")
+            for v in WinGetList() {
+                try {
+                    exe_name := ProcessGetName(WinGetPID("ahk_id " v))
+                    title := WinGetTitle("ahk_id " v)
+                    if (!InStr(temp, exe_name ":") && !InStr(value, exe_name ":")) {
+                        temp .= exe_name ":"
+                        gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v))
+                    }
+                }
+            }
+            gc.LV_add.Opt("+Redraw")
+            DetectHiddenWindows 1
+
+            gc.LV_rm := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw, [tipList.list])
+            valueArr := StrSplit(readIni(tipList.config, ""), ":")
+            temp := ":"
+            gc.LV_rm.Opt("-Redraw")
+            for v in valueArr {
+                if (Trim(v) && !InStr(temp, ":" v ":")) {
+                    gc.LV_rm.Add(, v)
+                    temp .= v ":"
+                }
+            }
+            gc.LV_rm.Opt("+Redraw")
+            gc.LV_rm.ModifyCol(1, "AutoHdr")
+            gc.LV_rm.OnEvent("DoubleClick", fn_CN)
+            fn_CN(LV, RowNumber) {
+                handleClick(LV, RowNumber, "rm", tipList)
+            }
+            handleClick(LV, RowNumber, from, tipList) {
                 RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
                 createGui(fn).Show()
                 fn(x, y, w, h) {
@@ -1584,52 +1739,65 @@ fn_common(tipList, handleFn) {
                     g_1.SetFont(fz, "微软雅黑")
                     bw := w - g_1.MarginX * 2
 
-                    g_1.AddLink(, tipList.addConfirm)
+                    g_1.AddLink(, tipList.%from "Confirm"%)
                     g_1.AddLink("yp cRed", RowText)
-                    g_1.AddLink("yp", tipList.addConfirm2)
-                    g_1.AddLink("xs", tipList.addConfirm3)
-                    g_1.AddButton("xs w" bw, "确认添加").OnEvent("Click", yes)
-                    yes(*) {
-                        g_1.Destroy()
-                        gc.addLV.Delete(RowNumber)
-                        gc.rmLV.Add(, RowText)
-                        value := readIni(tipList.config, "")
-                        if (value) {
-                            res := value ":"
-                        } else {
-                            res := ""
+                    g_1.AddLink("yp", tipList.%from "Confirm2"%)
+                    g_1.AddLink("xs", tipList.%from "Confirm3"%)
+
+                    if (from = "add") {
+                        g_1.AddButton("xs w" bw, "添加").OnEvent("Click", fn_add)
+                        fn_add(*) {
+                            g_1.Destroy()
+                            gc.LV_add.Delete(RowNumber)
+                            gc.LV_rm.Add(, RowText)
+                            config := tipList.config
+                            value := readIni(config, "")
+                            if (value) {
+                                result := value ":" RowText
+                                writeIni(config, value ":" RowText)
+                            } else {
+                                result := RowText
+                                writeIni(config, RowText)
+                            }
+                            handleFn(result)
                         }
-                        handleFn({
-                            RowText: RowText,
-                            config: tipList.config,
-                            newValue: res RowText
-                        })
+                    } else {
+                        g_1.AddButton("xs w" bw, "移除").OnEvent("Click", fn_rm)
+                    }
+                    fn_rm(*) {
+                        g_1.Destroy()
+                        LV.Delete(RowNumber)
+                        try {
+                            gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
+                        } catch {
+                            gc.LV_add.Add(, RowText)
+                        }
+                        config := tipList.config
+                        value := readIni(config, "")
+                        result := ""
+                        for v in StrSplit(value, ":") {
+                            if (Trim(v) && v != RowText) {
+                                result .= ":" v
+                            }
+                        }
+                        result := SubStr(result, 2)
+                        writeIni(config, result)
+                        handleFn(result)
+                    }
+                    g_1.AddButton("xs w" bw, "取消").OnEvent("Click", no)
+                    no(*) {
+                        g_1.Destroy()
                     }
                     return g_1
                 }
             }
-            value := readIni(tipList.config, "")
-            value := SubStr(value, -1) = ":" ? value : value ":"
-            temp := ""
-            DetectHiddenWindows deep
-            for v in WinGetList() {
-                try {
-                    exe_name := ProcessGetName(WinGetPID("ahk_id " v))
-                    title := WinGetTitle("ahk_id " v)
-                    if (!InStr(temp, exe_name ":") && !InStr(value, exe_name ":")) {
-                        temp .= exe_name ":"
-                        gc.addLV.Add(, exe_name, WinGetTitle("ahk_id " v))
-                    }
-                }
-            }
-            DetectHiddenWindows 1
             g.AddButton("xs w" bw / 2, "手动添加进程").OnEvent("Click", fn_add_by_hand)
             fn_add_by_hand(*) {
                 addApp("xxx.exe")
                 addApp(v) {
                     createGui(fn).Show()
                     fn(x, y, w, h) {
-                        g_2 := Gui("AlwaysOnTop", A_ScriptName " - 手动添加进程")
+                        g_2 := Gui("AlwaysOnTop", "InputTip - 手动添加进程")
                         g_2.SetFont(fz, "微软雅黑")
                         bw := w - g_2.MarginX * 2
                         g_2.AddText(, "1. 进程名称应该是")
@@ -1685,12 +1853,10 @@ fn_common(tipList, handleFn) {
                                     return g_2
                                 }
                             } else {
-                                gc.rmLV.Add(, exe_name)
-                                handleFn({
-                                    RowText: exe_name,
-                                    config: tipList.config,
-                                    newValue: res exe_name
-                                })
+                                gc.LV_rm.Add(, exe_name)
+                                result := res exe_name
+                                writeIni(tipList.config, result)
+                                handleFn(result)
                             }
                         }
                         return g_2
@@ -1710,64 +1876,8 @@ fn_common(tipList, handleFn) {
                     show(1)
                 }
             }
-            gc.addLV.ModifyCol(1, "AutoHdr")
+            gc.LV_add.ModifyCol(1, "AutoHdr")
             tab.UseTab(2)
-            value := readIni(tipList.config, "")
-            valueArr := StrSplit(value, ":")
-            g.AddLink("Section", tipList.tip)
-            g.AddLink("yp cRed", tipList.tip2)
-            g.AddLink("yp", tipList.tip3)
-            g.AddLink("xs", tipList.rmTopText)
-            g.AddLink(, tipList.rmList)
-            gc.rmLV := g.AddListView("-Multi r9 NoSortHdr Sort Grid w" bw, ["应用进程"])
-            gc.rmLV.OnEvent("DoubleClick", fn_double_click1)
-            fn_double_click1(LV, RowNumber) {
-                RowText := Trim(LV.GetText(RowNumber))  ; 从行的第一个字段中获取文本.
-                createGui(fn).Show()
-                fn(x, y, w, h) {
-                    g_3 := Gui("AlwaysOnTop")
-                    g_3.SetFont(fz, "微软雅黑")
-                    bw := w - g_3.MarginX * 2
-
-                    g_3.AddLink(, tipList.rmConfirm)
-                    g_3.AddLink("yp cRed", RowText)
-                    g_3.AddLink("yp", tipList.rmConfirm2)
-                    g_3.AddLink("xs", tipList.rmConfirm3)
-                    g_3.AddButton("xs w" bw, "确认移除").OnEvent("Click", yes)
-                    yes(*) {
-                        g_3.Destroy()
-                        value := readIni(tipList.config, "")
-                        result := ""
-                        for v in StrSplit(value, ":") {
-                            if (Trim(v) && v != RowText) {
-                                result .= ":" v
-                            }
-                        }
-                        gc.rmLV.Delete(RowNumber)
-                        try {
-                            gc.addLV.Add(, RowText, WinGetTitle("ahk_exe " RowText))
-                        } catch {
-                            gc.addLV.Add(, RowText)
-                        }
-                        handleFn({
-                            RowText: RowText,
-                            config: tipList.config,
-                            newValue: SubStr(result, 2)
-                        })
-                    }
-                    return g_3
-                }
-            }
-            temp := ":"
-            for v in valueArr {
-                if (Trim(v) && !InStr(temp, ":" v ":")) {
-                    gc.rmLV.Add(, v)
-                    temp .= v ":"
-                }
-            }
-            gc.rmLV.ModifyCol(1, "AutoHdr")
-
-            tab.UseTab(3)
             g.AddLink(, tipList.about)
             return g
         }
@@ -1777,27 +1887,21 @@ fn_common(tipList, handleFn) {
 fn_white_list(*) {
     fn_common({
         config: "app_show_state",
-        tip: "1. 点击上方的 「关于」查看",
-        tip2: "「符号显示白名单」",
-        tip3: "的相关说明。",
-        about: "什么是「符号显示白名单」？`n`n1. 白名单机制: 只有在白名单中的应用进程窗口才会显示符号。`n2. 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n3. 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n4. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n5. 如果使用 「启用 JetBrains IDE 支持」，还需要将 IDE 进程添加到白名单中。",
-        addTopText: "2. 双击应用进程，即可将其添加到「符号显示白名单」中",
-        addList: "以下列表是当前正在运行的应用进程",
-        addList1: "以下列表是当前正在运行的应用进程",
+        tab: ["管理白名单", "关于"],
+        tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
+        list: "符号显示白名单",
+        about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到 「符号显示白名单」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的「手动添加进程」直接添加进程名称。`n- 下方是 「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将其移除。`n`n- 白名单机制: 只有在白名单中的应用进程窗口才会显示符号。`n- 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n- 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n- 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n- 如果勾选了「启用 JetBrains IDE 支持」，还需要将相关 IDE 进程添加到白名单中。',
         addConfirm: "是否要将",
         addConfirm2: "添加到「符号显示白名单」中？",
         addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",
-        rmTopText: "2. 双击应用进程，将其从「符号显示白名单」中移除`n3. 移除后，白名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
-        rmList: "以下列表是「符号显示白名单」",
         rmConfirm: "是否要将",
         rmConfirm2: "从「符号显示白名单」中移除？",
         rmConfirm3: "移除后，白名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
     },
     fn
     )
-    fn(info) {
-        writeIni("app_show_state", info.newValue)
-        global app_show_state := ":" info.newValue ":"
+    fn(value) {
+        global app_show_state := ":" value ":"
         restartJetBrains()
     }
 }

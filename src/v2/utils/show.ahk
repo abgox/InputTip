@@ -5,12 +5,12 @@ while 1 {
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
         needShow := 1
-        if (symbolType) {
-            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol()
-                continue
-            }
-        }
+        ; if (symbolType) {
+        ;     if (isMouseOver("abgox-InputTip-Symbol-Window")) {
+        ;         hideSymbol()
+        ;         continue
+        ;     }
+        ; }
         try {
             exe_name := ProcessGetName(WinGetPID("A"))
             exe_str := ":" exe_name ":"

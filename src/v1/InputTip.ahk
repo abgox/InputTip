@@ -14,9 +14,9 @@ CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
 #Include .\utils\ini.ahk
-#Include ..\utils\IME.ahk
-#Include ..\utils\showMsg.ahk
-#Include ..\utils\checkVersion.ahk
+#Include .\utils\IME.ahk
+#Include .\utils\show-msg.ahk
+#Include .\utils\check-version.ahk
 
 currentVersion := "1.10.2"
 checkVersion(currentVersion, "v1")

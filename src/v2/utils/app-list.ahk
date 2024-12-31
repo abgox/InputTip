@@ -1,3 +1,7 @@
+; TODO: 后续可以考虑做一个网络同步
+; 默认使用这些应用列表，如果远程有更改，用远程覆盖本地
+
+; 只有使用黑名单机制，这个禁用列表才会生效
 disable_list := [
     ; 规避任务栏和开始菜单中的显示问题
     "ShellExperienceHost.exe",
@@ -18,7 +22,10 @@ disable_list := [
     ;
     "ShareX.exe",
     ;
-    "clipdiary-portable.exe"
+    "clipdiary-portable.exe",
+    ; 微软远程桌面，与 InputTip 冲突，输入时会导致其挂掉
+    ; 有的有问题，有的没问题
+    ; "mstsc.exe",
 ]
 
 Wpf_list := [
@@ -32,13 +39,13 @@ UIA_list := [
     ; 终端
     "WindowsTerminal.exe",
     "wt.exe",
-    ;
+    ; 一个文件管理器
     "OneCommander.exe",
     ; 有道词典
     "YoudaoDict.exe",
     ;
     "Mempad.exe",
-    ;
+    ; 任务管理器
     "Taskmgr.exe",
 ]
 
@@ -80,12 +87,26 @@ Gui_UIA_list := [
     ; 火狐浏览器
     "firefox.exe",
     ; Visual Studio
-    "devenv.exe"
+    "devenv.exe",
     ; 腾讯会议
-    "WeMeetApp.exe"
+    "WeMeetApp.exe",
+    ; 微信
+    "Weixin.exe",
 ]
 ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
 Hook_list_with_dll := [
     ; 微信
-    "WeChat.exe"
+    "WeChat.exe",
 ]
+
+
+appList := {
+    disable: ":" arrJoin(disable_list, ":") ":",
+    wpf: ":" arrJoin(Wpf_list, ":") ":",
+    UIA: ":" arrJoin(UIA_list, ":") ":",
+    MSAA: ":" arrJoin(MSAA_list, ":") ":",
+    GUI_UIA: ":" arrJoin(Gui_UIA_list, ":") ":",
+    Hook_with_dll: ":" arrJoin(Hook_list_with_dll, ":") ":"
+}
+
+; ACC_list := ":explorer.exe:ApplicationFrameHost.exe:"

@@ -21,8 +21,10 @@ showMsg(msgList) {
     for item in msgList {
         g.AddLink("w" Gui_width, item)
     }
-    g.AddButton("w" Gui_width, "确定").OnEvent("Click",fn_close)
-    fn_close(*){
+    y := g.AddButton("w" Gui_width, "确定")
+    y.OnEvent("Click", fn_close)
+    y.Focus()
+    fn_close(*) {
         g.Destroy()
     }
     g.Show()

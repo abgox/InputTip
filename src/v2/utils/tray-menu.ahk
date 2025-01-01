@@ -319,7 +319,7 @@ makeTrayMenu() {
             bw := w - g.MarginX * 2
 
             g.AddText("cRed", "「白」名单机制: 只有在白名单中的应用进程窗口会显示符号。`n「黑」名单机制: 只有不在黑名单中的应用进程窗口会显示符号。")
-            g.AddText(, "1. 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中")
+            g.AddText(, "1. 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。")
             g.AddText(, "-------------------------------------------------------------------------------------")
 
             g.AddText(, "选择显示符号的名单机制: ")
@@ -1291,16 +1291,17 @@ makeTrayMenu() {
                         _handle(to) {
                             g_1.Destroy()
                             gc.%"LV_" from%.Delete(RowNumber)
-                            config := "app_" from
-                            value := readIni(config, "")
-                            res := ""
-                            for v in StrSplit(value, ":") {
-                                if (Trim(v) && v != RowText) {
-                                    res .= ":" v
+                            if (from != "add") {
+                                config := "app_" from
+                                value := readIni(config, "")
+                                res := ""
+                                for v in StrSplit(value, ":") {
+                                    if (Trim(v) && v != RowText) {
+                                        res .= ":" v
+                                    }
                                 }
+                                writeIni(config, SubStr(res, 2))
                             }
-                            writeIni(config, SubStr(res, 2))
-
                             gc.%"LV_" to%.Add(, RowText)
                             config := "app_" to
                             value := readIni(config, "")

@@ -125,7 +125,7 @@ checkIni() {
 
             g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
             g.AddText("cRed", "白名单机制: 只有在白名单中的应用进程窗口会显示符号。")
-            g.AddText(, "建议立即添加应用进程到白名单中")
+            g.AddText(, "建议立即添加应用进程到白名单中。")
             g.AddButton("w" bw, "【是】现在就添加应用进程").OnEvent("Click", add_white_list)
             g.AddButton("w" bw, "【否】不了，等一下再添加").OnEvent("Click", no)
             add_white_list(*) {

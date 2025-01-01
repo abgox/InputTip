@@ -52,11 +52,21 @@ if (A_IsCompiled) {
 checkIni() ; 检查配置文件
 
 ; 检查更新
-ignoreUpdate := readIni("ignoreUpdate", 0)
+try {
+    ignoreUpdate := IniRead("InputTip.ini", "Config-v2", "ignoreUpdate")
+    if (ignoreUpdate) {
+        checkUpdateDelay := readIni("checkUpdateDelay", 0)
+    } else {
+        checkUpdateDelay := readIni("checkUpdateDelay", 1440)
+    }
+    IniDelete("InputTip.ini", "Config-v2", "ignoreUpdate")
+}
+
+checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 
 #Include .\utils\var.ahk
 
-checkUpdate()
+checkUpdate(1)
 
 checkUpdateDone()
 

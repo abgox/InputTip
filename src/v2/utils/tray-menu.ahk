@@ -1,13 +1,5 @@
 makeTrayMenu() {
     A_TrayMenu.Delete()
-    A_TrayMenu.Add("忽略更新", fn_ignore_update)
-    fn_ignore_update(item, *) {
-        global ignoreUpdate := !ignoreUpdate
-        writeIni("ignoreUpdate", ignoreUpdate)
-        A_TrayMenu.ToggleCheck(item)
-        checkUpdate()
-    }
-    ignoreUpdate ? A_TrayMenu.Check("忽略更新") : 0
     A_TrayMenu.Add("开机自启动", fn_startup)
     fn_startup(item, *) {
         global isStartUp
@@ -79,6 +71,29 @@ makeTrayMenu() {
     }
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")
+    }
+    A_TrayMenu.Add("设置更新检测", fn_check_update)
+    fn_check_update(item, *) {
+        createGui(fn).Show()
+        fn(x, y, w, h) {
+            g := Gui("AlwaysOnTop", "InputTip - 设置更新检测")
+            g.SetFont(fz, "微软雅黑")
+            g.AddText("cRed", "- 单位是分钟，默认是 1440 分钟，即一天。`n- 如果不为 0，在系统启动后，会立即检测一次。`n- 如果为 0，则表示不自动检测更新。`n")
+            g.AddText("xs", "每隔多少分钟检测一次更新: ")
+            _c := g.AddEdit("yp Number vcheckUpdateDelay")
+            _c.Value := readIni("checkUpdateDelay", 1440)
+            _c.OnEvent("Change", fn_change_delay)
+            fn_change_delay(item, *) {
+                if (item.value != "") {
+                    writeIni("checkUpdateDelay", item.value)
+                    global checkUpdateDelay := item.value
+                    if (checkUpdateDelay) {
+                        checkUpdate()
+                    }
+                }
+            }
+            return g
+        }
     }
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     fn_input_mode(item, *) {
@@ -319,7 +334,7 @@ makeTrayMenu() {
             bw := w - g.MarginX * 2
 
             g.AddText("cRed", "「白」名单机制: 只有在白名单中的应用进程窗口会显示符号。`n「黑」名单机制: 只有不在黑名单中的应用进程窗口会显示符号。")
-            g.AddText(, "1. 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中")
+            g.AddText(, "1. 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。")
             g.AddText(, "-------------------------------------------------------------------------------------")
 
             g.AddText(, "选择显示符号的名单机制: ")
@@ -1291,16 +1306,17 @@ makeTrayMenu() {
                         _handle(to) {
                             g_1.Destroy()
                             gc.%"LV_" from%.Delete(RowNumber)
-                            config := "app_" from
-                            value := readIni(config, "")
-                            res := ""
-                            for v in StrSplit(value, ":") {
-                                if (Trim(v) && v != RowText) {
-                                    res .= ":" v
+                            if (from != "add") {
+                                config := "app_" from
+                                value := readIni(config, "")
+                                res := ""
+                                for v in StrSplit(value, ":") {
+                                    if (Trim(v) && v != RowText) {
+                                        res .= ":" v
+                                    }
                                 }
+                                writeIni(config, SubStr(res, 2))
                             }
-                            writeIni(config, SubStr(res, 2))
-
                             gc.%"LV_" to%.Add(, RowText)
                             config := "app_" to
                             value := readIni(config, "")
@@ -1917,10 +1933,10 @@ getCursorDir() {
     loopDir(path) {
         Loop Files path "\*", "DR" {
             if (A_LoopFileAttrib ~= "D") {
-                loopDir A_LoopFileShortPath
-                if (!hasChildDir(A_LoopFileShortPath)) {
-                    if (!InStr(dirList, ":" A_LoopFileShortPath ":") && !InStr(defaultList, ":" A_LoopFileShortPath ":")) {
-                        dirList .= A_LoopFileShortPath ":"
+                loopDir A_LoopFilePath
+                if (!hasChildDir(A_LoopFilePath)) {
+                    if (!InStr(dirList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
+                        dirList .= A_LoopFilePath ":"
                     }
                 }
             }
@@ -1942,9 +1958,9 @@ getPicDir() {
     picList := ":"
     defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
     Loop Files "InputTipSymbol\*", "R" {
-        if (A_LoopFileExt = "png" && A_LoopFileShortPath != "InputTipSymbol\default\offer.png") {
-            if (!InStr(picList, ":" A_LoopFileShortPath ":") && !InStr(defaultList, ":" A_LoopFileShortPath ":")) {
-                picList .= A_LoopFileShortPath ":"
+        if (A_LoopFileExt = "png" && A_LoopFilePath != "InputTipSymbol\default\offer.png") {
+            if (!InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
+                picList .= A_LoopFilePath ":"
             }
         }
     }

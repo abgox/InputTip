@@ -13,5 +13,5 @@ InstallMouseHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.28.0
-currentVersion := "2.28.0"
+;@AHK2Exe-SetVersion 2.28.1
+currentVersion := "2.28.1"

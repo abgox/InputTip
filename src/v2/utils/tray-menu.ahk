@@ -1604,7 +1604,7 @@ makeTrayMenu() {
             tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
             list: "JetBrains IDE 应用列表",
             color: "cBlue",
-            about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「JetBrains IDE 应用进程列表」。`n- 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n- 如果正在使用白名单机制，还需要再添加到白名单中。`n- 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将它移除。`n- 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n- 如果未生效，请检查是否完成所有操作步骤。`n`n操作步骤相关链接: `n`n<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
+            about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「JetBrains IDE 应用进程列表」。`n- 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n- 如果正在使用白名单机制，还需要再添加到白名单中。`n- 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将它移除。`n- 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n- 如果未生效，请检查是否完成所有操作步骤。`n`n操作步骤相关链接: `n`n- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
             addTopText: "2. 双击应用进程进行添加`n3. 如果有非 JetBrains 系列 IDE 应用进程被意外添加，请立即移除`n4. 白名单机制下，还需要再添加到白名单中才会有效。",
             addList: "以下列表是当前正在运行的应用进程",
             addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
@@ -1716,16 +1716,15 @@ fn_common(tipList, handleFn) {
             fn_double_click(LV, RowNumber) {
                 handleClick(LV, RowNumber, "add", tipList)
             }
-            value := readIni(tipList.config, "")
-            value := SubStr(value, -1) = ":" ? value : value ":"
-            temp := ""
+            value := ":" readIni(tipList.config, "") ":"
+            temp := ":"
             DetectHiddenWindows deep
             gc.LV_add.Opt("-Redraw")
             for v in WinGetList() {
                 try {
                     exe_name := ProcessGetName(WinGetPID("ahk_id " v))
-                    title := WinGetTitle("ahk_id " v)
-                    if (!InStr(temp, exe_name ":") && !InStr(value, exe_name ":")) {
+                    exe_str := ":" exe_name ":"
+                    if (!InStr(temp, exe_str) && !InStr(value, exe_str)) {
                         temp .= exe_name ":"
                         gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v))
                     }
@@ -1736,7 +1735,7 @@ fn_common(tipList, handleFn) {
 
             ; gc.title := g.AddText("Section w" bw, tipList.list)
             ; gc.LV_rm := g.AddListView("xs IconSmall -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color)
-            gc.LV_rm := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color, [tipList.list])
+            gc.LV_rm := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 2 " " tipList.color, [tipList.list])
             valueArr := StrSplit(readIni(tipList.config, ""), ":")
             temp := ":"
             gc.LV_rm.Opt("-Redraw")
@@ -1813,7 +1812,7 @@ fn_common(tipList, handleFn) {
                     return g_1
                 }
             }
-            g.AddButton("xs w" bw / 2, "手动添加进程").OnEvent("Click", fn_add_by_hand)
+            g.AddButton("Section yp w" bw / 2, "手动添加进程").OnEvent("Click", fn_add_by_hand)
             fn_add_by_hand(*) {
                 addApp("xxx.exe")
                 addApp(v) {
@@ -1885,14 +1884,38 @@ fn_common(tipList, handleFn) {
                     }
                 }
             }
+            g.AddButton("xs w" bw / 2, "一键清空 「" tipList.list "」").OnEvent("Click", fn_clear)
+            fn_clear(*) {
+                createGui(fn).Show()
+                fn(x, y, w, h) {
+                    g_3 := Gui("AlwaysOnTop")
+                    g_3.SetFont(fz, "微软雅黑")
+                    bw := w - g_3.MarginX * 2
+                    g_3.AddText(, "确定要清空 「" tipList.list "」吗？")
+                    g_3.AddButton("xs w" bw, "确认").OnEvent("Click", yes)
+                    g_3.AddButton("xs w" bw, "取消").OnEvent("Click", no)
+                    yes(*) {
+                        g_3.Destroy()
+                        gc.LV_rm.Delete()
+                        writeIni(tipList.config, "")
+                        handleFn("")
+                        g.Destroy()
+                        show(deep)
+                    }
+                    no(*) {
+                        g_3.Destroy()
+                    }
+                    return g_3
+                }
+            }
             if (deep) {
-                g.AddButton("yp w" bw / 2, "显示更少进程(仅包含已经打开的窗口)").OnEvent("Click", fn_less_window)
+                g.AddButton("xs w" bw / 2, "显示更少进程(仅包含已经打开的窗口)").OnEvent("Click", fn_less_window)
                 fn_less_window(*) {
                     g.Destroy()
                     show("")
                 }
             } else {
-                g.AddButton("yp w" bw / 2, "显示更多进程(包含后台和隐藏窗口)").OnEvent("Click", fn_more_window)
+                g.AddButton("xs w" bw / 2, "显示更多进程(包含后台和隐藏窗口)").OnEvent("Click", fn_more_window)
                 fn_more_window(*) {
                     g.Destroy()
                     show(1)

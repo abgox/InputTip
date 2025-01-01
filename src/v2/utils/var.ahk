@@ -308,12 +308,12 @@ updateSymbol(init := 0) {
 reloadCursor() {
     if (changeCursor) {
         if (GetKeyState("CapsLock", "T")) {
-            loadCursor("Caps")
+            loadCursor("Caps", 1)
         } else {
             if (isCN()) {
-                loadCursor("CN")
+                loadCursor("CN", 1)
             } else {
-                loadCursor("EN")
+                loadCursor("EN", 1)
             }
         }
     }
@@ -357,8 +357,8 @@ pauseApp(*) {
 restartJetBrains() {
     static done := 1
     if (done && enableJetBrainsSupport) {
-        SetTimer(timer, -100)
-        timer() {
+        SetTimer(restartAppTimer, -10)
+        restartAppTimer() {
             done := 0
             RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
             if (A_IsAdmin) {

@@ -78,131 +78,155 @@ checkVersion(currentVersion, callback, urls := [
 /**
  * 检查更新并弹出确认框
  */
-checkUpdate() {
-    if (!ignoreUpdate) {
-        if (A_IsCompiled) {
-            checkVersion(currentVersion, updateConfirm)
-            updateConfirm(newVersion, url) {
-                createGui(fn).Show()
-                fn(x, y, w, h) {
-                    g := Gui("AlwaysOnTop", "InputTip - 版本更新")
-                    g.SetFont(fz, "微软雅黑")
-                    bw := w - g.MarginX * 2
-                    g.AddText(, "InputTip 有版本更新: ")
-                    g.AddText("yp cff5050", currentVersion)
-                    g.AddText("yp", ">")
-                    g.AddText("yp cRed", newVersion)
-                    g.AddText("xs", "---------------------------------------------------------")
-                    g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
-                    g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n")
-                    y := g.AddButton("xs w" bw, "确认更新")
-                    y.OnEvent("Click", yes)
-                    y.Focus()
-                    yes(*) {
-                        g.Destroy()
-                        releases := [
-                            "https://inputtip.pages.dev/releases/v2/InputTip.exe",
-                            "https://gitee.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe",
-                            "https://github.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe"
-                        ]
-                        done := false
-                        for v in releases {
-                            try {
-                                Download(v, A_AppData "\abgox-InputTip.exe")
-                                ; 尝试获取版本号，成功获取则表示下载没有问题
-                                done := FileGetVersion(A_AppData "\abgox-InputTip.exe")
-                                break
-                            }
-                        }
-                        if (done) {
-                            if (enableJetBrainsSupport) {
+checkUpdate(init := 0) {
+    if (checkUpdateDelay) {
+        if (init) {
+            checkUpdateTimer()
+        }
+        SetTimer(checkUpdateTimer, checkUpdateDelay * 1000 * 60)
+        checkUpdateTimer() {
+            if (!checkUpdateDelay) {
+                SetTimer(checkUpdateTimer, 0)
+                return
+            }
+            if (A_IsCompiled) {
+                checkVersion(currentVersion, updateConfirm)
+                updateConfirm(newVersion, url) {
+                    if (WinExist("InputTip - 有新版本啦，快点击更新体验新版本吧!   ")) {
+                        SetTimer(checkUpdateTimer, 0)
+                        return
+                    }
+                    createGui(fn).Show()
+                    fn(x, y, w, h) {
+                        g := Gui("AlwaysOnTop", "InputTip - 有新版本啦，快点击更新体验新版本吧!   ")
+                        g.SetFont(fz, "微软雅黑")
+                        bw := w - g.MarginX * 2
+                        g.AddText(, "InputTip 有版本更新: ")
+                        g.AddText("yp cff5050", currentVersion)
+                        g.AddText("yp", ">")
+                        g.AddText("yp cRed", newVersion)
+                        g.AddText("xs", "---------------------------------------------------------")
+                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+                        g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n")
+                        y := g.AddButton("xs w" bw, "确认更新")
+                        y.OnEvent("Click", yes)
+                        y.Focus()
+                        yes(*) {
+                            g.Destroy()
+                            releases := [
+                                "https://inputtip.pages.dev/releases/v2/InputTip.exe",
+                                "https://gitee.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe",
+                                "https://github.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe"
+                            ]
+                            done := false
+                            for v in releases {
                                 try {
-                                    RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
-                                    FileDelete("InputTip.JAB.JetBrains.exe")
+                                    Download(v, A_AppData "\abgox-InputTip.exe")
+                                    ; 尝试获取版本号，成功获取则表示下载没有问题
+                                    done := FileGetVersion(A_AppData "\abgox-InputTip.exe")
+                                    break
                                 }
                             }
-                            try {
-                                Run("powershell -NoProfile -Command $i=1;while (Get-Process | Where-Object { $_.Path -eq '" A_ScriptFullPath "' }) { Start-Sleep -Milliseconds 500;i++;if($i -gt 30){break}};Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';''| Out-File '" A_AppData "\.abgox-InputTip-update-version.txt' -Force;Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
-                                ExitApp()
-                            } catch {
-                                done := false
-                            }
-                        }
-
-                        if (!done) {
-                            createGui(fn).Show()
-                            fn(x, y, w, h) {
-                                g := Gui("AlwaysOnTop")
-                                g.SetFont(fz, "微软雅黑")
-                                bw := w - g.MarginX * 2
-                                g.AddText("cRed", "InputTip 新版本下载错误!")
-                                g.AddText("xs cRed", "请手动下载最新版本的 InputTip.exe 文件并替换。")
-                                g.AddText(, "--------------------------------------------------")
-                                g.AddText("xs", "官网:")
-                                g.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
-                                g.AddText("xs", "Github:")
-                                g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
-                                g.AddText("xs", "Gitee: :")
-                                g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
-                                y := g.AddButton("xs w" bw, "我知道了")
-                                y.OnEvent("Click", yes)
-                                y.Focus()
-                                g.OnEvent("Close", yes)
-                                yes(*) {
-                                    g.Destroy()
+                            if (done) {
+                                if (enableJetBrainsSupport) {
                                     try {
-                                        FileDelete(A_AppData "\abgox-InputTip.exe")
+                                        RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+                                        FileDelete("InputTip.JAB.JetBrains.exe")
                                     }
                                 }
-                                return g
+                                try {
+                                    Run("powershell -NoProfile -Command $i=1;while (Get-Process | Where-Object { $_.Path -eq '" A_ScriptFullPath "' }) { Start-Sleep -Milliseconds 500;i++;if($i -gt 30){break}};Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';''| Out-File '" A_AppData "\.abgox-InputTip-update-version.txt' -Force;Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
+                                    ExitApp()
+                                } catch {
+                                    done := false
+                                }
+                            }
+
+                            if (!done) {
+                                createGui(fn).Show()
+                                fn(x, y, w, h) {
+                                    g := Gui("AlwaysOnTop")
+                                    g.SetFont(fz, "微软雅黑")
+                                    bw := w - g.MarginX * 2
+                                    g.AddText("cRed", "InputTip 新版本下载错误!")
+                                    g.AddText("xs cRed", "请手动下载最新版本的 InputTip.exe 文件并替换。")
+                                    g.AddText(, "--------------------------------------------------")
+                                    g.AddText("xs", "官网:")
+                                    g.AddLink("yp", '<a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
+                                    g.AddText("xs", "Github:")
+                                    g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
+                                    g.AddText("xs", "Gitee: :")
+                                    g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+                                    y := g.AddButton("xs w" bw, "我知道了")
+                                    y.OnEvent("Click", yes)
+                                    y.Focus()
+                                    g.OnEvent("Close", yes)
+                                    yes(*) {
+                                        g.Destroy()
+                                        checkUpdate()
+                                        try {
+                                            FileDelete(A_AppData "\abgox-InputTip.exe")
+                                        }
+                                    }
+                                    return g
+                                }
                             }
                         }
+                        g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", no)
+                        no(*) {
+                            g.Destroy()
+                            global checkUpdateDelay := 0
+                            writeIni("checkUpdateDelay", 0)
+                            showMsg(["忽略版本更新成功!", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
+                        }
+                        g.OnEvent("Close", close)
+                        close(*) {
+                            g.Destroy()
+                            checkUpdate()
+                        }
+                        return g
                     }
-                    g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", no)
-                    no(*) {
-                        g.Destroy()
-                        global ignoreUpdate := 1
-                        writeIni("ignoreUpdate", 1)
-                        A_TrayMenu.Check("忽略更新")
-                        showMsg(["忽略版本更新成功!", "即使有新版本，下次启动时也不会再提示更新。", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
-                    }
-                    return g
                 }
-            }
-        } else {
-            checkVersion(currentVersion, updatePrompt)
-            updatePrompt(newVersion, url) {
-                createGui(fn).Show()
-                fn(x, y, w, h) {
-                    g := Gui("AlwaysOnTop")
-                    g.SetFont(fz, "微软雅黑")
-                    bw := w - g.MarginX * 2
-                    g.AddText(, "- 你正在通过项目源代码启动 InputTip")
-                    g.AddText("xs", "- InputTip 有版本更新:")
-                    g.AddText("yp cff5050", "v" currentVersion)
-                    g.AddText("yp ", ">")
-                    g.AddText("yp cRed", "v" newVersion)
-                    g.AddText("xs", "- 你应该使用")
-                    g.AddText("yp cRed", "git pull")
-                    g.AddText("yp", "拉取最新的代码更改，并重启 " A_ScriptName)
-                    g.AddText("xs", "---------------------------------------------------------------------")
-                    g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-                    g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
-                    y := g.AddButton("w" bw, "我知道了")
-                    y.OnEvent("Click", yes)
-                    y.Focus()
-                    yes(*) {
-                        g.Destroy()
+            } else {
+                checkVersion(currentVersion, updatePrompt)
+                updatePrompt(newVersion, url) {
+                    if (WinExist("InputTip - 有新版本啦，快点击更新体验新版本吧!   ")) {
+                        SetTimer(checkUpdateTimer, 0)
+                        return
                     }
-                    g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", no)
-                    no(*) {
-                        g.Destroy()
-                        global ignoreUpdate := 1
-                        writeIni("ignoreUpdate", 1)
-                        A_TrayMenu.Check("忽略更新")
-                        showMsg(["忽略版本更新成功!", "即使有新版本，下次启动时也不会再提示更新。", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
+                    createGui(fn).Show()
+                    fn(x, y, w, h) {
+                        g := Gui("AlwaysOnTop", "InputTip - 有新版本啦，快点击更新体验新版本吧!   ")
+                        g.SetFont(fz, "微软雅黑")
+                        bw := w - g.MarginX * 2
+                        g.AddText(, "- 你正在通过项目源代码启动 InputTip")
+                        g.AddText("xs", "- InputTip 有版本更新:")
+                        g.AddText("yp cff5050", "v" currentVersion)
+                        g.AddText("yp ", ">")
+                        g.AddText("yp cRed", "v" newVersion)
+                        g.AddText("xs", "- 你应该使用")
+                        g.AddText("yp cRed", "git pull")
+                        g.AddText("yp", "拉取最新的代码更改，并重启 " A_ScriptName)
+                        g.AddText("xs", "---------------------------------------------------------------------")
+                        g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+                        y := g.AddButton("w" bw, "我知道了")
+                        y.OnEvent("Click", yes)
+                        y.Focus()
+                        g.OnEvent("Close", yes)
+                        yes(*) {
+                            g.Destroy()
+                            checkUpdate()
+                        }
+                        g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", no)
+                        no(*) {
+                            g.Destroy()
+                            global checkUpdateDelay := 0
+                            writeIni("checkUpdateDelay", 0)
+                            showMsg(["忽略版本更新成功!", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
+                        }
+                        return g
                     }
-                    return g
                 }
             }
         }

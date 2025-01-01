@@ -40,7 +40,6 @@ statusModeEN := readIni("statusModeEN", "", "InputMethod")
 conversionModeEN := readIni("conversionModeEN", "", "InputMethod")
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
-
 ; 是否使用 Shift 键切换输入法状态
 useShift := readIni("useShift", 1)
 

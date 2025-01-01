@@ -13,21 +13,49 @@ makeTrayMenu() {
             A_TrayMenu.Uncheck(item)
             isStartUp := 0
             writeIni("isStartUp", isStartUp)
-            showMsg(["InputTip 开机自启动已取消", "可通过「托盘菜单」=> 「开机自启动」 再次启用"], "我知道了")
+
+            if (gc.w.cancelStartupGui) {
+                gc.w.cancelStartupGui.Destroy()
+                gc.w.cancelStartupGui := ""
+            }
+            createGui(_fn).Show()
+            _fn(x, y, w, h) {
+                g := Gui("AlwaysOnTop")
+                g.SetFont(fz, "微软雅黑")
+                g.AddText(, "InputTip 的")
+                g.AddText("yp cRed", "开机自启动")
+                g.AddText("yp", "已取消")
+                g.AddText("xs", "可通过「托盘菜单」=> 「开机自启动」 再次启用")
+                y := g.AddButton("w" w, "我知道了")
+                y.OnEvent("Click", yes)
+                y.Focus()
+                g.OnEvent("Close", yes)
+                yes(*) {
+                    g.Destroy()
+                }
+                gc.w.cancelStartupGui := g
+                return g
+            }
         } else {
+            if (gc.w.startupGui) {
+                gc.w.startupGui.Flash()
+                gc.w.startupGui.Show()
+                return
+            }
+            if (A_IsAdmin) {
+                isDisabled := ''
+                pad := ''
+            } else {
+                isDisabled := ' Disabled'
+                pad := ' (以管理员模式运行时可用)'
+            }
             createGui(fn).Show()
             fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop +OwnDialogs", "设置开机自启动")
                 g.SetFont(fz, "微软雅黑")
                 g.AddLink(, '详情: <a href="https://inputtip.pages.dev/FAQ/#关于开机自启动">https://inputtip.pages.dev/FAQ/#关于开机自启动</a>')
                 g.AddLink(, "当前有多种方式设置开机自启动，请选择有效的方式 :`n`n1. 通过「任务计划程序」`n2. 通过软件快捷方式`n3. 通过添加「注册表」`n`n「任务计划程序」可以避免管理员授权窗口(UAC)的干扰(部分用户无效)")
-                if (A_IsAdmin) {
-                    isDisabled := ''
-                    pad := ''
-                } else {
-                    isDisabled := ' Disabled'
-                    pad := ' (以管理员模式运行时可用)'
-                }
+
                 btn := g.AddButton("w" w isDisabled, "使用「任务计划程序」" pad)
                 btn.Focus()
                 btn.OnEvent("Click", fn_startUp_task)
@@ -53,18 +81,24 @@ makeTrayMenu() {
                         RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
                         fn_handle()
                     } catch {
+                        fn_handle(1)
                         MsgBox("添加注册表失败!", , "0x1000 0x10")
                     }
                 }
-                fn_handle() {
+                g.OnEvent("Close", fn_handle)
+                fn_handle(err := 0, *) {
                     g.Destroy()
-                    if (isStartUp) {
-                        A_TrayMenu.Check(item)
-                    } else {
-                        A_TrayMenu.Uncheck(item)
+                    gc.w.startupGui := ""
+                    if (!err) {
+                        if (isStartUp) {
+                            A_TrayMenu.Check(item)
+                        } else {
+                            A_TrayMenu.Uncheck(item)
+                        }
+                        writeIni("isStartUp", isStartUp)
                     }
-                    writeIni("isStartUp", isStartUp)
                 }
+                gc.w.startupGui := g
                 return g
             }
         }
@@ -74,8 +108,14 @@ makeTrayMenu() {
     }
     A_TrayMenu.Add("设置更新检测", fn_check_update)
     fn_check_update(item, *) {
+        if (gc.w.checkUpdateGui) {
+            gc.w.checkUpdateGui.Flash()
+            gc.w.checkUpdateGui.Show()
+            return
+        }
         createGui(fn).Show()
         fn(x, y, w, h) {
+            gc.checkUpdateDelay := checkUpdateDelay
             g := Gui("AlwaysOnTop", "InputTip - 设置更新检测")
             g.SetFont(fz, "微软雅黑")
             g.AddText("cRed", "- 单位: 分钟，默认 1440 分钟(1 天)。`n- 避免程序错误，可以设置的最大范围是 0-50000 分钟。`n- 如果为 0，则表示不检测版本更新。`n- 如果不为 0，在 InputTip 启动后，会立即检测一次。`n- 如果大于 50000，则会直接使用 50000。`n")
@@ -97,11 +137,25 @@ makeTrayMenu() {
                     }
                 }
             }
+            g.OnEvent("Close", close)
+            close(*) {
+                g.Destroy()
+                gc.w.checkUpdateGui := ""
+                if (gc.checkUpdateDelay = 0 && checkUpdateDelay != 0) {
+                    checkUpdate(1)
+                }
+            }
+            gc.w.checkUpdateGui := g
             return g
         }
     }
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     fn_input_mode(item, *) {
+        if (gc.w.inputModeGui) {
+            gc.w.inputModeGui.Flash()
+            gc.w.inputModeGui.Show()
+            return
+        }
         createGui(fn).Show()
         fn(x, y, w, h) {
             global statusModeEN, conversionModeEN, mode, checkTimeout, gc
@@ -129,6 +183,10 @@ makeTrayMenu() {
                 last := item.Value
 
                 if (item.Value = 1) {
+                    if (gc.w.customModeGui) {
+                        gc.w.customModeGui.Destroy()
+                        gc.w.customModeGui := ""
+                    }
                     createGui(fn).Show()
                     fn(x, y, w, h) {
                         g := Gui("AlwaysOnTop")
@@ -136,7 +194,9 @@ makeTrayMenu() {
                         bw := w - g.MarginX * 2
                         g.AddText("cRed", "请前往 「自定义」 配置页面中设置，此处无法直接修改")
                         g.AddText("cRed", "在配置页面的左上角，「基础配置」的右侧")
-                        g.AddButton("w" bw, "我知道了").OnEvent("Click", yes)
+                        y := g.AddButton("w" bw, "我知道了")
+                        y.OnEvent("Click", yes)
+                        y.Focus()
                         g.OnEvent("Close", yes)
                         yes(*) {
                             g.Destroy()
@@ -144,6 +204,7 @@ makeTrayMenu() {
                                 gc.mode.Value := mode + 1
                             }
                         }
+                        gc.w.customModeGui := g
                         return g
                     }
                 } else {
@@ -209,6 +270,10 @@ makeTrayMenu() {
                 if (useShift = item.Value) {
                     createGui(fn).Show()
                     fn(x, y, w, h) {
+                        if (gc.w.shiftSwitchGui) {
+                            gc.w.shiftSwitchGui.Destroy()
+                            gc.w.shiftSwitchGui := ""
+                        }
                         g := Gui("AlwaysOnTop")
                         g.SetFont(fz, "微软雅黑")
                         bw := w - g.MarginX * 2
@@ -217,6 +282,7 @@ makeTrayMenu() {
                         g.AddText("cRed", "更建议不要使用【否】，而是启用 Shift 切换状态，这也是几乎所有输入法的默认设置。")
                         g.AddButton("w" bw, "我确定要使用【否】").OnEvent("Click", yes)
                         g.AddButton("w" bw, "不，我只是误点了").OnEvent("Click", no)
+                        g.OnEvent("Close", no)
                         yes(*) {
                             g.Destroy()
                             value := item.Value - 1
@@ -229,6 +295,7 @@ makeTrayMenu() {
                                 gc.useShift.Value := useShift + 1
                             }
                         }
+                        gc.w.shiftSwitchGui := g
                         return g
                     }
                 } else {
@@ -327,11 +394,23 @@ makeTrayMenu() {
                 }
             }
             g.AddEdit("xs r10 ReadOnly cGray w" w, "1. 当点击按钮 「显示实时的状态码和切换码」之后，在鼠标位置会实时显示当前的状态码和切换码。`n2. 你需要来回切换输入法中英文状态进行观察，如果不同状态时的值是唯一的，就将它填入对应的输入框中。`n3. 英文状态时的状态码和切换码在不同窗口可能不同，但只要是唯一的，就应该被填写，多个就用空格分割。`n`n举个例子: `n假如当你切换到英文后，状态码显示 0，切换码显示 1025。`n切换到中文后，状态码显示 1，切换码显示 1025。`n换到另一个窗口后又发现，英文时状态码显示 3，切换码显示 1025，中文时状态码显示 4，切换码显示 1025。`n可以发现，英文的状态码 0 和 3 是唯一的，没有在中文状态时出现，因此当状态码是它们时，可以确定当前一定是英文状态，像这样的就应该将它们填入状态码输入框中，用空格分割，即 0 3`n而切换码相反，中英文状态时都为 1025，没有办法通过 1025 去判断当前是中文还是英文，就不填切换码，保持切换码为空。")
+
+            g.OnEvent("Close", fn_close)
+            fn_close(*) {
+                g.Destroy()
+                gc.w.inputModeGui := ""
+            }
+            gc.w.inputModeGui := g
             return g
         }
     }
     A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)
     fn_bw_list(*) {
+        if (gc.w.bwListGui) {
+            gc.w.bwListGui.Flash()
+            gc.w.bwListGui.Show()
+            return
+        }
         createGui(fn).Show()
         fn(x, y, w, h) {
             g := Gui("AlwaysOnTop", "InputTip - 设置符号显示的黑/白名单")
@@ -339,7 +418,7 @@ makeTrayMenu() {
             bw := w - g.MarginX * 2
 
             g.AddText("cRed", "「白」名单机制: 只有在白名单中的应用进程窗口会显示符号。`n「黑」名单机制: 只有不在黑名单中的应用进程窗口会显示符号。")
-            g.AddText(, "1. 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。")
+            g.AddLink(, '1. 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。')
             g.AddText(, "-------------------------------------------------------------------------------------")
 
             g.AddText(, "选择显示符号的名单机制: ")
@@ -350,24 +429,28 @@ makeTrayMenu() {
                 global useWhiteList := value
                 restartJetBrains()
             }
-            g.AddButton("xs w" bw, "设置「白」名单").OnEvent("Click", set_white_list)
+            _c := g.AddButton("xs w" bw, "设置「白」名单")
+            _c.OnEvent("Click", set_white_list)
+            _c.Focus()
             set_white_list(*) {
-                g.Destroy()
+                fn_close()
                 fn_white_list()
             }
             g.AddButton("xs w" bw, "设置「黑」名单").OnEvent("Click", set_black_list)
             set_black_list(*) {
-                g.Destroy()
+                fn_close()
                 fn_common({
+                    gui: "blackListGui",
                     config: "app_hide_state",
                     tab: ["管理黑名单", "关于"],
                     tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
                     list: "符号显示黑名单",
                     color: "cRed",
-                    about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「符号显示黑名单」中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的 「通过输入进程名称手动添加」直接添加进程名称。`n- 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将它移除。`n`n- 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n- 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n- 建议使用白名单机制，最好少用黑名单机制。',
+                    about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示黑名单」中。`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击右下角的 「通过输入进程名称手动添加」直接添加进程名称。`n   - 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效。`n   - 双击列表中任意应用进程，就可以将它移除。`n`n   - 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n   - 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n   - 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，最好少用黑名单机制。`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
                     addConfirm: "是否要将",
                     addConfirm2: "添加到「符号显示黑名单」中？",
                     addConfirm3: "添加后，黑名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
+                    addConfirm4: "",
                     rmConfirm: "是否要将",
                     rmConfirm2: "从「符号显示黑名单」中移除？",
                     rmConfirm3: "移除后，黑名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",
@@ -379,6 +462,12 @@ makeTrayMenu() {
                     restartJetBrains()
                 }
             }
+            g.OnEvent("Close", fn_close)
+            fn_close(*) {
+                g.Destroy()
+                gc.w.bwListGui := ""
+            }
+            gc.w.bwListGui := g
             return g
         }
     }
@@ -386,6 +475,11 @@ makeTrayMenu() {
     A_TrayMenu.Add("暂停/运行", pauseApp)
     A_TrayMenu.Add("暂停/运行快捷键", fn_pause_hotkey)
     fn_pause_hotkey(*) {
+        if (gc.w.pauseHotkeyGui) {
+            gc.w.pauseHotkeyGui.Flash()
+            gc.w.pauseHotkeyGui.Show()
+            return
+        }
         hotkeyGui := Gui("AlwaysOnTop")
         hotkeyGui.SetFont(fz, "微软雅黑")
         hotkeyGui.AddText(, "-------------------------------------------------------------------------------------")
@@ -445,7 +539,7 @@ makeTrayMenu() {
         tab.UseTab(2)
         hotkeyGui.AddLink("Section", "1.")
         hotkeyGui.AddLink("yp cRed", "优先使用「设置组合快捷键」设置，除非因为快捷键占用无法设置。")
-        hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/enter-shortcuts-manually">https://inputtip.pages.dev/enter-shortcuts-manually</a>')
+        hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">https://inputtip.pages.dev/FAQ/enter-shortcuts-manually</a>')
         hotkeyGui.AddText("xs", "3.  如果 InputTip 正在运行，此时按下快捷键，会停止运行。")
         hotkeyGui.AddText("xs", "4.  如果 InputTip 已经暂停，此时按下快捷键，会恢复运行。")
         hotkeyGui.AddText("xs", "-------------------------------------------------------------------------------------")
@@ -480,6 +574,13 @@ makeTrayMenu() {
             writeIni("hotkey_Pause", key)
             fn_restart()
         }
+
+        hotkeyGui.OnEvent("Close", fn_close)
+        fn_close(*) {
+            hotkeyGui.Destroy()
+            gc.w.pauseHotkeyGui := ""
+        }
+        gc.w.pauseHotkeyGui := hotkeyGui
         hotkeyGui.Show()
     }
     A_TrayMenu.Add("打开软件所在目录", fn_open_dir)
@@ -489,6 +590,11 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
     fn_config(*) {
+        if (gc.w.configGui) {
+            gc.w.configGui.Flash()
+            gc.w.configGui.Show()
+            return
+        }
         line := "-----------------------------------------------------------------------------------------------"
         configGui := Gui("AlwaysOnTop")
         configGui.SetFont(fz, "微软雅黑")
@@ -534,15 +640,22 @@ makeTrayMenu() {
 
                 createGui(fn).Show()
                 fn(x, y, w, h) {
+                    if (gc.w.subGui) {
+                        gc.w.subGui.Destroy()
+                        gc.w.subGui := ""
+                    }
                     g := Gui("AlwaysOnTop")
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText(, "正在尝试恢复到使用 InputTip 之前的鼠标样式。")
                     g.AddText("cRed", "可能无法完全恢复，你需要进行以下额外步骤或者重启系统:`n1. 进入「系统设置」=>「蓝牙和其他设备」=> 「鼠标」=>「其他鼠标设置」`n2. 先更改为另一个鼠标样式方案，再改回你之前使用的方案")
-                    g.AddButton("w" bw, "我知道了").OnEvent("Click", yes)
+                    y := g.AddButton("w" bw, "我知道了")
+                    y.OnEvent("Click", yes)
+                    y.Focus()
                     yes(*) {
                         g.Destroy()
                     }
+                    gc.w.subGui := g
                     return g
                 }
             } else {
@@ -563,7 +676,7 @@ makeTrayMenu() {
             updateSymbol()
             reloadSymbol()
         }
-        configGui.AddText("xs", "3. 无操作时，符号在多少")
+        configGui.AddText("xs", "3. 无键盘和鼠标左键点击操作时，符号在多少")
         configGui.AddText("yp cRed", "毫秒")
         configGui.AddText("yp", "后隐藏:")
         configGui.AddEdit("yp w150 Number", HideSymbolDelay).OnEvent("Change", fn_hide_symbol_delay)
@@ -581,7 +694,7 @@ makeTrayMenu() {
             updateDelay()
             restartJetBrains()
         }
-        configGui.AddEdit("xs Disabled -VScroll w" Gui_width, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，实际生效的值是 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
+        configGui.AddEdit("xs Disabled -VScroll w" Gui_width, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
         configGui.AddText("xs", "4. 每多少")
         configGui.AddText("yp cRed", "毫秒")
         configGui.AddText("yp", "后更新符号的显示位置和状态:")
@@ -659,6 +772,10 @@ makeTrayMenu() {
         }
         configGui.AddButton("xs w" Gui_width, "下载鼠标样式扩展包").OnEvent("Click", fn_cursor_package)
         fn_cursor_package(*) {
+            if (gc.w.subGui) {
+                gc.w.subGui.Destroy()
+                gc.w.subGui := ""
+            }
             dlGui := Gui("AlwaysOnTop", "下载鼠标样式扩展包")
             dlGui.SetFont(fz, "微软雅黑")
             dlGui.AddText("Center h30", "从以下任意可用地址中下载鼠标样式扩展包:")
@@ -667,6 +784,7 @@ makeTrayMenu() {
             dlGui.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
             dlGui.AddText(, "其中的鼠标样式已经完成适配，解压到 InputTipCursor 目录中即可使用")
             dlGui.Show()
+            gc.w.subGui := dlGui
         }
         tab.UseTab(3)
         configGui.AddLink("Section", '点击下方链接查看图片符号的详情说明: <a href="https://inputtip.pages.dev/v2/#图片符号">官网</a>   <a href="https://github.com/abgox/InputTip#图片符号">Github</a>   <a href="https://gitee.com/abgox/InputTip#图片符号">Gitee</a>' "`n" line)
@@ -771,6 +889,10 @@ makeTrayMenu() {
 
         configGui.AddButton("xs w" Gui_width, "下载图片符号扩展包").OnEvent("Click", fn_pic_package)
         fn_pic_package(*) {
+            if (gc.w.subGui) {
+                gc.w.subGui.Destroy()
+                gc.w.subGui := ""
+            }
             dlGui := Gui("AlwaysOnTop", "下载图片符号扩展包")
             dlGui.SetFont(fz, "微软雅黑")
             dlGui.AddText("Center h30", "从以下任意可用地址中下载图片符号扩展包:")
@@ -779,6 +901,7 @@ makeTrayMenu() {
             dlGui.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
             dlGui.AddText(, "将其中的图片解压到 InputTipSymbol 目录中即可使用")
             dlGui.Show()
+            gc.w.subGui := dlGui
         }
 
         tab.UseTab(4)
@@ -998,6 +1121,12 @@ makeTrayMenu() {
         configGui.AddLink(, '<a href="https://color.adobe.com/zh/create/color-wheel">https://color.adobe.com/zh/create/color-wheel</a>')
         configGui.AddLink(, '<a href="https://colordesigner.io/color-palette-builder">https://colordesigner.io/color-palette-builder</a>')
 
+        configGui.OnEvent("Close", fn_close)
+        fn_close(*) {
+            configGui.Destroy()
+            gc.w.configGui := ""
+        }
+        gc.w.configGui := configGui
         configGui.Show()
         SetTimer(getDirTimer, -1)
         getDirTimer() {
@@ -1015,6 +1144,11 @@ makeTrayMenu() {
     }
     A_TrayMenu.Add("设置状态切换快捷键", fn_switch_key)
     fn_switch_key(*) {
+        if (gc.w.switchKeyGui) {
+            gc.w.switchKeyGui.Flash()
+            gc.w.switchKeyGui.Show()
+            return
+        }
         hotkeyGui := Gui("AlwaysOnTop")
         hotkeyGui.SetFont(fz, "微软雅黑")
         hotkeyGui.AddText(, "-------------------------------------------------------------------------------------")
@@ -1162,7 +1296,7 @@ makeTrayMenu() {
         tab.UseTab(3)
         hotkeyGui.AddLink("Section", "1.")
         hotkeyGui.AddLink("yp cRed", "优先使用「设置单键」或「设置组合快捷键」设置，除非因为快捷键占用无法设置。")
-        hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/enter-shortcuts-manually">https://inputtip.pages.dev/enter-shortcuts-manually</a>`n-------------------------------------------------------------------------------------')
+        hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">https://inputtip.pages.dev/FAQ/enter-shortcuts-manually</a>`n-------------------------------------------------------------------------------------')
         for v in configList {
             hotkeyGui.AddText("xs", "强制切换到")
             hotkeyGui.AddText("yp cRed", v.tip)
@@ -1200,22 +1334,34 @@ makeTrayMenu() {
             }
             fn_restart()
         }
+
+        hotkeyGui.OnEvent("Close", fn_close)
+        fn_close(*) {
+            hotkeyGui.Destroy()
+            gc.w.switchKeyGui := ""
+        }
+        gc.w.switchKeyGui := hotkeyGui
         hotkeyGui.Show()
     }
     A_TrayMenu.Add("指定窗口自动切换状态", fn_window)
     fn_window(*) {
-        show()
-        show(deep := "") {
+        showGui()
+        showGui(deep := "") {
+            if (gc.w.windowToggleGui) {
+                gc.w.windowToggleGui.Flash()
+                gc.w.windowToggleGui.Show()
+                return
+            }
             createGui(fn).Show()
             fn(x, y, w, h) {
                 g := Gui("AlwaysOnTop")
                 g.SetFont(fz, "微软雅黑")
                 bw := w - g.MarginX * 2
 
-                tab := g.AddTab3("-Wrap", ["管理自动切换", "关于"])
+                tab := g.AddTab3("-Wrap", ["管理状态自动切换", "关于"])
                 tab.UseTab(1)
                 g.AddLink("Section cRed", "你首先应该点击上方的 「关于」查看具体的操作说明。")
-                gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题"])
+                gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题", "应用进程文件所在位置"])
                 gc.LV_add.OnEvent("DoubleClick", fn_add)
                 fn_add(LV, RowNumber) {
                     handleClick(LV, RowNumber, "add")
@@ -1234,7 +1380,7 @@ makeTrayMenu() {
                         title := WinGetTitle("ahk_id " v)
                         if (!InStr(temp, ":" exe_name ":") && !InStr(res, ":" exe_name ":")) {
                             temp .= exe_name ":"
-                            gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v))
+                            gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
                         }
                     }
                 }
@@ -1413,6 +1559,10 @@ makeTrayMenu() {
                     addApp(v) {
                         createGui(fn).Show()
                         fn(x, y, w, h) {
+                            if (gc.w.subGui) {
+                                gc.w.subGui.Destroy()
+                                gc.w.subGui := ""
+                            }
                             g_2 := Gui("AlwaysOnTop", "InputTip - 通过输入进程名称手动添加")
                             g_2.SetFont(fz, "微软雅黑")
                             bw := w - g_2.MarginX * 2
@@ -1445,7 +1595,9 @@ makeTrayMenu() {
                                         g_2.SetFont(fz, "微软雅黑")
                                         bw := w - g_2.MarginX * 2
                                         g_2.AddText(, "进程名称不符合格式要求，请重新输入")
-                                        g_2.AddButton("w" bw, "我知道了").OnEvent("click", close)
+                                        y := g_2.AddButton("w" bw, "我知道了")
+                                        y.OnEvent("click", close)
+                                        y.Focus()
                                         close(*) {
                                             g_2.Destroy()
                                             addApp(exe_name)
@@ -1466,6 +1618,7 @@ makeTrayMenu() {
                                 global app_EN := ":" readIni('app_EN', '') ":"
                                 global app_Caps := ":" readIni('app_Caps', '') ":"
                             }
+                            gc.w.subGui := g_2
                             return g_2
                         }
                     }
@@ -1473,30 +1626,43 @@ makeTrayMenu() {
                 if (deep) {
                     g.AddButton("yp w" bw / 2, "显示更少进程(仅包含已经打开的窗口)").OnEvent("Click", fn_less_window)
                     fn_less_window(*) {
-                        g.Destroy()
-                        show("")
+                        fn_close()
+                        showGui("")
                     }
                 } else {
                     g.AddButton("yp w" bw / 2, "显示更多进程(包含后台和隐藏窗口)").OnEvent("Click", fn_more_window)
                     fn_more_window(*) {
-                        g.Destroy()
-                        show(1)
+                        fn_close()
+                        showGui(1)
                     }
                 }
                 gc.LV_add.ModifyCol(1, "AutoHdr")
                 gc.LV_add.ModifyCol(2, "AutoHdr")
+                gc.LV_add.ModifyCol(3, "AutoHdr")
                 tab.UseTab(2)
-                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
+                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
+
+                g.OnEvent("Close", fn_close)
+                fn_close(*) {
+                    g.Destroy()
+                    gc.w.windowToggleGui := ""
+                }
+                gc.w.windowToggleGui := g
                 return g
             }
         }
     }
     A_TrayMenu.Add("设置特殊偏移量", fn_offset)
     fn_offset(*) {
+        if (gc.w.offsetGui) {
+            gc.w.offsetGui.Flash()
+            gc.w.offsetGui.Show()
+            return
+        }
         offsetGui := Gui("AlwaysOnTop")
         offsetGui.SetFont(fz, "微软雅黑")
         offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己手动的通过调整对应屏幕的偏移量，使其正确显示`n- 注意: 你需要先开启 Java Access Bridge，具体操作步骤，请查看以下网址:")
-        offsetGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
+        offsetGui.AddLink(, '<a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网: 如何在 Jetbrains 系列 IDE 中使用 InputTip</a>')
         offsetGui.Show("Hide")
         offsetGui.GetPos(, , &Gui_width)
         offsetGui.Destroy()
@@ -1505,14 +1671,19 @@ makeTrayMenu() {
         offsetGui.SetFont(fz, "微软雅黑")
         tab := offsetGui.AddTab3("-Wrap", ["JetBrains IDE"])
         tab.UseTab(1)
-        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 需要自己通过手动调整对应屏幕的偏移量，使其正确显示`n- 你可以通过以下链接了解如何在 JetBrains 系列 IDE 中使用 InputTip :")
-        offsetGui.AddLink(, '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-        btn := offsetGui.AddButton("w" Gui_width, "设置 JetBrains 系列 IDE 的偏移量")
+        offsetGui.AddText("Section", "- 由于 JetBrains 系列 IDE，在副屏上会存在极大的坐标偏差`n- 你需要通过手动调整对应屏幕的偏移量，使其正确显示`n`n- 通过以下链接了解如何在 Jetbrains 系列 IDE 中使用 InputTip")
+        offsetGui.AddLink(, '   <a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>`n')
+        btn := offsetGui.AddButton("w" Gui_width - offsetGui.MarginX * 2, "设置 JetBrains 系列 IDE 的偏移量")
         btn.Focus()
         btn.OnEvent("Click", JetBrains_offset)
 
         JetBrains_offset(*) {
-            offsetGui.Destroy()
+            fn_close()
+            if (gc.w.JetBrainsOffsetGui) {
+                gc.w.JetBrainsOffsetGui.Flash()
+                gc.w.JetBrainsOffsetGui.Show()
+                return
+            }
             JetBrainsGui := Gui("AlwaysOnTop", "InputTip - 设置 JetBrains 系列 IDE 的偏移量")
             JetBrainsGui.SetFont(fz, "微软雅黑")
             screenList := getScreenInfo()
@@ -1530,7 +1701,7 @@ makeTrayMenu() {
                     JetBrainsGui.AddText(, "这是副屏幕(副显示器)")
                 }
 
-                JetBrainsGui.AddText(, "屏幕坐标信息: 左上角(" v.left ", " v.top ")，右下角(" v.right ", " v.bottom ")")
+                JetBrainsGui.AddText(, "屏幕坐标信息(X,Y): 左上角(" v.left ", " v.top ")，右下角(" v.right ", " v.bottom ")")
 
                 x := 0, y := 0
                 try {
@@ -1555,8 +1726,20 @@ makeTrayMenu() {
                     writeIni("offset_JetBrains_y_" item.__num, returnNumber(item.Value))
                 }
             }
+            JetBrainsGui.OnEvent("Close", close)
+            close(*) {
+                JetBrainsGui.Destroy()
+                gc.w.JetBrainsOffsetGui := ""
+            }
+            gc.w.JetBrainsOffsetGui := JetBrainsGui
             JetBrainsGui.Show()
         }
+        offsetGui.OnEvent("Close", fn_close)
+        fn_close(*) {
+            offsetGui.Destroy()
+            gc.w.offsetGui := ""
+        }
+        gc.w.offsetGui := offsetGui
         offsetGui.Show()
     }
     A_TrayMenu.Add("启用 JetBrains IDE 支持", fn_JetBrains)
@@ -1567,27 +1750,36 @@ makeTrayMenu() {
         if (enableJetBrainsSupport) {
             FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
             waitFileInstall("InputTip.JAB.JetBrains.exe", 0)
-            createGui(fn).Show()
-            fn(x, y, w, h) {
-                g := Gui("AlwaysOnTop")
-                g.SetFont(fz, "微软雅黑")
-                bw := w - g.MarginX * 2
-                g.AddText(, "已成功启用 JetBrains IDE 支持，你还需要进行以下步骤:")
-                g.AddEdit("xs -VScroll ReadOnly w" bw, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保要使用的 IDE 已经添加`n3. 如果正在使用白名单机制，还需要添加到白名单中。`n4. 如果未生效，请重启正在使用的 JetBrains IDE 或重启系统")
-                g.AddText(, "具体操作步骤，请查看以下任意网址:")
-                g.AddLink(, '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-                g.AddLink(, '- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-                g.AddLink(, '- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-                _c := g.AddButton("xs w" bw, "我知道了")
-                _c.OnEvent("Click", yes)
-                _c.Focus()
-                yes(*) {
-                    g.Destroy()
-                }
-                return g
+
+            ideGui := Gui("AlwaysOnTop", "InputTip - 启用 JetBrains IDE 支持")
+            ideGui.SetFont(fz, "微软雅黑")
+            ideGui.AddText(, "------------------------------------------------------------------------------")
+            ideGui.Show("Hide")
+            ideGui.GetPos(, , &Gui_width)
+            ideGui.Destroy()
+
+            ideGui := Gui("AlwaysOnTop", "InputTip - 启用 JetBrains IDE 支持")
+            ideGui.SetFont(fz, "微软雅黑")
+            ideGui.AddText(, "已经成功启用了 JetBrains IDE 支持，你还需要进行以下步骤:")
+
+            ideGui.AddEdit("xs -VScroll ReadOnly w" Gui_width, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保要使用的 IDE 已经添加`n3. 如果未生效，请重启正在使用的 JetBrains IDE`n4. 如果仍未生效，请重启 InputTip 或重启系统")
+            ideGui.AddLink(, '详细操作步骤，请查看:   <a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>')
+            y := ideGui.AddButton("xs w" Gui_width, "我知道了")
+            y.OnEvent("Click", yes)
+            y.Focus()
+            ideGui.OnEvent("Close", yes)
+            yes(*) {
+                ideGui.Destroy()
+                gc.w.enableJetBrainsGui := ""
             }
+            gc.w.enableJetBrainsGui := ideGui
+            ideGui.Show()
             runJetBrains()
         } else {
+            if (gc.w.enableJetBrainsGui) {
+                gc.w.enableJetBrainsGui.Destroy()
+                gc.w.enableJetBrainsGui := ""
+            }
             SetTimer(killAppTimer, -10)
             killAppTimer() {
                 try {
@@ -1605,20 +1797,17 @@ makeTrayMenu() {
     A_TrayMenu.Add("添加 JetBrains IDE 应用", fn_add_JetBrains)
     fn_add_JetBrains(*) {
         fn_common({
+            gui: "addJetBrainsGui",
             config: "JetBrains_list",
             tab: ["管理 JetBrains IDE 应用", "关于"],
             tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
             list: "JetBrains IDE 应用列表",
             color: "cBlue",
-            about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方是「JetBrains IDE 应用进程列表」。`n- 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n- 如果正在使用白名单机制，还需要再添加到白名单中。`n- 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将它移除。`n- 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n- 如果未生效，请检查是否完成所有操作步骤。`n`n操作步骤相关链接: `n`n- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
-            addTopText: "2. 双击应用进程进行添加`n3. 如果有非 JetBrains 系列 IDE 应用进程被意外添加，请立即移除`n4. 白名单机制下，还需要再添加到白名单中才会有效。",
-            addList: "以下列表是当前正在运行的应用进程",
-            addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
+            about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n   - 下方是「JetBrains IDE 应用进程列表」。`n   - 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n   - 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将它移除。`n   - 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n   - 如果未生效，请检查是否完成「启用 JetBrains IDE 支持」中的所有操作步骤。`n      - 你应该访问这些相关链接:   <a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
             addConfirm: "是否要添加",
             addConfirm2: "？",
-            addConfirm3: "注意: 如果此应用进程不是 JetBrains 系列 IDE 应用程序，你不应该添加它",
-            rmTopText: "2. 双击应用进程进行移除`n3. 如果有非 JetBrains 系列 IDE 应用进程被意外添加，请立即移除",
-            rmList: "以下列表是已经添加的 JetBrains 系列 IDE 应用程序",
+            addConfirm3: "如果它不是 JetBrains 系列 IDE 应用程序，你不能添加它`n如果不小心添加了，必须立即移除。",
+            addConfirm4: "此处的「添加」按钮会将它同步添加到白名单中。",
             rmConfirm: "是否要将",
             rmConfirm2: "移除？",
             rmConfirm3: "如果它是一个 JetBrains 系列 IDE 应用程序，不建议移除它。`n反之，如果它不是，请立即移除。",
@@ -1637,6 +1826,11 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
     fn_about(*) {
+        if (gc.w.aboutGui) {
+            gc.w.aboutGui.Flash()
+            gc.w.aboutGui.Show()
+            return
+        }
         aboutGui := Gui("AlwaysOnTop")
         aboutGui.SetFont(fz, "微软雅黑")
         aboutGui.AddText(, "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具")
@@ -1685,9 +1879,12 @@ makeTrayMenu() {
         btn := aboutGui.AddButton("Section w" Gui_width + aboutGui.MarginX * 2, "关闭")
         btn.Focus()
         btn.OnEvent("Click", fn_close)
+        aboutGui.OnEvent("Close", fn_close)
         fn_close(*) {
             aboutGui.Destroy()
+            gc.w.aboutGui := ""
         }
+        gc.w.aboutGui := aboutGui
         aboutGui.Show()
     }
     A_TrayMenu.Add("重启", fn_restart)
@@ -1706,55 +1903,61 @@ makeTrayMenu() {
 }
 
 fn_common(tipList, handleFn) {
-    show()
-    show(deep := "") {
+    showGui()
+    showGui(deep := "") {
+        if (gc.w.%tipList.gui%) {
+            gc.w.%tipList.gui%.Flash()
+            gc.w.%tipList.gui%.Show()
+            return
+        }
         createGui(fn).Show()
         fn(x, y, w, h) {
             g := Gui("AlwaysOnTop")
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
+            _gui := tipList.gui
             tab := g.AddTab3("-Wrap", tipList.tab)
             tab.UseTab(1)
             g.AddLink("Section cRed", tipList.tip)
-            gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题"])
-            gc.LV_add.OnEvent("DoubleClick", fn_double_click)
+            gc.%_gui "_LV_add"% := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题", "应用进程文件所在位置"])
+            gc.%_gui "_LV_add"%.OnEvent("DoubleClick", fn_double_click)
             fn_double_click(LV, RowNumber) {
                 handleClick(LV, RowNumber, "add", tipList)
             }
             value := ":" readIni(tipList.config, "") ":"
             temp := ":"
             DetectHiddenWindows deep
-            gc.LV_add.Opt("-Redraw")
+            gc.%_gui "_LV_add"%.Opt("-Redraw")
             for v in WinGetList() {
                 try {
                     exe_name := ProcessGetName(WinGetPID("ahk_id " v))
                     exe_str := ":" exe_name ":"
                     if (!InStr(temp, exe_str) && !InStr(value, exe_str)) {
                         temp .= exe_name ":"
-                        gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v))
+                        gc.%_gui "_LV_add"%.Add(, exe_name, WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
                     }
                 }
             }
-            gc.LV_add.Opt("+Redraw")
+            gc.%_gui "_LV_add"%.Opt("+Redraw")
             DetectHiddenWindows 1
 
             ; gc.title := g.AddText("Section w" bw, tipList.list)
-            ; gc.LV_rm := g.AddListView("xs IconSmall -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color)
-            gc.LV_rm := g.AddListView("xs -LV0x10 -Multi r6 NoSortHdr Sort Grid w" bw / 2 " " tipList.color, [tipList.list])
+            ; gc.%_gui "_LV_rm"% := g.AddListView("xs IconSmall -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color)
+            gc.%_gui "_LV_rm"% := g.AddListView("xs -LV0x10 -Multi r6 NoSortHdr Sort Grid w" bw / 2 " " tipList.color, [tipList.list])
             valueArr := StrSplit(readIni(tipList.config, ""), ":")
             temp := ":"
-            gc.LV_rm.Opt("-Redraw")
+            gc.%_gui "_LV_rm"%.Opt("-Redraw")
             for v in valueArr {
                 if (Trim(v) && !InStr(temp, ":" v ":")) {
-                    gc.LV_rm.Add(, v)
+                    gc.%_gui "_LV_rm"%.Add(, v)
                     temp .= v ":"
                 }
             }
-            gc.LV_rm.Opt("+Redraw")
-            ; gc.title.Text := tipList.list "(" gc.LV_rm.GetCount() "项)"
-            gc.LV_rm.ModifyCol(1, "AutoHdr")
-            gc.LV_rm.OnEvent("DoubleClick", fn_dbClick)
+            gc.%_gui "_LV_rm"%.Opt("+Redraw")
+            ; gc.title.Text := tipList.list "(" gc.%_gui "_LV_rm"%.GetCount() "项)"
+            gc.%_gui "_LV_rm"%.ModifyCol(1, "AutoHdr")
+            gc.%_gui "_LV_rm"%.OnEvent("DoubleClick", fn_dbClick)
             fn_dbClick(LV, RowNumber) {
                 handleClick(LV, RowNumber, "rm", tipList)
             }
@@ -1775,32 +1978,74 @@ fn_common(tipList, handleFn) {
                     g_1.AddLink("xs", tipList.%from "Confirm3"%)
 
                     if (from = "add") {
-                        g_1.AddButton("xs w" bw, "添加").OnEvent("Click", fn_add)
-                        fn_add(*) {
-                            g_1.Destroy()
-                            gc.LV_add.Delete(RowNumber)
-                            gc.LV_rm.Add(, RowText)
-                            ; gc.title.Text := tipList.list "(" gc.LV_rm.GetCount() "项)"
-                            config := tipList.config
-                            value := readIni(config, "")
-                            if (value) {
-                                result := value ":" RowText
-                                writeIni(config, value ":" RowText)
-                            } else {
-                                result := RowText
-                                writeIni(config, RowText)
+                        ; 需要同步添加到白名单
+                        flag := tipList.config = "JetBrains_list" && useWhiteList
+                        if (flag && tipList.addConfirm4) {
+                            g_1.AddLink("xs cRed", tipList.addConfirm4)
+                        }
+                        if (flag) {
+                            _g := g_1.AddButton("xs w" bw, "添加")
+                            _g.OnEvent("Click", fn_add_with_white_list)
+                            _g.Focus()
+                            fn_add_with_white_list(*) {
+                                global app_show_state
+                                _app_show_state := readIni("app_show_state", "")
+                                if (!InStr(app_show_state, ":" RowText ":")) {
+                                    if (_app_show_state) {
+                                        _app_show_state .= ":" RowText
+                                    } else {
+                                        _app_show_state := RowText
+                                    }
+                                    app_show_state := ":" _app_show_state ":"
+                                    writeIni("app_show_state", _app_show_state)
+                                }
+                                g_1.Destroy()
+                                gc.%_gui "_LV_add"%.Delete(RowNumber)
+                                gc.%_gui "_LV_rm"%.Add(, RowText)
+                                ; gc.title.Text := tipList.list "(" gc.%_gui "_LV_rm"%.GetCount() "项)"
+                                config := tipList.config
+                                value := readIni(config, "")
+                                if (value) {
+                                    result := value ":" RowText
+                                    writeIni(config, value ":" RowText)
+                                } else {
+                                    result := RowText
+                                    writeIni(config, RowText)
+                                }
+                                handleFn(result)
                             }
-                            handleFn(result)
+                        } else {
+                            _g := g_1.AddButton("xs w" bw, "添加")
+                            _g.OnEvent("Click", fn_add)
+                            _g.Focus()
+                            fn_add(*) {
+                                g_1.Destroy()
+                                gc.%_gui "_LV_add"%.Delete(RowNumber)
+                                gc.%_gui "_LV_rm"%.Add(, RowText)
+                                ; gc.title.Text := tipList.list "(" gc.%_gui "_LV_rm"%.GetCount() "项)"
+                                config := tipList.config
+                                value := readIni(config, "")
+                                if (value) {
+                                    result := value ":" RowText
+                                    writeIni(config, value ":" RowText)
+                                } else {
+                                    result := RowText
+                                    writeIni(config, RowText)
+                                }
+                                handleFn(result)
+                            }
                         }
                     } else {
-                        g_1.AddButton("xs w" bw, "移除").OnEvent("Click", fn_rm)
+                        _g := g_1.AddButton("xs w" bw, "移除")
+                        _g.OnEvent("Click", fn_rm)
+                        _g.Focus()
                     }
                     fn_rm(*) {
                         g_1.Destroy()
                         LV.Delete(RowNumber)
                         ; gc.title.Text := tipList.list "(" LV.GetCount() "项)"
                         try {
-                            gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
+                            gc.%_gui "_LV_add"%.Add(, RowText, WinGetTitle("ahk_exe " RowText))
                         }
                         config := tipList.config
                         value := readIni(config, "")
@@ -1821,10 +2066,10 @@ fn_common(tipList, handleFn) {
                     return g_1
                 }
             }
-            g.AddButton("Section yp w" bw / 2, "刷新上方的应用进程列表").OnEvent("Click", fn_refresh)
+            g.AddButton("Section yp w" bw / 2, "刷新应用进程列表").OnEvent("Click", fn_refresh)
             fn_refresh(*) {
-                g.Destroy()
-                show(deep)
+                fn_close()
+                showGui(deep)
             }
             g.AddButton("xs w" bw / 2, "通过输入进程名称手动添加").OnEvent("Click", fn_add_by_hand)
             fn_add_by_hand(*) {
@@ -1832,16 +2077,26 @@ fn_common(tipList, handleFn) {
                 addApp(v) {
                     createGui(fn).Show()
                     fn(x, y, w, h) {
+                        if (gc.w.subGui) {
+                            gc.w.subGui.Destroy()
+                            gc.w.subGui := ""
+                        }
                         g_2 := Gui("AlwaysOnTop", "InputTip - 手动添加进程")
                         g_2.SetFont(fz, "微软雅黑")
                         bw := w - g_2.MarginX * 2
+
+                        ; 需要同步添加到白名单
+                        flag := tipList.config = "JetBrains_list" && useWhiteList
+                        if (flag && tipList.addConfirm4) {
+                            g_2.AddText("cRed", tipList.addConfirm4)
+                        }
                         g_2.AddText(, "1. 进程名称应该是")
                         g_2.AddText("yp cRed", "xxx.exe")
                         g_2.AddText("yp", "这样的格式")
                         g_2.AddText("xs", "2. 每一次只能添加一个")
                         g_2.AddText("xs", "进程名称: ")
                         g_2.AddEdit("yp vexe_name", "").Value := v
-                        g_2.AddButton("xs w" bw, "确认添加").OnEvent("Click", yes)
+                        g_2.AddButton("xs w" bw, "添加").OnEvent("Click", yes)
                         yes(*) {
                             exe_name := g_2.Submit().exe_name
                             if (!RegExMatch(exe_name, "^.+\.\w{3}$")) {
@@ -1851,7 +2106,9 @@ fn_common(tipList, handleFn) {
                                     g_2.SetFont(fz, "微软雅黑")
                                     bw := w - g_2.MarginX * 2
                                     g_2.AddText(, "进程名称不符合格式要求，请重新输入")
-                                    g_2.AddButton("w" bw, "我知道了").OnEvent("click", close)
+                                    y := g_2.AddButton("w" bw, "我知道了")
+                                    y.OnEvent("click", close)
+                                    y.Focus()
                                     close(*) {
                                         g_2.Destroy()
                                         addApp(exe_name)
@@ -1860,7 +2117,6 @@ fn_common(tipList, handleFn) {
                                 }
                                 return
                             }
-
                             value := readIni(tipList.config, "")
                             valueArr := StrSplit(value, ":")
                             res := ""
@@ -1888,12 +2144,26 @@ fn_common(tipList, handleFn) {
                                     return g_2
                                 }
                             } else {
-                                gc.LV_rm.Add(, exe_name)
+                                if (flag) {
+                                    global app_show_state
+                                    _app_show_state := readIni("app_show_state", "")
+                                    if (!InStr(app_show_state, ":" exe_name ":")) {
+                                        if (_app_show_state) {
+                                            _app_show_state .= ":" exe_name
+                                        } else {
+                                            _app_show_state := exe_name
+                                        }
+                                        app_show_state := ":" _app_show_state ":"
+                                        writeIni("app_show_state", _app_show_state)
+                                    }
+                                }
+                                gc.%_gui "_LV_rm"%.Add(, exe_name)
                                 result := res exe_name
                                 writeIni(tipList.config, result)
                                 handleFn(result)
                             }
                         }
+                        gc.w.subGui := g_2
                         return g_2
                     }
                 }
@@ -1902,6 +2172,10 @@ fn_common(tipList, handleFn) {
             fn_clear(*) {
                 createGui(fn).Show()
                 fn(x, y, w, h) {
+                    if (gc.w.subGui) {
+                        gc.w.subGui.Destroy()
+                        gc.w.subGui := ""
+                    }
                     g_3 := Gui("AlwaysOnTop")
                     g_3.SetFont(fz, "微软雅黑")
                     bw := w - g_3.MarginX * 2
@@ -1910,35 +2184,43 @@ fn_common(tipList, handleFn) {
                     g_3.AddButton("xs w" bw, "取消").OnEvent("Click", no)
                     yes(*) {
                         g_3.Destroy()
-                        gc.LV_rm.Delete()
+                        gc.%_gui "_LV_rm"%.Delete()
                         writeIni(tipList.config, "")
                         handleFn("")
-                        g.Destroy()
-                        show(deep)
+                        fn_close()
+                        showGui(deep)
                     }
                     no(*) {
                         g_3.Destroy()
                     }
+                    gc.w.subGui := g_3
                     return g_3
                 }
             }
             if (deep) {
                 g.AddButton("xs w" bw / 2, "显示更少进程(仅包含已经打开的窗口)").OnEvent("Click", fn_less_window)
                 fn_less_window(*) {
-                    g.Destroy()
-                    show("")
+                    fn_close()
+                    showGui("")
                 }
             } else {
                 g.AddButton("xs w" bw / 2, "显示更多进程(包含后台和隐藏窗口)").OnEvent("Click", fn_more_window)
                 fn_more_window(*) {
-                    g.Destroy()
-                    show(1)
+                    fn_close()
+                    showGui(1)
                 }
             }
-            gc.LV_add.ModifyCol(1, "AutoHdr")
-            gc.LV_add.ModifyCol(2, "AutoHdr")
+            gc.%_gui "_LV_add"%.ModifyCol(1, "AutoHdr")
+            gc.%_gui "_LV_add"%.ModifyCol(2, "AutoHdr")
+            gc.%_gui "_LV_add"%.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
             g.AddLink(, tipList.about)
+            g.OnEvent("Close", fn_close)
+            fn_close(*) {
+                g.Destroy()
+                gc.w.%tipList.gui% := ""
+            }
+            gc.w.%tipList.gui% := g
             return g
         }
     }
@@ -1946,15 +2228,17 @@ fn_common(tipList, handleFn) {
 
 fn_white_list(*) {
     fn_common({
+        gui: "whiteListGui",
         config: "app_show_state",
         tab: ["管理白名单", "关于"],
         tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
         list: "符号显示白名单",
         color: "cGreen",
-        about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将它移除。`n`n- 白名单机制: 只有在白名单中的应用进程窗口才会显示符号。`n- 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n- 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n- 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n- 如果勾选了「启用 JetBrains IDE 支持」，还需要将相关 IDE 进程添加到白名单中。',
+        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中。`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击右下角的 「通过输入进程名称手动添加」直接添加进程名称。`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效。`n   - 双击列表中任意应用进程，就可以将它移除。`n`n   - <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a> : 只有在白名单中的应用进程窗口才会显示符号。`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
         addConfirm: "是否要将",
         addConfirm2: "添加到「符号显示白名单」中？",
         addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",
+        addConfirm4: "",
         rmConfirm: "是否要将",
         rmConfirm2: "从「符号显示白名单」中移除？",
         rmConfirm3: "移除后，白名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",

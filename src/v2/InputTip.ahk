@@ -24,7 +24,44 @@ fileLnk := filename ".lnk"
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
 
 ; GUI 控件(gui control)
-gc := {}
+gc := {
+    ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
+    w: {
+        ; 开机自启动
+        startupGui: "",
+        cancelStartupGui: "",
+        ; 设置更新检测
+        checkUpdateGui: "",
+        ; 设置输入法模式
+        inputModeGui: "",
+        ; 符号显示黑/白名单
+        bwListGui: "",
+        ; 暂停/运行快捷键
+        pauseHotkeyGui: "",
+        ; 更改配置
+        configGui: "",
+        ; 设置状态切换快捷键
+        switchKeyGui: "",
+        ; 指定窗口自动切换状态
+        windowToggleGui: "",
+        ; 设置特殊偏移量
+        offsetGui: "",
+        ; 设置 JetBrains IDE 偏移量
+        JetBrainsOffsetGui: "",
+        ; 启用 JetBrains IDE 支持
+        enableJetBrainsGui: "",
+        ; 应用列表
+        blackListGui: "",
+        whiteListGui: "",
+        addJetBrainsGui: "",
+        ; 关于
+        aboutGui: "",
+        ; 二级菜单
+        subGui: "",
+        customModeGui: "",
+        shiftSwitchGui: "",
+    }
+}
 
 ; 配置菜单的字体大小
 

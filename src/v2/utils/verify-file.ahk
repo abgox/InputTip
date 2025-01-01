@@ -55,12 +55,7 @@ waitFileInstall(path, isExit := 1) {
  * - 当配置文件不存在时，选择是否修改鼠标样式
  */
 checkIni() {
-    if (FileExist("InputTip.ini")) {
-        c := IniRead("InputTip.ini", "config-v2")
-        if (InStr(c, "isStartUp") && !InStr(c, "JetBrains_list")) {
-            writeIni("JetBrains_list", "WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:Idea64.exe:DataSpell64.exe")
-        }
-    } else {
+    if (!FileExist("InputTip.ini")) {
         ; 是否使用白名单机制，如果是第一次使用，就直接使用白名单机制
         useWhiteList := readIni("useWhiteList", 1)
 
@@ -127,9 +122,11 @@ checkIni() {
             bw := w - g.MarginX * 2
 
             g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
-            g.AddText("cRed", "白名单机制: 只有在白名单中的应用进程窗口会显示符号。")
+            g.AddLink("cRed", '<a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
             g.AddText(, "建议立即添加应用进程到白名单中。")
-            g.AddButton("w" bw, "【是】现在就添加应用进程").OnEvent("Click", add_white_list)
+            _c := g.AddButton("w" bw, "【是】现在就添加应用进程")
+            _c.OnEvent("Click", add_white_list)
+            _c.Focus()
             g.AddButton("w" bw, "【否】不了，等一下再添加").OnEvent("Click", no)
             add_white_list(*) {
                 g.Destroy()

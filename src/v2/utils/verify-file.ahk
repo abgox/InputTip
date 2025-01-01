@@ -61,6 +61,9 @@ checkIni() {
             writeIni("JetBrains_list", "WebStorm64.exe:DataGrip64.exe:PhpStorm64.exe:PyCharm64.exe:Rider64.exe:CLion64.exe:RubyMine64.exe:GoLand64.exe:Idea64.exe:DataSpell64.exe")
         }
     } else {
+        ; 是否使用白名单机制，如果是第一次使用，就直接使用白名单机制
+        useWhiteList := readIni("useWhiteList", 1)
+
         isContinue := true
         createGui(fn1).Show()
         fn1(x, y, w, h) {

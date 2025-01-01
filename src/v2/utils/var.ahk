@@ -44,8 +44,8 @@ checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 ; 是否使用 Shift 键切换输入法状态
 useShift := readIni("useShift", 1)
 
-; 是否启用白名单
-useWhiteList := readIni("useWhiteList", 1)
+; 是否使用白名单机制
+useWhiteList := readIni("useWhiteList", 0)
 
 ; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)

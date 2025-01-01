@@ -358,7 +358,8 @@ makeTrayMenu() {
                     tab: ["管理黑名单", "关于"],
                     tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
                     list: "符号显示黑名单",
-                    about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到 「符号显示黑名单」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将其移除。`n`n- 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n- 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n- 建议使用白名单机制，最好少用黑名单机制。',
+                    color: "cRed",
+                    about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到 「符号显示黑名单」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将它移除。`n`n- 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n- 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n- 建议使用白名单机制，最好少用黑名单机制。',
                     addConfirm: "是否要将",
                     addConfirm2: "添加到「符号显示黑名单」中？",
                     addConfirm3: "添加后，黑名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
@@ -1357,19 +1358,19 @@ makeTrayMenu() {
                             {
                                 g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
                                 g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
-                                g_1.AddButton("xs w" bw, "将其移除").OnEvent("Click", fn_rm)
+                                g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
                             }
                             case "EN":
                             {
                                 g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
                                 g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
-                                g_1.AddButton("xs w" bw, "将其移除").OnEvent("Click", fn_rm)
+                                g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
                             }
                             case "Caps":
                             {
                                 g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
                                 g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
-                                g_1.AddButton("xs w" bw, "将其移除").OnEvent("Click", fn_rm)
+                                g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
                             }
                         }
                         fn_rm(*) {
@@ -1377,8 +1378,6 @@ makeTrayMenu() {
                             LV.Delete(RowNumber)
                             try {
                                 gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
-                            } catch {
-                                gc.LV_add.Add(, RowText)
                             }
                             config := "app_" from
                             value := readIni(config, "")
@@ -1479,8 +1478,9 @@ makeTrayMenu() {
                     }
                 }
                 gc.LV_add.ModifyCol(1, "AutoHdr")
+                gc.LV_add.ModifyCol(2, "AutoHdr")
                 tab.UseTab(2)
-                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将其移除或者添加到其他列表中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
+                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
                 return g
             }
         }
@@ -1567,12 +1567,14 @@ makeTrayMenu() {
                 g.SetFont(fz, "微软雅黑")
                 bw := w - g.MarginX * 2
                 g.AddText(, "已成功启用 JetBrains IDE 支持，你还需要进行以下步骤:")
-                g.AddText(, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保你使用的 JetBrains IDE 已经被添加`n3. 重启 InputTip 和你正在使用的 JetBrains IDE`n5. 如果没有生效，请重启电脑")
+                g.AddEdit("xs -VScroll ReadOnly w" bw, "1. 开启 Java Access Bridge`n2. 点击托盘菜单中的 「添加 JetBrains IDE 应用」，确保要使用的 IDE 已经添加`n3. 如果正在使用白名单机制，还需要添加到白名单中。`n4. 如果未生效，请重启正在使用的 JetBrains IDE 或重启系统")
                 g.AddText(, "具体操作步骤，请查看以下任意网址:")
                 g.AddLink(, '- <a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
                 g.AddLink(, '- <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
                 g.AddLink(, '- <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>')
-                g.AddButton("xs w" bw, "我知道了").OnEvent("Click", yes)
+                _c := g.AddButton("xs w" bw, "我知道了")
+                _c.OnEvent("Click", yes)
+                _c.Focus()
                 yes(*) {
                     g.Destroy()
                 }
@@ -1601,7 +1603,8 @@ makeTrayMenu() {
             tab: ["管理 JetBrains IDE 应用", "关于"],
             tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
             list: "JetBrains IDE 应用列表",
-            about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「JetBrains IDE 应用进程列表」。`n- 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n- 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将其移除。`n- 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n- 如果未生效，请检查是否完成所有操作步骤。`n`n操作步骤相关链接: `n`n<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
+            color: "cBlue",
+            about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到「JetBrains IDE 应用进程列表」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的 「手动添加进程」直接添加进程名称。`n- 下方是「JetBrains IDE 应用进程列表」。`n- 你需要将你使用的 JetBrains IDE 应用进程添加进去，它会实时生效。`n- 如果正在使用白名单机制，还需要再添加到白名单中。`n- 如果不小心将其他应用添加了，需要双击下方列表中的应用进程将它移除。`n- 在 IDE 添加完成后，勾选「启用 JetBrains IDE 支持」，就可以在 IDE 中使用 InputTip 了。`n- 如果未生效，请检查是否完成所有操作步骤。`n`n操作步骤相关链接: `n`n<a href="https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip">https://inputtip.pages.dev/FAQ/#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>`n`n<a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip</a>',
             addTopText: "2. 双击应用进程进行添加`n3. 如果有非 JetBrains 系列 IDE 应用进程被意外添加，请立即移除`n4. 白名单机制下，还需要再添加到白名单中才会有效。",
             addList: "以下列表是当前正在运行的应用进程",
             addList1: "以下列表是当前系统正在运行的应用进程(包含后台和隐藏窗口)",
@@ -1731,7 +1734,9 @@ fn_common(tipList, handleFn) {
             gc.LV_add.Opt("+Redraw")
             DetectHiddenWindows 1
 
-            gc.LV_rm := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw, [tipList.list])
+            ; gc.title := g.AddText("Section w" bw, tipList.list)
+            ; gc.LV_rm := g.AddListView("xs IconSmall -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color)
+            gc.LV_rm := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color, [tipList.list])
             valueArr := StrSplit(readIni(tipList.config, ""), ":")
             temp := ":"
             gc.LV_rm.Opt("-Redraw")
@@ -1742,9 +1747,10 @@ fn_common(tipList, handleFn) {
                 }
             }
             gc.LV_rm.Opt("+Redraw")
+            ; gc.title.Text := tipList.list "(" gc.LV_rm.GetCount() "项)"
             gc.LV_rm.ModifyCol(1, "AutoHdr")
-            gc.LV_rm.OnEvent("DoubleClick", fn_CN)
-            fn_CN(LV, RowNumber) {
+            gc.LV_rm.OnEvent("DoubleClick", fn_dbClick)
+            fn_dbClick(LV, RowNumber) {
                 handleClick(LV, RowNumber, "rm", tipList)
             }
             handleClick(LV, RowNumber, from, tipList) {
@@ -1766,6 +1772,7 @@ fn_common(tipList, handleFn) {
                             g_1.Destroy()
                             gc.LV_add.Delete(RowNumber)
                             gc.LV_rm.Add(, RowText)
+                            ; gc.title.Text := tipList.list "(" gc.LV_rm.GetCount() "项)"
                             config := tipList.config
                             value := readIni(config, "")
                             if (value) {
@@ -1783,10 +1790,9 @@ fn_common(tipList, handleFn) {
                     fn_rm(*) {
                         g_1.Destroy()
                         LV.Delete(RowNumber)
+                        ; gc.title.Text := tipList.list "(" LV.GetCount() "项)"
                         try {
                             gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
-                        } catch {
-                            gc.LV_add.Add(, RowText)
                         }
                         config := tipList.config
                         value := readIni(config, "")
@@ -1893,6 +1899,7 @@ fn_common(tipList, handleFn) {
                 }
             }
             gc.LV_add.ModifyCol(1, "AutoHdr")
+            gc.LV_add.ModifyCol(2, "AutoHdr")
             tab.UseTab(2)
             g.AddLink(, tipList.about)
             return g
@@ -1906,7 +1913,8 @@ fn_white_list(*) {
         tab: ["管理白名单", "关于"],
         tip: "你首先应该点击上方的 「关于」查看具体的操作说明。",
         list: "符号显示白名单",
-        about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到 「符号显示白名单」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的「手动添加进程」直接添加进程名称。`n- 下方是 「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将其移除。`n`n- 白名单机制: 只有在白名单中的应用进程窗口才会显示符号。`n- 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n- 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n- 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n- 如果勾选了「启用 JetBrains IDE 支持」，还需要将相关 IDE 进程添加到白名单中。',
+        color: "cGreen",
+        about: '如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅包含有前台窗口的)`n- 双击列表中任意应用进程，就可以将其添加到 「符号显示白名单」中。`n- 如果需要更多的进程，请点击右下角的 「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击左下角的「手动添加进程」直接添加进程名称。`n- 下方是 「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效。`n- 双击列表中任意应用进程，就可以将它移除。`n`n- 白名单机制: 只有在白名单中的应用进程窗口才会显示符号。`n- 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n- 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n- 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n- 如果勾选了「启用 JetBrains IDE 支持」，还需要将相关 IDE 进程添加到白名单中。',
         addConfirm: "是否要将",
         addConfirm2: "添加到「符号显示白名单」中？",
         addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",

@@ -27,7 +27,7 @@ while 1 {
                 continue
             }
             if (useWhiteList) {
-                if (!InStr(app_show_state, exe_str)) {
+                if (!InStr(app_show_state, exe_str) && !WinActive("ahk_class AutoHotkeyGUI")) {
                     hideSymbol()
                     needShow := 0
                 }

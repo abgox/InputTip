@@ -331,7 +331,9 @@ reloadSymbol() {
                 type := "EN"
             }
         }
-        loadSymbol(type, left, top)
+        if (canShowSymbol) {
+            loadSymbol(type, left, top)
+        }
     }
 }
 

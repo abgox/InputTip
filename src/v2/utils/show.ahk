@@ -100,12 +100,9 @@ while 1 {
 
 updateDelay() {
     if (HideSymbolDelay) {
-        SetTimer(timer, 25)
-        timer() {
-            global
-            if (HideSymbolDelay = 0) {
-                SetTimer(, 0)
-            }
+        SetTimer(updateDelayTimer, 25)
+        updateDelayTimer() {
+            global needHide, isWait
             if (GetKeyState("LButton", "P")) {
                 needHide := 0
                 isWait := 1
@@ -121,6 +118,11 @@ updateDelay() {
                 } else {
                     needHide := 0
                 }
+            }
+            if (HideSymbolDelay = 0) {
+                SetTimer(updateDelayTimer, 0)
+                needHide := 0
+                isWait := 0
             }
         }
     }

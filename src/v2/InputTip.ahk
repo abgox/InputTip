@@ -73,8 +73,8 @@ checkUpdateDone()
 cursorDir := readIni("cursorDir", "")
 picDir := readIni("picDir", ":")
 
-SetTimer(getDir, -1)
-getDir() {
+SetTimer(_getDirTimer, -1)
+_getDirTimer() {
     _cursorDir := arrJoin(getCursorDir(), ":")
     _picDir := arrJoin(getPicDir(), ":")
     if (cursorDir != _cursorDir) {

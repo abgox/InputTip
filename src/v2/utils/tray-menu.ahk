@@ -78,15 +78,20 @@ makeTrayMenu() {
         fn(x, y, w, h) {
             g := Gui("AlwaysOnTop", "InputTip - 设置更新检测")
             g.SetFont(fz, "微软雅黑")
-            g.AddText("cRed", "- 单位是分钟，默认是 1440 分钟，即一天。`n- 如果不为 0，在 InputTip 启动后，会立即检测一次。`n- 如果为 0，则表示不自动检测更新。`n")
+            g.AddText("cRed", "- 单位: 分钟，默认 1440 分钟(1 天)。`n- 避免程序错误，可以设置的最大范围是 0-50000 分钟。`n- 如果为 0，则表示不检测版本更新。`n- 如果不为 0，在 InputTip 启动后，会立即检测一次。`n- 如果大于 50000，则会直接使用 50000。`n")
             g.AddText("xs", "每隔多少分钟检测一次更新: ")
-            _c := g.AddEdit("yp Number vcheckUpdateDelay")
+            _c := g.AddEdit("yp Number Limit5 vcheckUpdateDelay")
             _c.Value := readIni("checkUpdateDelay", 1440)
             _c.OnEvent("Change", fn_change_delay)
+            g.AddText()
             fn_change_delay(item, *) {
-                if (item.value != "") {
-                    writeIni("checkUpdateDelay", item.value)
-                    global checkUpdateDelay := item.value
+                value := item.Value
+                if (value != "") {
+                    if (value > 50000) {
+                        value := 50000
+                    }
+                    writeIni("checkUpdateDelay", value)
+                    global checkUpdateDelay := value
                     if (checkUpdateDelay) {
                         checkUpdate()
                     }
@@ -309,8 +314,8 @@ makeTrayMenu() {
                     isOpen := 0
                 } else {
                     isOpen := 1
-                    SetTimer(timer, 25)
-                    timer() {
+                    SetTimer(statusTimer, 25)
+                    statusTimer() {
                         if (isOpen) {
                             info := IME.CheckInputMode()
                             ToolTip("状态码: " IME.CheckInputMode().statusMode "`n切换码: " IME.CheckInputMode().conversionMode)
@@ -573,9 +578,7 @@ makeTrayMenu() {
             }
             writeIni("HideSymbolDelay", value)
             global HideSymbolDelay := value
-            if (value > 0) {
-                updateDelay()
-            }
+            updateDelay()
             restartJetBrains()
         }
         configGui.AddEdit("xs Disabled -VScroll w" Gui_width, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，实际生效的值是 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
@@ -996,8 +999,8 @@ makeTrayMenu() {
         configGui.AddLink(, '<a href="https://colordesigner.io/color-palette-builder">https://colordesigner.io/color-palette-builder</a>')
 
         configGui.Show()
-        SetTimer(getDir, -1)
-        getDir() {
+        SetTimer(getDirTimer, -1)
+        getDirTimer() {
             _cursorDir := arrJoin(getCursorDir(), ":")
             _picDir := arrJoin(getPicDir(), ":")
             if (cursorDir != _cursorDir) {
@@ -1582,8 +1585,8 @@ makeTrayMenu() {
             }
             runJetBrains()
         } else {
-            SetTimer(timer2, -100)
-            timer2() {
+            SetTimer(killAppTimer, -10)
+            killAppTimer() {
                 try {
                     RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
                     if (A_IsAdmin) {
@@ -2009,8 +2012,8 @@ getPicDir() {
  * @param runOrStop 1: Run; 0:Stop
  */
 runJetBrains() {
-    SetTimer(timer, -100)
-    timer() {
+    SetTimer(runAppTimer, -10)
+    runAppTimer() {
         if (A_IsAdmin) {
             try {
                 RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")

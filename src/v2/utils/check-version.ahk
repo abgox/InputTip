@@ -36,7 +36,7 @@ checkVersion(currentVersion, callback, urls := [
                     return
                 }
                 newVersion := Trim(StrReplace(StrReplace(StrReplace(req.responseText, "`r", ""), "`n", ""), "v", ""))
-                if (newVersion ~= "^[v]?[\d\.]+$" && compareVersion(newVersion, currentVersion) > 0) {
+                if (newVersion ~= "^[\d\.]+$" && compareVersion(newVersion, currentVersion) > 0) {
                     if (info.version) {
                         return
                     }

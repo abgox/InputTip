@@ -50,7 +50,7 @@
 
 > - [查看 v1 老版本](./src/v1/README.md) (此版本已经没啥用了，不再更新)
 
-**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**
+[**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**](#stars)
 
 ### 新的变化
 
@@ -142,6 +142,10 @@
 
 > [!Tip]
 > 你可以自行查看源代码并编译 `InputTip`
+
+> [!Warning]
+>
+> 如果修改了项目代码，需要先编译 `InputTip.JAB.JetBrains.ahk`，再编译 `InputTip.ahk`
 
 1. 克隆项目仓库到本地
 
@@ -323,6 +327,7 @@
     - 如果正在使用 **讯飞**输入法，你需要选择它
   - `手心输入法`
     - 如果你正在使用 **手心**输入法，你需要选择它
+    - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题。
   - `自定义`
     - [关于设置输入法模式中的自定义](https://inputtip.pages.dev/FAQ/about-input-mode-custom)
 
@@ -343,8 +348,19 @@
   - 之后看到了 [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot) 和 [language-indicator - yakunins](https://github.com/yakunins/language-indicator) 的设计，通过不同颜色加上小符号来判断不同输入法状态
   - InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](./src/v1/README.md) 中带文字的方块符号，去掉文字，加上不同的背景颜色
 
+### Stars
+
+**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**
+
+<a href="https://github.com/abgox/InputTip">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="https://reporoster.com/stars/abgox/InputTip"> <!-- light theme -->
+    <img alt="stargazer-widget" src="https://reporoster.com/stars/dark/abgox/InputTip"> <!-- dark theme -->
+  </picture>
+</a>
+
 ### 赞赏支持
 
-<a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://abgox.pages.dev/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ![赞赏支持](https://abgox.pages.dev/support.png)

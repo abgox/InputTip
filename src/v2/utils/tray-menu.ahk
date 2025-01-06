@@ -200,6 +200,7 @@ makeTrayMenu() {
                         g.OnEvent("Close", yes)
                         yes(*) {
                             g.Destroy()
+                            last := mode + 1
                             try {
                                 gc.mode.Value := mode + 1
                             }
@@ -429,6 +430,7 @@ makeTrayMenu() {
                 global useWhiteList := value
                 restartJetBrains()
             }
+            g.AddEdit("xs Disabled", "如果使用「黑」名单，你需要承担未知的可能存在的窗口兼容性代价")
             _c := g.AddButton("xs w" bw, "设置「白」名单")
             _c.OnEvent("Click", set_white_list)
             _c.Focus()
@@ -1478,6 +1480,20 @@ makeTrayMenu() {
                             } else {
                                 writeIni(config, RowText)
                             }
+
+                            ; 同步添加到白名单
+                            global app_show_state
+                            _app_show_state := readIni("app_show_state", "")
+                            if (!InStr(app_show_state, ":" RowText ":")) {
+                                if (_app_show_state) {
+                                    _app_show_state .= ":" RowText
+                                } else {
+                                    _app_show_state := RowText
+                                }
+                                app_show_state := ":" _app_show_state ":"
+                                writeIni("app_show_state", _app_show_state)
+                            }
+
                             global app_CN := ":" readIni('app_CN', '') ":"
                             global app_EN := ":" readIni('app_EN', '') ":"
                             global app_Caps := ":" readIni('app_Caps', '') ":"
@@ -1489,6 +1505,7 @@ makeTrayMenu() {
                         g_1.AddLink(, "要将进程")
                         g_1.AddLink("yp cRed", RowText)
                         g_1.AddLink("yp", "添加到哪一个自动切换列表中？")
+                        g_1.AddLink("xs cRed", "如果选择添加且此应用不在白名单中，则会同步添加到白名单中")
                         fn_CN(*) {
                             _handle("CN")
                         }
@@ -1640,7 +1657,7 @@ makeTrayMenu() {
                 gc.LV_add.ModifyCol(2, "AutoHdr")
                 gc.LV_add.ModifyCol(3, "AutoHdr")
                 tab.UseTab(2)
-                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
+                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n- 如果选择添加且此应用不在白名单中，则会同步添加到白名单中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
 
                 g.OnEvent("Close", fn_close)
                 fn_close(*) {

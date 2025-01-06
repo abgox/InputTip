@@ -135,8 +135,11 @@ class IME {
 
 /**
  * 判断当前输入法状态是否为中文
- * 需要: DetectHiddenWindows 1
  * @returns {Boolean} 输入法是否为中文
+ * @example
+ * DetectHiddenWindows 1 ; 前置条件(不为1，可能判断有误)
+ * ;...
+ * MsgBox isCN()
  */
 isCN() {
     return IME.GetInputMode().isCN
@@ -145,8 +148,13 @@ isCN() {
 /**
  * 将输入法状态切换为中文
  * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
+ * @example
+ * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
+ * ; ...
+ * switch_CN()
  */
 switch_CN(*) {
+    isShift := GetKeyState("Shift", "P")
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -155,15 +163,25 @@ switch_CN(*) {
             IME.SetInputMode(1)
         }
     }
-    if (!GetKeyState("Shift", "P") && !isCN()) {
-        SendInput("{Shift}")
+    Sleep(50)
+    if (!isShift && !isCN()) {
+        SendInput("{LShift}")
+        Sleep(50)
+        if (!isCN()) {
+            SendInput("{RShift}")
+        }
     }
 }
 /**
  * 将输入法状态切换为英文
  * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
+ * @example
+ * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
+ * ; ...
+ * switch_EN()
  */
 switch_EN(*) {
+    isShift := GetKeyState("Shift", "P")
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -172,12 +190,21 @@ switch_EN(*) {
             IME.SetInputMode(0)
         }
     }
-    if (!GetKeyState("Shift", "P") && isCN()) {
-        SendInput("{Shift}")
+    Sleep(50)
+    if (!isShift && isCN()) {
+        SendInput("{LShift}")
+        Sleep(50)
+        if (isCN()) {
+            SendInput("{RShift}")
+        }
     }
 }
 /**
  * 将输入法状态切换为大写锁定
+ * @example
+ * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
+ * ; ...
+ * switch_Caps()
  */
 switch_Caps(*) {
     if (!GetKeyState("CapsLock", "T")) {

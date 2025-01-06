@@ -64,7 +64,6 @@ gc := {
 }
 
 ; 配置菜单的字体大小
-
 fz := "s12"
 if (A_ScreenHeight < 1000 || A_ScreenWidth < 2000) {
     fz := "s10"

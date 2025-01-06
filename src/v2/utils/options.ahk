@@ -9,9 +9,8 @@ ListLines 0
 KeyHistory 0
 DetectHiddenWindows 1
 InstallKeybdHook
-InstallMouseHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.28.5
-currentVersion := "2.28.5"
+;@AHK2Exe-SetVersion 2.28.6
+currentVersion := "2.28.6"

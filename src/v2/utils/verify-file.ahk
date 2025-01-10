@@ -60,16 +60,17 @@ checkIni() {
         useWhiteList := readIni("useWhiteList", 1)
 
         isContinue := true
+        fz := "s14"
         createGui(fn1).Show()
         fn1(x, y, w, h) {
             g := Gui("AlwaysOnTop")
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
-            g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
-            g.AddText(, "当确定修改后，InputTip")
-            g.AddText("yp cRed", "会根据不同的输入法状态(中英文/大写锁定)同步修改鼠标样式")
-            g.AddEdit("xs Disabled -VScroll", "更多信息，请点击托盘菜单中的 「关于」，前往官网或项目中查看")
+            g.AddText(, "你是否希望 InputTip 同步修改鼠标样式?")
+            g.AddText(, "InputTip")
+            g.AddText("yp cRed", "会根据不同输入法状态(中英文/大写锁定)同步修改鼠标样式")
+            g.AddEdit("xs Disabled -VScroll", "更多详情，请点击托盘菜单中的「关于」，前往官网或项目中查看")
             g.AddButton("xs cRed w" bw, "【是】对，我要修改").OnEvent("Click", yes)
             yes(*) {
                 g.Destroy()
@@ -79,7 +80,7 @@ checkIni() {
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
-                    g.AddText("cRed", "注意：请谨慎选择，如果是误点了确定，恢复之前的鼠标样式需要以下额外步骤或者重启系统`n1. 点击「托盘菜单」=>「更改配置」`n2. 修改其中「1. 要不要修改鼠标样式」的值`n3. 「系统设置」=>「其他鼠标设置」=> 先更改为另一个鼠标样式方案，再改回你之前使用的方案")
+                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 要不要同步修改鼠标样式」的值更改为 【否】")
                     g.AddButton("xs cRed w" bw, "【是】对，我很确定").OnEvent("Click", yes)
                     yes(*) {
                         g.Destroy()
@@ -115,8 +116,6 @@ checkIni() {
         }
         createGui(fn2).Show()
         fn2(x, y, w, h) {
-            warning := "注意：请谨慎选择，如果是误点了确定，恢复之前的鼠标样式需要以下额外步骤或者重启系统`n1. 点击「托盘菜单」=>「更改配置」`n2. 修改其中「1. 要不要修改鼠标样式」的值`n3. 「系统设置」=>「其他鼠标设置」=> 先更改为另一个鼠标样式方案，再改回你之前使用的方案"
-
             g := Gui("AlwaysOnTop")
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2

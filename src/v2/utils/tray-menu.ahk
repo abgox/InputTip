@@ -115,7 +115,7 @@ makeTrayMenu() {
             gc.checkUpdateDelay := checkUpdateDelay
             g := Gui("AlwaysOnTop", "InputTip - 设置更新检测")
             g.SetFont(fz, "微软雅黑")
-            g.AddText("cRed", "- 单位: 分钟，默认 1440 分钟(1 天)。`n- 避免程序错误，可以设置的最大范围是 0-50000 分钟。`n- 如果为 0，则表示不检测版本更新。`n- 如果不为 0，在 InputTip 启动后，会立即检测一次。`n- 如果大于 50000，则会直接使用 50000。`n")
+            g.AddText("cRed", "- 单位: 分钟，默认 1440 分钟(1 天)`n- 避免程序错误，可以设置的最大范围是 0-50000 分钟`n- 如果为 0，则表示不检测版本更新`n- 如果不为 0，在 InputTip 启动后，会立即检测一次`n- 如果大于 50000，则会直接使用 50000`n")
             g.AddText("xs", "每隔多少分钟检测一次更新: ")
             _c := g.AddEdit("yp Number Limit5 vcheckUpdateDelay")
             _c.Value := readIni("checkUpdateDelay", 1440)
@@ -417,8 +417,8 @@ makeTrayMenu() {
 
                 tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
                 tab.UseTab(1)
-                g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明。")
-                gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["应用进程列表(包括白名单)", "窗口标题", "应用进程文件所在位置"])
+                g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明")
+                gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["应用进程列表", "窗口标题", "应用进程文件所在位置"])
                 gc.LV_add.OnEvent("DoubleClick", fn_add)
                 fn_add(LV, RowNumber) {
                     handleClick(LV, RowNumber, "add")
@@ -541,8 +541,9 @@ makeTrayMenu() {
                         if (from != "add") {
                             mode_list.RemoveAt(modeListMap.%from%)
                         }
-                        for v in mode_list {
-                            _g := g_1.AddButton("xs w" bw, "「" v "」")
+                        for i, v in mode_list {
+                            opt := i = 1 || i = 5 ? "xs" : "yp"
+                            _g := g_1.AddButton(opt " w" bw / 4, v)
                             _g._mode := v
                             _g.OnEvent("Click", fn_mode)
                             fn_mode(item, *) {
@@ -550,7 +551,7 @@ makeTrayMenu() {
                             }
                         }
                         if (from != "add") {
-                            g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
+                            g_1.AddButton("xs w" w, "将它移除").OnEvent("Click", fn_rm)
                             fn_rm(*) {
                                 g_1.Destroy()
                                 LV.Delete(RowNumber)
@@ -570,7 +571,7 @@ makeTrayMenu() {
                             }
                         }
 
-                        g_1.AddButton("xs w" bw, "取消操作").OnEvent("Click", no)
+                        g_1.AddButton("xs w" w, "取消操作").OnEvent("Click", no)
                         no(*) {
                             g_1.Destroy()
                         }
@@ -604,9 +605,11 @@ makeTrayMenu() {
                             g_2.AddText("xs", "2. 每一次只能添加一个")
                             g_2.AddText("xs", "进程名称: ")
                             g_2.AddEdit("yp vexe_name", "").Value := v
+                            g_2.AddText("xs cGray", "要这个应用进程添加到下方哪一个光标获取模式中？")
 
-                            for v in modeNameList {
-                                _g := g_2.AddButton("xs w" bw, "添加到「" v "」")
+                            for i, v in modeNameList {
+                                opt := i = 1 || i = 5 ? "xs" : "yp"
+                                _g := g_2.AddButton(opt " w" bw / 4, v)
                                 _g._mode := v
                                 _g.OnEvent("Click", fn_handle)
                                 fn_handle(item, *) {
@@ -687,7 +690,7 @@ makeTrayMenu() {
                 gc.LV_add.ModifyCol(2, "AutoHdr")
                 gc.LV_add.ModifyCol(3, "AutoHdr")
                 tab.UseTab(2)
-                g.AddLink(, '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称。`n   - 下方分别是 InputTip 的多种光标获取模式。`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可。`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置。`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n   - 如果选择添加且此应用不在白名单中，则会同步添加到白名单中。`n`n2. 什么时候需要去添加？`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题。`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的。`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决。`n  - 如果已知都不可用，记得移除它。`n`n3. JetBrains 系列 IDE`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JetBrains IDE 支持」中的所有操作步骤。`n      - 你应该访问这些相关链接:   <a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>')
+                g.AddLink(, '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 如果选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除它`n`n3. JetBrains 系列 IDE`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JetBrains IDE 支持」中的所有操作步骤`n      - 你应该访问这些相关链接:   <a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>')
 
                 g.OnEvent("Close", fn_close)
                 fn_close(*) {
@@ -710,8 +713,8 @@ makeTrayMenu() {
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
-            g.AddText("cRed", "「白」名单机制: 只有在白名单中的应用进程窗口会显示符号。`n「黑」名单机制: 只有不在黑名单中的应用进程窗口会显示符号。")
-            g.AddLink(, '1. 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，这样可以精确控制哪些应用进程窗口需要显示符号。`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题。`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。')
+            g.AddText("cRed", "「白」名单机制: 只有在白名单中的应用进程窗口会显示符号`n「黑」名单机制: 只有不在黑名单中的应用进程窗口会显示符号")
+            g.AddLink(, '1. 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，这样可以精确控制哪些应用进程窗口需要显示符号`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中')
             g.AddText(, "-------------------------------------------------------------------------------------")
 
             g.AddText(, "选择显示符号的名单机制: ")
@@ -737,10 +740,10 @@ makeTrayMenu() {
                     gui: "blackListGui",
                     config: "app_hide_state",
                     tab: ["管理黑名单", "关于"],
-                    tip: "你首先应该点击上方的「关于」查看具体的操作说明。",
+                    tip: "你首先应该点击上方的「关于」查看具体的操作说明",
                     list: "符号显示黑名单",
                     color: "cRed",
-                    about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示黑名单」中。`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n   - 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效。`n   - 双击列表中任意应用进程，就可以将它移除。`n`n   - 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号。`n   - 使用黑名单，可能会有一些特殊窗口的兼容性问题。`n   - 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，最好少用黑名单机制。`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
+                    about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示黑名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方是「符号显示黑名单」应用进程列表，如果使用黑名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号`n   - 使用黑名单，可能会有一些特殊窗口的兼容性问题`n   - 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，最好少用黑名单机制`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
                     addConfirm: "是否要将",
                     addConfirm2: "添加到「符号显示黑名单」中？",
                     addConfirm3: "添加后，黑名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
@@ -787,8 +790,6 @@ makeTrayMenu() {
         tab.UseTab(1)
         hotkeyGui.AddText("Section", "1.  当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键")
         hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-        hotkeyGui.AddText("xs", "3.  如果 InputTip 正在运行，此时按下快捷键，会停止运行。")
-        hotkeyGui.AddText("xs", "4.  如果 InputTip 已经暂停，此时按下快捷键，会恢复运行。")
         hotkeyGui.AddText("xs", "-------------------------------------------------------------------------------------")
 
         hotkeyGui.AddText("xs", "设置")
@@ -831,10 +832,8 @@ makeTrayMenu() {
         }
         tab.UseTab(2)
         hotkeyGui.AddLink("Section", "1.")
-        hotkeyGui.AddLink("yp cRed", "优先使用「设置组合快捷键」设置，除非因为快捷键占用无法设置。")
+        hotkeyGui.AddLink("yp cRed", "优先使用「设置组合快捷键」设置，除非因为快捷键占用无法设置")
         hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">https://inputtip.pages.dev/FAQ/enter-shortcuts-manually</a>')
-        hotkeyGui.AddText("xs", "3.  如果 InputTip 正在运行，此时按下快捷键，会停止运行。")
-        hotkeyGui.AddText("xs", "4.  如果 InputTip 已经暂停，此时按下快捷键，会恢复运行。")
         hotkeyGui.AddText("xs", "-------------------------------------------------------------------------------------")
 
         hotkeyGui.AddText("xs", "设置")
@@ -912,7 +911,7 @@ makeTrayMenu() {
         configGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">Gitee</a>')
         configGui.AddLink("yp", '<a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>')
 
-        configGui.AddText("xs cRed", "所有的配置项的更改会实时生效，你可以立即看到最新效果。")
+        configGui.AddText("xs cRed", "所有的配置项的更改会实时生效，你可以立即看到最新效果")
         configGui.AddText("xs", line)
         configGui.AddText("xs", "1. 要不要同步修改鼠标样式: ")
         _g := configGui.AddDropDownList("w" Gui_width / 1.6 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
@@ -943,7 +942,7 @@ makeTrayMenu() {
                     g := Gui("AlwaysOnTop")
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
-                    g.AddText(, "正在尝试恢复到使用 InputTip 之前的鼠标样式。")
+                    g.AddText(, "正在尝试恢复到使用 InputTip 之前的鼠标样式")
                     g.AddText("cRed", "可能无法完全恢复，你需要进行以下额外步骤或者重启系统:`n1. 进入「系统设置」=>「蓝牙和其他设备」=>「鼠标」=>「其他鼠标设置」`n2. 先更改为另一个鼠标样式方案，再改回你之前使用的方案")
                     y := g.AddButton("w" bw, "我知道了")
                     y.OnEvent("Click", yes)
@@ -1455,10 +1454,10 @@ makeTrayMenu() {
             gui: "appOffsetGui",
             config: "app_offset",
             tab: ["管理特殊偏移量", "关于"],
-            tip: "你首先应该点击上方的「关于」查看具体的操作说明。",
+            tip: "你首先应该点击上方的「关于」查看具体的操作说明",
             list: "特殊偏移量列表",
-            color: "cBlue",
-            about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「特殊偏移量列表」中。`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n`n   - 下方是「特殊偏移量列表」，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它。`n`n2. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过屏幕坐标判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左侧，另一块屏幕在右侧`n      - 那么另一块屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
+            color: "cRed",
+            about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「特殊偏移量列表」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「特殊偏移量列表」，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它`n`n2. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过屏幕坐标判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左侧，另一块屏幕在右侧`n      - 那么另一块屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
             addConfirm: "",
             addConfirm2: "",
             addConfirm3: "",
@@ -1849,7 +1848,7 @@ makeTrayMenu() {
         }
         tab.UseTab(3)
         hotkeyGui.AddLink("Section", "1.")
-        hotkeyGui.AddLink("yp cRed", "优先使用「设置单键」或「设置组合快捷键」设置，除非因为快捷键占用无法设置。")
+        hotkeyGui.AddLink("yp cRed", "优先使用「设置单键」或「设置组合快捷键」设置，除非因为快捷键占用无法设置")
         hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">https://inputtip.pages.dev/FAQ/enter-shortcuts-manually</a>`n-------------------------------------------------------------------------------------')
         for v in configList {
             hotkeyGui.AddText("xs", "强制切换到")
@@ -1918,7 +1917,7 @@ makeTrayMenu() {
 
                 tab := g.AddTab3("-Wrap", ["管理状态自动切换", "关于"])
                 tab.UseTab(1)
-                g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明。")
+                g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明")
                 gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题", "应用进程文件所在位置"])
                 gc.LV_add.OnEvent("DoubleClick", fn_add)
                 fn_add(LV, RowNumber) {
@@ -2246,7 +2245,7 @@ makeTrayMenu() {
                 gc.LV_add.ModifyCol(2, "AutoHdr")
                 gc.LV_add.ModifyCol(3, "AutoHdr")
                 tab.UseTab(2)
-                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中。`n- 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程。`n- 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称。`n- 下方分别是中文、英文、大写锁定这三个自动切换列表。`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态。`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中。`n- 如果选择添加且此应用不在白名单中，则会同步添加到白名单中。`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程。`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中。`n  - 添加完成后，会在下方对应列表中显示，并实时生效。`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作。")
+                g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n- 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n- 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n- 下方分别是中文、英文、大写锁定这三个自动切换列表`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n- 如果选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中`n  - 添加完成后，会在下方对应列表中显示，并实时生效`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作")
 
                 g.OnEvent("Close", fn_close)
                 fn_close(*) {
@@ -2774,10 +2773,10 @@ fn_white_list(*) {
         gui: "whiteListGui",
         config: "app_show_state",
         tab: ["管理白名单", "关于"],
-        tip: "你首先应该点击上方的「关于」查看具体的操作说明。",
+        tip: "你首先应该点击上方的「关于」查看具体的操作说明",
         list: "符号显示白名单",
-        color: "cGreen",
-        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中。`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程。`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称。`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效。`n   - 双击列表中任意应用进程，就可以将它移除。`n`n   - <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a> : 只有在白名单中的应用进程窗口才会显示符号。`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号。`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题。`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中。`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
+        color: "cRed",
+        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a> : 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
         addConfirm: "是否要将",
         addConfirm2: "添加到「符号显示白名单」中？",
         addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",

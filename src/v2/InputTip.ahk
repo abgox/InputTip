@@ -11,7 +11,7 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\ini.ahk
 #Include .\utils\IME.ahk
 #Include .\utils\check-version.ahk
-#Include .\utils\tray-menu.ahk
+#Include .\menu\tray-menu.ahk
 
 #Include .\utils\tools.ahk
 #Include .\utils\app-list.ahk
@@ -29,11 +29,12 @@ gc := {
     w: {
         ; 开机自启动
         startupGui: "",
-        cancelStartupGui: "",
         ; 设置更新检测
         checkUpdateGui: "",
         ; 设置输入法模式
         inputModeGui: "",
+        ; 设置光标获取模式
+        cursorModeGui: "",
         ; 符号显示黑/白名单
         bwListGui: "",
         ; 暂停/运行快捷键
@@ -45,15 +46,13 @@ gc := {
         ; 指定窗口自动切换状态
         windowToggleGui: "",
         ; 设置特殊偏移量
+        appOffsetGui: "",
         offsetGui: "",
-        ; 设置 JetBrains IDE 偏移量
-        JetBrainsOffsetGui: "",
         ; 启用 JetBrains IDE 支持
         enableJetBrainsGui: "",
         ; 应用列表
         blackListGui: "",
         whiteListGui: "",
-        addJetBrainsGui: "",
         ; 关于
         aboutGui: "",
         ; 二级菜单
@@ -61,12 +60,6 @@ gc := {
         customModeGui: "",
         shiftSwitchGui: "",
     }
-}
-
-; 配置菜单的字体大小
-fz := "s12"
-if (A_ScreenHeight < 1000 || A_ScreenWidth < 2000) {
-    fz := "s10"
 }
 
 if (A_IsCompiled) {
@@ -157,11 +150,15 @@ if (hotkey_Pause) {
 }
 
 needSkip(exe_str) {
-    return InStr(JetBrains_list, exe_str)
+    return InStr(modeList.JAB, exe_str)
 }
 
 returnCanShowSymbol(&left, &top) {
     res := GetCaretPosEx(&left, &top)
+    try {
+        left += app_offset.%exe_name%.%isWhichScreen(screenList).num%.x
+        top += app_offset.%exe_name%.%isWhichScreen(screenList).num%.y
+    }
     return res && left
 }
 
@@ -237,25 +234,26 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     }
     hwnd := getHwnd()
 
-    if (InStr(appList.disable, exe_str) && !useWhiteList) {
+    if (InStr(modeList.disable, exe_str) && !useWhiteList) {
         return 0
     }
-    else if (InStr(appList.UIA, exe_str)) {
+
+    if (InStr(modeList.UIA, exe_str)) {
         return getCaretPosFromUIA()
     }
-    else if (InStr(appList.MSAA, exe_str)) {
+    else if (InStr(modeList.MSAA, exe_str)) {
         return getCaretPosFromMSAA()
     }
-    else if (InStr(appList.GUI_UIA, exe_str)) {
+    else if (InStr(modeList.GUI_UIA, exe_str)) {
         if (getCaretPosFromGui(&hwnd := 0)) {
             return 1
         }
         return getCaretPosFromUIA()
     }
-    else if (InStr(appList.Hook_with_dll, exe_str)) {
+    else if (InStr(modeList.Hook_DLL, exe_str)) {
         return getCaretPosFromHook(1)
     }
-    else if (InStr(appList.wpf, exe_str)) {
+    else if (InStr(modeList.WPF, exe_str)) {
         return getCaretPosFromWpfCaret()
     }
     else {

@@ -1,23 +1,24 @@
 #Include .\utils\options.ahk
 
 #NoTrayIcon
-;@AHK2Exe-SetName InputTip.JAB.JetBrains
-;@AHK2Exe-SetDescription InputTip(JetBrains 进程) - 一个输入法状态(中文/英文/大写锁定)提示工具
+;@AHK2Exe-SetName InputTip.JAB
+;@AHK2Exe-SetDescription InputTip(JAB 进程) - 一个输入法状态(中文/英文/大写锁定)提示工具
 
 #Include .\utils\IME.ahk
 #Include .\utils\ini.ahk
+#Include .\utils\app-list.ahk
 #Include .\utils\var.ahk
 #Include .\utils\tools.ahk
 
 needSkip(exe_str) {
-    return !InStr(JetBrains_list, exe_str)
+    return !InStr(modeList.JAB, exe_str)
 }
 
 returnCanShowSymbol(&left, &top) {
     GetCaretPosFromJetBrains(&left, &top)
     try {
-        left += IniRead("InputTip.ini", "config-v2", "offset_JetBrains_x_" isWhichScreen(screenList).num)
-        top += IniRead("InputTip.ini", "config-v2", "offset_JetBrains_y_" isWhichScreen(screenList).num)
+        left += app_offset.%exe_name%.%isWhichScreen(screenList).num%.x
+        top += app_offset.%exe_name%.%isWhichScreen(screenList).num%.y
     }
     return left
 }

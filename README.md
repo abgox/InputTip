@@ -11,9 +11,8 @@
     <a href="https://github.com/abgox/InputTip/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/abgox/InputTip" alt="license" />
     </a>
-    <a href="https://inputtip.pages.dev/releases/v2/version.json">
-        <img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version
-        " alt="version" />
+    <a href="https://github.com/abgox/InputTip">
+        <img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version" alt="version" />
     </a>
     <a href="https://img.shields.io/github/languages/code-size/abgox/InputTip.svg">
         <img src="https://img.shields.io/github/languages/code-size/abgox/InputTip.svg" alt="code size" />

@@ -514,18 +514,7 @@ makeTrayMenu() {
                                     writeIni(config, RowText)
                                 }
                             }
-                            ; 同步添加到白名单
-                            global app_show_state
-                            _app_show_state := readIni("app_show_state", "")
-                            if (!InStr(app_show_state, ":" RowText ":")) {
-                                if (_app_show_state) {
-                                    _app_show_state .= ":" RowText
-                                } else {
-                                    _app_show_state := RowText
-                                }
-                                app_show_state := ":" _app_show_state ":"
-                                writeIni("app_show_state", _app_show_state)
-                            }
+                            updateWhiteList(RowText)
                             updateCursorMode(config != "cursor_mode_JAB")
                         }
                         g_1 := Gui("AlwaysOnTop")
@@ -535,7 +524,9 @@ makeTrayMenu() {
                         g_1.AddLink(, "要将进程")
                         g_1.AddLink("yp cRed", RowText)
                         g_1.AddLink("yp", "添加到哪一个光标获取模式中？")
-                        g_1.AddLink("xs cRed", "如果选择添加且此应用不在白名单中，则会同步添加到白名单中")
+                        if (useWhiteList) {
+                            g_1.AddLink("xs cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
+                        }
 
                         mode_list := modeNameList.Clone()
                         if (from != "add") {
@@ -599,6 +590,9 @@ makeTrayMenu() {
                             g_2 := Gui("AlwaysOnTop", "InputTip - 通过输入进程名称手动添加")
                             g_2.SetFont(fz, "微软雅黑")
                             bw := w - g_2.MarginX * 2
+                            if (useWhiteList) {
+                                g_2.AddLink("cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
+                            }
                             g_2.AddText(, "1. 进程名称应该是")
                             g_2.AddText("yp cRed", "xxx.exe")
                             g_2.AddText("yp", "这样的格式")
@@ -665,6 +659,7 @@ makeTrayMenu() {
                                 } else {
                                     writeIni(config, exe_name)
                                 }
+                                updateWhiteList(exe_name)
                                 updateCursorMode(config != "cursor_mode_JAB")
                             }
                             gc.w.subGui := g_2
@@ -1461,7 +1456,7 @@ makeTrayMenu() {
             addConfirm: "",
             addConfirm2: "",
             addConfirm3: "",
-            addConfirm4: "",
+            addConfirm4: "如果此应用不在白名单中，则会同步添加到白名单中",
             rmConfirm: "",
             rmConfirm2: "",
             rmConfirm3: "",
@@ -1490,7 +1485,7 @@ makeTrayMenu() {
                     bw := w - g_2.MarginX * 2
 
                     ; 需要同步添加到白名单
-                    if (tipList.addConfirm4) {
+                    if (useWhiteList && tipList.addConfirm4) {
                         g_2.AddText("cRed", tipList.addConfirm4)
                     }
                     g_2.AddText(, "1. 进程名称应该是")
@@ -1591,19 +1586,7 @@ makeTrayMenu() {
                     app_offset.%app%.%v.num% := { x: 0, y: 0 }
                 }
                 fn_write_offset()
-
-                ; 同步添加到白名单
-                global app_show_state
-                _app_show_state := readIni("app_show_state", "")
-                if (!InStr(app_show_state, ":" app ":")) {
-                    if (_app_show_state) {
-                        _app_show_state .= ":" app
-                    } else {
-                        _app_show_state := app
-                    }
-                    app_show_state := ":" _app_show_state ":"
-                    writeIni("app_show_state", _app_show_state)
-                }
+                updateWhiteList(app)
             }
             offsetGui := Gui("AlwaysOnTop", "InputTip - 设置 " app " 的特殊偏移量")
             offsetGui.SetFont(fz, "微软雅黑")
@@ -2037,18 +2020,7 @@ makeTrayMenu() {
                                     writeIni(config, RowText)
                                 }
                             }
-                            ; 同步添加到白名单
-                            global app_show_state
-                            _app_show_state := readIni("app_show_state", "")
-                            if (!InStr(app_show_state, ":" RowText ":")) {
-                                if (_app_show_state) {
-                                    _app_show_state .= ":" RowText
-                                } else {
-                                    _app_show_state := RowText
-                                }
-                                app_show_state := ":" _app_show_state ":"
-                                writeIni("app_show_state", _app_show_state)
-                            }
+                            updateWhiteList(RowText)
 
                             global app_CN := ":" readIni('app_CN', '') ":"
                             global app_EN := ":" readIni('app_EN', '') ":"
@@ -2066,7 +2038,9 @@ makeTrayMenu() {
                         g_1.AddLink(, "要将进程")
                         g_1.AddLink("yp cRed", RowText)
                         g_1.AddLink("yp", "添加到哪一个自动切换列表中？")
-                        g_1.AddLink("xs cRed", "如果选择添加且此应用不在白名单中，则会同步添加到白名单中")
+                        if (useWhiteList) {
+                            g_1.AddLink("xs cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
+                        }
                         fn_CN(*) {
                             _handle("CN")
                         }
@@ -2151,6 +2125,10 @@ makeTrayMenu() {
                             g_2 := Gui("AlwaysOnTop", "InputTip - 通过输入进程名称手动添加")
                             g_2.SetFont(fz, "微软雅黑")
                             bw := w - g_2.MarginX * 2
+
+                            if (useWhiteList) {
+                                g_2.AddText("cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
+                            }
                             g_2.AddText(, "1. 进程名称应该是")
                             g_2.AddText("yp cRed", "xxx.exe")
                             g_2.AddText("yp", "这样的格式")
@@ -2219,6 +2197,7 @@ makeTrayMenu() {
                                 } else {
                                     writeIni(config, exe_name)
                                 }
+                                updateWhiteList(exe_name)
                                 global app_CN := ":" readIni('app_CN', '') ":"
                                 global app_EN := ":" readIni('app_EN', '') ":"
                                 global app_Caps := ":" readIni('app_Caps', '') ":"
@@ -2517,17 +2496,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                             _g.OnEvent("Click", fn_add_with_white_list)
                             _g.Focus()
                             fn_add_with_white_list(*) {
-                                global app_show_state
-                                _app_show_state := readIni("app_show_state", "")
-                                if (!InStr(app_show_state, ":" RowText ":")) {
-                                    if (_app_show_state) {
-                                        _app_show_state .= ":" RowText
-                                    } else {
-                                        _app_show_state := RowText
-                                    }
-                                    app_show_state := ":" _app_show_state ":"
-                                    writeIni("app_show_state", _app_show_state)
-                                }
+                                updateWhiteList(RowText)
                                 g_1.Destroy()
                                 gc.%_gui "_LV_add"%.Delete(RowNumber)
                                 gc.%_gui "_LV_rm"%.Add(, RowText)
@@ -2687,19 +2656,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                                     return g_2
                                 }
                             } else {
-                                if (useWhiteList) {
-                                    global app_show_state
-                                    _app_show_state := readIni("app_show_state", "")
-                                    if (!InStr(app_show_state, ":" exe_name ":")) {
-                                        if (_app_show_state) {
-                                            _app_show_state .= ":" exe_name
-                                        } else {
-                                            _app_show_state := exe_name
-                                        }
-                                        app_show_state := ":" _app_show_state ":"
-                                        writeIni("app_show_state", _app_show_state)
-                                    }
-                                }
+                                updateWhiteList(exe_name)
                                 gc.%_gui "_LV_rm"%.Add(, exe_name)
                                 result := res exe_name
                                 writeIni(tipList.config, result)

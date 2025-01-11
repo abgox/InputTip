@@ -457,3 +457,20 @@ updateCursorMode(init := 0) {
         modeList.%item% .= %item% ":"
     }
 }
+
+updateWhiteList(app) {
+    if (!useWhiteList) {
+        return
+    }
+    global app_show_state
+    _app_show_state := readIni("app_show_state", "")
+    if (!InStr(app_show_state, ":" app ":")) {
+        if (_app_show_state) {
+            _app_show_state .= ":" app
+        } else {
+            _app_show_state := app
+        }
+        app_show_state := ":" _app_show_state ":"
+        writeIni("app_show_state", _app_show_state)
+    }
+}

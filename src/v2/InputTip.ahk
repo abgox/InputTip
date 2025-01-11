@@ -11,7 +11,7 @@ A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示
 #Include .\utils\ini.ahk
 #Include .\utils\IME.ahk
 #Include .\utils\check-version.ahk
-#Include .\utils\tray-menu.ahk
+#Include .\menu\tray-menu.ahk
 
 #Include .\utils\tools.ahk
 #Include .\utils\app-list.ahk

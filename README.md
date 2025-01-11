@@ -12,7 +12,8 @@
         <img src="https://img.shields.io/github/license/abgox/InputTip" alt="license" />
     </a>
     <a href="https://inputtip.pages.dev/releases/v2/version.json">
-        <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Finputtip.pages.dev%2Freleases%2Fv2%2Fversion.json&query=%24.version&prefix=v&label=version" alt="version" />
+        <img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version
+        " alt="version" />
     </a>
     <a href="https://img.shields.io/github/languages/code-size/abgox/InputTip.svg">
         <img src="https://img.shields.io/github/languages/code-size/abgox/InputTip.svg" alt="code size" />
@@ -58,7 +59,7 @@
 
 ### 常见问题
 
-- 如果有使用上的任何问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: middle;" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Finputtip.pages.dev%2Freleases%2Fv2%2Fversion.json&query=%24.version&prefix=v&label=%20" alt="version">
+- 如果有使用上的任何问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
   - 在 `托盘菜单` => `关于` 中查看当前版本号
 - 然后查看相关的说明文档、[常见问题(FAQ)](https://inputtip.pages.dev/FAQ/)、[issues](https://github.com/abgox/InputTip/issues) 等等
 
@@ -112,7 +113,8 @@
         - 通过任务计划程序生成的特殊快捷方式
         - 运行此快捷方式不会弹出 `UAC` 权限提示窗口
         - 此快捷方式被删除后，会随着 `InputTip.exe` 启动重新生成
-    - **这样做的话，所有相关的文件或文件夹都在同一个目录中，方便管理**
+    - **这样做，所有相关的文件或文件夹都在同一个目录中，方便管理**
+      - 或者直接下载 `InputTip.zip`
 
 - 关于 `UAC` 权限提示窗口
 

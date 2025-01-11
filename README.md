@@ -186,6 +186,10 @@
 
 > [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 
+> [!Note]
+>
+> 如果有其他 JAB 程序，也可以按照此步骤进行设置
+
 1. 打开 Java Access Bridge (java 访问桥)
 
    - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
@@ -194,21 +198,19 @@
      jabswitch -enable
    ```
 
-2. 点击 `托盘菜单` => `启用 JetBrains IDE 支持`
+2. 点击 `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
 
    - 会在 `InputTip.exe` 同级目录下生成 `InputTip.JAB.JetBrains.exe`
    - 它由 `InputTip.exe` 控制，不需要手动启动/终止
 
-3. 点击 `托盘菜单` => `添加 JetBrains IDE 应用`，确保你使用的 JetBrains IDE 应用已经添加
+3. 点击 `托盘菜单` => `设置光标获取模式`，将 JetBrains IDE 应用添加到其中的 `JAB` 列表中
 
-4. 重启 JetBrains IDE 应用
+4. 如果未生效，请重启正在使用的 JetBrains IDE
 
-5. 如果没有生效，可能需要重启电脑
+5. 如果仍未生效，请重启 InputTip 或重启系统
 
 > [!TIP]
-> 如果你有多块屏幕，JetBrains IDE 在副屏上，会有非常大的坐标偏差
->
-> 你需要通过 `托盘菜单` => `设置特殊偏移量` => `设置 JetBrains 系列 IDE 的偏移量` 手动调整
+> 如果有多块屏幕，副屏幕上可能有坐标偏差，需要通过 `托盘菜单` => `设置特殊偏移量` 手动调整
 
 ### 关于符号
 
@@ -243,7 +245,7 @@
 
 > [!Tip]
 >
-> 也可以直接下载 [已经适配好的鼠标样式](https://inputtip.pages.dev/download/extra) 来使用
+> 也可以直接下载 [已经适配的鼠标样式](https://inputtip.pages.dev/download/extra) 来使用
 
 > [!Tip]
 >
@@ -296,40 +298,46 @@
 >
 > 这里的兼容情况也仅供参考，实际情况可能有所不同，你应该自行尝试
 >
-> 如果是**讯飞**输入法或**手心**输入法，直接使用对应模式即可
+> - 一般使用 `通用模式`，如果是 [讯飞输入法](https://srf.xunfei.cn/) 或 [手心输入法](https://www.xinshuru.com/)，直接使用对应模式即可
 >
-> 建议尝试的顺序是 `通用模式` > `自定义`
+> - 否则，使用 `自定义`
 >
-> [输入法模式的已知问题](https://inputtip.pages.dev/FAQ/#输入法模式的已知问题)
+> - [输入法模式的已知问题](https://inputtip.pages.dev/FAQ/#输入法模式的已知问题)
 
 - 已知可用的输入法(通过模式切换兼容)
 
   - `通用模式`(默认):
 
-    - **微信**输入法
-    - **搜狗**(五笔)输入法
-    - **QQ**输入法
-    - **微软**(拼音/五笔)
-    - **冰凌**(五笔)输入法
-    - **小狼毫(rime)** 输入法
-    - **小鹤音形**输入法(使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成)
+    - [微信输入法](https://z.weixin.qq.com/)
+    - [搜狗输入法](https://shurufa.sogou.com/)
+      - [搜狗五笔输入法](https://wubi.sogou.com/)
+    - [QQ 输入法](https://qq.pinyin.cn/)
+    - [百度输入法](https://shurufa.baidu.com/)
+    - 微软
+      - 微软拼音
+      - 微软五笔
+      - 微软仓颉
+    - [冰凌输入法](https://icesofts.com/)
+    - [小狼毫(rime)输入法](https://rime.im/download/)
+    - 小鹤音形输入法
+      - 需要使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成
       - 使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成的输入法都可用
-    - **百度**输入法
-    - **谷歌**输入法
-    - **微软仓颉**输入法
-    - **小小**输入法
-    - **影子**输入法
+    - [小小输入法](http://yongim.ysepan.com/)
+    - [影子输入法](https://gitee.com/orz707/Yzime)
       - 需要关闭影子输入法中的 `tsf`
       - 在键盘布局中，选择一个能正常识别状态的输入法(建议选择微信输入法、搜狗输入法等)
       - 然后正常使用影子输入法即可
+    - [可可五笔](https://suke.kim/)
+    - 谷歌输入法
 
   - `讯飞输入法`
-    - 如果正在使用 **讯飞**输入法，你需要选择它
+    - 如果正在使用 [讯飞输入法](https://srf.xunfei.cn/)，你需要选择它
   - `手心输入法`
-    - 如果你正在使用 **手心**输入法，你需要选择它
+    - 如果你正在使用 [手心输入法](https://www.xinshuru.com/)，你需要选择它
     - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题。
   - `自定义`
-    - [关于设置输入法模式中的自定义](https://inputtip.pages.dev/FAQ/about-input-mode-custom)
+    - 一个万能的模式，需要根据实际情况设置状态码和切换码
+    - 详情参考: [关于设置输入法模式中的自定义](https://inputtip.pages.dev/FAQ/about-input-mode-custom)
 
 - 如何进行模式切换
   1.  运行 `InputTip.exe` 后，在底部任务栏右侧找到软件托盘图标

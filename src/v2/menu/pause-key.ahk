@@ -1,12 +1,12 @@
 fn_pause_key(*) {
     if (gc.w.pauseHotkeyGui) {
-        gc.w.pauseHotkeyGui.Flash()
-        gc.w.pauseHotkeyGui.Show()
-        return
+        gc.w.pauseHotkeyGui.Destroy()
+        gc.w.pauseHotkeyGui := ""
     }
+    line := "----------------------------------------------------------------------------"
     hotkeyGui := Gui("AlwaysOnTop")
     hotkeyGui.SetFont(fz, "微软雅黑")
-    hotkeyGui.AddText(, "-------------------------------------------------------------------------------------")
+    hotkeyGui.AddText(, line)
     hotkeyGui.Show("Hide")
     hotkeyGui.GetPos(, , &Gui_width)
     hotkeyGui.Destroy()
@@ -14,11 +14,13 @@ fn_pause_key(*) {
     hotkeyGui := Gui("AlwaysOnTop", "InputTip - 设置暂停/运行快捷键的快捷键")
     hotkeyGui.SetFont(fz, "微软雅黑")
 
+    bw := Gui_width - hotkeyGui.MarginX * 2
+
     tab := hotkeyGui.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
     tab.UseTab(1)
     hotkeyGui.AddText("Section", "1.  当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键")
     hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-    hotkeyGui.AddText("xs", "-------------------------------------------------------------------------------------")
+    hotkeyGui.AddText("xs", line)
 
     hotkeyGui.AddText("xs", "设置")
     hotkeyGui.AddText("yp cRed", "暂停/运行")
@@ -48,7 +50,7 @@ fn_pause_key(*) {
     }
 
     gc.win.Value := InStr(value, "#") ? 1 : 0
-    hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes)
+    hotkeyGui.AddButton("xs w" bw, "确定").OnEvent("Click", yes)
     yes(*) {
         if (hotkeyGui.Submit().win) {
             key := "#" hotkeyGui.Submit().hotkey_Pause
@@ -61,16 +63,14 @@ fn_pause_key(*) {
     tab.UseTab(2)
     hotkeyGui.AddLink("Section", "1.")
     hotkeyGui.AddLink("yp cRed", "优先使用「设置组合快捷键」设置，除非因为快捷键占用无法设置")
-    hotkeyGui.AddLink("xs", '2.  如何手动输入快捷键：<a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">https://inputtip.pages.dev/FAQ/enter-shortcuts-manually</a>')
-    hotkeyGui.AddText("xs", "-------------------------------------------------------------------------------------")
-
+    hotkeyGui.AddLink("xs", '2. <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>')
+    hotkeyGui.AddText("xs", line)
     hotkeyGui.AddText("xs", "设置")
     hotkeyGui.AddText("yp cRed", "暂停/运行")
     hotkeyGui.AddText("yp", "的快捷键: ")
     value := readIni('hotkey_Pause', '')
     gc.hotkey_Pause2 := hotkeyGui.AddEdit("yp w300 vhotkey_Pause2", readIni("hotkey_Pause", ''))
     gc.hotkey_Pause2.OnEvent("Change", fn_change_hotkey2)
-
     fn_change_hotkey2(item, *) {
         gc.win.Value := InStr(item.Value, "#") ? 1 : 0
         if (item.Value ~= "^~\w+\sUp$") {
@@ -84,7 +84,7 @@ fn_pause_key(*) {
             }
         }
     }
-    hotkeyGui.AddButton("xs w" Gui_width, "确定").OnEvent("Click", yes2)
+    hotkeyGui.AddButton("xs w" bw, "确定").OnEvent("Click", yes2)
     yes2(*) {
         if (hotkeyGui.Submit().win) {
             key := "#" hotkeyGui.Submit().hotkey_Pause
@@ -94,11 +94,9 @@ fn_pause_key(*) {
         writeIni("hotkey_Pause", key)
         fn_restart()
     }
-
     hotkeyGui.OnEvent("Close", fn_close)
     fn_close(*) {
         hotkeyGui.Destroy()
-        gc.w.pauseHotkeyGui := ""
     }
     gc.w.pauseHotkeyGui := hotkeyGui
     hotkeyGui.Show()

@@ -251,7 +251,7 @@ fn_switch_window(*) {
                         g_2.AddText("yp cRed", "xxx.exe")
                         g_2.AddText("yp", "这样的格式")
                         g_2.AddText("xs", "2. 每一次只能添加一个")
-                        g_2.AddText("xs", "进程名称: ")
+                        g_2.AddText("xs", "应用进程名称: ")
                         g_2.AddEdit("yp vexe_name", "").Value := v
 
                         g_2.AddButton("xs w" bw, "添加到「自动切换中文」").OnEvent("Click", fn_CN)

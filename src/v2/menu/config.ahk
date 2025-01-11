@@ -479,7 +479,9 @@ fn_config(*) {
     configGui.AddText("xs", "3. 当方块符号中的背景颜色设置为空时，对应的文本字符也不显示`n" line)
     for v in symbolCharConfig {
         configGui.AddText("xs", v.tip ": ")
-        configGui.AddEdit("v" v.config " yp w150 " v.options, %v.config%).OnEvent("Change", fn_char_config)
+        _g := configGui.AddEdit("v" v.config " yp " v.options)
+        _g.Value := %v.config%
+        _g.OnEvent("Change", fn_char_config)
 
         fn_char_config(item, *) {
             value := item.Text

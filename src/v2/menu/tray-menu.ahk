@@ -45,19 +45,20 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
     A_TrayMenu.Add("重启", fn_restart)
-    fn_restart(flag := 0, *) {
-        if (flag || enableJetBrainsSupport) {
-            RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
-        }
-        Run(A_ScriptFullPath)
-    }
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("退出", fn_exit)
-    fn_exit(*) {
+}
+
+fn_exit(*) {
+    RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+    ExitApp()
+}
+fn_restart(flag := 0, *) {
+    if (flag || enableJetBrainsSupport) {
         RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
-        ExitApp()
     }
+    Run(A_ScriptFullPath)
 }
 
 fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
@@ -287,7 +288,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         g_2.AddText("yp cRed", "xxx.exe")
                         g_2.AddText("yp", "这样的格式")
                         g_2.AddText("xs", "2. 每一次只能添加一个")
-                        g_2.AddText("xs", "进程名称: ")
+                        g_2.AddText("xs", "应用进程名称: ")
                         g_2.AddEdit("yp vexe_name", "").Value := v
                         g_2.AddButton("xs w" bw, "添加").OnEvent("Click", yes)
                         yes(*) {
@@ -371,8 +372,11 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     g_3.SetFont(fz, "微软雅黑")
                     bw := w - g_3.MarginX * 2
                     g_3.AddText(, "确定要清空「" tipList.list "」吗？")
-                    g_3.AddButton("xs w" bw, "确认").OnEvent("Click", yes)
-                    g_3.AddButton("xs w" bw, "取消").OnEvent("Click", no)
+                    g_3.AddText("cRed", "请谨慎选择，一旦清空，无法恢复，只能重新一个一个添加")
+                    g_3.AddButton("xs w" bw, "【是】我确定要清空").OnEvent("Click", yes)
+                    _g := g_3.AddButton("xs w" bw, "【否】不，我点错了")
+                    _g.OnEvent("Click", no)
+                    _g.Focus()
                     yes(*) {
                         g_3.Destroy()
                         gc.%_gui "_LV_rm"%.Delete()

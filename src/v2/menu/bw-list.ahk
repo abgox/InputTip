@@ -9,11 +9,9 @@ fn_bw_list(*) {
         g.SetFont(fz, "微软雅黑")
         bw := w - g.MarginX * 2
 
-        g.AddText("cRed", "「白」名单机制: 只有在白名单中的应用进程窗口会显示符号`n「黑」名单机制: 只有不在黑名单中的应用进程窗口会显示符号")
-        g.AddLink(, '1. 建议使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，这样可以精确控制哪些应用进程窗口需要显示符号`n2. 使用白名单机制，可以减少大量特殊窗口的兼容性问题`n3. 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中')
-        g.AddText(, "-------------------------------------------------------------------------------------")
-
-        g.AddText(, "选择显示符号的名单机制: ")
+        g.AddText("cRed", "白名单机制 : 只有在「白」名单中的应用进程窗口会显示符号`n黑名单机制 : 只有不在「黑」名单中的应用进程窗口会显示符号")
+        g.AddLink("cGray", '如果你正在使用 <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>，InputTip 提供了同步添加机制`n当使用以下配置菜单时，添加的应用进程会同步添加到「白」名单中`n「设置光标获取模式」「设置特殊偏移量」「指定窗口自动切换状态」')
+        g.AddText(, "选择符号显示的名单机制: ")
         gc._bw_list := g.AddDropDownList("yp AltSubmit vuseWhiteList Choose" useWhiteList + 1, ["使用「黑」名单", "使用「白」名单"])
         gc._bw_list.OnEvent("Change", fn_change_list)
         fn_change_list(item, *) {
@@ -29,7 +27,7 @@ fn_bw_list(*) {
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText("cRed", "确定要使用「黑」名单吗？")
-                    g.AddText("cRed", "这是不建议的，使用它，你需要承担未知的可能存在的窗口兼容性代价")
+                    g.AddText("cRed", "这是不建议的，更建议继续使用「白」名单`n因为「黑」名单机制下，你需要承担未知的可能存在的窗口兼容性代价")
                     g.AddButton("w" bw, "【是】我确定要使用「黑」名单").OnEvent("Click", yes)
                     g.AddButton("w" bw, "【否】不，我只是不小心点到了").OnEvent("Click", no)
                     g.OnEvent("Close", no)

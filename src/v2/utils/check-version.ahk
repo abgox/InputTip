@@ -265,22 +265,14 @@ checkUpdateDone() {
                 case 3:
                 {
                     ; 讯飞输入法
-                    ; 中文时状态码为 2
-                    ; 英文时状态码为 1
-                    ; 切换码无规律不唯一
-                    writeIni("statusModeEN", ":1:", "InputMethod")
-                    writeIni("conversionModeEN", "", "InputMethod")
-                    writeIni("mode", 2, "InputMethod")
+                    writeIni("evenStatusModeEN", "0", "InputMethod")
+                    writeIni("mode", 0, "InputMethod")
                 }
                 case 4:
                 {
-                    ; 手心输入法:
-                    ; 中文时切换码为 1025
-                    ; 英文时切换码为 1
-                    ; 状态码一直为 1
-                    writeIni("statusModeEN", "", "InputMethod")
+                    ; 手心输入法
                     writeIni("conversionModeEN", ":1:", "InputMethod")
-                    writeIni("mode", 3, "InputMethod")
+                    writeIni("mode", 0, "InputMethod")
                 }
             }
             border_type := readIni('border_type', 1)

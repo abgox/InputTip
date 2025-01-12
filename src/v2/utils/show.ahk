@@ -1,16 +1,19 @@
 updateDelay()
 
+; 鼠标悬浮在符号上
+isOverSymbol := 0
 while 1 {
     Sleep(delay)
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
         needShow := 1
-        ; if (symbolType) {
-        ;     if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-        ;         hideSymbol()
-        ;         continue
-        ;     }
-        ; }
+        if (symbolType) {
+            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
+                hideSymbol()
+                isOverSymbol := 1
+                continue
+            }
+        }
         try {
             exe_name := ProcessGetName(WinGetPID("A"))
             exe_str := ":" exe_name ":"
@@ -141,12 +144,14 @@ loadCursor(type, change := 0) {
     }
 }
 loadSymbol(type, left, top) {
-    global lastSymbol
-    static old_top := 0
-    static old_left := 0
-
-    if (type = lastSymbol && left = old_left && top = old_top) {
-        return
+    global lastSymbol, isOverSymbol
+    static old_left := 0, old_top := 0
+    if (left = old_left && top = old_top) {
+        if (type = lastSymbol || isOverSymbol) {
+            return
+        }
+    } else {
+        isOverSymbol := 0
     }
 
     hideSymbol()

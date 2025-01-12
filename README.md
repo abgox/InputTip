@@ -27,13 +27,13 @@
 
 ---
 
-> [!NOTE]
+> [!Tip]
 >
-> `托盘菜单` 指的是在电脑底部的任务栏右侧的 `InputTip` 软件托盘菜单
+> `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
 
 ### 介绍
 
-- 基于 `AutoHotKey` 编写
+- 使用 `AutoHotKey` 编写，仅 Windows 系统可用
 - 一个实时的输入法状态(中文/英文/大写锁定)提示工具
 
   - 根据输入法状态改变鼠标样式
@@ -76,7 +76,7 @@
 
 ### 使用
 
-> [!NOTE]
+> [!Tip]
 >
 > - 因为以下原因，可能无法正常运行 `InputTip.exe`
 >   - 没有管理员权限
@@ -92,7 +92,7 @@
 >   3. 直接运行项目中的 `InputTip.ahk` 文件
 >      - `src\v2\InputTip.ahk`
 
-> [!warning]
+> [!Warning]
 >
 > - 软件中使用到了 `powershell`，请确保你的电脑环境中有 `powershell`
 > - 现在的 Windows，都内置了 `powershell`，但总有一些特殊环境没有，可能导致运行报错
@@ -157,8 +157,8 @@
 2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
    - 这一步完成后，你也可以直接运行 `src\v2\InputTip.ahk` 来使用 `InputTip`
 3. 打开 `AutoHotKey Dash`
-4. 点击左侧的 `Compile`，等待编译器下载完成
-5. 重新点击左侧的 `Compile`
+4. 点击左边的 `Compile`，等待编译器下载完成
+5. 重新点击左边的 `Compile`
 6. 将 `src\v2\InputTip.ahk` 拖入弹出的编译窗口中
 7. 点击左下角的 `Convert` 完成编译
 8. 运行编译后的 `InputTip.exe`
@@ -187,7 +187,7 @@
 
 > [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 
-> [!Note]
+> [!Tip]
 >
 > 如果有其他 JAB 程序，也可以按照此步骤进行设置
 
@@ -210,7 +210,7 @@
 
 5. 如果仍未生效，请重启 InputTip 或重启系统
 
-> [!TIP]
+> [!Tip]
 > 如果有多块屏幕，副屏幕上可能有坐标偏差，需要通过 `托盘菜单` => `设置特殊偏移量` 手动调整
 
 ### 关于符号
@@ -220,23 +220,25 @@
 - `InputTip.exe` 启动后，会在同级目录下生成 `InputTipSymbol` 目录，其中包括 `default` 文件夹
 
   - `default` 文件夹中包含了默认的图片符号
-  - 当 `托盘菜单` 中 `更改配置` => `显示形式` => 第 2 个显示配置，选择 `显示图片符号` 时，会在输入光标附近显示对应的图片符号
-  - 你也可以将自己喜欢的图片符号，或者自己制作图片符号，放入 `InputTipSymbol` 目录下(图片必须是 `.png` 格式)
+  - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 在输入光标附近显示什么类型的符号`，选择 `显示图片符号` 时，会在输入光标附近显示对应的图片符号
+  - 你也可以将自己喜欢的图片符号，或者自己制作图片符号，放入 `InputTipSymbol` 目录下
+    - 限制: 图片必须是 `.png` 格式
     - [更多的符号图片](https://inputtip.pages.dev/download/extra)
   - 然后，点击 `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择正确的图片路径
   - 如果留空，则不会显示对应状态的图片符号
 
 #### 方块符号
 
-- 当 `托盘菜单` 中 `更改配置` => `显示形式` => 第 2 个显示配置，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
+- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 在输入光标附近显示什么类型的符号`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
 - 默认中文状态为**红色**，英文状态为**蓝色**，大写锁定为**绿色**
 - 方块符号相关的配置: `托盘菜单` => `更改配置` => `方块符号`
 - 当其中的方块符号的颜色设置修改为空时，则不会显示该状态的方块符号
   - 比如: 你只希望在中文状态下显示方块符号，那么就将 `英文状态时方块符号的颜色` 和 `大写锁定时方块符号的颜色` 的值都设置为空
+  - 如果选择 `显示文本符号`，方块符号的颜色为空会导致文本符号无法显示
 
 #### 文本符号
 
-- 当 `托盘菜单` 中 `更改配置` => `显示形式` => 第 2 个显示配置，选择 `显示文本符号` 时，会在输入光标附近显示对应的文本符号
+- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 在输入光标附近显示什么类型的符号`，选择 `显示文本符号` 时，会在输入光标附近显示对应的文本符号
 - 默认中文状态为 `中`，英文状态为 `英`，大写锁定为 `大`
 - 文本符号相关的配置: `托盘菜单` => `更改配置` => `文本符号`
 - 当其中的文本字符设置修改为空时，则不会显示该状态的文本符号
@@ -246,10 +248,7 @@
 
 > [!Tip]
 >
-> 也可以直接下载 [已经适配的鼠标样式](https://inputtip.pages.dev/download/extra) 来使用
-
-> [!Tip]
->
+> - 也可以直接下载 [已经适配的鼠标样式](https://inputtip.pages.dev/download/extra) 来使用
 > - `InputTip.exe` 启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `default` 文件夹
 >   - `default` 用于存放中文/英文/大写锁定状态的 **默认** 鼠标样式
 
@@ -281,7 +280,7 @@
      |    Person    |            人员选择             |
      |     Pen      |              手写               |
 
-   - 详情参考 [关于光标(游标)](https://learn.microsoft.com/windows/win32/menurc/about-cursors)
+   - 详情参考 [微软文档: 关于光标(游标)](https://learn.microsoft.com/windows/win32/menurc/about-cursors)
 
 2. 点击 `托盘菜单` => `更改配置` => `鼠标样式` => 在下拉列表中选择对应文件夹目录路径
 
@@ -295,56 +294,42 @@
 
 ### 兼容情况
 
-> [!NOTE]
+#### 输入法兼容情况
+
+> [!Tip]
 >
-> 这里的兼容情况也仅供参考，实际情况可能有所不同，你应该自行尝试
->
-> - 一般使用 `通用模式`，如果是 [讯飞输入法](https://srf.xunfei.cn/) 或 [手心输入法](https://www.xinshuru.com/)，直接使用对应模式即可
->
-> - 否则，使用 `自定义`
->
-> - [输入法模式的已知问题](https://inputtip.pages.dev/FAQ/#输入法模式的已知问题)
+> 现在，InputTip 使用【通用】和【自定义】模式兼容输入法，默认使用【通用】模式
 
-- 已知可用的输入法(通过模式切换兼容)
+- `【通用】模式`
 
-  - `通用模式`(默认):
+  - [微信输入法](https://z.weixin.qq.com/)
+  - [搜狗输入法](https://shurufa.sogou.com/)，[搜狗五笔输入法](https://wubi.sogou.com/)
+  - [QQ 输入法](https://qq.pinyin.cn/)
+  - [百度输入法](https://shurufa.baidu.com/)
+  - 微软拼音，微软五笔，微软仓颉
+  - [冰凌输入法](https://icesofts.com/)
+  - 小鹤音形输入法
+    - 需要使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成
+    - 使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成的输入法都可用
+  - [小小输入法](http://yongim.ysepan.com/)
+  - [影子输入法](https://gitee.com/orz707/Yzime)
+    - 需要关闭影子输入法中的 `tsf`
+    - 在键盘布局中，选择一个能正常识别状态的输入法(建议选择微信输入法、搜狗输入法等)
+    - 然后正常使用影子输入法即可
+  - [可可五笔](https://suke.kim/)
+  - 谷歌输入法
 
-    - [微信输入法](https://z.weixin.qq.com/)
-    - [搜狗输入法](https://shurufa.sogou.com/)
-      - [搜狗五笔输入法](https://wubi.sogou.com/)
-    - [QQ 输入法](https://qq.pinyin.cn/)
-    - [百度输入法](https://shurufa.baidu.com/)
-    - 微软
-      - 微软拼音
-      - 微软五笔
-      - 微软仓颉
-    - [冰凌输入法](https://icesofts.com/)
-    - [小狼毫(rime)输入法](https://rime.im/download/)
-    - 小鹤音形输入法
-      - 需要使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成
-      - 使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成的输入法都可用
-    - [小小输入法](http://yongim.ysepan.com/)
-    - [影子输入法](https://gitee.com/orz707/Yzime)
-      - 需要关闭影子输入法中的 `tsf`
-      - 在键盘布局中，选择一个能正常识别状态的输入法(建议选择微信输入法、搜狗输入法等)
-      - 然后正常使用影子输入法即可
-    - [可可五笔](https://suke.kim/)
-    - 谷歌输入法
+- `【自定义】模式`
 
-  - `讯飞输入法`
-    - 如果正在使用 [讯飞输入法](https://srf.xunfei.cn/)，你需要选择它
-  - `手心输入法`
-    - 如果你正在使用 [手心输入法](https://www.xinshuru.com/)，你需要选择它
-    - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题。
-  - `自定义`
-    - 一个万能的模式，需要根据实际情况设置状态码和切换码
-    - 详情参考: [关于设置输入法模式中的自定义](https://inputtip.pages.dev/FAQ/about-input-mode-custom)
+  - 一个万能的模式，需要根据实际情况设置状态码和切换码
+  - 详情参考: [关于【自定义】模式](https://inputtip.pages.dev/FAQ/about-input-mode-custom)
+  - `设置输入法模式` => `自定义` 进行配置:
+    - [小狼毫(rime)输入法](https://rime.im/download/): 勾选 `切换码规则` 中的 `使用偶数`
+    - [讯飞输入法](https://srf.xunfei.cn/): 勾选 `状态码规则` 中的 `使用奇数`
+    - [手心输入法](https://www.xinshuru.com/): 在 `切换码数字`的输入框中填入 `1`
+      - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题。
 
-- 如何进行模式切换
-  1.  运行 `InputTip.exe` 后，在底部任务栏右侧找到软件托盘图标
-  2.  `鼠标右击` 软件托盘图标
-  3.  点击 `设置输入法模式` => `1. 当前输入法模式`
-  4.  选择一个可用的模式
+#### [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list)
 
 ### 参考项目
 

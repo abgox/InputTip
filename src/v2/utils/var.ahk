@@ -4,8 +4,15 @@ fz := "s" readIni("gui_font_size", "12")
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
 
+; 指定的英文状态码
 statusModeEN := readIni("statusModeEN", "", "InputMethod")
+; 指定的英文切换码
 conversionModeEN := readIni("conversionModeEN", "", "InputMethod")
+
+; 是否使用偶数
+evenStatusModeEN := readIni("evenStatusModeEN", "", "InputMethod")
+evenConversionModeEN := readIni("evenConversionModeEN", "", "InputMethod")
+
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
 ; 是否使用 Shift 键切换输入法状态

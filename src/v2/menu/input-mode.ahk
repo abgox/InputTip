@@ -1,7 +1,7 @@
 fn_input_mode(*) {
     createGui(fn).Show()
     fn(x, y, w, h) {
-        global statusModeEN, conversionModeEN, mode, checkTimeout, gc
+        global statusModeEN, conversionModeEN, evenStatusModeEN, evenConversionModeEN, mode, checkTimeout, gc
 
         if (gc.w.inputModeGui) {
             gc.w.inputModeGui.Destroy()
@@ -19,87 +19,20 @@ fn_input_mode(*) {
         g.SetFont(fz, "微软雅黑")
         bw := w - g.MarginX * 2
 
-        gc.imList := ["1. 自定义", "2. 通用模式", "3. 讯飞输入法", "4. 手心输入法"]
         statusModeEN := readIni("statusModeEN", "", "InputMethod")
         conversionModeEN := readIni("conversionModeEN", "", "InputMethod")
         mode := readIni("mode", 1, "InputMethod")
 
-        tab := g.AddTab3("-Wrap", ["基础配置", "自定义"])
+        gc.modeList := ["【自定义】", "【通用】"]
+        tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义"])
         tab.UseTab(1)
-        g.AddText("Section cRed", "- 一般情况，使用「通用模式」，如果是讯飞或手心输入法，则选择对应模式。`n- 当修改了输入法模式之后，如果已经打开的窗口不生效，需要重新打开。`n- 如果需要自定义，请前往「自定义」页面配置。")
-        g.AddText(, "1. 当前输入法模式: ")
-        gc.mode := g.AddDropDownList("yp AltSubmit vmode", gc.imList)
-        gc.mode.OnEvent("Change", fn_change_mode)
-        fn_change_mode(item, *) {
-            if (item.Value = 1) {
-                createGui(fn).Show()
-                fn(x, y, w, h) {
-                    if (gc.w.customModeGui) {
-                        gc.w.customModeGui.Destroy()
-                        gc.w.customModeGui := ""
-                    }
-                    gc.mode.Value := mode + 1
-                    g := Gui("AlwaysOnTop")
-                    g.SetFont(fz, "微软雅黑")
-                    bw := w - g.MarginX * 2
-                    g.AddText("cRed", "请前往「自定义」配置页面中设置，此处无法直接修改")
-                    g.AddText("cRed", "在配置页面的左上角，「基础配置」的右边")
-                    y := g.AddButton("w" bw, "我知道了")
-                    y.OnEvent("Click", yes)
-                    y.Focus()
-                    g.OnEvent("Close", yes)
-                    yes(*) {
-                        g.Destroy()
-                    }
-                    gc.w.customModeGui := g
-                    return g
-                }
-            } else {
-                switch (item.Value) {
-                    case 2:
-                    {
-                        writeIni("statusModeEN", "", "InputMethod")
-                        writeIni("conversionModeEN", "", "InputMethod")
-                        gc.statusModeEN.Value := ""
-                        gc.conversionModeEN.Value := ""
-                        statusModeEN := ""
-                        conversionModeEN := ""
-                    }
-                    case 3:
-                    {
-                        ; 讯飞输入法
-                        ; 中文时状态码为 2
-                        ; 英文时状态码为 1
-                        ; 切换码无规律不唯一
-                        writeIni("statusModeEN", ":1:", "InputMethod")
-                        writeIni("conversionModeEN", "", "InputMethod")
-                        gc.statusModeEN.Value := "1"
-                        gc.conversionModeEN.Value := ""
-                        statusModeEN := ":1:"
-                        conversionModeEN := ""
-                    }
-                    case 4:
-                    {
-                        ; 手心输入法:
-                        ; 中文时切换码为 1025
-                        ; 英文时切换码为 1
-                        ; 状态码一直为 1
-                        writeIni("statusModeEN", "", "InputMethod")
-                        writeIni("conversionModeEN", ":1:", "InputMethod")
-                        gc.statusModeEN.Value := ""
-                        gc.conversionModeEN.Value := "1"
-                        statusModeEN := ""
-                        conversionModeEN := ":1:"
-                    }
-                }
-                writeIni("mode", gc.mode.Value - 1, "InputMethod")
-                mode := readIni("mode", gc.mode.Value - 1, "InputMethod")
-                restartJetBrains()
-            }
-        }
-        gc.mode.Value := mode + 1
+        g.AddText("Section cRed", "如果【通用】模式不可用，需要前往「自定义」标签页去配置【自定义】模式")
+        g.AddText(, "1. 当前使用的输入法模式:")
+        gc.mode := g.AddText("yp cRed w" w / 2)
+        gc.mode.Value := gc.modeList[mode + 1]
         g.AddText("xs", "2. 设置获取输入法状态的超时时间: ")
         timeout := g.AddEdit("yp Number Limit5 vcheckTimeout", "")
+        timeout.Focus()
         timeout.OnEvent("Change", fn_change_timeout)
         fn_change_timeout(item, *) {
             if (item.value != "") {
@@ -109,8 +42,8 @@ fn_input_mode(*) {
             }
         }
         timeout.Value := checkTimeout
-        g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒。`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态。`n如果超过了这个时间，则认为获取失败，直接显示英文状态。`n它可能是有时识别不到输入法状态的原因，可以尝试调节它。")
-        g.AddText("xs", "3. Shift 按键是否可以切换输入法状态")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒。`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态。`n如果超过了这个时间，则认为获取失败，直接显示英文状态。`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它。")
+        g.AddText("xs", "3. Shift 按键是否可以正常切换输入法状态")
         gc.useShift := g.AddDropDownList("yp vuseShift Choose" useShift + 1, ["【否】(慎重选择)", "【是】"])
         gc.useShift.OnEvent("Change", fn_change_useShift)
         fn_change_useShift(item, *) {
@@ -127,7 +60,7 @@ fn_input_mode(*) {
                     bw := w - g.MarginX * 2
                     g.AddText("cRed", "确定要使用【否】吗？")
                     g.AddText("cRed", "除非你的输入法自定义了切换状态的按键，且禁用了 Shift 切换，才需要选择【否】。`n如果选择【否】，在美式键盘或部分特殊输入法中，可能会导致状态提示间歇性错误。")
-                    g.AddText("cRed", "更建议不要使用【否】，而是启用 Shift 切换状态，这也是几乎所有输入法的默认设置。")
+                    g.AddText("cRed", "建议不要使用【否】，而是启用 Shift 切换状态，这也是几乎所有输入法的默认设置。")
                     g.AddButton("w" bw, "我确定要使用【否】").OnEvent("Click", yes)
                     g.AddButton("w" bw, "不，我只是误点了").OnEvent("Click", no)
                     g.OnEvent("Close", no)
@@ -152,30 +85,22 @@ fn_input_mode(*) {
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" w, "除非你的输入法自定义了切换状态的按键，且禁用了 Shift 切换，才需要选择【否】。`n如果选择【否】，在美式键盘或部分特殊输入法中，可能会导致状态提示间歇性错误。")
         tab.UseTab(2)
+
+        g.AddText("Section ReadOnly cRed -VScroll w" w, "首先需要点击上方的「关于自定义」标签页，查看帮助说明，了解如何设置")
+        g.AddText("Section", "优先级顺序: 切换码规则(4) > 切换码数字(3) > 状态码规则(2) > 状态码数字(1)")
+        g.AddText("xs cGray", "输入框中有值的或规则有勾选的，取其中优先级最高的生效`n如果都没有设置或勾选，则自动变回【通用】模式，反之变为【自定义】模式")
+
         g.AddText("Section", "1.")
         g.AddText("yp cRed", "英文状态")
-        g.AddText("yp", "时应该返回的")
-        g.AddText("yp cRed", "状态码")
-        g.AddText("yp", ": ")
-        gc.statusModeEN := g.AddEdit("yp vstatusMode w" 100, "")
+        g.AddText("yp", "的状态码数字: ")
+        gc.statusModeEN := g.AddEdit("yp vstatusMode", "")
         gc.statusModeEN.Value := Trim(StrReplace(statusModeEN, ":", " "))
         gc.statusModeEN.OnEvent("Change", fn_change_statusModeEN)
         fn_change_statusModeEN(item, *) {
             if (Trim(item.Value) = "") {
-                if (conversionModeEN = "") {
-                    ; 如果状态码和切换码都为空，则恢复到通用模式
-                    writeIni("mode", 1, "InputMethod")
-                    mode := 1
-                    gc.mode.Value := 2
-                }
                 writeIni("statusModeEN", "", "InputMethod")
                 statusModeEN := ""
             } else {
-                if (mode != 0) {
-                    writeIni("mode", 0, "InputMethod")
-                    mode := 0
-                    gc.mode.Value := 1
-                }
                 value := ":"
                 for v in StrSplit(item.value, " ") {
                     value .= v ":"
@@ -183,32 +108,71 @@ fn_input_mode(*) {
                 writeIni("statusModeEN", value, "InputMethod")
                 statusModeEN := value
             }
+            checkModeChange()
             restartJetBrains()
         }
+        checkModeChange() {
+            if (gc.statusModeEN.Value = "" && gc.conversionModeEN.Value = "" && evenStatusModeEN = "" && evenConversionModeEN = "") {
+                gc.mode.Value := gc.modeList[2]
+                if (mode != 1) {
+                    writeIni("mode", 1, "InputMethod")
+                    global mode := 1
+                }
+            } else {
+                gc.mode.Value := gc.modeList[1]
+                if (mode != 0) {
+                    writeIni("mode", 0, "InputMethod")
+                    global mode := 0
+                }
+            }
+        }
+
+        handle_mode(v, c, box, d) {
+            if (v) {
+                gc.%box%.Value := 0
+                writeIni(c, d, "InputMethod")
+            } else {
+                if (!gc.%box%.Value) {
+                    writeIni(c, "", "InputMethod")
+                }
+            }
+            global evenStatusModeEN := readIni("evenStatusModeEN", "", "InputMethod")
+            global evenConversionModeEN := readIni("evenConversionModeEN", "", "InputMethod")
+            checkModeChange()
+            restartJetBrains()
+        }
+
         g.AddText("xs", "2.")
         g.AddText("yp cRed", "英文状态")
-        g.AddText("yp", "时应该返回的")
-        g.AddText("yp cRed", "切换码")
-        g.AddText("yp", ": ")
-        gc.conversionModeEN := g.AddEdit("yp vconversionMode w" 100, "")
+        g.AddText("yp", "的状态码规则: ")
+        gc.oddStatusMode := g.AddCheckbox("yp", "使用奇数")
+        if (evenStatusModeEN != "") {
+            gc.oddStatusMode.Value := !evenStatusModeEN
+        }
+        gc.oddStatusMode.OnEvent("Click", fn_oddStatusMode)
+        fn_oddStatusMode(item, *) {
+            handle_mode(item.Value, "evenStatusModeEN", "evenStatusMode", 0)
+        }
+        gc.evenStatusMode := g.AddCheckbox("yp", "使用偶数")
+        if (evenStatusModeEN != "") {
+            gc.evenStatusMode.Value := evenStatusModeEN
+        }
+        gc.evenStatusMode.OnEvent("Click", fn_evenStatusMode)
+        fn_evenStatusMode(item, *) {
+            handle_mode(item.Value, "evenStatusModeEN", "oddStatusMode", 1)
+        }
+
+        g.AddText("xs", "3.")
+        g.AddText("yp cRed", "英文状态")
+        g.AddText("yp", "的切换码数字: ")
+        gc.conversionModeEN := g.AddEdit("yp vconversionMode", "")
         gc.conversionModeEN.Value := Trim(StrReplace(conversionModeEN, ":", " "))
         gc.conversionModeEN.OnEvent("Change", fn_change_conversionModeEN)
         fn_change_conversionModeEN(item, *) {
             if (Trim(item.Value) = "") {
-                if (statusModeEN = "") {
-                    ; 如果状态码和切换码都为空，则恢复到通用模式
-                    writeIni("mode", 1, "InputMethod")
-                    mode := 1
-                    gc.mode.Value := 2
-                }
                 writeIni("conversionModeEN", "", "InputMethod")
                 conversionModeEN := ""
             } else {
-                if (mode != 0) {
-                    writeIni("mode", 0, "InputMethod")
-                    mode := 0
-                    gc.mode.Value := 1
-                }
                 value := ":"
                 for v in StrSplit(item.value, " ") {
                     value .= v ":"
@@ -216,9 +180,31 @@ fn_input_mode(*) {
                 writeIni("conversionModeEN", value, "InputMethod")
                 conversionModeEN := value
             }
+            checkModeChange()
             restartJetBrains()
         }
-        gc.status_btn := g.AddButton("xs w" bw, "显示实时的状态码和切换码")
+
+        g.AddText("xs", "4.")
+        g.AddText("yp cRed", "英文状态")
+        g.AddText("yp", "的切换码规则: ")
+        gc.oddConversionMode := g.AddCheckbox("yp", "使用奇数")
+        if (evenConversionModeEN != "") {
+            gc.oddConversionMode.Value := !evenConversionModeEN
+        }
+        gc.oddConversionMode.OnEvent("Click", fn_oddConversionMode)
+        fn_oddConversionMode(item, *) {
+            handle_mode(item.Value, "evenConversionModeEN", "evenConversionMode", 0)
+        }
+        gc.evenConversionMode := g.AddCheckbox("yp", "使用偶数")
+        if (evenConversionModeEN != "") {
+            gc.evenConversionMode.Value := evenConversionModeEN
+        }
+        gc.evenConversionMode.OnEvent("Click", fn_evenConversionMode)
+        fn_evenConversionMode(item, *) {
+            handle_mode(item.Value, "evenConversionModeEN", "oddConversionMode", 1)
+        }
+
+        gc.status_btn := g.AddButton("xs w" w, "显示实时的状态码和切换码")
         gc.status_btn.OnEvent("Click", showStatus)
         showStatus(*) {
             if (gc.timer) {
@@ -242,7 +228,11 @@ fn_input_mode(*) {
                 ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
             }
         }
-        g.AddEdit("xs r10 ReadOnly cGray w" w, "1. 当点击按钮「显示实时的状态码和切换码」之后，在鼠标位置会实时显示当前的状态码和切换码。`n2. 你需要来回切换输入法中英文状态进行观察，如果不同状态时的值是唯一的，就将它填入对应的输入框中。`n3. 英文状态时的状态码和切换码在不同窗口可能不同，但只要是唯一的，就应该被填写，多个就用空格分割。`n`n举个例子: `n假如当你切换到英文后，状态码显示 0，切换码显示 1025。`n切换到中文后，状态码显示 1，切换码显示 1025。`n换到另一个窗口后又发现，英文时状态码显示 3，切换码显示 1025，中文时状态码显示 4，切换码显示 1025。`n可以发现，英文的状态码 0 和 3 是唯一的，没有在中文状态时出现，因此当状态码是它们时，可以确定当前一定是英文状态，像这样的就应该将它们填入状态码输入框中，用空格分割，即 0 3`n而切换码相反，中英文状态时都为 1025，没有办法通过 1025 去判断当前是中文还是英文，就不填切换码，保持切换码为空。")
+
+        tab.UseTab(3)
+        g.AddEdit("Section r12 ReadOnly w" w, "如何配置【自定义】模式？以讯飞输入法为例:`n1. 点击按钮「显示实时的状态码和切换码」，它会在光标处显示状态码和切换码。`n2. 来回切换输入法的中英文状态观察它们的变化。`n3. 会发现切换码始终为 1，而状态码在英文时为 1，中文时为 2。`n4. 于是，在状态码数字的输入框中填入 1，就会发现已经生效了。`n5. 这里更推荐勾选状态码规则中的「使用奇数」，它包含 1，且范围更大。`n6. 再比如小狼毫(rime)输入法，按照同样的操作流程，你会发现很大的不同。`n7. 它的状态码始终为 1，而切换码在英文时是随机的偶数，中文时是随机的奇数。`n8. 于是，勾选切换码规则中的「使用偶数」后，就会发现已经生效了。`n9. 当然，不要盲目的使用规则扩大范围，比如手心输入法就不能这样做。`n10. 当使用手心输入法按照同样的流程操作时，你会发现又有不同。`n11. 手心输入法的状态码始终为 1，而切换码在英文时为 1，中文时为 1025。`n12. 于是，在状态码数字的输入框中填入 1，就会发现已经生效了。`n13. 但是，这里就不能勾选「使用奇数」，因为中文时的 1025 也是奇数。`n14. 【自定义】模式是靠唯一的值去区分状态，勾选「使用奇数」就无法区分了。`n`n什么是优先级顺序？`n1. 优先级顺序: 切换码规则(4) > 切换码数字(3) > 状态码规则(2) > 状态码数字(1)`n2. 对于【自定义】模式来说，生效的是优先级最高的配置项。`n3. 比如: 你使用了切换码规则，则切换码数字/状态码规则/状态码数字即使有值，也无效。`n`n在数字输入框中，是可以填入许多个的:`n1. 有可能你会遇到这样的情况。`n2. 你发现状态码在英文时不唯一，有时为 0，有时为 3，在中文时为 1。`n3. 这种情况，一个奇数，一个偶数，也无法使用规则。`n4. 你可以直接在状态码数字的输入框中填入它们，以空格分割即可。")
+
+        g.AddLink(, '此处的帮助说明无法动态更新，建议前往 <a href="https://inputtip.pages.dev/FAQ/about-input-mode-custom">官网</a> 查看最新的观感更好的帮助说明文档')
 
         g.OnEvent("Close", fn_close)
         fn_close(*) {

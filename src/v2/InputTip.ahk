@@ -29,7 +29,7 @@ gc := {
     w: {
         ; 开机自启动
         startupGui: "",
-        ; 设置更新检测
+        ; 设置更新检查
         checkUpdateGui: "",
         ; 设置输入法模式
         inputModeGui: "",

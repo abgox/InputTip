@@ -1,37 +1,61 @@
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
- * @Tip 有所修改，外部必须提供变量 checkTimeout,statusModeEN,conversionModeEN
+ * @Tip 有所修改，外部必须提供变量 checkTimeout,statusModeEN,conversionModeEN,evenStatusModeEN,evenConversionModeEN
  * @example
  * statusModeEN := 0 ; 英文状态时的状态码
  * conversionModeEN := 0 ; 英文状态时的转换码
+ * evenStatusModeEN := ""
+ * evenConversionModeEN := ""
  * checkTimeout := 1000 ; 超时时间 单位：毫秒
  * IME.GetInputMode() ; 获取当前输入法输入模式
  * IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
  */
 class IME {
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if (statusModeEN = "") {
-            if !this.GetOpenStatus(hwnd) {
+        if (statusModeEN = "" && evenStatusModeEN = "" && conversionModeEN = "" && evenConversionModeEN = "") {
+            if (!this.GetOpenStatus(hwnd)) {
                 return {
                     code: 0,
                     isCN: 0
                 }
             }
-        } else {
+
+            v := this.GetConversionMode(hwnd)
             return {
-                code: 0,
-                isCN: !(InStr(statusModeEN, ":" this.GetOpenStatus(hwnd) ":"))
+                code: v,
+                isCN: v & 1
             }
         }
-        if (conversionModeEN = "") {
+
+        ; 切换码
+        v := this.GetConversionMode(hwnd)
+        flag := v & 1
+        if (evenConversionModeEN != "") {
             return {
-                code: this.GetConversionMode(hwnd),
-                isCN: this.GetConversionMode(hwnd) & 1
+                code: v,
+                isCN: evenConversionModeEN ? flag : !flag
             }
-        } else {
+        }
+        if (conversionModeEN != "") {
             return {
-                code: this.GetConversionMode(hwnd),
-                isCN: !(InStr(conversionModeEN, ":" this.GetConversionMode(hwnd) ":"))
+                code: v,
+                isCN: !(InStr(conversionModeEN, ":" v ":"))
+            }
+        }
+
+        ; 状态码
+        v := this.GetOpenStatus(hwnd)
+        flag := v & 1
+        if (evenStatusModeEN != "") {
+            return {
+                code: v,
+                isCN: evenStatusModeEN ? flag : !flag
+            }
+        }
+        if (statusModeEN != "") {
+            return {
+                code: 0,
+                isCN: !(InStr(statusModeEN, ":" v ":"))
             }
         }
     }

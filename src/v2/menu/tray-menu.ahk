@@ -17,7 +17,7 @@ makeTrayMenu() {
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")
     }
-    A_TrayMenu.Add("设置更新检测", fn_check_update)
+    A_TrayMenu.Add("设置更新检查", fn_check_update)
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
     A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)

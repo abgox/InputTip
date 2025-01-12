@@ -131,8 +131,9 @@ fn_config(*) {
     configGui.AddEdit("xs ReadOnly cGray -VScroll w" Gui_width, "单位：毫秒，默认为 50 毫秒。一般使用 1-100 之间的值。`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值。`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
 
     tab.UseTab(2)
-    configGui.AddText(, "你可以点击以下任意网址获取设置鼠标样式文件夹的相关说明:")
-    configGui.AddLink(, '<a href="https://inputtip.pages.dev/v2/#自定义鼠标样式">官网</a>   <a href="https://github.com/abgox/InputTip#自定义鼠标样式">Github</a>   <a href="https://gitee.com/abgox/InputTip#自定义鼠标样式">Gitee</a>`n' line)
+    configGui.AddLink(, '查看设置鼠标样式文件夹的相关说明: <a href="https://inputtip.pages.dev/v2/#自定义鼠标样式">官网</a>   <a href="https://github.com/abgox/InputTip#自定义鼠标样式">Github</a>   <a href="https://gitee.com/abgox/InputTip#自定义鼠标样式">Gitee</a>')
+    configGui.AddText(, "建议点击下方的「下载鼠标样式扩展包」去下载已经适配的鼠标样式来使用")
+    configGui.AddText(, line)
     configGui.AddText("cRed", "如果列表中显示的鼠标样式文件夹路径不是最新的，请重新打开这个配置界面")
     typeList := [{
         label: "中文状态",
@@ -154,7 +155,6 @@ fn_config(*) {
     for i, v in typeList {
         configGui.AddText("xs", i ".")
         configGui.AddText("yp cRed", v.label)
-        configGui.AddText("yp", "鼠标样式: ")
         _g := configGui.AddDropDownList("xs r9 w" Gui_width " v" v.type "_cursor", dirList)
         _g.OnEvent("Change", fn_cursor_dir)
         fn_cursor_dir(item, *) {
@@ -269,11 +269,10 @@ fn_config(*) {
     }
 
     configGui.AddText("xs Section cRed", "如果列表中显示的图片符号路径不是最新的，请重新打开这个配置界面")
-    configGui.AddText(, "选择或输入不同状态下的图片符号的图片路径(只能是 .png 图片或设置为空): ")
+    configGui.AddText(, "选择不同状态下的图片符号的文件路径: ")
     for i, v in typeList {
         configGui.AddText("xs", i ".")
         configGui.AddText("yp cRed", v.label)
-        configGui.AddText("yp", "图片符号: ")
         _g := configGui.AddDropDownList("xs r9 w" Gui_width " v" v.type "_pic", dirList)
         _g.OnEvent("Change", fn_pic_path)
         fn_pic_path(item, *) {

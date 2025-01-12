@@ -18,9 +18,9 @@ fn_pause_key(*) {
 
     tab := hotkeyGui.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
     tab.UseTab(1)
-    hotkeyGui.AddText("Section", "1.  直接按下快捷键即可设置，除非快捷键被占用，则使用「手动输入快捷键」")
+    hotkeyGui.AddText("Section", "1.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
     hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
-    hotkeyGui.AddText("xs", "3.  通过勾选右侧的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
+    hotkeyGui.AddText("xs", "3.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
     hotkeyGui.AddText("xs", "设置")
     hotkeyGui.AddText("yp cRed", "暂停/运行")
@@ -69,7 +69,8 @@ fn_pause_key(*) {
     hotkeyGui.AddText("yp cRed", "暂停/运行")
     hotkeyGui.AddText("yp", "的快捷键: ")
     value := readIni('hotkey_Pause', '')
-    gc.hotkey_Pause2 := hotkeyGui.AddEdit("yp w300 vhotkey_Pause2", readIni("hotkey_Pause", ''))
+    gc.hotkey_Pause2 := hotkeyGui.AddEdit("yp vhotkey_Pause2")
+    gc.hotkey_Pause2.Value := readIni("hotkey_Pause", '')
     gc.hotkey_Pause2.OnEvent("Change", fn_change_hotkey2)
     fn_change_hotkey2(item, *) {
         gc.win.Value := InStr(item.Value, "#") ? 1 : 0

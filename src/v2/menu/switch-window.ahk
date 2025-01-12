@@ -19,7 +19,7 @@ fn_switch_window(*) {
             tab := g.AddTab3("-Wrap", ["设置状态自动切换", "关于"])
             tab.UseTab(1)
             g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
-            gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题", "应用进程文件所在位置"])
+            gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["应用进程列表", "窗口标题", "应用进程文件所在位置"])
             gc.LV_add.OnEvent("DoubleClick", fn_add)
             fn_add(LV, RowNumber) {
                 handleClick(LV, RowNumber, "add")
@@ -38,6 +38,16 @@ fn_switch_window(*) {
                     if (!InStr(temp, ":" exe_name ":") && !InStr(res, ":" exe_name ":")) {
                         temp .= exe_name ":"
                         gc.LV_add.Add(, exe_name, WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
+                    }
+                }
+            }
+            for v in StrSplit(readIni("app_show_state", ''), ":") {
+                if (!InStr(temp, ":" v ":") && !InStr(res, ":" v ":")) {
+                    temp .= v ":"
+                    try {
+                        gc.LV_add.Add(, v, WinGetTitle("ahk_exe " v), WinGetProcessPath("ahk_exe " v))
+                    } catch {
+                        gc.LV_add.Add(, v)
                     }
                 }
             }
@@ -280,7 +290,7 @@ fn_switch_window(*) {
 
                         _handle(to) {
                             exe_name := g_2.Submit().exe_name
-                            if (!RegExMatch(exe_name, "^.+\.\w{3}$")) {
+                            if (!RegExMatch(exe_name, "^.+\.\w{3}$") || InStr(exe_name, ":")) {
                                 createGui(fn).Show()
                                 fn(x, y, w, h) {
                                     g_2 := Gui("AlwaysOnTop")
@@ -353,7 +363,7 @@ fn_switch_window(*) {
             gc.LV_add.ModifyCol(2, "AutoHdr")
             gc.LV_add.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
-            g.AddEdit("ReadOnly -VScroll w" w, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n- 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n- 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n- 下方分别是中文、英文、大写锁定这三个自动切换列表`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n- 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中`n  - 添加完成后，会在下方对应列表中显示，并实时生效`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作")
+            g.AddEdit("ReadOnly -VScroll w" w, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 为了便于操作，白名单中的应用进程也会添加到列表中`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n- 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n- 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n- 下方分别是中文、英文、大写锁定这三个自动切换列表`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n- 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中`n  - 添加完成后，会在下方对应列表中显示，并实时生效`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作")
 
             g.OnEvent("Close", fn_close)
             fn_close(*) {

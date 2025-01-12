@@ -91,7 +91,9 @@ fn_config(*) {
     configGui.AddText("xs", "3. 无键盘和鼠标左键点击操作时，符号在多少")
     configGui.AddText("yp cRed", "毫秒")
     configGui.AddText("yp", "后隐藏:")
-    configGui.AddEdit("yp w150 Number", HideSymbolDelay).OnEvent("Change", fn_hide_symbol_delay)
+    _g := configGui.AddEdit("yp Number")
+    _g.Value := HideSymbolDelay
+    _g.OnEvent("Change", fn_hide_symbol_delay)
     fn_hide_symbol_delay(item, *) {
         value := item.Value
         if (value = "") {
@@ -109,7 +111,9 @@ fn_config(*) {
     configGui.AddText("xs", "4. 每多少")
     configGui.AddText("yp cRed", "毫秒")
     configGui.AddText("yp", "后更新符号的显示位置和状态:")
-    configGui.AddEdit("yp w150 Number Limit3", delay).OnEvent("Change", fn_delay)
+    _g := configGui.AddEdit("yp Number Limit3")
+    _g.Value := delay
+    _g.OnEvent("Change", fn_delay)
     fn_delay(item, *) {
         value := item.Value
         if (value = "") {
@@ -223,7 +227,9 @@ fn_config(*) {
     }]
     for v in symbolPicConfig {
         configGui.AddText(v.options, v.tip ": ")
-        configGui.AddEdit("v" v.config " yp w150 " v.opts, readIni(v.config, 0)).OnEvent("Change", fn_pic_config)
+        _g := configGui.AddEdit("v" v.config " yp " v.opts)
+        _g.Value := readIni(v.config, 0)
+        _g.OnEvent("Change", fn_pic_config)
 
         fn_pic_config(item, *) {
             value := returnNumber(item.Value)
@@ -356,7 +362,7 @@ fn_config(*) {
     configGui.AddText("Section", "不同状态时方块符号的颜色可以设置为空，表示不显示对应的方块符号`n" line)
     for v in symbolBlockColorConfig {
         configGui.AddText("xs", v.tip ": ")
-        _g := configGui.AddComboBox("v" v.config " yp w150 " v.options, v.colors)
+        _g := configGui.AddComboBox("v" v.config " yp " v.options, v.colors)
         _g.OnEvent("Change", fn_color_config)
         fn_color_config(item, *) {
             value := item.Text
@@ -384,7 +390,9 @@ fn_config(*) {
     for v in symbolBlockConfig {
         configGui.AddText("xs", v.tip ": ")
         if (v.config = "transparent") {
-            configGui.AddEdit("v" v.config " yp w150 " v.options, readIni(v.config, 1)).OnEvent("Change", fn_trans_config)
+            _g := configGui.AddEdit("v" v.config " yp " v.options)
+            _g.Value := readIni(v.config, 1)
+            _g.OnEvent("Change", fn_trans_config)
             fn_trans_config(item, *) {
                 value := item.Text
                 if (value = "") {
@@ -399,7 +407,9 @@ fn_config(*) {
                 reloadSymbol()
             }
         } else {
-            configGui.AddEdit("v" v.config " yp w150 " v.options, readIni(v.config, 1)).OnEvent("Change", fn_block_config)
+            _g := configGui.AddEdit("v" v.config " yp " v.options)
+            _g.Value := readIni(v.config, 1)
+            _g.OnEvent("Change", fn_block_config)
             fn_block_config(item, *) {
                 value := returnNumber(item.Text)
                 writeIni(item.Name, value)
@@ -433,7 +443,7 @@ fn_config(*) {
     }
     symbolStyle := ["无", "样式1", "样式2", "样式3"]
     configGui.AddText("xs", "边框样式: ")
-    _g := configGui.AddDropDownList("AltSubmit vborder_type" " yp w150 ", symbolStyle)
+    _g := configGui.AddDropDownList("yp AltSubmit vborder_type", symbolStyle)
     _g.OnEvent("Change", fn_border_config)
     fn_border_config(item, *) {
         value := item.Value
@@ -541,21 +551,17 @@ fn_config(*) {
     }
     configGui.AddEdit("xs ReadOnly cGray -VScroll w" Gui_width, "取值范围: 5-30，超出范围的值无效，建议 12-20。`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，重新打开配置菜单即可。")
 
-    configGui.AddText("Section", "2. 点击下方按钮，实时显示当前激活的窗口进程信息")
-    gc._window_info := configGui.AddButton("w" Gui_width, "获取窗口进程信息")
+    configGui.AddText("xs", "2. 点击下方按钮，实时显示当前激活的窗口进程信息")
+    configGui.AddText("yp", " ").GetPos(, , &__w)
+    gc._window_info := configGui.AddButton("xs w" Gui_width, "获取窗口进程信息")
     gc._window_info.OnEvent("Click", fn_window_info)
-    configGui.AddText("xs", "  - 窗口进程")
-    configGui.AddText("yp cRed", "名称")
-    configGui.AddText("yp", ": ")
-    gc.app_name := configGui.AddEdit("yp ReadOnly -VScroll w" Gui_width / 5 * 4)
-    configGui.AddText("xs", "  - 窗口进程")
-    configGui.AddText("yp cRed", "标题")
-    configGui.AddText("yp", ": ")
-    gc.app_title := configGui.AddEdit("yp ReadOnly -VScroll w" Gui_width / 5 * 4)
-    configGui.AddText("xs", "  - 窗口进程")
-    configGui.AddText("yp cRed", "路径")
-    configGui.AddText("yp", ": ")
-    gc.app_path := configGui.AddEdit("yp ReadOnly -VScroll w" Gui_width / 5 * 4)
+    configGui.AddText("xs cRed", "名称: ").GetPos(, , &_w)
+    _width := Gui_width - _w - configGui.MarginX + __w
+    gc.app_name := configGui.AddEdit("yp ReadOnly -VScroll w" _width)
+    configGui.AddText("xs cRed", "标题: ").GetPos(, , &_w)
+    gc.app_title := configGui.AddEdit("yp ReadOnly -VScroll w" _width)
+    configGui.AddText("xs cRed", "路径: ").GetPos(, , &_w)
+    gc.app_path := configGui.AddEdit("yp ReadOnly -VScroll w" _width)
     fn_window_info(*) {
         if (gc.timer) {
             gc.timer := 0

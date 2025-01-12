@@ -18,7 +18,7 @@ fn_switch_key(*) {
 
     tab := hotkeyGui.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
     tab.UseTab(1)
-    hotkeyGui.AddText("Section", "1.  LShift 指的是左侧的 Shift 键，RShift 指的是右侧的 Shift 键，以此类推")
+    hotkeyGui.AddText("Section", "1.  LShift 指的是左边的 Shift 键，RShift 指的是右边的 Shift 键，以此类推")
     hotkeyGui.AddText("xs", "2.  单键不会覆盖原本的按键功能，因为在设置的单键抬起时才会触发强制切换")
     hotkeyGui.AddText("xs", "3.  如果要移除快捷键，请选择「无」`n" line)
 
@@ -86,9 +86,9 @@ fn_switch_key(*) {
         fn_restart()
     }
     tab.UseTab(2)
-    hotkeyGui.AddText("Section", "1.  直接按下快捷键即可设置，除非快捷键被占用，则使用「手动输入快捷键」")
+    hotkeyGui.AddText("Section", "1.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
     hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
-    hotkeyGui.AddText("xs", "3.  通过勾选右侧的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
+    hotkeyGui.AddText("xs", "3.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
     configList := [{
         config: "hotkey_CN",

@@ -43,7 +43,7 @@ fn_input_mode(*) {
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText("cRed", "请前往「自定义」配置页面中设置，此处无法直接修改")
-                    g.AddText("cRed", "在配置页面的左上角，「基础配置」的右侧")
+                    g.AddText("cRed", "在配置页面的左上角，「基础配置」的右边")
                     y := g.AddButton("w" bw, "我知道了")
                     y.OnEvent("Click", yes)
                     y.Focus()

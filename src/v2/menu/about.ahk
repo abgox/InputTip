@@ -31,7 +31,7 @@ fn_about(*) {
     aboutGui.AddLink("xs", '3. Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
     tab.UseTab(2)
     aboutGui.AddText("Section", "如果 InputTip 对你有所帮助，你也可以出于善意, 向我捐款。`n非常感谢对 InputTip 的支持！希望 InputTip 能一直帮助你！")
-    aboutGui.AddPicture("w432 h-1", "InputTipSymbol\default\offer.png")
+    aboutGui.AddPicture("h-1 w" Gui_width / 4 * 3, "InputTipSymbol\default\offer.png")
     tab.UseTab(3)
     aboutGui.AddLink("Section", '1. <a href="https://github.com/aardio/ImTip">ImTip - aardio</a>')
     aboutGui.AddLink("xs", '2. <a href="https://github.com/flyinclouds/KBLAutoSwitch">KBLAutoSwitch - flyinclouds</a>')

@@ -6,7 +6,7 @@ fn_app_offset(*) {
         tip: "你首先应该点击上方的「关于」查看具体的操作说明                                         ",
         list: "特殊偏移量列表",
         color: "cRed",
-        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「特殊偏移量列表」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「特殊偏移量列表」，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它`n`n2. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过屏幕坐标判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左侧，另一块屏幕在右侧`n      - 那么另一块屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
+        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到「特殊偏移量列表」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「特殊偏移量列表」，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它`n`n2. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过坐标信息判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左边，副屏幕在右边`n      - 那么副屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
         link: '',
         addConfirm: "",
         addConfirm2: "",
@@ -58,7 +58,7 @@ fn_app_offset(*) {
                 g_2.AddButton("xs w" bw, "添加").OnEvent("Click", yes)
                 yes(*) {
                     exe_name := g_2.Submit().exe_name
-                    if (!RegExMatch(exe_name, "^.+\.\w{3}$")) {
+                    if (!RegExMatch(exe_name, "^.+\.\w{3}$") || InStr(exe_name, ":")) {
                         createGui(fn).Show()
                         fn(x, y, w, h) {
                             if (gc.w.subGui) {
@@ -154,9 +154,14 @@ fn_app_offset(*) {
         }
         offsetGui := Gui("AlwaysOnTop", "InputTip - 设置 " app " 的特殊偏移量")
         offsetGui.SetFont(fz, "微软雅黑")
-        offsetGui.AddText(, "当前正在设置的应用进程:")
+        offsetGui.AddText(, "正在设置")
         offsetGui.AddText("yp cRed", app)
-        offsetGui.AddText("xs", "-----------------------------------------------------------------------")
+        offsetGui.AddText("yp", "的特殊偏移量")
+        tab := offsetGui.AddTab3("xs -Wrap", ["屏幕1"])
+        tab.UseTab(1)
+        offsetGui.AddText(, "屏幕坐标信息(X,Y): 左上角(99999, 99999)，右下角(99999, 99999)")
+        offsetGui.AddText(, "水平方向的偏移量: ")
+        offsetGui.AddEdit("yp")
         offsetGui.Show("Hide")
         offsetGui.GetPos(, , &Gui_width)
         offsetGui.Destroy()
@@ -170,7 +175,8 @@ fn_app_offset(*) {
         for v in screenList {
             pages.push("屏幕 " v.num)
         }
-        tab := offsetGui.AddTab3("xs -Wrap", pages)
+        bw := Gui_width - offsetGui.MarginX * 2
+        tab := offsetGui.AddTab3("xs -Wrap w" bw, pages)
         for v in screenList {
             tab.UseTab(v.num)
             if (v.num = v.main) {
@@ -189,16 +195,18 @@ fn_app_offset(*) {
                 app_offset.%app%.%v.num% := { x: 0, y: 0 }
             }
 
-            offsetGui.AddText(, "水平方向的偏移量: ")
-            _g := offsetGui.AddEdit("voffset_x_" v.num " yp w100", x)
+            offsetGui.AddText("Section", "水平方向的偏移量: ")
+            _g := offsetGui.AddEdit("voffset_x_" v.num " yp")
+            _g.Value := x
             _g.__num := v.num
             _g.OnEvent("Change", fn_change_offset_x)
             fn_change_offset_x(item, *) {
                 app_offset.%app%.%item.__num%.x := returnNumber(item.Value)
                 fn_write_offset()
             }
-            offsetGui.AddText("yp", "垂直方向的偏移量: ")
-            _g := offsetGui.AddEdit("voffset_y_" v.num " yp w100", y)
+            offsetGui.AddText("xs", "垂直方向的偏移量: ")
+            _g := offsetGui.AddEdit("voffset_y_" v.num " yp")
+            _g.Value := y
             _g.__num := v.num
             _g.OnEvent("Change", fn_change_offset_y)
             fn_change_offset_y(item, *) {
@@ -208,7 +216,7 @@ fn_app_offset(*) {
         }
         tab.UseTab(0)
         if (action = "rm") {
-            _g := offsetGui.AddButton("Section w" Gui_width, "将它移除")
+            _g := offsetGui.AddButton("Section w" bw, "将它移除")
             _g.OnEvent("Click", fn_rm)
             fn_rm(*) {
                 close()

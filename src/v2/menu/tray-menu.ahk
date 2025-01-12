@@ -94,12 +94,12 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 }
             }
             if (tipList.config = "app_offset") {
-                value := ":"
+                res := ":"
                 for v in app_offset.OwnProps() {
-                    value .= v ":"
+                    res .= v ":"
                 }
             } else {
-                value := ":" readIni(tipList.config, "") ":"
+                res := ":" readIni(tipList.config, "") ":"
             }
             temp := ":"
             DetectHiddenWindows deep
@@ -108,7 +108,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 try {
                     exe_name := ProcessGetName(WinGetPID("ahk_id " v))
                     exe_str := ":" exe_name ":"
-                    if (!InStr(temp, exe_str) && !InStr(value, exe_str)) {
+                    if (!InStr(temp, exe_str) && !InStr(res, exe_str)) {
                         temp .= exe_name ":"
                         gc.%_gui "_LV_add"%.Add(, exe_name, WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
                     }
@@ -116,7 +116,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             }
             if (tipList.config != "app_show_state") {
                 for v in StrSplit(readIni("app_show_state", ''), ":") {
-                    if (!InStr(temp, ":" v ":") && !InStr(value, ":" v ":")) {
+                    if (!InStr(temp, ":" v ":") && !InStr(res, ":" v ":")) {
                         temp .= v ":"
                         try {
                             gc.%_gui "_LV_add"%.Add(, v, WinGetTitle("ahk_exe " v), WinGetProcessPath("ahk_exe " v))
@@ -186,7 +186,9 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                             _g.OnEvent("Click", fn_add_with_white_list)
                             _g.Focus()
                             fn_add_with_white_list(*) {
-                                updateWhiteList(RowText)
+                                if (tipList.config != "app_show_state") {
+                                    updateWhiteList(RowText)
+                                }
                                 g_1.Destroy()
                                 gc.%_gui "_LV_add"%.Delete(RowNumber)
                                 gc.%_gui "_LV_rm"%.Add(, RowText)
@@ -289,7 +291,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         g_2.AddButton("xs w" bw, "添加").OnEvent("Click", yes)
                         yes(*) {
                             exe_name := g_2.Submit().exe_name
-                            if (!RegExMatch(exe_name, "^.+\.\w{3}$")) {
+                            if (!RegExMatch(exe_name, "^.+\.\w{3}$") || InStr(exe_name, ":")) {
                                 createGui(fn).Show()
                                 fn(x, y, w, h) {
                                     if (gc.w.subGui) {

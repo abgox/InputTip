@@ -13,8 +13,11 @@ hasChildDir(path) {
 }
 
 isMouseOver(WinTitle) {
-    MouseGetPos , , &Win
-    return WinExist(WinTitle " ahk_id " Win)
+    try {
+        MouseGetPos(, , &Win)
+        return WinExist(WinTitle " ahk_id " Win)
+    }
+    return 0
 }
 
 replaceEnvVariables(str) {
@@ -50,6 +53,15 @@ getScreenInfo() {
     }
     return list
 }
+
+/**
+ * 调用时外层必须使用 try 包裹，因为 MouseGetPos 在极少数情况下，会因为权限问题报错拒绝访问
+ * @example
+ * try {
+ *      isWhichScreen()
+ *      ; ...
+ * }
+ */
 isWhichScreen(screenList) {
     MouseGetPos(&x, &y)
     for v in screenList {

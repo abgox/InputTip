@@ -4,41 +4,6 @@ fz := "s" readIni("gui_font_size", "12")
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
 
-try {
-    IniRead("InputTip.ini", "InputMethod", "statusModeEN")
-} catch {
-    switch mode {
-        case 2:
-        {
-            writeIni("mode", 1, "InputMethod")
-        }
-        case 3:
-        {
-            ; 讯飞输入法
-            ; 中文时状态码为 2
-            ; 英文时状态码为 1
-            ; 切换码无规律不唯一
-            writeIni("statusModeEN", ":1:", "InputMethod")
-            writeIni("conversionModeEN", "", "InputMethod")
-            writeIni("mode", 2, "InputMethod")
-        }
-        case 4:
-        {
-            ; 手心输入法:
-            ; 中文时切换码为 1025
-            ; 英文时切换码为 1
-            ; 状态码一直为 1
-            writeIni("statusModeEN", "", "InputMethod")
-            writeIni("conversionModeEN", ":1:", "InputMethod")
-            writeIni("mode", 3, "InputMethod")
-        }
-    }
-    border_type := readIni('border_type', 1)
-    if (border_type = 4) {
-        writeIni('border_type', 0)
-    }
-}
-
 statusModeEN := readIni("statusModeEN", "", "InputMethod")
 conversionModeEN := readIni("conversionModeEN", "", "InputMethod")
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
@@ -67,14 +32,9 @@ delay := readIni("delay", 50)
 
 ; 开机自启动
 isStartUp := readIni("isStartUp", 0)
-; 启用 JetBrains 支持
-enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
 
-try {
-    JetBrains_list := IniRead("InputTip.ini", "Config-v2", "JetBrains_list")
-    writeIni("cursor_mode_JAB", JetBrains_list)
-    IniDelete("InputTip.ini", "Config-v2", "JetBrains_list")
-}
+; 启用 JAB/JetBrains 支持
+enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
 
 updateList(1)
 

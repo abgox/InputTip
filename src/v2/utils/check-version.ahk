@@ -238,10 +238,61 @@ checkUpdate(init := 0) {
  */
 checkUpdateDone() {
     if (FileExist(A_AppData "\.abgox-InputTip-update-version.txt")) {
+        try {
+            JetBrains_list := IniRead("InputTip.ini", "Config-v2", "JetBrains_list")
+            writeIni("cursor_mode_JAB", JetBrains_list)
+            IniDelete("InputTip.ini", "Config-v2", "JetBrains_list")
+        }
+        try {
+            ignoreUpdate := IniRead("InputTip.ini", "Config-v2", "ignoreUpdate")
+            if (ignoreUpdate) {
+                checkUpdateDelay := readIni("checkUpdateDelay", 0)
+            } else {
+                checkUpdateDelay := readIni("checkUpdateDelay", 1440)
+            }
+            IniDelete("InputTip.ini", "Config-v2", "ignoreUpdate")
+        }
+
+        try {
+            IniRead("InputTip.ini", "InputMethod", "statusModeEN")
+        } catch {
+            mode := readIni("mode", 1, "InputMethod")
+            switch mode {
+                case 2:
+                {
+                    writeIni("mode", 1, "InputMethod")
+                }
+                case 3:
+                {
+                    ; 讯飞输入法
+                    ; 中文时状态码为 2
+                    ; 英文时状态码为 1
+                    ; 切换码无规律不唯一
+                    writeIni("statusModeEN", ":1:", "InputMethod")
+                    writeIni("conversionModeEN", "", "InputMethod")
+                    writeIni("mode", 2, "InputMethod")
+                }
+                case 4:
+                {
+                    ; 手心输入法:
+                    ; 中文时切换码为 1025
+                    ; 英文时切换码为 1
+                    ; 状态码一直为 1
+                    writeIni("statusModeEN", "", "InputMethod")
+                    writeIni("conversionModeEN", ":1:", "InputMethod")
+                    writeIni("mode", 3, "InputMethod")
+                }
+            }
+            border_type := readIni('border_type', 1)
+            if (border_type = 4) {
+                writeIni('border_type', 0)
+            }
+        }
+
         createGui(fn).Show()
         fn(x, y, w, h) {
             g := Gui("AlwaysOnTop", "InputTip - 版本更新完成")
-            g.SetFont(fz, "微软雅黑")
+            g.SetFont("s14", "微软雅黑")
             g.AddText(, "版本更新完成，当前版本: ")
             g.AddText("yp cRed", currentVersion)
             g.AddText("xs", "-------------------------------------------")

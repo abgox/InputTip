@@ -3,7 +3,7 @@ fn_pause_key(*) {
         gc.w.pauseHotkeyGui.Destroy()
         gc.w.pauseHotkeyGui := ""
     }
-    line := "----------------------------------------------------------------------------"
+    line := "---------------------------------------------------------------------------------"
     hotkeyGui := Gui("AlwaysOnTop")
     hotkeyGui.SetFont(fz, "微软雅黑")
     hotkeyGui.AddText(, line)
@@ -18,9 +18,9 @@ fn_pause_key(*) {
 
     tab := hotkeyGui.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
     tab.UseTab(1)
-    hotkeyGui.AddText("Section", "1.  当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键")
-    hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键")
-    hotkeyGui.AddText("xs", line)
+    hotkeyGui.AddText("Section", "1.  直接按下快捷键即可设置，除非快捷键被占用，则使用「手动输入快捷键」")
+    hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
+    hotkeyGui.AddText("xs", "3.  通过勾选右侧的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
     hotkeyGui.AddText("xs", "设置")
     hotkeyGui.AddText("yp cRed", "暂停/运行")
@@ -62,9 +62,9 @@ fn_pause_key(*) {
     }
     tab.UseTab(2)
     hotkeyGui.AddLink("Section", "1.")
-    hotkeyGui.AddLink("yp cRed", "优先使用「设置组合快捷键」设置，除非因为快捷键占用无法设置")
-    hotkeyGui.AddLink("xs", '2. <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>')
-    hotkeyGui.AddText("xs", line)
+    hotkeyGui.AddLink("yp cRed", "优先使用「设置组合快捷键」进行设置，除非因为快捷键占用无法设置")
+    hotkeyGui.AddLink("xs", '2.  你需要首先查看 <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>')
+    hotkeyGui.AddLink("xs", '3.  建议先使用「设置组合快捷键」，然后回到此处适当修改`n' line)
     hotkeyGui.AddText("xs", "设置")
     hotkeyGui.AddText("yp cRed", "暂停/运行")
     hotkeyGui.AddText("yp", "的快捷键: ")
@@ -87,9 +87,9 @@ fn_pause_key(*) {
     hotkeyGui.AddButton("xs w" bw, "确定").OnEvent("Click", yes2)
     yes2(*) {
         if (hotkeyGui.Submit().win) {
-            key := "#" hotkeyGui.Submit().hotkey_Pause
+            key := "#" hotkeyGui.Submit().hotkey_Pause2
         } else {
-            key := hotkeyGui.Submit().hotkey_Pause
+            key := hotkeyGui.Submit().hotkey_Pause2
         }
         writeIni("hotkey_Pause", key)
         fn_restart()

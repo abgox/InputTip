@@ -19,7 +19,8 @@ fn_switch_key(*) {
     tab := hotkeyGui.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
     tab.UseTab(1)
     hotkeyGui.AddText("Section", "1.  LShift 指的是左侧的 Shift 键，RShift 指的是右侧的 Shift 键，以此类推")
-    hotkeyGui.AddText("xs", "2.  如果要移除快捷键，请选择「无」`n" line)
+    hotkeyGui.AddText("xs", "2.  单键不会覆盖原本的按键功能，因为在设置的单键抬起时才会触发强制切换")
+    hotkeyGui.AddText("xs", "3.  如果要移除快捷键，请选择「无」`n" line)
 
     singleHotKeyList := [{
         tip: "中文状态",
@@ -85,8 +86,9 @@ fn_switch_key(*) {
         fn_restart()
     }
     tab.UseTab(2)
-    hotkeyGui.AddText("Section", "1.  当右侧的 Win 复选框勾选后，表示快捷键中加入 Win 修饰键")
-    hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以移除不需要的快捷键`n" line)
+    hotkeyGui.AddText("Section", "1.  直接按下快捷键即可设置，除非快捷键被占用，则使用「手动输入快捷键」")
+    hotkeyGui.AddText("xs", "2.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
+    hotkeyGui.AddText("xs", "3.  通过勾选右侧的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
     configList := [{
         config: "hotkey_CN",
@@ -153,7 +155,8 @@ fn_switch_key(*) {
     tab.UseTab(3)
     hotkeyGui.AddLink("Section", "1.")
     hotkeyGui.AddLink("yp cRed", "优先使用「设置单键」或「设置组合快捷键」设置，除非因为快捷键占用无法设置")
-    hotkeyGui.AddLink("xs", '2. <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
+    hotkeyGui.AddLink("xs", '2.  你需要首先查看 <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>')
+    hotkeyGui.AddLink("xs", '3.  建议先使用「设置单键」或「设置组合快捷键」，然后回到此处适当修改`n' line)
     for v in configList {
         hotkeyGui.AddText("xs", "强制切换到")
         hotkeyGui.AddText("yp cRed", v.tip)

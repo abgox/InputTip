@@ -1,30 +1,5 @@
+; 内部的默认模式应用列表，优先级最低，会被通过「设置光标获取模式」设置的配置覆盖
 defaultModeList := {
-    ; 只有使用黑名单机制，这个禁用列表才会生效
-    disable: [
-        ; 规避任务栏和开始菜单中的显示问题
-        "ShellExperienceHost.exe",
-        "StartMenuExperienceHost.exe",
-        ; WPS 无法使用，Office 可以正常使用
-        "wps.exe",
-        ; HBuilderX 无法使用
-        "HBuilderX.exe",
-        ; 微信输入法配置界面
-        "wetype_update.exe",
-        ; PotPlayer 无法使用，没有什么输入场景，不太影响
-        "PotPlayer.exe",
-        "PotPlayer64.exe",
-        "PotPlayerMini.exe",
-        "PotPlayerMini64.exe",
-        ;
-        "AnLink.exe",
-        ;
-        "ShareX.exe",
-        ;
-        "clipdiary-portable.exe",
-        ; 微软远程桌面，与 InputTip 冲突，输入时会导致其挂掉
-        ; 有的有问题，有的没问题
-        ; "mstsc.exe",
-    ],
     HOOK: [],
     UIA: [
         ; Word
@@ -41,6 +16,7 @@ defaultModeList := {
         ; 任务管理器
         "Taskmgr.exe",
     ],
+    ; 先后调用 GUI 和 UIA
     GUI_UIA: [
         ; PowerPoint(PPT)
         "POWERPNT.EXE",
@@ -55,7 +31,6 @@ defaultModeList := {
         ; 微信
         "Weixin.exe",
     ],
-    ; MSAA 可能有符号残留
     MSAA: [
         ; Excel
         "EXCEL.EXE",
@@ -84,7 +59,7 @@ defaultModeList := {
         ; 邮箱
         "Foxmail.exe",
     ],
-    ; 需要调用有兼容性问题的 dll 来更新光标位置的应用列表
+    ; 需要调用有兼容性问题(32位)的 dll
     HOOK_DLL: [
         ; 微信
         "WeChat.exe",
@@ -94,11 +69,11 @@ defaultModeList := {
         "powershell_ise.exe",
     ],
     ACC: [],
+    ; 需要使用 Java Access Bridge
     JAB: []
 }
-modeNameList := [
-    "HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"
-]
+
+modeNameList := ["HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"]
 modeListMap := {
     HOOK: 1,
     UIA: 2,

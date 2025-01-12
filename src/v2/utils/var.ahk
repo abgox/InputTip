@@ -427,7 +427,6 @@ updateCursorMode(init := 0) {
         restartJetBrains()
     }
     modeList := {
-        disable: ":" arrJoin(defaultModeList.disable, ":") ":",
         HOOK: ":" arrJoin(defaultModeList.HOOK, ":") ":",
         UIA: ":" arrJoin(defaultModeList.UIA, ":") ":",
         GUI_UIA: ":" arrJoin(defaultModeList.Gui_UIA, ":") ":",
@@ -448,7 +447,7 @@ updateCursorMode(init := 0) {
 
     for item in modeNameList {
         for v in StrSplit(%item%, ":") {
-            for value in modeList.OwnProps() {
+            for value in modeNameList {
                 modeList.%value% := StrReplace(modeList.%value%, ":" v ":", ":")
             }
         }

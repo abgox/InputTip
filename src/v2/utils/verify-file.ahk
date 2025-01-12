@@ -80,7 +80,7 @@ checkIni() {
                     g.SetFont(fz, "微软雅黑")
                     bw := w - g.MarginX * 2
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
-                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 要不要同步修改鼠标样式」的值更改为 【否】")
+                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 要不要同步修改鼠标样式」的值更改为【否】")
                     g.AddButton("xs cRed w" bw, "【是】对，我很确定").OnEvent("Click", yes)
                     yes(*) {
                         g.Destroy()

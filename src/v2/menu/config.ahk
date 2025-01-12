@@ -23,7 +23,7 @@ fn_config(*) {
     tab.UseTab(1)
 
     configGui.AddText("Section cRed", "在更改配置前，你应该首先阅读一下相关的说明文档")
-    configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/">文档官网</a>')
+    configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/">官网</a>')
     configGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">Github</a>')
     configGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">Gitee</a>')
     configGui.AddLink("yp", '<a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>')
@@ -105,7 +105,7 @@ fn_config(*) {
         updateDelay()
         restartJetBrains()
     }
-    configGui.AddEdit("xs Disabled -VScroll w" Gui_width, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
+    configGui.AddEdit("xs ReadOnly cGray -VScroll w" Gui_width, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
     configGui.AddText("xs", "4. 每多少")
     configGui.AddText("yp cRed", "毫秒")
     configGui.AddText("yp", "后更新符号的显示位置和状态:")
@@ -124,7 +124,7 @@ fn_config(*) {
         restartJetBrains()
     }
     ; configGui.AddUpDown("Range1-500", delay)
-    configGui.AddEdit("xs Disabled -VScroll w" Gui_width, "单位：毫秒，默认为 50 毫秒。一般使用 1-100 之间的值。`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值。`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
+    configGui.AddEdit("xs ReadOnly cGray -VScroll w" Gui_width, "单位：毫秒，默认为 50 毫秒。一般使用 1-100 之间的值。`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值。`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
 
     tab.UseTab(2)
     configGui.AddText(, "你可以点击以下任意网址获取设置鼠标样式文件夹的相关说明:")
@@ -539,7 +539,69 @@ fn_config(*) {
         writeIni("gui_font_size", item.Value)
         global fz := "s" item.Value
     }
-    configGui.AddEdit("xs Disabled -VScroll w" Gui_width, "取值范围: 5-30，超出范围的值无效，建议 12-20。`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，重新打开配置菜单即可。")
+    configGui.AddEdit("xs ReadOnly cGray -VScroll w" Gui_width, "取值范围: 5-30，超出范围的值无效，建议 12-20。`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，重新打开配置菜单即可。")
+
+    configGui.AddText("Section", "2. 点击下方按钮，实时显示当前激活的窗口进程信息")
+    gc._window_info := configGui.AddButton("w" Gui_width, "获取窗口进程信息")
+    gc._window_info.OnEvent("Click", fn_window_info)
+    configGui.AddText("xs", "  - 窗口进程")
+    configGui.AddText("yp cRed", "名称")
+    configGui.AddText("yp", ": ")
+    gc.app_name := configGui.AddEdit("yp ReadOnly -VScroll w" Gui_width / 5 * 4)
+    configGui.AddText("xs", "  - 窗口进程")
+    configGui.AddText("yp cRed", "标题")
+    configGui.AddText("yp", ": ")
+    gc.app_title := configGui.AddEdit("yp ReadOnly -VScroll w" Gui_width / 5 * 4)
+    configGui.AddText("xs", "  - 窗口进程")
+    configGui.AddText("yp cRed", "路径")
+    configGui.AddText("yp", ": ")
+    gc.app_path := configGui.AddEdit("yp ReadOnly -VScroll w" Gui_width / 5 * 4)
+    fn_window_info(*) {
+        if (gc.timer) {
+            gc.timer := 0
+            gc._window_info.Text := "获取窗口进程信息"
+            return
+        }
+
+        gc.timer := 1
+        gc._window_info.Text := "停止获取"
+
+        SetTimer(statusTimer, 25)
+        statusTimer() {
+            static first := "", last := ""
+
+            if (!gc.timer) {
+                SetTimer(, 0)
+                first := ""
+                last := ""
+                return
+            }
+
+            try {
+                if (!first) {
+                    name := WinGetProcessName("A")
+                    title := WinGetTitle("A")
+                    path := WinGetProcessPath("A")
+                    gc.app_name.Value := name
+                    gc.app_title.Value := title
+                    gc.app_path.Value := path
+                    first := name title path
+                }
+
+                name := WinGetProcessName("A")
+                title := WinGetTitle("A")
+                path := WinGetProcessPath("A")
+                info := name title path
+                if (info = last || info = first) {
+                    return
+                }
+                gc.app_name.Value := name
+                gc.app_title.Value := title
+                gc.app_path.Value := path
+                last := info
+            }
+        }
+    }
     tab.UseTab(7)
     configGui.AddText(, "1. 对于颜色相关的配置，建议使用 16 进制的颜色值`n2. 不过由于没有调色板，可能并不好设置`n3. 建议使用以下配色网站(也可以自己去找)，找到喜欢的颜色，复制 16 进制值`n4. 显示的颜色以最终渲染的颜色效果为准")
     configGui.AddLink(, '<a href="https://colorhunt.co">https://colorhunt.co</a>')
@@ -550,6 +612,7 @@ fn_config(*) {
     configGui.OnEvent("Close", fn_close)
     fn_close(*) {
         configGui.Destroy()
+        gc.timer := 0
     }
     gc.w.configGui := configGui
     configGui.Show()

@@ -76,7 +76,6 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             }
             g := Gui("AlwaysOnTop")
             g.SetFont(fz, "微软雅黑")
-            bw := w - g.MarginX * 2
 
             _gui := tipList.gui
             tab := g.AddTab3("-Wrap", tipList.tab)
@@ -85,7 +84,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
 
             tabs := ["应用进程列表", "窗口标题", "应用进程文件所在位置"]
 
-            gc.%_gui "_LV_add"% := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, tabs)
+            gc.%_gui "_LV_add"% := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, tabs)
             gc.%_gui "_LV_add"%.OnEvent("DoubleClick", fn_double_click)
             fn_double_click(LV, RowNumber) {
                 if (addClickFn) {
@@ -131,9 +130,8 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             gc.%_gui "_LV_add"%.Opt("+Redraw")
             DetectHiddenWindows 1
 
-            ; gc.title := g.AddText("Section w" bw, tipList.list)
-            ; gc.%_gui "_LV_rm"% := g.AddListView("xs IconSmall -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw " " tipList.color)
-            gc.%_gui "_LV_rm"% := g.AddListView("xs -LV0x10 -Multi r6 NoSortHdr Sort Grid w" bw / 2 " " tipList.color, [tipList.list])
+            gc.%_gui "_LV_rm_title"% := g.AddText("w" w, tipList.list)
+            gc.%_gui "_LV_rm"% := g.AddListView("xs -Hdr -LV0x10 -Multi r8 NoSortHdr Sort Grid w" w / 2 " " tipList.color, [tipList.list])
             valueArr := StrSplit(readIni(tipList.config, ""), ":")
             temp := ":"
             gc.%_gui "_LV_rm"%.Opt("-Redraw")
@@ -148,7 +146,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 }
             }
             gc.%_gui "_LV_rm"%.Opt("+Redraw")
-            ; gc.title.Text := tipList.list "(" gc.%_gui "_LV_rm"%.GetCount() "项)"
+            gc.%_gui "_LV_rm_title"%.Text := tipList.list " ( " gc.%_gui "_LV_rm"%.GetCount() " 个 )"
             gc.%_gui "_LV_rm"%.ModifyCol(1, "AutoHdr")
             gc.%_gui "_LV_rm"%.OnEvent("DoubleClick", fn_dbClick)
             fn_dbClick(LV, RowNumber) {
@@ -192,7 +190,6 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                                 g_1.Destroy()
                                 gc.%_gui "_LV_add"%.Delete(RowNumber)
                                 gc.%_gui "_LV_rm"%.Add(, RowText)
-                                ; gc.title.Text := tipList.list "(" gc.%_gui "_LV_rm"%.GetCount() "项)"
                                 config := tipList.config
                                 value := readIni(config, "")
                                 if (value) {
@@ -212,7 +209,6 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                                 g_1.Destroy()
                                 gc.%_gui "_LV_add"%.Delete(RowNumber)
                                 gc.%_gui "_LV_rm"%.Add(, RowText)
-                                ; gc.title.Text := tipList.list "(" gc.%_gui "_LV_rm"%.GetCount() "项)"
                                 config := tipList.config
                                 value := readIni(config, "")
                                 if (value) {
@@ -233,7 +229,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     fn_rm(*) {
                         g_1.Destroy()
                         LV.Delete(RowNumber)
-                        ; gc.title.Text := tipList.list "(" LV.GetCount() "项)"
+                        gc.%_gui "_LV_rm_title"%.Text := tipList.list " ( " gc.%_gui "_LV_rm"%.GetCount() " 个 )"
                         try {
                             gc.%_gui "_LV_add"%.Add(, RowText, WinGetTitle("ahk_exe " RowText))
                         }
@@ -257,12 +253,12 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     return g_1
                 }
             }
-            g.AddButton("Section yp w" bw / 2, "刷新应用进程列表").OnEvent("Click", fn_refresh)
+            g.AddButton("Section yp w" w / 2, "刷新应用进程列表").OnEvent("Click", fn_refresh)
             fn_refresh(*) {
                 fn_close()
                 showGui(deep)
             }
-            g.AddButton("xs w" bw / 2, "通过输入进程名称手动添加").OnEvent("Click", fn_add_by_hand)
+            g.AddButton("xs w" w / 2, "通过输入进程名称手动添加").OnEvent("Click", fn_add_by_hand)
             fn_add_by_hand(*) {
                 if (addFn) {
                     addFn(tipList)
@@ -360,10 +356,11 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     }
                 }
             }
-            g.AddButton("xs w" bw / 2, "一键清空「" tipList.list "」").OnEvent("Click", fn_clear)
+            g.AddButton("xs w" w / 2, "一键清空「" tipList.list "」").OnEvent("Click", fn_clear)
             fn_clear(*) {
                 createGui(fn).Show()
                 fn(x, y, w, h) {
+                    count := gc.%tipList.gui "_LV_rm"%.GetCount()
                     if (gc.w.subGui) {
                         gc.w.subGui.Destroy()
                         gc.w.subGui := ""
@@ -372,7 +369,8 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     g_3.SetFont(fz, "微软雅黑")
                     bw := w - g_3.MarginX * 2
                     g_3.AddText(, "确定要清空「" tipList.list "」吗？")
-                    g_3.AddText("cRed", "请谨慎选择，一旦清空，无法恢复，只能重新一个一个添加")
+                    g_3.AddText("cRed", "请谨慎选择，它会移除其中的 " count " 个应用进程")
+                    g_3.AddText("cRed", "一旦清空，无法恢复，只能重新一个一个添加")
                     g_3.AddButton("xs w" bw, "【是】我确定要清空").OnEvent("Click", yes)
                     _g := g_3.AddButton("xs w" bw, "【否】不，我点错了")
                     _g.OnEvent("Click", no)
@@ -393,13 +391,13 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 }
             }
             if (deep) {
-                g.AddButton("xs w" bw / 2, "显示更少进程(前台窗口)").OnEvent("Click", fn_less_window)
+                g.AddButton("xs w" w / 2, "显示更少进程(前台窗口)").OnEvent("Click", fn_less_window)
                 fn_less_window(*) {
                     fn_close()
                     showGui("")
                 }
             } else {
-                g.AddButton("xs w" bw / 2, "显示更多进程(后台窗口)").OnEvent("Click", fn_more_window)
+                g.AddButton("xs w" w / 2, "显示更多进程(后台窗口)").OnEvent("Click", fn_more_window)
                 fn_more_window(*) {
                     fn_close()
                     showGui(1)
@@ -409,7 +407,10 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             gc.%_gui "_LV_add"%.ModifyCol(2, "AutoHdr")
             gc.%_gui "_LV_add"%.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
-            g.AddLink(, tipList.about)
+            g.AddEdit("ReadOnly -VScroll w" w, tipList.about)
+            if (tipList.link) {
+                g.AddLink(, tipList.link)
+            }
             g.OnEvent("Close", fn_close)
             fn_close(*) {
                 g.Destroy()
@@ -424,23 +425,25 @@ fn_white_list(*) {
     fn_common({
         gui: "whiteListGui",
         config: "app_show_state",
-        tab: ["管理白名单", "关于"],
-        tip: "你首先应该点击上方的「关于」查看具体的操作说明",
+        tab: ["设置白名单", "关于"],
+        tip: "你首先应该点击上方的「关于」查看具体的操作说明                                    ",
         list: "符号显示白名单",
         color: "cRed",
-        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a> : 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
+        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 白名单机制: 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
+        link: '相关链接: <a href="https://inputtip.pages.dev/FAQ/about-white-list">白名单机制</a>',
         addConfirm: "是否要将",
         addConfirm2: "添加到「符号显示白名单」中？",
-        addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号(图片/方块/文本符号)",
+        addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号",
         addConfirm4: "",
         rmConfirm: "是否要将",
         rmConfirm2: "从「符号显示白名单」中移除？",
-        rmConfirm3: "移除后，白名单机制下，在此应用窗口中时，不会显示符号(图片/方块/文本符号)",
+        rmConfirm3: "移除后，白名单机制下，在此应用窗口中时，不会显示符号",
     },
     fn
     )
     fn(value) {
         global app_show_state := ":" value ":"
+        gc.whiteListGui_LV_rm_title.Text := "符号显示白名单 ( " gc.whiteListGui_LV_rm.GetCount() " 个 )"
         restartJetBrains()
     }
 }

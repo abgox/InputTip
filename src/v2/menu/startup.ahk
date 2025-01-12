@@ -49,8 +49,8 @@ fn_startup(item, *) {
             }
             g := Gui("AlwaysOnTop +OwnDialogs", "设置开机自启动")
             g.SetFont(fz, "微软雅黑")
-            g.AddLink(, '详情: <a href="https://inputtip.pages.dev/FAQ/#关于开机自启动">https://inputtip.pages.dev/FAQ/#关于开机自启动</a>')
-            g.AddLink(, "当前有多种方式设置开机自启动，请选择有效的方式 :`n`n1. 通过「任务计划程序」`n2. 通过软件快捷方式`n3. 通过添加「注册表」`n`n「任务计划程序」可以避免管理员授权窗口(UAC)的干扰(部分用户无效)")
+            g.AddLink(, '详情请查看: <a href="https://inputtip.pages.dev/FAQ/about-startup">关于开机自启动</a>                                                     `n')
+            g.AddEdit("xs ReadOnly -VScroll w" w, "1. 当前有多种方式设置开机自启动，请选择有效的方式 :`n   - 通过「任务计划程序」`n   - 通过应用快捷方式`n   - 通过添加「注册表」`n`n2. 如何避免管理员授权窗口(UAC)的干扰？`n   - 使用「任务计划程序」`n   - 将系统设置中的「更改用户账户控制设置」修改为【从不通知】`n")
 
             btn := g.AddButton("w" w isDisabled, "使用「任务计划程序」" pad)
             btn.Focus()
@@ -60,7 +60,7 @@ fn_startup(item, *) {
                 FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , favicon, , , 7)
                 fn_handle()
             }
-            btn := g.AddButton("w" w, "使用软件快捷方式")
+            btn := g.AddButton("w" w, "使用应用快捷方式")
             if (!A_IsAdmin) {
                 btn.Focus()
             }

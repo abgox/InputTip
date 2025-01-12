@@ -18,7 +18,7 @@ fn_cursor_mode(*) {
 
             tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
             tab.UseTab(1)
-            g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明")
+            g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
             gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["应用进程列表", "窗口标题", "应用进程文件所在位置"])
             gc.LV_add.OnEvent("DoubleClick", fn_add)
             fn_add(LV, RowNumber) {
@@ -54,22 +54,37 @@ fn_cursor_mode(*) {
             gc.LV_add.Opt("+Redraw")
             DetectHiddenWindows 1
 
-            addItem(state) {
-                gc.%"LV_" state%.Opt("-Redraw")
-                valueArr := StrSplit(readIni("cursor_mode_" state, ""), ":")
+            addItem(mode) {
+                gc.%"LV_" mode%.Opt("-Redraw")
+                valueArr := StrSplit(readIni("cursor_mode_" mode, ""), ":")
                 temp := ":"
                 for v in valueArr {
                     if (Trim(v) && !InStr(temp, ":" v ":")) {
-                        gc.%"LV_" state%.Add(, v)
+                        gc.%"LV_" mode%.Add(, v)
                         temp .= v ":"
                     }
                 }
-                gc.%"LV_" state%.Opt("+Redraw")
+                gc.%"LV_" mode%.Opt("+Redraw")
+                gc.%mode "_title"%.Value .= " ( " gc.%"LV_" mode%.GetCount() " 个 )"
             }
 
             for i, v in modeNameList {
                 opt := i = 1 || i = 5 ? "xs" : "yp"
-                gc.%"LV_" v% := g.AddListView(opt " cRed -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 4, [v])
+                if (i = 1) {
+                    for value in [1, 2, 3, 4] {
+                        o := value = 1 ? "xs" : "yp"
+                        item := modeNameList[value]
+                        gc.%item "_title"% := g.AddText(o " w" bw / 4, item)
+                    }
+                }
+                if (i = 5) {
+                    for value in [5, 6, 7, 8] {
+                        o := value = 5 ? "xs" : "yp"
+                        item := modeNameList[value]
+                        gc.%item "_title"% := g.AddText(o " w" bw / 4, item)
+                    }
+                }
+                gc.%"LV_" v% := g.AddListView(opt " cRed -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 4, [v])
                 addItem(v)
                 gc.%"LV_" v%.ModifyCol(1, "AutoHdr")
                 gc.%"LV_" v%.OnEvent("DoubleClick", fn_mode)
@@ -94,6 +109,9 @@ fn_cursor_mode(*) {
                         g_1.Destroy()
                         gc.%"LV_" from%.Delete(RowNumber)
                         if (from != "add") {
+                            v := gc.%from "_title"%.Value
+                            gc.%from "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" from%.GetCount() " 个 )"
+
                             config := "cursor_mode_" from
                             value := readIni(config, "")
                             res := ""
@@ -109,6 +127,8 @@ fn_cursor_mode(*) {
 
                         if (!InStr(":" value ":", ":" RowText ":")) {
                             gc.%"LV_" to%.Add(, RowText)
+                            v := gc.%to "_title"%.Value
+                            gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
                             if (value) {
                                 writeIni(config, value ":" RowText)
                             } else {
@@ -128,13 +148,11 @@ fn_cursor_mode(*) {
                     if (useWhiteList) {
                         g_1.AddLink("xs cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
                     }
-
-                    mode_list := modeNameList.Clone()
-                    if (from != "add") {
-                        mode_list.RemoveAt(modeListMap.%from%)
-                    }
-                    for i, v in mode_list {
+                    for i, v in modeNameList {
                         opt := i = 1 || i = 5 ? "xs" : "yp"
+                        if (v = from) {
+                            opt .= " Disabled"
+                        }
                         _g := g_1.AddButton(opt " w" bw / 4, v)
                         _g._mode := v
                         _g.OnEvent("Click", fn_mode)
@@ -147,6 +165,8 @@ fn_cursor_mode(*) {
                         fn_rm(*) {
                             g_1.Destroy()
                             LV.Delete(RowNumber)
+                            v := gc.%from "_title"%.Value
+                            gc.%from "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" from%.GetCount() " 个 )"
                             try {
                                 gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
                             }
@@ -255,6 +275,8 @@ fn_cursor_mode(*) {
                             }
 
                             gc.%"LV_" to%.Add(, exe_name)
+                            v := gc.%to "_title"%.Value
+                            gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
                             if (value) {
                                 writeIni(config, value ":" exe_name)
                             } else {
@@ -286,8 +308,8 @@ fn_cursor_mode(*) {
             gc.LV_add.ModifyCol(2, "AutoHdr")
             gc.LV_add.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
-            g.AddLink(, '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 如果选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除它`n`n3. JetBrains 系列 IDE`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JetBrains IDE 支持」中的所有操作步骤`n      - 你应该访问这些相关链接:   <a href="https://inputtip.pages.dev/FAQ/use-inputtip-in-jetbrains">InputTip 官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>')
-
+            g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果很想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n`n3. JetBrains 系列 IDE`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JAB/JetBrains IDE 支持」中的所有操作步骤')
+            g.AddLink(, '相关链接: <a href="https://inputtip.pages.dev/FAQ/about-cursor-mode-list">关于光标获取模式</a>')
             g.OnEvent("Close", fn_close)
             fn_close(*) {
                 g.Destroy()

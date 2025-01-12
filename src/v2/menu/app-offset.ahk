@@ -2,11 +2,12 @@ fn_app_offset(*) {
     fn_common({
         gui: "appOffsetGui",
         config: "app_offset",
-        tab: ["管理特殊偏移量", "关于"],
-        tip: "你首先应该点击上方的「关于」查看具体的操作说明",
+        tab: ["设置特殊偏移量", "关于"],
+        tip: "你首先应该点击上方的「关于」查看具体的操作说明                                         ",
         list: "特殊偏移量列表",
         color: "cRed",
         about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「特殊偏移量列表」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「特殊偏移量列表」，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它`n`n2. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过屏幕坐标判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左侧，另一块屏幕在右侧`n      - 那么另一块屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
+        link: '',
         addConfirm: "",
         addConfirm2: "",
         addConfirm3: "",
@@ -15,8 +16,14 @@ fn_app_offset(*) {
         rmConfirm2: "",
         rmConfirm3: "",
     },
-    "", addClickFn, rmClickFn, addFn
+    handleFn, addClickFn, rmClickFn, addFn
     )
+    handleFn(*) {
+        gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"
+        writeIni("app_offset", "")
+        global app_offset := {}
+        restartJetBrains()
+    }
 
     addClickFn(LV, RowNumber, tipList) {
         handleClick(LV, RowNumber, tipList, "add")
@@ -139,8 +146,11 @@ fn_app_offset(*) {
             for v in screenList {
                 app_offset.%app%.%v.num% := { x: 0, y: 0 }
             }
-            fn_write_offset()
-            updateWhiteList(app)
+            SetTimer(timer, -1)
+            timer(*) {
+                fn_write_offset()
+                updateWhiteList(app)
+            }
         }
         offsetGui := Gui("AlwaysOnTop", "InputTip - 设置 " app " 的特殊偏移量")
         offsetGui.SetFont(fz, "微软雅黑")
@@ -219,6 +229,7 @@ fn_app_offset(*) {
         offsetGui.Show()
 
         fn_write_offset() {
+            gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"
             _app_offset := ""
             for v in app_offset.OwnProps() {
                 _info := v "|"

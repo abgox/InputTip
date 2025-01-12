@@ -16,9 +16,9 @@ fn_switch_window(*) {
             g.SetFont(fz, "微软雅黑")
             bw := w - g.MarginX * 2
 
-            tab := g.AddTab3("-Wrap", ["管理状态自动切换", "关于"])
+            tab := g.AddTab3("-Wrap", ["设置状态自动切换", "关于"])
             tab.UseTab(1)
-            g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明")
+            g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
             gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" bw, ["正在运行的应用进程列表", "窗口标题", "应用进程文件所在位置"])
             gc.LV_add.OnEvent("DoubleClick", fn_add)
             fn_add(LV, RowNumber) {
@@ -55,7 +55,12 @@ fn_switch_window(*) {
                     }
                 }
                 gc.%"LV_" state%.Opt("+Redraw")
+                gc.%state "_title"%.Value .= " ( " gc.%"LV_" state%.GetCount() " 个 )"
             }
+
+            gc.CN_title := g.AddText("xs w" bw / 3, "中文状态")
+            gc.EN_title := g.AddText("yp w" bw / 3, "英文状态")
+            gc.Caps_title := g.AddText("yp w" bw / 3, "大写锁定")
 
             if (CN_color) {
                 c := "c" StrReplace(CN_color, "#")
@@ -63,9 +68,9 @@ fn_switch_window(*) {
                 c := ""
             }
             try {
-                gc.LV_CN := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换中文"])
+                gc.LV_CN := g.AddListView("xs -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换中文"])
             } catch {
-                gc.LV_CN := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换中文"])
+                gc.LV_CN := g.AddListView("xs -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换中文"])
             }
             addItem("CN")
             gc.LV_CN.ModifyCol(1, "AutoHdr")
@@ -79,9 +84,9 @@ fn_switch_window(*) {
                 c := ""
             }
             try {
-                gc.LV_EN := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换英文"])
+                gc.LV_EN := g.AddListView("yp -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换英文"])
             } catch {
-                gc.LV_EN := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换英文"])
+                gc.LV_EN := g.AddListView("yp -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换英文"])
             }
             addItem("EN")
             gc.LV_EN.ModifyCol(1, "AutoHdr")
@@ -95,9 +100,9 @@ fn_switch_window(*) {
                 c := ""
             }
             try {
-                gc.LV_Caps := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换大写锁定"])
+                gc.LV_Caps := g.AddListView("yp -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["自动切换大写锁定"])
             } catch {
-                gc.LV_Caps := g.AddListView("yp -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换大写锁定"])
+                gc.LV_Caps := g.AddListView("yp -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3, ["自动切换大写锁定"])
             }
             addItem("Caps")
             gc.LV_Caps.ModifyCol(1, "AutoHdr")
@@ -117,6 +122,7 @@ fn_switch_window(*) {
                         g_1.Destroy()
                         gc.%"LV_" from%.Delete(RowNumber)
                         if (from != "add") {
+                            gc.%from "_title"%.Value := SubStr(gc.%from "_title"%.Value, 1, 4) " ( " gc.%"LV_" from%.GetCount() " 个 )"
                             config := "app_" from
                             value := readIni(config, "")
                             res := ""
@@ -132,6 +138,7 @@ fn_switch_window(*) {
 
                         if (!InStr(":" value ":", ":" RowText ":")) {
                             gc.%"LV_" to%.Add(, RowText)
+                            gc.%to "_title"%.Value := SubStr(gc.%to "_title"%.Value, 1, 4) " ( " gc.%"LV_" to%.GetCount() " 个 )"
                             if (value) {
                                 writeIni(config, value ":" RowText)
                             } else {
@@ -178,6 +185,7 @@ fn_switch_window(*) {
                         }
                         case "CN":
                         {
+                            g_1.AddButton("xs Disabled w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
                             g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
                             g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
                             g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
@@ -185,6 +193,7 @@ fn_switch_window(*) {
                         case "EN":
                         {
                             g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
+                            g_1.AddButton("xs Disabled w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
                             g_1.AddButton("xs w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
                             g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
                         }
@@ -192,12 +201,14 @@ fn_switch_window(*) {
                         {
                             g_1.AddButton("xs w" bw, "「自动切换中文」").OnEvent("Click", fn_CN)
                             g_1.AddButton("xs w" bw, "「自动切换英文」").OnEvent("Click", fn_EN)
+                            g_1.AddButton("xs Disabled w" bw, "「自动切换大写锁定」").OnEvent("Click", fn_Caps)
                             g_1.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
                         }
                     }
                     fn_rm(*) {
                         g_1.Destroy()
                         LV.Delete(RowNumber)
+                        gc.%from "_title"%.Value := SubStr(gc.%from "_title"%.Value, 1, 4) " ( " gc.%"LV_" from%.GetCount() " 个 )"
                         try {
                             gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
                         }
@@ -342,7 +353,7 @@ fn_switch_window(*) {
             gc.LV_add.ModifyCol(2, "AutoHdr")
             gc.LV_add.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
-            g.AddLink(, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n- 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n- 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n- 下方分别是中文、英文、大写锁定这三个自动切换列表`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n- 如果选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中`n  - 添加完成后，会在下方对应列表中显示，并实时生效`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作")
+            g.AddEdit("ReadOnly -VScroll w" w, "如何使用这个管理面板？`n`n- 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n- 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n- 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n- 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n- 下方分别是中文、英文、大写锁定这三个自动切换列表`n- 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n- 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n- 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n- 举个例子: `n  - 你可以双击上方正在运行的应用进程列表中的其中一个应用进程`n  - 然后在弹出的操作窗口中，选择将其添加到哪一个列表中`n  - 添加完成后，会在下方对应列表中显示，并实时生效`n  - 你也可以双击下方列表中的其中一个应用进程进行同样的操作")
 
             g.OnEvent("Close", fn_close)
             fn_close(*) {

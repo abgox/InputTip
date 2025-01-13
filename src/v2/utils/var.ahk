@@ -171,54 +171,59 @@ updateSymbol(init := 0) {
         restartJetBrains()
     }
     ; 存放不同状态下的符号
-    symbolGui := {
-        EN: "",
-        CN: "",
-        Caps: ""
+    symbolInfo := {
+        gui_EN: "",
+        gui_CN: "",
+        gui_Caps: ""
     }
 
-    ; 图片符号的宽高
+    ; * 图片字符相关配置
+    ; 宽高
     pic_symbol_width := readIni('pic_symbol_width', 9) * A_ScreenDPI / 96
     pic_symbol_height := readIni('pic_symbol_height', 9) * A_ScreenDPI / 96
-
-    ; 图片符号的路径
+    ; 文件路径
     CN_pic := readIni("CN_pic", "InputTipSymbol\default\CN.png")
     EN_pic := readIni("EN_pic", "InputTipSymbol\default\EN.png")
     Caps_pic := readIni("Caps_pic", "InputTipSymbol\default\Caps.png")
-
-    ; 图片符号的偏移量
+    ; 偏移量
     pic_offset_x := readIni('pic_offset_x', -30)
     pic_offset_y := readIni('pic_offset_y', -40)
-
-    ; 方块/文本符号的背景颜色
+    ; * 方块符号相关配置
+    ; 背景颜色
     CN_color := StrReplace(readIni("CN_color", "red"), '#', '')
     EN_color := StrReplace(readIni("EN_color", "blue"), '#', '')
     Caps_color := StrReplace(readIni("Caps_color", "green"), '#', '')
-
-    ; 方块/文本符号的透明度
+    ; 透明度
     transparent := readIni('transparent', 222)
-
-    ; 方块/文本符号的偏移量
+    ; 偏移量
     offset_x := readIni('offset_x', 10)
     offset_y := readIni('offset_y', -30)
-    ; 方块符号的宽高
+    ; 宽高
     symbol_width := readIni('symbol_width', 6) * A_ScreenDPI / 96
     symbol_height := readIni('symbol_height', 6) * A_ScreenDPI / 96
-
-    /*
-        边框样式
-        0: 无边框
-        1: 样式1
-        2: 样式2
-        3: 样式3
-    */
+    ; 边框样式: 0(无边框),1(样式1),2(样式2),3(样式3)
     border_type := readIni('border_type', 1)
-
-    ; 文本符号相关的配置
+    ; * 文本符号相关配置
+    ; 背景颜色
+    charSymbol_CN_color := StrReplace(readIni("charSymbol_CN_color", "red"), '#', '')
+    charSymbol_EN_color := StrReplace(readIni("charSymbol_EN_color", "blue"), '#', '')
+    charSymbol_Caps_color := StrReplace(readIni("charSymbol_Caps_color", "green"), '#', '')
+    ; 透明度
+    charSymbol_transparent := readIni('charSymbol_transparent', 222)
+    ; 偏移量
+    charSymbol_offset_x := readIni('charSymbol_offset_x', 0)
+    charSymbol_offset_y := readIni('charSymbol_offset_y', 45)
+    ; 边框样式: 0(无边框),1(样式1),2(样式2),3(样式3)
+    charSymbol_border_type := readIni('charSymbol_border_type', 1)
+    ; 字体
     font_family := readIni('font_family', '微软雅黑')
+    ; 字号
     font_size := readIni('font_size', 7)
+    ; 粗细
     font_weight := readIni('font_weight', 600)
+    ; 颜色
     font_color := StrReplace(readIni('font_color', 'ffffff'), '#', '')
+    ; 显示文本
     CN_Text := readIni('CN_Text', '中')
     EN_Text := readIni('EN_Text', '英')
     Caps_Text := readIni('Caps_Text', '大')
@@ -227,56 +232,59 @@ updateSymbol(init := 0) {
         case 1:
         {
             ; 图片字符
-            for v in ["CN", "EN", "Caps"] {
-                if (%v "_pic"%) {
-                    symbolGui.%v% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                    symbolGui.%v%.BackColor := "000000"
-                    WinSetTransColor("000000", symbolGui.%v%)
-                    symbolGui.%v%.AddPicture("w" pic_symbol_width " h" pic_symbol_height, %v "_pic"%)
+
+            for state in ["CN", "EN", "Caps"] {
+                if (%state "_pic"%) {
+                    symbolInfo.%"gui_" state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                    symbolInfo.%"gui_" state%.BackColor := "000000"
+                    WinSetTransColor("000000", symbolInfo.%"gui_" state%)
+                    symbolInfo.%"gui_" state%.AddPicture("w" pic_symbol_width " h" pic_symbol_height, %state "_pic"%)
                 }
             }
         }
         case 2:
         {
             ; 方块符号
-            for v in ["CN", "EN", "Caps"] {
-                if (%v "_color"%) {
-                    symbolGui.%v% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+
+            for state in ["CN", "EN", "Caps"] {
+                if (%state "_color"%) {
+                    symbolInfo.%"gui_" state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
                     WinSetTransparent(transparent)
                     try {
-                        symbolGui.%v%.BackColor := %v "_color"%
+                        symbolInfo.%"gui_" state%.BackColor := %state "_color"%
                     }
 
                     switch border_type {
-                        case 1: symbolGui.%v%.Opt("-LastFound +e0x00000001")
-                        case 2: symbolGui.%v%.Opt("-LastFound +e0x00000200")
-                        case 3: symbolGui.%v%.Opt("-LastFound +e0x00020000")
-                        default: symbolGui.%v%.Opt("-LastFound")
+                        case 1: symbolInfo.%"gui_" state%.Opt("-LastFound +e0x00000001")
+                        case 2: symbolInfo.%"gui_" state%.Opt("-LastFound +e0x00000200")
+                        case 3: symbolInfo.%"gui_" state%.Opt("-LastFound +e0x00020000")
+                        default: symbolInfo.%"gui_" state%.Opt("-LastFound")
                     }
                 }
             }
         }
         case 3:
         {
-            ; 文本字符
-            symbolGui.fontOpt := 's' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight
-            for v in ["CN", "EN", "Caps"] {
-                if (%v "_Text"% && %v "_color"%) {
-                    symbolGui.%v% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                    symbolGui.%v%.MarginX := 0, symbolGui.%v%.MarginY := 0
+            ; 文本符号
+
+            symbolInfo.fontOpt := 's' font_size * A_ScreenDPI / 96 ' c' font_color ' w' font_weight
+            for state in ["CN", "EN", "Caps"] {
+                if (%state "_Text"%) {
+                    symbolInfo.%"gui_" state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                    symbolInfo.%"gui_" state%.MarginX := 0, symbolInfo.%"gui_" state%.MarginY := 0
                     try {
-                        symbolGui.%v%.SetFont(symbolGui.fontOpt, font_family)
+                        symbolInfo.%"gui_" state%.SetFont(symbolInfo.fontOpt, font_family)
                     }
-                    symbolGui.%v%.AddText(, %v "_Text"%)
-                    WinSetTransparent(transparent)
+                    symbolInfo.%"gui_" state%.AddText(, %state "_Text"%)
+                    WinSetTransparent(charSymbol_transparent)
                     try {
-                        symbolGui.%v%.BackColor := %v "_color"%
+                        symbolInfo.%"gui_" state%.BackColor := %"charSymbol_" state "_color"%
                     }
-                    switch border_type {
-                        case 1: symbolGui.%v%.Opt("-LastFound +e0x00000001")
-                        case 2: symbolGui.%v%.Opt("-LastFound +e0x00000200")
-                        case 3: symbolGui.%v%.Opt("-LastFound +e0x00020000")
-                        default: symbolGui.%v%.Opt("-LastFound")
+                    switch charSymbol_border_type {
+                        case 1: symbolInfo.%"gui_" state%.Opt("-LastFound +e0x00000001")
+                        case 2: symbolInfo.%"gui_" state%.Opt("-LastFound +e0x00000200")
+                        case 3: symbolInfo.%"gui_" state%.Opt("-LastFound +e0x00020000")
+                        default: symbolInfo.%"gui_" state%.Opt("-LastFound")
                     }
                 }
             }

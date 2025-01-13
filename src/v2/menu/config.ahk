@@ -8,27 +8,25 @@ fn_config(*) {
             gc.w.subGui := ""
         }
     }
-    line := "-----------------------------------------------------------------------------------------------"
+    line := "-------------------------------------------------------------------------------------------------------------"
     configGui := Gui("AlwaysOnTop")
     configGui.SetFont(fz, "微软雅黑")
-    configGui.AddText(, line)
+    configGui.AddText(, "-------------------------------------------------------------------------------------------------------")
     configGui.Show("Hide")
     configGui.GetPos(, , &Gui_width)
     configGui.Destroy()
 
     configGui := Gui("AlwaysOnTop", "InputTip - 更改配置")
     configGui.SetFont(fz, "微软雅黑")
+
+    bw := Gui_width - configGui.MarginX * 2
     ; tab := configGui.AddTab3("-Wrap 0x100", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号", "配色网站"])
     tab := configGui.AddTab3("-Wrap", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号", "其他杂项", "配色网站"])
     tab.UseTab(1)
 
-    configGui.AddText("Section cRed", "在更改配置前，你应该首先阅读一下相关的说明文档")
-    configGui.AddLink("xs", '<a href="https://inputtip.pages.dev/v2/">官网</a>')
-    configGui.AddLink("yp", '<a href="https://github.com/abgox/InputTip">Github</a>')
-    configGui.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-    configGui.AddLink("yp", '<a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>')
+    configGui.AddLink("Section cRed", '你首先应该查看相关的说明文档: <a href="https://inputtip.pages.dev/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>')
 
-    configGui.AddText("xs cRed", "所有的配置项的更改会实时生效，你可以立即看到最新效果")
+    configGui.AddText("xs cGray", "所有的配置项修改会实时生效，可以立即看到最新效果，但是更改时不要太快`n比如需要输入值的配置项，输入过快可能因为响应稍慢导致最新修改丢失，需要放缓输入速度")
     configGui.AddText("xs", line)
     configGui.AddText("xs", "1. 要不要同步修改鼠标样式: ")
     _g := configGui.AddDropDownList("w" Gui_width / 1.6 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
@@ -81,6 +79,7 @@ fn_config(*) {
 
     configGui.addText("xs", "2. 在输入光标附近显示什么类型的符号: ")
     configGui.AddDropDownList("yp AltSubmit Choose" symbolType + 1, ["不显示符号", "显示图片符号", "显示方块符号", "显示文本符号"]).OnEvent("Change", fn_symbol_type)
+    configGui.AddText("xs cGray", "当鼠标悬浮在符号上时，符号会立即隐藏，下次键盘操作或光标位置变化时再次显示")
     fn_symbol_type(item, *) {
         writeIni("symbolType", item.Value - 1)
         global symbolType := item.Value - 1
@@ -158,24 +157,7 @@ fn_config(*) {
         _g := configGui.AddDropDownList("xs r9 w" Gui_width " v" v.type "_cursor", dirList)
         _g.OnEvent("Change", fn_cursor_dir)
         fn_cursor_dir(item, *) {
-            if (item.Text = "") {
-                return
-            }
             writeIni(item.Name, item.Text)
-            switch (item.Name) {
-                case "CN_cursor":
-                {
-                    global CN_cursor := item.Text
-                }
-                case "EN_cursor":
-                {
-                    global EN_cursor := item.Text
-                }
-                case "Caps_cursor":
-                {
-                    global Caps_cursor := item.Text
-                }
-            }
             updateCursor()
             reloadCursor()
         }
@@ -232,34 +214,11 @@ fn_config(*) {
         _g.OnEvent("Change", fn_pic_config)
 
         fn_pic_config(item, *) {
-            value := returnNumber(item.Value)
-            writeIni(item.Name, value)
-            switch (item.Name) {
-                case "pic_offset_x":
-                {
-                    global pic_offset_x := value
-                    restartJetBrains()
-                }
-                case "pic_offset_y":
-                {
-                    global pic_offset_y := value
-                    restartJetBrains()
-                }
-                case "pic_symbol_width":
-                {
-                    global pic_symbol_width := value
-                    hideSymbol()
-                    updateSymbol()
-                    reloadSymbol()
-                }
-                case "pic_symbol_height":
-                {
-                    global pic_symbol_height := value
-                    hideSymbol()
-                    updateSymbol()
-                    reloadSymbol()
-                }
-            }
+            writeIni(item.Name, returnNumber(item.Value))
+            hideSymbol()
+            updateSymbol()
+            reloadSymbol()
+            restartJetBrains()
         }
     }
 
@@ -277,20 +236,6 @@ fn_config(*) {
         _g.OnEvent("Change", fn_pic_path)
         fn_pic_path(item, *) {
             writeIni(item.Name, item.Text)
-            switch (item.Name) {
-                case "CN_pic":
-                {
-                    global CN_pic := item.Text
-                }
-                case "EN_pic":
-                {
-                    global EN_pic := item.Text
-                }
-                case "Caps_pic":
-                {
-                    global Caps_pic := item.Text
-                }
-            }
             hideSymbol()
             updateSymbol()
             reloadSymbol()
@@ -340,7 +285,7 @@ fn_config(*) {
     symbolBlockConfig := [{
         config: "transparent",
         options: "Number Limit3",
-        tip: "方块符号的透明度"
+        tip: "方块符号的方块透明度"
     }, {
         config: "offset_x",
         options: "",
@@ -362,179 +307,150 @@ fn_config(*) {
     for v in symbolBlockColorConfig {
         configGui.AddText("xs", v.tip ": ")
         _g := configGui.AddComboBox("v" v.config " yp " v.options, v.colors)
+        _g.Text := readIni(v.config, "red")
         _g.OnEvent("Change", fn_color_config)
         fn_color_config(item, *) {
-            value := item.Text
-            writeIni(item.Name, value)
-            switch (item.Name) {
-                case "CN_color":
-                {
-                    global CN_color := value
-                }
-                case "EN_color":
-                {
-                    global EN_color := value
-                }
-                case "Caps_color":
-                {
-                    global Caps_color := value
-                }
-            }
+            writeIni(item.Name, item.Text)
             hideSymbol()
             updateSymbol()
             reloadSymbol()
         }
-        _g.Text := readIni(v.config, "red")
     }
     for v in symbolBlockConfig {
         configGui.AddText("xs", v.tip ": ")
-        if (v.config = "transparent") {
-            _g := configGui.AddEdit("v" v.config " yp " v.options)
-            _g.Value := readIni(v.config, 1)
-            _g.OnEvent("Change", fn_trans_config)
-            fn_trans_config(item, *) {
-                value := item.Text
+        _g := configGui.AddEdit("v" v.config " yp " v.options)
+        _g.Value := readIni(v.config, 1)
+        _g.OnEvent("Change", fn_block_config)
+        fn_block_config(item, *) {
+            value := item.Value
+            if (item.Name = "transparent") {
                 if (value = "") {
                     return
                 }
                 if (value > 255) {
                     value := 255
                 }
-                writeIni(item.Name, value)
-                hideSymbol()
-                updateSymbol()
-                reloadSymbol()
             }
-        } else {
-            _g := configGui.AddEdit("v" v.config " yp " v.options)
-            _g.Value := readIni(v.config, 1)
-            _g.OnEvent("Change", fn_block_config)
-            fn_block_config(item, *) {
-                value := returnNumber(item.Text)
-                writeIni(item.Name, value)
-                switch (item.Name) {
-                    case "transparent":
-                    {
-                        global transparent := value
-                    }
-                    case "offset_x":
-                    {
-                        global offset_x := value
-                    }
-                    case "offset_y":
-                    {
-                        global offset_y := value
-                    }
-                    case "symbol_height":
-                    {
-                        global symbol_height := value
-                    }
-                    case "symbol_width":
-                    {
-                        global symbol_width := value
-                    }
-                }
-                hideSymbol()
-                updateSymbol()
-                reloadSymbol()
-            }
-        }
-    }
-    symbolStyle := ["无", "样式1", "样式2", "样式3"]
-    configGui.AddText("xs", "边框样式: ")
-    _g := configGui.AddDropDownList("yp AltSubmit vborder_type", symbolStyle)
-    _g.OnEvent("Change", fn_border_config)
-    fn_border_config(item, *) {
-        value := item.Value
-        writeIni("border_type", value - 1)
-        global border_type := value - 1
-        hideSymbol()
-        updateSymbol()
-        reloadSymbol()
-    }
-    _g.Value := readIni("border_type", "") + 1
-    tab.UseTab(5)
-    symbolCharConfig := [{
-        config: "font_family",
-        options: "",
-        tip: "文本字符的字体"
-    }, {
-        config: "font_size",
-        options: "Number",
-        tip: "文本字符的大小"
-    }, {
-        config: "font_weight",
-        options: "Number",
-        tip: "文本字符的粗细"
-    }, {
-        config: "font_color",
-        options: "",
-        tip: "文本字符的颜色"
-    }, {
-        config: "CN_Text",
-        options: "",
-        tip: "中文状态时显示的文本字符"
-    }, {
-        config: "EN_Text",
-        options: "",
-        tip: "英文状态时显示的文本字符"
-    }, {
-        config: "Caps_Text",
-        options: "",
-        tip: "大写锁定时显示的文本字符"
-    }]
-    configGui.AddText("Section cRed", "1. 符号偏移量、透明度、边框样式以及不同状态下的背景颜色由方块符号中的相关配置决定")
-    configGui.AddText("xs", "2. 不同状态时显示的文本字符可以设置为空，表示不显示对应的文本字符")
-    configGui.AddText("xs", "3. 当方块符号中的背景颜色设置为空时，对应的文本字符也不显示`n" line)
-    for v in symbolCharConfig {
-        configGui.AddText("xs", v.tip ": ")
-        _g := configGui.AddEdit("v" v.config " yp " v.options)
-        _g.Value := %v.config%
-        _g.OnEvent("Change", fn_char_config)
-
-        fn_char_config(item, *) {
-            value := item.Text
-            switch (item.Name) {
-                case "font_family":
-                {
-                    global font_family := value
-                }
-                case "font_size":
-                {
-                    if (value = "") {
-                        return
-                    }
-                    global font_size := value
-                }
-                case "font_weight":
-                {
-                    if (value = "") {
-                        return
-                    }
-                    global font_weight := value
-                }
-                case "font_color":
-                {
-                    global font_color := value
-                }
-                case "CN_Text":
-                {
-                    global CN_Text := value
-                }
-                case "EN_Text":
-                {
-                    global EN_Text := value
-                }
-                case "Caps_Text":
-                {
-                    global Caps_Text := value
-                }
-            }
-            writeIni(item.Name, value)
+            writeIni(item.Name, returnNumber(value))
             hideSymbol()
             updateSymbol()
             reloadSymbol()
         }
+    }
+    symbolStyle := ["无", "样式1", "样式2", "样式3"]
+    configGui.AddText("xs", "方块符号的边框样式: ")
+    _g := configGui.AddDropDownList("yp AltSubmit vborder_type", symbolStyle)
+    _g.Value := readIni("border_type", "") + 1
+    _g.OnEvent("Change", fn_border_config)
+    fn_border_config(item, *) {
+        writeIni("border_type", item.Value - 1)
+        hideSymbol()
+        updateSymbol()
+        reloadSymbol()
+    }
+    tab.UseTab(5)
+    configGui.AddText("Section", "1. 不同状态时显示的文本字符可以设置为空，表示不显示对应的文本字符")
+    configGui.AddText("xs", "2. 当方块符号中的背景颜色设置为空时，对应的文本字符也不显示`n" line)
+    symbolCharConfig := [{
+        config: "CN_Text",
+        opts: "xs",
+        options: "",
+        tip: "中文状态的文本字符"
+    }, {
+        config: "charSymbol_CN_color",
+        opts: "yp",
+        options: "",
+        tip: "中文状态的背景颜色"
+    }, {
+        config: "EN_Text",
+        opts: "xs",
+        options: "",
+        tip: "英文状态的文本字符"
+    }, {
+        config: "charSymbol_EN_color",
+        opts: "yp",
+        options: "",
+        tip: "英文状态的背景颜色"
+    }, {
+        config: "Caps_Text",
+        opts: "xs",
+        options: "",
+        tip: "大写锁定的文本字符"
+    }, {
+        config: "charSymbol_Caps_color",
+        opts: "yp",
+        options: "",
+        tip: "大写锁定的背景颜色"
+    }, {
+        config: "font_family",
+        opts: "xs",
+        options: "",
+        tip: "文本符号的字符字体"
+    }, {
+        config: "font_size",
+        opts: "yp",
+        options: "Number",
+        tip: "文本符号的字符大小"
+    }, {
+        config: "font_weight",
+        opts: "xs",
+        options: "Number",
+        tip: "文本符号的字符粗细"
+    }, {
+        config: "font_color",
+        opts: "yp",
+        options: "",
+        tip: "文本符号的字符颜色"
+    }, {
+        config: "charSymbol_transparent",
+        opts: "xs",
+        options: "Number Limit3",
+        tip: "文本符号的字符透明度"
+    }, {
+        config: "charSymbol_offset_x",
+        opts: "xs",
+        options: "",
+        tip: "文本符号的水平偏移量"
+    }, {
+        config: "charSymbol_offset_y",
+        opts: "xs",
+        options: "",
+        tip: "文本符号的垂直偏移量"
+    }]
+    for v in symbolCharConfig {
+        configGui.AddText(v.opts, v.tip ": ")
+        _g := configGui.AddEdit("v" v.config " yp " v.options)
+        _g.Value := %v.config%
+        _g.OnEvent("Change", fn_char_config)
+    }
+    fn_char_config(item, *) {
+        value := item.Value
+        if (item.Name = "charSymbol_transparent") {
+            if (value = "") {
+                return
+            }
+            if (value > 255) {
+                value := 255
+            }
+        } else if (item.Name = "charSymbol_offset_x" || item.Name = "charSymbol_offset_y") {
+            value := returnNumber(value)
+        }
+        writeIni(item.Name, value)
+        hideSymbol()
+        updateSymbol()
+        reloadSymbol()
+    }
+
+    symbolStyle := ["无", "样式1", "样式2", "样式3"]
+    configGui.AddText("xs", "文本符号的边框样式: ")
+    _g := configGui.AddDropDownList("yp AltSubmit vcharSymbol_border_type", symbolStyle)
+    _g.Value := readIni("charSymbol_border_type", "") + 1
+    _g.OnEvent("Change", fn_border_config2)
+    fn_border_config2(item, *) {
+        writeIni("charSymbol_border_type", item.Value - 1)
+        hideSymbol()
+        updateSymbol()
+        reloadSymbol()
     }
     tab.UseTab(6)
     configGui.AddText("Section", "1. 所有配置菜单的字体大小: ")

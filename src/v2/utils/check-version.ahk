@@ -281,6 +281,18 @@ checkUpdateDone() {
             }
         }
 
+        try {
+            IniRead("InputTip.ini", "Config-v2", "charSymbol_CN_color")
+        } catch {
+            writeIni("charSymbol_CN_color", readIni("CN_color", "red"))
+            writeIni("charSymbol_EN_color", readIni("EN_color", "blue"))
+            writeIni("charSymbol_Caps_color", readIni("Caps_color", "green"))
+            writeIni("charSymbol_transparent", readIni('transparent', 222))
+            writeIni("charSymbol_offset_x", readIni('offset_x', 10))
+            writeIni("charSymbol_offset_y", readIni('offset_y', -30))
+            writeIni("charSymbol_border_type", readIni('border_type', 1))
+        }
+
         createGui(fn).Show()
         fn(x, y, w, h) {
             g := Gui("AlwaysOnTop", "InputTip - 版本更新完成")

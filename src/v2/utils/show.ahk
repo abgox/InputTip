@@ -130,24 +130,24 @@ updateDelay() {
         }
     }
 }
-loadCursor(type, change := 0) {
+loadCursor(state, change := 0) {
     global lastCursor
     if (changeCursor) {
-        if (type != lastCursor || change) {
+        if (state != lastCursor || change) {
             for v in cursorInfo {
-                if (v.%type%) {
-                    DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
+                if (v.%state%) {
+                    DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%state%, "Ptr"), "Int", v.value)
                 }
             }
-            lastCursor := type
+            lastCursor := state
         }
     }
 }
-loadSymbol(type, left, top) {
+loadSymbol(state, left, top) {
     global lastSymbol, isOverSymbol
     static old_left := 0, old_top := 0
     if (left = old_left && top = old_top) {
-        if (type = lastSymbol || isOverSymbol) {
+        if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
             return
         }
     } else {
@@ -164,20 +164,20 @@ loadSymbol(type, left, top) {
     } else if (symbolType = 2) {
         showConfig .= "w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y
     } else if (symbolType = 3) {
-        showConfig .= "x" left + offset_x "y" top + offset_y
+        showConfig .= "x" left + charSymbol_offset_x "y" top + charSymbol_offset_y
     }
-    if (symbolGui.%type%) {
-        symbolGui.%type%.Show(showConfig)
+    if (symbolInfo.%"gui_" state%) {
+        symbolInfo.%"gui_" state%.Show(showConfig)
     }
 
-    lastSymbol := type
+    lastSymbol := state
     old_top := top
     old_left := left
 }
 hideSymbol() {
-    for v in ["CN", "EN", "Caps"] {
+    for state in ["CN", "EN", "Caps"] {
         try {
-            symbolGui.%v%.Hide()
+            symbolInfo.%"gui_" state%.Hide()
         }
     }
     global lastSymbol := ""

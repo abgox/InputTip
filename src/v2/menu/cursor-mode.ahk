@@ -1,27 +1,30 @@
 fn_cursor_mode(*) {
     showGui()
     showGui(deep := "") {
-        createGui(fn).Show()
-        fn(x, y, w, h) {
-            if (gc.w.cursorModeGui) {
-                gc.w.cursorModeGui.Destroy()
-                gc.w.cursorModeGui := ""
-
-                try {
-                    gc.w.subGui.Destroy()
-                    gc.w.subGui := ""
-                }
+        if (gc.w.cursorModeGui) {
+            gc.w.cursorModeGui.Destroy()
+            gc.w.cursorModeGui := ""
+            try {
+                gc.w.subGui.Destroy()
+                gc.w.subGui := ""
             }
-            g := Gui("AlwaysOnTop")
-            g.SetFont(fz, "微软雅黑")
-            bw := w - g.MarginX * 2
-
+        }
+        createGui(modeGui).Show()
+        modeGui(info) {
+            g := createGuiOpt()
             tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
             tab.UseTab(1)
-            g.AddLink("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
+            g.AddText("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
+
+            if (info.i) {
+                return g
+            }
+            w := info.w
+            bw := w - g.MarginX * 2
+
             gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["应用进程列表", "窗口标题", "应用进程文件所在位置"])
-            gc.LV_add.OnEvent("DoubleClick", fn_add)
-            fn_add(LV, RowNumber) {
+            gc.LV_add.OnEvent("DoubleClick", e_add)
+            e_add(LV, RowNumber) {
                 handleClick(LV, RowNumber, "add")
             }
             res := []
@@ -87,9 +90,9 @@ fn_cursor_mode(*) {
                 gc.%"LV_" v% := g.AddListView(opt " cRed -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 4, [v])
                 addItem(v)
                 gc.%"LV_" v%.ModifyCol(1, "AutoHdr")
-                gc.%"LV_" v%.OnEvent("DoubleClick", fn_mode)
+                gc.%"LV_" v%.OnEvent("DoubleClick", e_mode)
                 gc.%"LV_" v%._mode := v
-                fn_mode(LV, RowNumber) {
+                e_mode(LV, RowNumber) {
                     handleClick(LV, RowNumber, LV._mode)
                 }
             }
@@ -98,15 +101,15 @@ fn_cursor_mode(*) {
                 if (!RowNumber) {
                     return
                 }
-                RowText := LV.GetText(RowNumber)  ; 从行的第一个字段中获取文本.
-                createGui(fn).Show()
-                fn(x, y, w, h) {
-                    if (gc.w.subGui) {
-                        gc.w.subGui.Destroy()
-                        gc.w.subGui := ""
-                    }
+                exe_name := LV.GetText(RowNumber)
+                if (gc.w.subGui) {
+                    gc.w.subGui.Destroy()
+                    gc.w.subGui := ""
+                }
+                createGui(addGui).Show()
+                addGui(info) {
                     _handle(to) {
-                        g_1.Destroy()
+                        g.Destroy()
                         gc.%"LV_" from%.Delete(RowNumber)
                         if (from != "add") {
                             v := gc.%from "_title"%.Value
@@ -116,7 +119,7 @@ fn_cursor_mode(*) {
                             value := readIni(config, "")
                             res := ""
                             for v in StrSplit(value, ":") {
-                                if (Trim(v) && v != RowText) {
+                                if (Trim(v) && v != exe_name) {
                                     res .= ":" v
                                 }
                             }
@@ -125,155 +128,7 @@ fn_cursor_mode(*) {
                         config := "cursor_mode_" to
                         value := readIni(config, "")
 
-                        if (!InStr(":" value ":", ":" RowText ":")) {
-                            gc.%"LV_" to%.Add(, RowText)
-                            v := gc.%to "_title"%.Value
-                            gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
-                            if (value) {
-                                writeIni(config, value ":" RowText)
-                            } else {
-                                writeIni(config, RowText)
-                            }
-                        }
-                        updateWhiteList(RowText)
-                        updateCursorMode(config != "cursor_mode_JAB")
-                    }
-                    g_1 := Gui("AlwaysOnTop")
-                    g_1.SetFont(fz, "微软雅黑")
-                    bw := w - g_1.MarginX * 2
-
-                    g_1.AddLink(, "要将进程")
-                    g_1.AddLink("yp cRed", RowText)
-                    g_1.AddLink("yp", "添加到哪一个光标获取模式中？")
-                    if (useWhiteList) {
-                        g_1.AddLink("xs cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
-                    }
-                    for i, v in modeNameList {
-                        opt := i = 1 || i = 5 ? "xs" : "yp"
-                        if (v = from) {
-                            opt .= " Disabled"
-                        }
-                        _g := g_1.AddButton(opt " w" bw / 4, v)
-                        _g._mode := v
-                        _g.OnEvent("Click", fn_mode)
-                        fn_mode(item, *) {
-                            _handle(item._mode)
-                        }
-                    }
-                    if (from != "add") {
-                        g_1.AddButton("xs w" w, "将它移除").OnEvent("Click", fn_rm)
-                        fn_rm(*) {
-                            g_1.Destroy()
-                            LV.Delete(RowNumber)
-                            v := gc.%from "_title"%.Value
-                            gc.%from "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" from%.GetCount() " 个 )"
-                            try {
-                                gc.LV_add.Add(, RowText, WinGetTitle("ahk_exe " RowText))
-                            }
-                            config := "cursor_mode_" from
-                            value := readIni(config, "")
-                            result := ""
-                            for v in StrSplit(value, ":") {
-                                if (Trim(v) && v != RowText) {
-                                    result .= ":" v
-                                }
-                            }
-                            writeIni(config, SubStr(result, 2))
-                            updateCursorMode(config != "cursor_mode_JAB")
-                        }
-                    }
-
-                    g_1.AddButton("xs w" w, "取消操作").OnEvent("Click", no)
-                    no(*) {
-                        g_1.Destroy()
-                    }
-                    gc.w.subGui := g_1
-                    return g_1
-                }
-            }
-
-            g.AddButton("xs w" w / 3, "刷新应用进程列表").OnEvent("Click", fn_refresh)
-            fn_refresh(*) {
-                fn_close()
-                showGui(deep)
-            }
-
-            g.AddButton("yp w" w / 3, "通过输入进程名称手动添加").OnEvent("Click", fn_add_by_hand)
-            fn_add_by_hand(*) {
-                addApp("xxx.exe")
-                addApp(v) {
-                    createGui(fn).Show()
-                    fn(x, y, w, h) {
-                        if (gc.w.subGui) {
-                            gc.w.subGui.Destroy()
-                            gc.w.subGui := ""
-                        }
-                        g_2 := Gui("AlwaysOnTop", "InputTip - 通过输入进程名称手动添加")
-                        g_2.SetFont(fz, "微软雅黑")
-                        bw := w - g_2.MarginX * 2
-                        if (useWhiteList) {
-                            g_2.AddLink("cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
-                        }
-                        g_2.AddText(, "1. 进程名称应该是")
-                        g_2.AddText("yp cRed", "xxx.exe")
-                        g_2.AddText("yp", "这样的格式")
-                        g_2.AddText("xs", "2. 每一次只能添加一个")
-                        g_2.AddText("xs", "应用进程名称: ")
-                        g_2.AddEdit("yp vexe_name", "").Value := v
-                        g_2.AddText("xs cGray", "要将这个应用进程添加到下方哪一个光标获取模式中？")
-
-                        for i, v in modeNameList {
-                            opt := i = 1 || i = 5 ? "xs" : "yp"
-                            _g := g_2.AddButton(opt " w" bw / 4, v)
-                            _g._mode := v
-                            _g.OnEvent("Click", fn_handle)
-                            fn_handle(item, *) {
-                                _handle(item._mode)
-                            }
-                        }
-
-                        _handle(to) {
-                            exe_name := g_2.Submit().exe_name
-                            if (!RegExMatch(exe_name, "^.+\.\w{3}$") || InStr(exe_name, ":")) {
-                                createGui(fn).Show()
-                                fn(x, y, w, h) {
-                                    g_2 := Gui("AlwaysOnTop")
-                                    g_2.SetFont(fz, "微软雅黑")
-                                    bw := w - g_2.MarginX * 2
-                                    g_2.AddText(, "进程名称不符合格式要求，请重新输入")
-                                    y := g_2.AddButton("w" bw, "我知道了")
-                                    y.OnEvent("click", close)
-                                    y.Focus()
-                                    close(*) {
-                                        g_2.Destroy()
-                                        addApp(exe_name)
-                                    }
-                                    return g_2
-                                }
-                                return
-                            }
-
-                            config := "cursor_mode_" to
-                            value := readIni(config, "")
-
-                            if (InStr(":" value ":", ":" exe_name ":")) {
-                                createGui(fn1).Show()
-                                fn1(x, y, w, h) {
-                                    g_2 := Gui("AlwaysOnTop")
-                                    g_2.SetFont(fz, "微软雅黑")
-                                    bw := w - g_2.MarginX * 2
-                                    g_2.AddText("cRed", exe_name)
-                                    g_2.AddText("yp", "已经存在，请重新输入")
-                                    g_2.AddButton("xs w" bw, "重新输入").OnEvent("click", close)
-                                    close(*) {
-                                        g_2.Destroy()
-                                        addApp(exe_name)
-                                    }
-                                    return g_2
-                                }
-                                return
-                            }
-
+                        if (!InStr(":" value ":", ":" exe_name ":")) {
                             gc.%"LV_" to%.Add(, exe_name)
                             v := gc.%to "_title"%.Value
                             gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
@@ -282,23 +137,198 @@ fn_cursor_mode(*) {
                             } else {
                                 writeIni(config, exe_name)
                             }
-                            updateWhiteList(exe_name)
+                        }
+                        updateWhiteList(exe_name)
+                        updateCursorMode(config != "cursor_mode_JAB")
+                    }
+                    g := createGuiOpt()
+                    g.AddText(, "要将进程")
+                    g.AddText("yp cRed", exe_name)
+                    g.AddText("yp", "添加到哪一个光标获取模式中？")
+                    if (useWhiteList) {
+                        g.AddText("xs cRed", "如果此应用不在白名单中，则会同步添加到白名单中")
+                    }
+
+                    if (info.i) {
+                        return g
+                    }
+                    w := info.w
+                    bw := w - g.MarginX * 2
+
+                    for i, v in modeNameList {
+                        opt := i = 1 || i = 5 ? "xs" : "yp"
+                        if (v = from) {
+                            opt .= " Disabled"
+                        }
+                        _ := g.AddButton(opt " w" bw / 4, v)
+                        _._mode := v
+                        _.OnEvent("Click", e_mode)
+                        e_mode(item, *) {
+                            _handle(item._mode)
+                        }
+                    }
+                    if (from != "add") {
+                        g.AddButton("xs w" w, "将它移除").OnEvent("Click", e_rm)
+                        e_rm(*) {
+                            g.Destroy()
+                            LV.Delete(RowNumber)
+                            v := gc.%from "_title"%.Value
+                            gc.%from "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" from%.GetCount() " 个 )"
+                            try {
+                                gc.LV_add.Add(, exe_name, WinGetTitle("ahk_exe " exe_name))
+                            }
+                            config := "cursor_mode_" from
+                            value := readIni(config, "")
+                            result := ""
+                            for v in StrSplit(value, ":") {
+                                if (Trim(v) && v != exe_name) {
+                                    result .= ":" v
+                                }
+                            }
+                            writeIni(config, SubStr(result, 2))
                             updateCursorMode(config != "cursor_mode_JAB")
                         }
-                        gc.w.subGui := g_2
-                        return g_2
+                    }
+
+                    g.AddButton("xs w" w, "取消操作").OnEvent("Click", e_no)
+                    e_no(*) {
+                        g.Destroy()
+                    }
+                    gc.w.subGui := g
+                    return g
+                }
+            }
+
+            g.AddButton("xs w" w / 3, "刷新应用进程列表").OnEvent("Click", e_refresh)
+            e_refresh(*) {
+                fn_close()
+                showGui(deep)
+            }
+
+            g.AddButton("yp w" w / 3, "通过输入进程名称手动添加").OnEvent("Click", e_add_by_hand)
+            e_add_by_hand(*) {
+                addApp("xxx.exe")
+                addApp(v) {
+                    if (gc.w.subGui) {
+                        gc.w.subGui.Destroy()
+                        gc.w.subGui := ""
+                    }
+                    createGui(addGui).Show()
+                    addGui(info) {
+                        g := createGuiOpt("InputTip - 设置光标获取模式")
+                        text := "每次只能添加一个应用进程名称"
+                        if (useWhiteList) {
+                            text .= "`n如果它不在白名单中，则会同步添加到白名单中"
+                        }
+                        g.AddText("cRed", text)
+                        g.AddText("xs", "应用进程名称: ")
+                        gc._exe_name := g.AddEdit("yp", "")
+                        gc._exe_name.Value := v
+                        g.AddText("xs cGray", "要将这个应用进程添加到哪一个光标获取模式中？")
+
+                        if (info.i) {
+                            return g
+                        }
+                        w := info.w
+                        bw := w - g.MarginX * 2
+
+                        for i, v in modeNameList {
+                            opt := i = 1 || i = 5 ? "xs" : "yp"
+                            _ := g.AddButton(opt " w" bw / 4, v)
+                            _._mode := v
+                            _.OnEvent("Click", e_handle)
+                            e_handle(item, *) {
+                                to := item._mode
+                                exe_name := gc._exe_name.value
+                                g.Destroy()
+                                if (!RegExMatch(exe_name, "^.+\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
+                                    if (gc.w.subGui) {
+                                        gc.w.subGui.Destroy()
+                                        gc.w.subGui := ""
+                                    }
+                                    createGui(errGui).Show()
+                                    errGui(info) {
+                                        g := createGuiOpt()
+                                        g.AddText("cRed", exe_name)
+                                        g.AddText("yp", "是一个错误的应用进程名称")
+                                        g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
+
+                                        if (info.i) {
+                                            return g
+                                        }
+                                        w := info.w
+                                        bw := w - g.MarginX * 2
+
+                                        y := g.AddButton("xs w" bw, "重新输入")
+                                        y.Focus()
+                                        y.OnEvent("click", e_close)
+                                        e_close(*) {
+                                            g.Destroy()
+                                            addApp(exe_name)
+                                        }
+                                        gc.w.subGui := g
+                                        return g
+                                    }
+                                    return
+                                }
+
+                                config := "cursor_mode_" to
+                                value := readIni(config, "")
+
+                                if (InStr(":" value ":", ":" exe_name ":")) {
+                                    if (gc.w.subGui) {
+                                        gc.w.subGui.Destroy()
+                                        gc.w.subGui := ""
+                                    }
+                                    createGui(existGui).Show()
+                                    existGui(info) {
+                                        g := createGuiOpt()
+                                        g.AddText("cRed", exe_name)
+                                        g.AddText("yp", "这个应用进程已经存在了")
+
+                                        if (info.i) {
+                                            return g
+                                        }
+                                        w := info.w
+                                        bw := w - g.MarginX * 2
+
+                                        g.AddButton("xs w" bw, "重新输入").OnEvent("click", e_close)
+                                        e_close(*) {
+                                            g.Destroy()
+                                            addApp(exe_name)
+                                        }
+                                        gc.w.subGui := g
+                                        return g
+                                    }
+                                    return
+                                }
+
+                                gc.%"LV_" to%.Add(, exe_name)
+                                v := gc.%to "_title"%.Value
+                                gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
+                                if (value) {
+                                    writeIni(config, value ":" exe_name)
+                                } else {
+                                    writeIni(config, exe_name)
+                                }
+                                updateWhiteList(exe_name)
+                                updateCursorMode(config != "cursor_mode_JAB")
+                            }
+                        }
+                        gc.w.subGui := g
+                        return g
                     }
                 }
             }
             if (deep) {
-                g.AddButton("yp w" w / 3, "显示更少进程(仅前台窗口)").OnEvent("Click", fn_less_window)
-                fn_less_window(*) {
+                g.AddButton("yp w" w / 3, "显示更少进程(仅前台窗口)").OnEvent("Click", e_less_window)
+                e_less_window(*) {
                     fn_close()
                     showGui("")
                 }
             } else {
-                g.AddButton("yp w" w / 3, "显示更多进程(后台窗口)").OnEvent("Click", fn_more_window)
-                fn_more_window(*) {
+                g.AddButton("yp w" w / 3, "显示更多进程(后台窗口)").OnEvent("Click", e_more_window)
+                e_more_window(*) {
                     fn_close()
                     showGui(1)
                 }
@@ -309,10 +339,14 @@ fn_cursor_mode(*) {
             gc.LV_add.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
             g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果很想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n`n3. JetBrains 系列 IDE`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JAB/JetBrains IDE 支持」中的所有操作步骤')
-            g.AddLink(, '相关链接: <a href="https://inputtip.pages.dev/FAQ/about-cursor-mode-list">关于光标获取模式</a>')
+            g.AddLink(, '相关链接: <a href="https://inputtip.pages.dev/FAQ/cursor-mode">关于光标获取模式</a>')
             g.OnEvent("Close", fn_close)
             fn_close(*) {
                 g.Destroy()
+                try {
+                    gc.w.subGui.Destroy()
+                    gc.w.subGui := ""
+                }
             }
             gc.w.cursorModeGui := g
             return g

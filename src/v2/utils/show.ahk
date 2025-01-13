@@ -164,7 +164,7 @@ loadSymbol(state, left, top) {
     } else if (symbolType = 2) {
         showConfig .= "w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y
     } else if (symbolType = 3) {
-        showConfig .= "x" left + charSymbol_offset_x "y" top + charSymbol_offset_y
+        showConfig .= "x" left + textSymbol_offset_x "y" top + textSymbol_offset_y
     }
     if (symbolInfo.%"gui_" state%) {
         symbolInfo.%"gui_" state%.Show(showConfig)

@@ -178,7 +178,6 @@ isCN() {
  * switch_CN()
  */
 switch_CN(*) {
-    isShift := GetKeyState("Shift", "P")
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -188,7 +187,7 @@ switch_CN(*) {
         }
     }
     Sleep(50)
-    if (!isShift && !isCN()) {
+    if (!isCN()) {
         SendInput("{LShift}")
         Sleep(50)
         if (!isCN()) {
@@ -205,7 +204,6 @@ switch_CN(*) {
  * switch_EN()
  */
 switch_EN(*) {
-    isShift := GetKeyState("Shift", "P")
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -215,7 +213,7 @@ switch_EN(*) {
         }
     }
     Sleep(50)
-    if (!isShift && isCN()) {
+    if (isCN()) {
         SendInput("{LShift}")
         Sleep(50)
         if (isCN()) {

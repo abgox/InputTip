@@ -78,8 +78,13 @@ checkVersion(currentVersion, callback, urls := [
 /**
  * 检查更新并弹出确认框
  */
-checkUpdate(init := 0) {
+checkUpdate(init := 0, once := false) {
     if (checkUpdateDelay) {
+        updateTitle := "InputTip - 有新版本啦，快点击更新体验新版本吧!   "
+        if (once) {
+            checkUpdateTimer()
+            return
+        }
         if (init) {
             checkUpdateTimer()
         }
@@ -89,18 +94,19 @@ checkUpdate(init := 0) {
                 SetTimer(checkUpdateTimer, 0)
                 return
             }
+            if (gc.init) {
+                return
+            }
             if (A_IsCompiled) {
                 checkVersion(currentVersion, updateConfirm)
                 updateConfirm(newVersion, url) {
-                    if (WinExist("InputTip - 有新版本啦，快点击更新体验新版本吧!   ")) {
+                    if (WinExist(updateTitle)) {
                         SetTimer(checkUpdateTimer, 0)
                         return
                     }
-                    createGui(fn).Show()
-                    fn(x, y, w, h) {
-                        g := Gui("AlwaysOnTop", "InputTip - 有新版本啦，快点击更新体验新版本吧!   ")
-                        g.SetFont(fz, "微软雅黑")
-                        bw := w - g.MarginX * 2
+                    createGui(updateGui).Show()
+                    updateGui(info) {
+                        g := createGuiOpt(updateTitle)
                         g.AddText(, "InputTip 有版本更新: ")
                         g.AddText("yp cff5050", currentVersion)
                         g.AddText("yp", ">")
@@ -108,10 +114,15 @@ checkUpdate(init := 0) {
                         g.AddText("xs", "---------------------------------------------------------")
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
                         g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n")
+                        if (info.i) {
+                            return g
+                        }
+                        w := info.w
+                        bw := w - g.MarginX * 2
                         y := g.AddButton("xs w" bw, "确认更新")
-                        y.OnEvent("Click", yes)
                         y.Focus()
-                        yes(*) {
+                        y.OnEvent("Click", e_yes)
+                        e_yes(*) {
                             g.Destroy()
                             releases := [
                                 "https://inputtip.pages.dev/releases/v2/InputTip.exe",
@@ -143,11 +154,9 @@ checkUpdate(init := 0) {
                             }
 
                             if (!done) {
-                                createGui(fn).Show()
-                                fn(x, y, w, h) {
-                                    g := Gui("AlwaysOnTop")
-                                    g.SetFont(fz, "微软雅黑")
-                                    bw := w - g.MarginX * 2
+                                createGui(errGui).Show()
+                                errGui(info) {
+                                    g := createGuiOpt()
                                     g.AddText("cRed", "InputTip 新版本下载错误!")
                                     g.AddText("xs cRed", "请手动下载最新版本的 InputTip.exe 文件并替换。")
                                     g.AddText(, "--------------------------------------------------")
@@ -157,9 +166,14 @@ checkUpdate(init := 0) {
                                     g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
                                     g.AddText("xs", "Gitee: :")
                                     g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+                                    if (info.i) {
+                                        return g
+                                    }
+                                    w := info.w
+                                    bw := w - g.MarginX * 2
                                     y := g.AddButton("xs w" bw, "我知道了")
-                                    y.OnEvent("Click", yes)
                                     y.Focus()
+                                    y.OnEvent("Click", yes)
                                     g.OnEvent("Close", yes)
                                     yes(*) {
                                         g.Destroy()
@@ -172,15 +186,15 @@ checkUpdate(init := 0) {
                                 }
                             }
                         }
-                        g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", no)
-                        no(*) {
+                        g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", e_no)
+                        e_no(*) {
                             g.Destroy()
                             global checkUpdateDelay := 0
                             writeIni("checkUpdateDelay", 0)
                             showMsg(["忽略版本更新成功!", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
                         }
-                        g.OnEvent("Close", close)
-                        close(*) {
+                        g.OnEvent("Close", e_close)
+                        e_close(*) {
                             g.Destroy()
                             checkUpdate()
                         }
@@ -190,15 +204,13 @@ checkUpdate(init := 0) {
             } else {
                 checkVersion(currentVersion, updatePrompt)
                 updatePrompt(newVersion, url) {
-                    if (WinExist("InputTip - 有新版本啦，快点击更新体验新版本吧!   ")) {
+                    if (WinExist(updateTitle)) {
                         SetTimer(checkUpdateTimer, 0)
                         return
                     }
                     createGui(fn).Show()
-                    fn(x, y, w, h) {
-                        g := Gui("AlwaysOnTop", "InputTip - 有新版本啦，快点击更新体验新版本吧!   ")
-                        g.SetFont(fz, "微软雅黑")
-                        bw := w - g.MarginX * 2
+                    fn(info) {
+                        g := createGuiOpt(updateTitle)
                         g.AddText(, "- 你正在通过项目源代码启动 InputTip")
                         g.AddText("xs", "- InputTip 有版本更新:")
                         g.AddText("yp cff5050", "v" currentVersion)
@@ -210,9 +222,14 @@ checkUpdate(init := 0) {
                         g.AddText("xs", "---------------------------------------------------------------------")
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+                        if (info.i) {
+                            return g
+                        }
+                        w := info.w
+                        bw := w - g.MarginX * 2
                         y := g.AddButton("w" bw, "我知道了")
-                        y.OnEvent("Click", yes)
                         y.Focus()
+                        y.OnEvent("Click", yes)
                         g.OnEvent("Close", yes)
                         yes(*) {
                             g.Destroy()
@@ -282,19 +299,19 @@ checkUpdateDone() {
         }
 
         try {
-            IniRead("InputTip.ini", "Config-v2", "charSymbol_CN_color")
+            IniRead("InputTip.ini", "Config-v2", "textSymbol_CN_color")
         } catch {
-            writeIni("charSymbol_CN_color", readIni("CN_color", "red"))
-            writeIni("charSymbol_EN_color", readIni("EN_color", "blue"))
-            writeIni("charSymbol_Caps_color", readIni("Caps_color", "green"))
-            writeIni("charSymbol_transparent", readIni('transparent', 222))
-            writeIni("charSymbol_offset_x", readIni('offset_x', 10))
-            writeIni("charSymbol_offset_y", readIni('offset_y', -30))
-            writeIni("charSymbol_border_type", readIni('border_type', 1))
+            writeIni("textSymbol_CN_color", readIni("CN_color", "red"))
+            writeIni("textSymbol_EN_color", readIni("EN_color", "blue"))
+            writeIni("textSymbol_Caps_color", readIni("Caps_color", "green"))
+            writeIni("textSymbol_transparent", readIni('transparent', 222))
+            writeIni("textSymbol_offset_x", readIni('offset_x', 10))
+            writeIni("textSymbol_offset_y", readIni('offset_y', -30))
+            writeIni("textSymbol_border_type", readIni('border_type', 1))
         }
 
-        createGui(fn).Show()
-        fn(x, y, w, h) {
+        createGui(doneGui).Show()
+        doneGui(info) {
             g := Gui("AlwaysOnTop", "InputTip - 版本更新完成")
             g.SetFont("s14", "微软雅黑")
             g.AddText(, "版本更新完成，当前版本: ")
@@ -302,9 +319,14 @@ checkUpdateDone() {
             g.AddText("xs", "-------------------------------------------")
             g.AddText("xs", "建议查看更新日志，了解最新变化")
             g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
-            y := g.AddButton("xs w" w, "我知道了")
-            y.OnEvent("Click", yes)
+            if (info.i) {
+                return g
+            }
+            w := info.w
+            bw := w - g.MarginX * 2
+            y := g.AddButton("xs w" bw, "我知道了")
             y.Focus()
+            y.OnEvent("Click", yes)
             yes(*) {
                 g.Destroy()
             }

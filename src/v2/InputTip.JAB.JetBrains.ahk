@@ -2,7 +2,7 @@
 
 #NoTrayIcon
 ;@AHK2Exe-SetName InputTip.JAB
-;@AHK2Exe-SetDescription InputTip(JAB 进程) - 一个输入法状态(中文/英文/大写锁定)提示工具
+;@AHK2Exe-SetDescription InputTip(JAB 进程) - 一个输入法状态提示工具
 
 #Include .\utils\IME.ahk
 #Include .\utils\ini.ahk
@@ -15,7 +15,7 @@ needSkip(exe_str) {
 }
 
 returnCanShowSymbol(&left, &top) {
-    GetCaretPosFromJetBrains(&left, &top)
+    GetCaretPosFromJAB(&left, &top)
     try {
         left += app_offset.%exe_name%.%isWhichScreen(screenList).num%.x
         top += app_offset.%exe_name%.%isWhichScreen(screenList).num%.y
@@ -27,13 +27,14 @@ returnCanShowSymbol(&left, &top) {
 
 /**
  * Gets the position of the caret with UIA, Acc or CaretGetPos.
- * Credit: plankoe (https://www.reddit.com/r/AutoHotkey/comments/ysuawq/get_the_caret_location_in_any_program/)
+ * @link https://www.reddit.com/r/AutoHotkey/comments/ysuawq/get_the_caret_location_in_any_program/
+ * @link https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439
  * @param X Value is set to the screen X-coordinate of the caret
  * @param Y Value is set to the screen Y-coordinate of the caret
  * @param W Value is set to the width of the caret
  * @param H Value is set to the height of the caret
  */
-GetCaretPosFromJetBrains(&X?, &Y?, &W?, &H?) {
+GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
     static JAB := InitJAB() ; Source: https://github.com/Elgin1/Java-Access-Bridge-for-AHK
     if JAB && (hWnd := WinExist("A")) && DllCall(JAB.module "\isJavaWindow", "ptr", hWnd, "CDecl Int") {
         if JAB.firstRun

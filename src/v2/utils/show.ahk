@@ -1,16 +1,19 @@
 updateDelay()
 
+; 鼠标悬浮在符号上
+isOverSymbol := 0
 while 1 {
     Sleep(delay)
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
         needShow := 1
-        ; if (symbolType) {
-        ;     if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-        ;         hideSymbol()
-        ;         continue
-        ;     }
-        ; }
+        if (symbolType) {
+            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
+                hideSymbol()
+                isOverSymbol := 1
+                continue
+            }
+        }
         try {
             exe_name := ProcessGetName(WinGetPID("A"))
             exe_str := ":" exe_name ":"
@@ -126,54 +129,4 @@ updateDelay() {
             }
         }
     }
-}
-loadCursor(type, change := 0) {
-    global lastCursor
-    if (changeCursor) {
-        if (type != lastCursor || change) {
-            for v in cursorInfo {
-                if (v.%type%) {
-                    DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%type%, "Ptr"), "Int", v.value)
-                }
-            }
-            lastCursor := type
-        }
-    }
-}
-loadSymbol(type, left, top) {
-    global lastSymbol
-    static old_top := 0
-    static old_left := 0
-
-    if (type = lastSymbol && left = old_left && top = old_top) {
-        return
-    }
-
-    hideSymbol()
-    if (!symbolType || !canShowSymbol) {
-        return
-    }
-    showConfig := "NA "
-    if (symbolType = 1) {
-        showConfig .= "x" left + pic_offset_x "y" top + pic_offset_y
-    } else if (symbolType = 2) {
-        showConfig .= "w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y
-    } else if (symbolType = 3) {
-        showConfig .= "x" left + offset_x "y" top + offset_y
-    }
-    if (symbolGui.%type%) {
-        symbolGui.%type%.Show(showConfig)
-    }
-
-    lastSymbol := type
-    old_top := top
-    old_left := left
-}
-hideSymbol() {
-    for v in ["CN", "EN", "Caps"] {
-        try {
-            symbolGui.%v%.Hide()
-        }
-    }
-    global lastSymbol := ""
 }

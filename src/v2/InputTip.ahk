@@ -2,20 +2,17 @@
 
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-UpdateManifest 1
-;@AHK2Exe-SetDescription InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具
-A_IconTip := "InputTip - 一个输入法状态(中文/英文/大写锁定)提示工具"
-
-;@Ahk2Exe-AddResource InputTipCursor.zip
-;@Ahk2Exe-AddResource InputTip.JAB.JetBrains.exe
+;@AHK2Exe-SetDescription InputTip - 一个输入法状态提示工具
+A_IconTip := "当前状态: 【运行中】`nInputTip - 一个输入法状态提示工具"
 
 #Include .\utils\ini.ahk
 #Include .\utils\IME.ahk
 #Include .\utils\check-version.ahk
 #Include .\menu\tray-menu.ahk
-
 #Include .\utils\tools.ahk
 #Include .\utils\app-list.ahk
 #Include .\utils\verify-file.ahk
+#Include .\utils\create-gui.ahk
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
@@ -23,13 +20,15 @@ fileLnk := filename ".lnk"
 ; 注册表: 开机自启动
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
 
-; GUI 控件(gui control)
 gc := {
+    init: 0,
+    timer: 0,
+    tab: 0,
     ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
     w: {
         ; 开机自启动
         startupGui: "",
-        ; 设置更新检测
+        ; 设置更新检查
         checkUpdateGui: "",
         ; 设置输入法模式
         inputModeGui: "",
@@ -49,7 +48,7 @@ gc := {
         appOffsetGui: "",
         offsetGui: "",
         ; 启用 JAB/JetBrains IDE 支持
-        enableJetBrainsGui: "",
+        enableJABGui: "",
         ; 应用列表
         blackListGui: "",
         whiteListGui: "",
@@ -59,8 +58,7 @@ gc := {
         subGui: "",
         customModeGui: "",
         shiftSwitchGui: "",
-    },
-    timer: 0
+    }
 }
 
 if (A_IsCompiled) {
@@ -73,10 +71,13 @@ if (A_IsCompiled) {
     ; 生成任务计划程序
     try {
         Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+        powershell := 1
+    } catch {
+        powershell := 0
     }
 } else {
-    favicon := A_ScriptDir "\..\favicon.ico"
-    TraySetIcon(favicon)
+    favicon := A_ScriptDir "\img\favicon.ico"
+    TraySetIcon(favicon, , 1)
 }
 
 checkIni() ; 检查配置文件
@@ -88,25 +89,6 @@ checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 #Include .\utils\var.ahk
 
 checkUpdate(1)
-
-cursorDir := readIni("cursorDir", "")
-picDir := readIni("picDir", ":")
-
-SetTimer(_getDirTimer, -1)
-_getDirTimer() {
-    _cursorDir := arrJoin(getCursorDir(), ":")
-    _picDir := arrJoin(getPicDir(), ":")
-    if (cursorDir != _cursorDir) {
-        global cursorDir := _cursorDir
-        writeIni("cursorDir", _cursorDir)
-    }
-    if (picDir != _picDir) {
-        global picDir := _picDir
-        writeIni("picDir", _picDir)
-    }
-}
-
-makeTrayMenu() ; 生成托盘菜单
 
 ; XXX: 快捷键修改后，必须重启再生效，不重启动态修改 Hotkey 会存在问题
 ; 中文快捷键
@@ -139,6 +121,25 @@ if (hotkey_Pause) {
     }
 }
 
+picDir := readIni("picDir", ":")
+cursorDir := readIni("cursorDir", "")
+
+SetTimer(getDirTimer, -1)
+getDirTimer() {
+    _picDir := arrJoin(getPicDir(), ":")
+    _cursorDir := arrJoin(getCursorDir(), ":")
+    if (picDir != _picDir) {
+        global picDir := _picDir
+        writeIni("picDir", _picDir)
+    }
+    if (cursorDir != _cursorDir) {
+        global cursorDir := _cursorDir
+        writeIni("cursorDir", _cursorDir)
+    }
+}
+
+makeTrayMenu() ; 生成托盘菜单
+
 needSkip(exe_str) {
     return InStr(modeList.JAB, exe_str)
 }
@@ -153,67 +154,6 @@ returnCanShowSymbol(&left, &top) {
 }
 
 #Include .\utils\show.ahk
-
-/**
- * - 用于创建 Gui 对象。
- * - 能够获取窗口最终的坐标和宽高，方便配置控件(如按钮宽度)。
- * @param {Func} fn 一个函数。
- * - 在此函数中正常创建 Gui，但是不能调用 `Show()` 方法，必须返回 Gui 对象。
- * - 函数接受 `4` 个形参(`x`/`y`/`w`/`h`)，分别是最终计算得到的窗口坐标和宽高。
- * - `4` 个形参即使不用，也不能省略，否则会报错。
- * - 在 `fn` 中直接/间接使用了其中任意形参的控件，在最终计算时会被忽略。
- * @returns {Gui} 返回 Gui 对象，通过调用 `Show()` 方法显示窗口。
- * @example
- * createGui(fn).Show()
- * fn(x,y,w,h){
- *   g := Gui("AlwaysOnTop")
- *   g.SetFont("s12", "微软雅黑")
- *   g.AddText(, "这是一个示例，4个形参不能省略")
- *   g.AddButton("w" w,"确定")
- *   ; ... 其他控件配置
- *   return g
- * }
- */
-createGui(fn) {
-    _g := fn(0, 0, 0, 0)
-    _g.Show("Hide")
-    _g.GetPos(&x, &y, &w, &h)
-    _g.Destroy()
-    return fn(x, y, w, h)
-}
-
-/**
- * 显示信息
- * @param {Array} msgList 字符串数组，每一项都会生成一个 Text 控件，控件之间有较大间距，如果不希望有间距，应该使用换行符拼接成一个字符串
- * @param {String} btnText 按钮文本，默认为 `确定`
- * @example
- * showMsg(["Hello`nWorld", "test"])
- */
-showMsg(msgList, btnText := "确定") {
-    g := Gui("AlwaysOnTop")
-    g.SetFont(fz, "微软雅黑")
-    g.MarginX := 0
-    g.AddLink("yp", "")
-    for item in msgList {
-        g.AddLink("xs", item)
-    }
-    g.Show("Hide")
-    g.GetPos(, , &Gui_width)
-    g.Destroy()
-
-    g := Gui("AlwaysOnTop")
-    g.SetFont(fz, "微软雅黑")
-    for item in msgList {
-        g.AddLink("w" Gui_width, item)
-    }
-    y := g.AddButton("w" Gui_width, btnText)
-    y.OnEvent("Click", yes)
-    y.Focus()
-    yes(*) {
-        g.Destroy()
-    }
-    g.Show()
-}
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk

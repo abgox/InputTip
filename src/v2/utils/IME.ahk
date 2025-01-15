@@ -1,37 +1,94 @@
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
- * @Tip 有所修改，外部必须提供变量 checkTimeout,statusModeEN,conversionModeEN
+ * @Tip 有所修改，外部必须提供变量 checkTimeout,baseStatus,statusMode,conversionMode,evenStatusMode,evenConversionMode
  * @example
- * statusModeEN := 0 ; 英文状态时的状态码
- * conversionModeEN := 0 ; 英文状态时的转换码
- * checkTimeout := 1000 ; 超时时间 单位：毫秒
+ * checkTimeout := 1000 ; 超时时间(单位：毫秒)
+ * baseStatus := 0 ; 以英文状态作为判断依据
+ * statusMode := 0 ; 状态码
+ * conversionMode := 0 ; 转换码
+ * evenStatusMode := "" ; 状态码规则
+ * evenConversionMode := "" ; 转换码规则
  * IME.GetInputMode() ; 获取当前输入法输入模式
  * IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
  */
 class IME {
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if (statusModeEN = "") {
-            if !this.GetOpenStatus(hwnd) {
+        if (statusMode = "" && evenStatusMode = "" && conversionMode = "" && evenConversionMode = "") {
+            if (!this.GetOpenStatus(hwnd)) {
                 return {
                     code: 0,
                     isCN: 0
                 }
             }
-        } else {
+
+            v := this.GetConversionMode(hwnd)
             return {
-                code: 0,
-                isCN: !(InStr(statusModeEN, ":" this.GetOpenStatus(hwnd) ":"))
+                code: v,
+                isCN: v & 1
             }
         }
-        if (conversionModeEN = "") {
-            return {
-                code: this.GetConversionMode(hwnd),
-                isCN: this.GetConversionMode(hwnd) & 1
+
+        ; 切换码
+        v := this.GetConversionMode(hwnd)
+        flag := v & 1
+
+        if (baseStatus) {
+            if (evenConversionMode != "") {
+                return {
+                    code: v,
+                    isCN: evenConversionMode ? !flag : flag
+                }
+            }
+            if (conversionMode != "") {
+                return {
+                    code: v,
+                    isCN: InStr(conversionMode, ":" v ":")
+                }
             }
         } else {
-            return {
-                code: this.GetConversionMode(hwnd),
-                isCN: !(InStr(conversionModeEN, ":" this.GetConversionMode(hwnd) ":"))
+            if (evenConversionMode != "") {
+                return {
+                    code: v,
+                    isCN: evenConversionMode ? flag : !flag
+                }
+            }
+            if (conversionMode != "") {
+                return {
+                    code: v,
+                    isCN: !(InStr(conversionMode, ":" v ":"))
+                }
+            }
+        }
+
+        ; 状态码
+        v := this.GetOpenStatus(hwnd)
+        flag := v & 1
+
+        if (baseStatus) {
+            if (evenStatusMode != "") {
+                return {
+                    code: v,
+                    isCN: evenStatusMode ? !flag : flag
+                }
+            }
+            if (statusMode != "") {
+                return {
+                    code: 0,
+                    isCN: InStr(statusMode, ":" v ":")
+                }
+            }
+        } else {
+            if (evenStatusMode != "") {
+                return {
+                    code: v,
+                    isCN: evenStatusMode ? flag : !flag
+                }
+            }
+            if (statusMode != "") {
+                return {
+                    code: 0,
+                    isCN: !(InStr(statusMode, ":" v ":"))
+                }
             }
         }
     }
@@ -154,7 +211,6 @@ isCN() {
  * switch_CN()
  */
 switch_CN(*) {
-    isShift := GetKeyState("Shift", "P")
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -164,7 +220,7 @@ switch_CN(*) {
         }
     }
     Sleep(50)
-    if (!isShift && !isCN()) {
+    if (!isCN()) {
         SendInput("{LShift}")
         Sleep(50)
         if (!isCN()) {
@@ -181,7 +237,6 @@ switch_CN(*) {
  * switch_EN()
  */
 switch_EN(*) {
-    isShift := GetKeyState("Shift", "P")
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -191,7 +246,7 @@ switch_EN(*) {
         }
     }
     Sleep(50)
-    if (!isShift && isCN()) {
+    if (isCN()) {
         SendInput("{LShift}")
         Sleep(50)
         if (isCN()) {

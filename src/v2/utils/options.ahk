@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetLanguage 0x0804
-;@Ahk2Exe-SetMainIcon ..\favicon.ico
+;@Ahk2Exe-SetMainIcon img\favicon.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 #SingleInstance Force
 #Warn All, Off
@@ -12,5 +12,5 @@ InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.30.2
-currentVersion := "2.30.2"
+;@AHK2Exe-SetVersion 2.31.0
+currentVersion := "2.31.0"

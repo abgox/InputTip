@@ -48,6 +48,7 @@ fn_startup(item, *) {
             g := createGuiOpt("InputTip - 设置开机自启动")
             g.AddLink(, '详情请查看: <a href="https://inputtip.pages.dev/FAQ/startup">关于开机自启动</a>')
             g.AddText(, "---------------------------------------------------------------------")
+
             if (info.i) {
                 return g
             }
@@ -97,11 +98,13 @@ fn_startup(item, *) {
                         g := createGuiOpt()
                         g.AddText("cRed", "添加注册表失败!")
                         g.AddText("cRed", "你需要考虑使用其他方式设置开机自启动")
+
                         if (info.i) {
                             return g
                         }
                         w := info.w
                         bw := w - g.MarginX * 2
+
 
                         g.AddButton("w" bw, "我知道了").OnEvent("Click", e_close)
                         e_close(*) {

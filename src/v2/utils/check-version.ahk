@@ -114,11 +114,13 @@ checkUpdate(init := 0, once := false) {
                         g.AddText("xs", "---------------------------------------------------------")
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
                         g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n")
+
                         if (info.i) {
                             return g
                         }
                         w := info.w
                         bw := w - g.MarginX * 2
+
                         y := g.AddButton("xs w" bw, "确认更新")
                         y.Focus()
                         y.OnEvent("Click", e_yes)
@@ -166,11 +168,13 @@ checkUpdate(init := 0, once := false) {
                                     g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
                                     g.AddText("xs", "Gitee: :")
                                     g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+
                                     if (info.i) {
                                         return g
                                     }
                                     w := info.w
                                     bw := w - g.MarginX * 2
+
                                     y := g.AddButton("xs w" bw, "我知道了")
                                     y.Focus()
                                     y.OnEvent("Click", yes)
@@ -191,7 +195,26 @@ checkUpdate(init := 0, once := false) {
                             g.Destroy()
                             global checkUpdateDelay := 0
                             writeIni("checkUpdateDelay", 0)
-                            showMsg(["忽略版本更新成功!", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
+                            createGui(doneGui).Show()
+                            doneGui(info) {
+                                g := createGuiOpt()
+                                g.AddText(, "InputTip 的")
+                                g.AddText("yp cRed", "版本更新检查")
+                                g.AddText("yp", "已忽略")
+                                g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
+
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+
+                                if (info.i) {
+                                    return g
+                                }
+
+                                g.AddButton("w" info.w, "我知道了").OnEvent("Click", yes)
+                                yes(*) {
+                                    g.Destroy()
+                                }
+                                return g
+                            }
                         }
                         g.OnEvent("Close", e_close)
                         e_close(*) {
@@ -222,11 +245,13 @@ checkUpdate(init := 0, once := false) {
                         g.AddText("xs", "---------------------------------------------------------------------")
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+
                         if (info.i) {
                             return g
                         }
                         w := info.w
                         bw := w - g.MarginX * 2
+
                         y := g.AddButton("w" bw, "我知道了")
                         y.Focus()
                         y.OnEvent("Click", yes)
@@ -240,7 +265,26 @@ checkUpdate(init := 0, once := false) {
                             g.Destroy()
                             global checkUpdateDelay := 0
                             writeIni("checkUpdateDelay", 0)
-                            showMsg(["忽略版本更新成功!", "如果你在使用过程中有任何问题，首先需要确定是否为最新版本。", "如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue", "Github 和其他相关地址可以在软件托盘菜单的 「关于」 中找到"], "我知道了")
+                            createGui(doneGui).Show()
+                            doneGui(info) {
+                                g := createGuiOpt()
+                                g.AddText(, "InputTip 的")
+                                g.AddText("yp cRed", "版本更新检查")
+                                g.AddText("yp", "已忽略")
+                                g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
+
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+
+                                if (info.i) {
+                                    return g
+                                }
+
+                                g.AddButton("w" info.w, "我知道了").OnEvent("Click", yes)
+                                yes(*) {
+                                    g.Destroy()
+                                }
+                                return g
+                            }
                         }
                         return g
                     }
@@ -319,11 +363,13 @@ checkUpdateDone() {
             g.AddText("xs", "-------------------------------------------")
             g.AddText("xs", "建议查看更新日志，了解最新变化")
             g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+
             if (info.i) {
                 return g
             }
             w := info.w
             bw := w - g.MarginX * 2
+
             y := g.AddButton("xs w" bw, "我知道了")
             y.Focus()
             y.OnEvent("Click", yes)

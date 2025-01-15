@@ -78,9 +78,9 @@ fn_switch_window(*) {
             gc.Caps_title := g.AddText("yp w" bw / 3, "大写锁定")
 
             if (symbolType = 3) {
-                c := textSymbol_CN_color ? "c" StrReplace(textSymbol_CN_color, "#") : ""
+                c := symbolConfig.textSymbol_CN_color ? "c" StrReplace(symbolConfig.textSymbol_CN_color, "#") : ""
             } else {
-                c := CN_color ? "c" StrReplace(CN_color, "#") : ""
+                c := symbolConfig.CN_color ? "c" StrReplace(symbolConfig.CN_color, "#") : ""
             }
             try {
                 gc.LV_CN := g.AddListView("xs -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["中文状态"])
@@ -93,9 +93,9 @@ fn_switch_window(*) {
             gc.LV_CN._type := "CN"
 
             if (symbolType = 3) {
-                c := textSymbol_EN_color ? "c" StrReplace(textSymbol_EN_color, "#") : ""
+                c := symbolConfig.textSymbol_EN_color ? "c" StrReplace(symbolConfig.textSymbol_EN_color, "#") : ""
             } else {
-                c := EN_color ? "c" StrReplace(EN_color, "#") : ""
+                c := symbolConfig.EN_color ? "c" StrReplace(symbolConfig.EN_color, "#") : ""
             }
             try {
                 gc.LV_EN := g.AddListView("yp -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["英文状态"])
@@ -108,9 +108,9 @@ fn_switch_window(*) {
             gc.LV_EN._type := "EN"
 
             if (symbolType = 3) {
-                c := textSymbol_Caps_color ? "c" StrReplace(textSymbol_Caps_color, "#") : ""
+                c := symbolConfig.textSymbol_Caps_color ? "c" StrReplace(symbolConfig.textSymbol_Caps_color, "#") : ""
             } else {
-                c := Caps_color ? "c" StrReplace(Caps_color, "#") : ""
+                c := symbolConfig.Caps_color ? "c" StrReplace(symbolConfig.Caps_color, "#") : ""
             }
             try {
                 gc.LV_Caps := g.AddListView("yp -Hdr -LV0x10 -Multi r5 NoSortHdr Sort Grid w" bw / 3 " " c, ["大写锁定"])

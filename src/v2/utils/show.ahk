@@ -160,14 +160,28 @@ loadSymbol(state, left, top) {
     }
     showConfig := "NA "
     if (symbolType = 1) {
-        showConfig .= "x" left + pic_offset_x "y" top + pic_offset_y
+        _ := symbolConfig.enableIsolateConfigPic
+        x := _ ? symbolConfig.%"pic_offset_x" state% : symbolConfig.pic_offset_x
+        y := _ ? symbolConfig.%"pic_offset_y" state% : symbolConfig.pic_offset_y
+
+        showConfig .= "x" left + x "y" top + y
     } else if (symbolType = 2) {
-        showConfig .= "w" symbol_width "h" symbol_height "x" left + offset_x "y" top + offset_y
+        _ := symbolConfig.enableIsolateConfigBlock
+        w := _ ? symbolConfig.%"symbol_width" state% : symbolConfig.symbol_width
+        h := _ ? symbolConfig.%"symbol_height" state% : symbolConfig.symbol_height
+        x := _ ? symbolConfig.%"offset_x" state% : symbolConfig.offset_x
+        y := _ ? symbolConfig.%"offset_y" state% : symbolConfig.offset_y
+
+        showConfig .= "w" w "h" h "x" left + x "y" top + y
     } else if (symbolType = 3) {
-        showConfig .= "x" left + textSymbol_offset_x "y" top + textSymbol_offset_y
+        _ := symbolConfig.enableIsolateConfigText
+        x := _ ? symbolConfig.%"textSymbol_offset_x" state% : symbolConfig.textSymbol_offset_x
+        y := _ ? symbolConfig.%"textSymbol_offset_y" state% : symbolConfig.textSymbol_offset_y
+
+        showConfig .= "x" left + x "y" top + y
     }
-    if (symbolInfo.%"gui_" state%) {
-        symbolInfo.%"gui_" state%.Show(showConfig)
+    if (symbolGui.%state%) {
+        symbolGui.%state%.Show(showConfig)
     }
 
     lastSymbol := state
@@ -177,7 +191,7 @@ loadSymbol(state, left, top) {
 hideSymbol() {
     for state in ["CN", "EN", "Caps"] {
         try {
-            symbolInfo.%"gui_" state%.Hide()
+            symbolGui.%state%.Hide()
         }
     }
     global lastSymbol := ""

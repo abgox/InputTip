@@ -84,25 +84,6 @@ checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 
 checkUpdate(1)
 
-cursorDir := readIni("cursorDir", "")
-picDir := readIni("picDir", ":")
-
-SetTimer(_getDirTimer, -1)
-_getDirTimer() {
-    _cursorDir := arrJoin(getCursorDir(), ":")
-    _picDir := arrJoin(getPicDir(), ":")
-    if (cursorDir != _cursorDir) {
-        global cursorDir := _cursorDir
-        writeIni("cursorDir", _cursorDir)
-    }
-    if (picDir != _picDir) {
-        global picDir := _picDir
-        writeIni("picDir", _picDir)
-    }
-}
-
-makeTrayMenu() ; 生成托盘菜单
-
 ; XXX: 快捷键修改后，必须重启再生效，不重启动态修改 Hotkey 会存在问题
 ; 中文快捷键
 hotkey_CN := readIni('hotkey_CN', '')
@@ -134,6 +115,25 @@ if (hotkey_Pause) {
     }
 }
 
+picDir := readIni("picDir", ":")
+cursorDir := readIni("cursorDir", "")
+
+SetTimer(getDirTimer, -1)
+getDirTimer() {
+    _picDir := arrJoin(getPicDir(), ":")
+    _cursorDir := arrJoin(getCursorDir(), ":")
+    if (picDir != _picDir) {
+        global picDir := _picDir
+        writeIni("picDir", _picDir)
+    }
+    if (cursorDir != _cursorDir) {
+        global cursorDir := _cursorDir
+        writeIni("cursorDir", _cursorDir)
+    }
+}
+
+makeTrayMenu() ; 生成托盘菜单
+
 needSkip(exe_str) {
     return InStr(modeList.JAB, exe_str)
 }
@@ -148,37 +148,6 @@ returnCanShowSymbol(&left, &top) {
 }
 
 #Include .\utils\show.ahk
-
-/**
- * 显示信息
- * @param {Array} msgList 字符串数组，每一项都会生成一个 Text 控件，控件之间有较大间距，如果不希望有间距，应该使用换行符拼接成一个字符串
- * @param {String} btnText 按钮文本，默认为 `确定`
- * @example
- * showMsg(["Hello`nWorld", "test"])
- */
-showMsg(msgList, btnText := "确定") {
-    g := createGuiOpt()
-    g.MarginX := 0
-    g.AddLink("yp", "")
-    for item in msgList {
-        g.AddLink("xs", item)
-    }
-    g.Show("Hide")
-    g.GetPos(, , &Gui_width)
-    g.Destroy()
-
-    g := createGuiOpt()
-    for item in msgList {
-        g.AddLink("w" Gui_width, item)
-    }
-    y := g.AddButton("w" Gui_width, btnText)
-    y.Focus()
-    y.OnEvent("Click", yes)
-    yes(*) {
-        g.Destroy()
-    }
-    g.Show()
-}
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk

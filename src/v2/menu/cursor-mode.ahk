@@ -237,83 +237,83 @@ fn_cursor_mode(*) {
                             _ := g.AddButton(opt " w" bw / 4, v)
                             _._mode := v
                             _.OnEvent("Click", e_handle)
-                            e_handle(item, *) {
-                                to := item._mode
-                                exe_name := gc._exe_name.value
-                                g.Destroy()
-                                if (!RegExMatch(exe_name, "^.+\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
-                                    if (gc.w.subGui) {
-                                        gc.w.subGui.Destroy()
-                                        gc.w.subGui := ""
-                                    }
-                                    createGui(errGui).Show()
-                                    errGui(info) {
-                                        g := createGuiOpt()
-                                        g.AddText("cRed", exe_name)
-                                        g.AddText("yp", "是一个错误的应用进程名称")
-                                        g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
+                        }
+                        e_handle(item, *) {
+                            to := item._mode
+                            exe_name := gc._exe_name.value
+                            g.Destroy()
+                            if (!RegExMatch(exe_name, "^.+\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
+                                if (gc.w.subGui) {
+                                    gc.w.subGui.Destroy()
+                                    gc.w.subGui := ""
+                                }
+                                createGui(errGui).Show()
+                                errGui(info) {
+                                    g := createGuiOpt()
+                                    g.AddText("cRed", exe_name)
+                                    g.AddText("yp", "是一个错误的应用进程名称")
+                                    g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
 
-                                        if (info.i) {
-                                            return g
-                                        }
-                                        w := info.w
-                                        bw := w - g.MarginX * 2
-
-                                        y := g.AddButton("xs w" bw, "重新输入")
-                                        y.Focus()
-                                        y.OnEvent("click", e_close)
-                                        e_close(*) {
-                                            g.Destroy()
-                                            addApp(exe_name)
-                                        }
-                                        gc.w.subGui := g
+                                    if (info.i) {
                                         return g
                                     }
-                                    return
-                                }
+                                    w := info.w
+                                    bw := w - g.MarginX * 2
 
-                                config := "cursor_mode_" to
-                                value := readIni(config, "")
-
-                                if (InStr(":" value ":", ":" exe_name ":")) {
-                                    if (gc.w.subGui) {
-                                        gc.w.subGui.Destroy()
-                                        gc.w.subGui := ""
+                                    y := g.AddButton("xs w" bw, "重新输入")
+                                    y.Focus()
+                                    y.OnEvent("click", e_close)
+                                    e_close(*) {
+                                        g.Destroy()
+                                        addApp(exe_name)
                                     }
-                                    createGui(existGui).Show()
-                                    existGui(info) {
-                                        g := createGuiOpt()
-                                        g.AddText("cRed", exe_name)
-                                        g.AddText("yp", "这个应用进程已经存在了")
-
-                                        if (info.i) {
-                                            return g
-                                        }
-                                        w := info.w
-                                        bw := w - g.MarginX * 2
-
-                                        g.AddButton("xs w" bw, "重新输入").OnEvent("click", e_close)
-                                        e_close(*) {
-                                            g.Destroy()
-                                            addApp(exe_name)
-                                        }
-                                        gc.w.subGui := g
-                                        return g
-                                    }
-                                    return
+                                    gc.w.subGui := g
+                                    return g
                                 }
-
-                                gc.%"LV_" to%.Add(, exe_name)
-                                v := gc.%to "_title"%.Value
-                                gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
-                                if (value) {
-                                    writeIni(config, value ":" exe_name)
-                                } else {
-                                    writeIni(config, exe_name)
-                                }
-                                updateWhiteList(exe_name)
-                                updateCursorMode(config != "cursor_mode_JAB")
+                                return
                             }
+
+                            config := "cursor_mode_" to
+                            value := readIni(config, "")
+
+                            if (InStr(":" value ":", ":" exe_name ":")) {
+                                if (gc.w.subGui) {
+                                    gc.w.subGui.Destroy()
+                                    gc.w.subGui := ""
+                                }
+                                createGui(existGui).Show()
+                                existGui(info) {
+                                    g := createGuiOpt()
+                                    g.AddText("cRed", exe_name)
+                                    g.AddText("yp", "这个应用进程已经存在了")
+
+                                    if (info.i) {
+                                        return g
+                                    }
+                                    w := info.w
+                                    bw := w - g.MarginX * 2
+
+                                    g.AddButton("xs w" bw, "重新输入").OnEvent("click", e_close)
+                                    e_close(*) {
+                                        g.Destroy()
+                                        addApp(exe_name)
+                                    }
+                                    gc.w.subGui := g
+                                    return g
+                                }
+                                return
+                            }
+
+                            gc.%"LV_" to%.Add(, exe_name)
+                            v := gc.%to "_title"%.Value
+                            gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
+                            if (value) {
+                                writeIni(config, value ":" exe_name)
+                            } else {
+                                writeIni(config, exe_name)
+                            }
+                            updateWhiteList(exe_name)
+                            updateCursorMode(config != "cursor_mode_JAB")
                         }
                         gc.w.subGui := g
                         return g

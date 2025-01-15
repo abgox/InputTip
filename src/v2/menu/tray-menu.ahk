@@ -177,11 +177,13 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     g.AddLink("yp cRed", exe_name)
                     g.AddLink("yp", tipList.%from "Confirm2"%)
                     g.AddLink("xs", tipList.%from "Confirm3"%)
+
                     if (info.i) {
                         return g
                     }
                     w := info.w
                     bw := w - g.MarginX * 2
+
                     if (from = "add") {
                         _ := g.AddButton("xs w" bw, "添加")
                         _.Focus()

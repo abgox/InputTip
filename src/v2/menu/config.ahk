@@ -52,7 +52,7 @@ fn_config(*) {
                 createGui(doingGui).Show()
                 doingGui(info) {
                     g := createGuiOpt()
-                    g.AddText(, "正在尝试恢复到使用 InputTip 之前的鼠标样式")
+                    g.AddText(, "正在尝试恢复到启动 InputTip 之前的鼠标样式")
                     g.AddText("cRed", "可能无法完全恢复，你需要进行以下额外步骤或者重启系统:`n1. 进入「系统设置」=>「蓝牙和其他设备」=>「鼠标」=>「其他鼠标设置」`n2. 先更改为另一个鼠标样式方案，再改回你之前使用的方案")
 
                     if (info.i) {
@@ -83,10 +83,10 @@ fn_config(*) {
         e_symbol_type(item, *) {
             writeIni("symbolType", item.value - 1)
             global symbolType := item.value - 1
-            hideSymbol()
             updateSymbol()
-            reloadSymbol()
-            gc._focusSymbol.Focus()
+            if (symbolType) {
+                gc._focusSymbol.Focus()
+            }
         }
         g.AddText("yp w20")
         gc._focusSymbol := g.AddEdit("yp w1")
@@ -157,16 +157,16 @@ fn_config(*) {
             _ := g.AddDropDownList("xs r9 w" bw, dirList)
             _._config := v "_cursor"
             _.OnEvent("Change", e_cursor_dir)
-            e_cursor_dir(item, *) {
-                writeIni(item._config, item.Text)
-                updateCursor()
-                reloadCursor()
-            }
             try {
                 _.Text := %v "_cursor"%
             } catch {
                 _.Text := ""
             }
+        }
+        e_cursor_dir(item, *) {
+            writeIni(item._config, item.Text)
+            updateCursor()
+            reloadCursor()
         }
         g.AddButton("xs w" bw, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
         e_cursor_package(*) {
@@ -214,24 +214,95 @@ fn_config(*) {
             g.AddText(v.textOpt, v.tip ": ")
             _ := g.AddEdit("yp " v.editOpt " w" bw / 8)
             _._config := v.config
-            _.Value := readIni(v.config, 0)
+            _.Value := symbolConfig.%v.config%
             _.OnEvent("Change", e_pic_config)
-            e_pic_config(item, *) {
-                writeIni(item._config, returnNumber(item.value))
-                hideSymbol()
+        }
+        e_pic_config(item, *) {
+            writeIni(item._config, returnNumber(item.value))
+            updateSymbol()
+            restartJetBrains()
+        }
+
+        fn_setIsolateConfig(item, *) {
+            writeIni(item._config, item.value - 1)
+            updateSymbol()
+        }
+        fn_writeIsolateConfig(item, *) {
+            if (InStr(item._config, "color")) {
+                writeIni(item._config, item.Value)
+            } else {
+                writeIni(item._config, returnNumber(item.Value))
+            }
+            if (item._update) {
                 updateSymbol()
-                reloadSymbol()
                 restartJetBrains()
             }
         }
-        ; todo
+
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "图片符号")
         g.AddText("yp", "的独立配置: ")
-        g.AddDropDownList("yp AltSubmit w" bw / 2, ["【否】禁用独立配置，则上方的统一配置生效", "【是】启用独立配置，则上方的统一配置无效"])
+        _ := g.AddDropDownList("yp AltSubmit w" bw / 2, ["【否】禁用独立配置，则上方的统一配置生效", "【是】启用独立配置，则上方的统一配置无效"])
+        _.Value := symbolConfig.enableIsolateConfigPic + 1
+        _.OnEvent("Change", fn_setIsolateConfig)
+        _._config := "enableIsolateConfigPic"
+
+
         g.AddButton("xs w" bw, "设置图片符号在不同状态下的独立配置").OnEvent("Click", e_picIsolateConfig)
         e_picIsolateConfig(*) {
+            if (gc.w.subGui) {
+                gc.w.subGui.Destroy()
+                gc.w.subGui := ""
+            }
+            createGui(picConfigGui).Show()
+            picConfigGui(info) {
+                g := createGuiOpt("InputTip - 设置图片符号的独立配置")
+                g.AddText("cRed", "图片符号")
+                g.AddText("yp", "的独立配置")
+                g.AddText("xs", "------------------------------------------------------------------------")
 
+                if (info.i) {
+                    return g
+                }
+
+                configList := [{
+                    config: "pic_offset_x",
+                    textOpt: "xs",
+                    editOpt: "",
+                    tip: "水平偏移量"
+                }, {
+                    config: "pic_symbol_width",
+                    textOpt: "yp",
+                    editOpt: "Number",
+                    tip: "宽度"
+                }, {
+                    config: "pic_offset_y",
+                    textOpt: "xs",
+                    editOpt: "",
+                    tip: "垂直偏移量"
+                }, {
+                    config: "pic_symbol_height",
+                    textOpt: "yp",
+                    editOpt: "Number",
+                    tip: "高度"
+                }]
+                for state in ["CN", "EN", "Caps"] {
+                    g.AddText("xs cRed", stateMap.%state%)
+                    g.AddText("yp", "时的独立配置:")
+                    for v in configList {
+                        config := v.config state
+                        g.AddText(v.textOpt, v.tip)
+                        _g := g.AddEdit("yp " v.editOpt)
+                        _g.Value := symbolConfig.%config%
+                        _g._config := config
+                        _g._update := symbolType = 1 && symbolConfig.enableIsolateConfigPic
+                        _g.OnEvent("Change", fn_writeIsolateConfig)
+                    }
+                }
+                g.AddText()
+                gc.w.subGui := g
+                return g
+            }
         }
 
         dirList := StrSplit(picDir, ":")
@@ -257,16 +328,14 @@ fn_config(*) {
             _.OnEvent("Change", e_pic_path)
             e_pic_path(item, *) {
                 writeIni(item._config, item.Text)
-                hideSymbol()
                 updateSymbol()
-                reloadSymbol()
                 if (symbolType = 1) {
                     gc._focusSymbolPic.Focus()
                 }
             }
 
             try {
-                _.Text := readIni(v "_pic", "")
+                _.Text := symbolConfig.%v "_pic"%
             } catch {
                 _.Text := ""
             }
@@ -305,10 +374,6 @@ fn_config(*) {
             colors: ["green", "#4E9A06", "#96ED89", "#66BB6A", "#8BC34A", "#45BF55", "#43A047", "#2E7D32", "#33691E"]
         }]
         symbolBlockConfig := [{
-            config: "transparent",
-            editOpt: "Number Limit3",
-            tip: "方块符号的方块透明度"
-        }, {
             config: "offset_x",
             editOpt: "",
             tip: "方块符号的水平偏移量"
@@ -316,6 +381,10 @@ fn_config(*) {
             config: "offset_y",
             editOpt: "",
             tip: "方块符号的垂直偏移量"
+        }, {
+            config: "transparent",
+            editOpt: "Number Limit3",
+            tip: "方块符号的透明度"
         }, {
             config: "symbol_height",
             editOpt: "Number",
@@ -334,64 +403,131 @@ fn_config(*) {
             g.AddText("xs", v.tip ": ")
             _ := g.AddComboBox("yp " v.editOpt, v.colors)
             _._config := v.config
-            _.Text := readIni(v.config, "red")
+            _.Text := symbolConfig.%v.config%
             _.OnEvent("Change", e_color_config)
-            e_color_config(item, *) {
-                writeIni(item._config, item.Text)
-                hideSymbol()
-                updateSymbol()
-                reloadSymbol()
-            }
+        }
+        e_color_config(item, *) {
+            writeIni(item._config, item.Text)
+            updateSymbol()
         }
         for v in symbolBlockConfig {
             g.AddText("xs", v.tip ": ")
             _ := g.AddEdit("yp " v.editOpt)
             _._config := v.config
-            _.Value := readIni(v.config, 1)
+            _.Value := symbolConfig.%v.config%
             _.OnEvent("Change", e_block_config)
-            e_block_config(item, *) {
-                value := item.value
-                if (item._config = "transparent") {
-                    if (value = "") {
-                        return
-                    }
-                    if (value > 255) {
-                        value := 255
-                    }
+        }
+        e_block_config(item, *) {
+            value := item.value
+            if (item._config = "transparent") {
+                if (value = "") {
+                    return
                 }
-                writeIni(item._config, returnNumber(value))
-                hideSymbol()
-                updateSymbol()
-                reloadSymbol()
+                if (value > 255) {
+                    value := 255
+                }
+            }
+            writeIni(item._config, returnNumber(value))
+            updateSymbol()
+        }
+
+        fn_border_config(item, *) {
+            writeIni(item._config, item.value - 1)
+            updateSymbol()
+            if (symbolType) {
+                item._focus.Focus()
             }
         }
+
         symbolStyle := ["无", "样式1", "样式2", "样式3"]
         g.AddText("xs", "方块符号的边框样式: ")
         _ := g.AddDropDownList("yp AltSubmit", symbolStyle)
-        _.Value := readIni("border_type", "") + 1
-        _.OnEvent("Change", e_border_config)
-        e_border_config(item, *) {
-            writeIni("border_type", item.value - 1)
-            hideSymbol()
-            updateSymbol()
-            reloadSymbol()
-            if (symbolType = 2) {
-                gc._focusBlock.Focus()
-            }
-        }
+        _.Value := symbolConfig.border_type + 1
+        _._config := "border_type"
+        _.OnEvent("Change", fn_border_config)
         g.AddText("yp w20")
-        gc._focusBlock := g.AddEdit("yp w1")
-        gc._focusBlock.OnEvent("Focus", fn_clear)
-        gc._focusBlock.OnEvent("LoseFocus", fn_clear)
+        _._focus := g.AddEdit("yp w1")
+        _._focus.OnEvent("Focus", fn_clear)
+        _._focus.OnEvent("LoseFocus", fn_clear)
 
-        ; todo
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "方块符号")
         g.AddText("yp", "的独立配置: ")
-        g.AddDropDownList("yp AltSubmit w" bw / 2, ["【否】禁用独立配置，则上方的统一配置生效", "【是】启用独立配置，则上方的统一配置无效"])
+        _ := g.AddDropDownList("yp AltSubmit w" bw / 2, ["【否】禁用独立配置，则上方的统一配置生效", "【是】启用独立配置，则上方的统一配置无效"])
+        _.Value := symbolConfig.enableIsolateConfigBlock + 1
+        _.OnEvent("Change", fn_setIsolateConfig)
+        _._config := "enableIsolateConfigBlock"
+
         g.AddButton("xs w" bw, "设置方块符号在不同状态下的独立配置").OnEvent("Click", e_blockIsolateConfig)
         e_blockIsolateConfig(*) {
+            if (gc.w.subGui) {
+                gc.w.subGui.Destroy()
+                gc.w.subGui := ""
+            }
+            createGui(blockConfigGui).Show()
+            blockConfigGui(info) {
+                g := createGuiOpt("InputTip - 设置方块符号的独立配置")
+                g.AddText("cRed", "方块符号")
+                g.AddText("yp", "的独立配置")
+                g.AddText("xs", "------------------------------------------------------------------------")
 
+                if (info.i) {
+                    return g
+                }
+
+                configList := [{
+                    config: "offset_x",
+                    textOpt: "xs",
+                    editOpt: "",
+                    tip: "水平偏移量"
+                }, {
+                    config: "symbol_width",
+                    textOpt: "yp",
+                    editOpt: "Number",
+                    tip: "宽度"
+                }, {
+                    config: "offset_y",
+                    textOpt: "xs",
+                    editOpt: "",
+                    tip: "垂直偏移量"
+                }, {
+                    config: "symbol_height",
+                    textOpt: "yp",
+                    editOpt: "Number",
+                    tip: "高度"
+                }, {
+                    config: "transparent",
+                    textOpt: "xs",
+                    editOpt: "Number Limit3",
+                    tip: "透明度"
+                }]
+                for state in ["CN", "EN", "Caps"] {
+                    g.AddText("xs cRed", stateMap.%state%)
+                    g.AddText("yp", "时的独立配置:")
+                    for v in configList {
+                        config := v.config state
+                        g.AddText(v.textOpt, v.tip)
+                        _g := g.AddEdit("yp " v.editOpt)
+                        _g.Value := symbolConfig.%config%
+                        _g._config := config
+                        _g._update := symbolType = 2 && symbolConfig.enableIsolateConfigBlock
+                        _g.OnEvent("Change", fn_writeIsolateConfig)
+                    }
+                    config := "border_type" state
+                    g.AddText("xs", "边框样式: ")
+                    _ := g.AddDropDownList("yp AltSubmit", symbolStyle)
+                    _.Value := symbolConfig.%config% +1
+                    _._config := config
+                    _.OnEvent("Change", fn_border_config)
+                    g.AddText("yp w20")
+                    _._focus := g.AddEdit("yp w1")
+                    _._focus.OnEvent("Focus", fn_clear)
+                    _._focus.OnEvent("LoseFocus", fn_clear)
+                }
+                g.AddText()
+                gc.w.subGui := g
+                return g
+            }
         }
         tab.UseTab(5)
         g.AddText("Section", "1. 你应该首先查看")
@@ -469,7 +605,7 @@ fn_config(*) {
             g.AddText(v.textOpt, v.tip ": ")
             _ := g.AddEdit("yp " v.editOpt)
             _._config := v.config
-            _.Value := %v.config%
+            _.Value := symbolConfig.%v.config%
             _.OnEvent("Change", e_text_config)
         }
         e_text_config(item, *) {
@@ -485,38 +621,107 @@ fn_config(*) {
                 value := returnNumber(value)
             }
             writeIni(item._config, value)
-            hideSymbol()
             updateSymbol()
-            reloadSymbol()
-        }
-        symbolStyle := ["无", "样式1", "样式2", "样式3"]
-        g.AddText("xs", "文本符号的边框样式: ")
-        _ := g.AddDropDownList("yp AltSubmit", symbolStyle)
-        _.Value := readIni("textSymbol_border_type", "") + 1
-        _.OnEvent("Change", en_border_config2)
-        en_border_config2(item, *) {
-            writeIni("textSymbol_border_type", item.value - 1)
-            hideSymbol()
-            updateSymbol()
-            reloadSymbol()
-            if (symbolType = 3) {
-                gc._focusText.Focus()
-            }
         }
 
+        g.AddText("xs", "文本符号的边框样式: ")
+        _ := g.AddDropDownList("yp AltSubmit", symbolStyle)
+        _.Value := symbolConfig.textSymbol_border_type + 1
+        _._config := "textSymbol_border_type"
+        _.OnEvent("Change", fn_border_config)
         g.AddText("yp w20")
-        gc._focusText := g.AddEdit("yp w1")
-        gc._focusText.OnEvent("Focus", fn_clear)
-        gc._focusText.OnEvent("LoseFocus", fn_clear)
+        _._focus := g.AddEdit("yp w1")
+        _._focus.OnEvent("Focus", fn_clear)
+        _._focus.OnEvent("LoseFocus", fn_clear)
+
         g.AddText()
-        ; todo
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "文本符号")
         g.AddText("yp", "的独立配置: ")
-        g.AddDropDownList("yp AltSubmit w" bw / 2, ["【否】禁用独立配置，则上方的统一配置生效", "【是】启用独立配置，则上方的统一配置无效"])
+        _ := g.AddDropDownList("yp AltSubmit w" bw / 2, ["【否】禁用独立配置，则上方的统一配置生效", "【是】启用独立配置，则上方的统一配置无效"])
+        _.Value := symbolConfig.enableIsolateConfigText + 1
+        _.OnEvent("Change", fn_setIsolateConfig)
+        _._config := "enableIsolateConfigText"
         g.AddButton("xs w" bw, "设置文本符号在不同状态下的独立配置").OnEvent("Click", e_textIsolateConfig)
         e_textIsolateConfig(*) {
+            if (gc.w.subGui) {
+                gc.w.subGui.Destroy()
+                gc.w.subGui := ""
+            }
+            createGui(blockConfigGui).Show()
+            blockConfigGui(info) {
+                g := createGuiOpt("InputTip - 设置文本符号的独立配置")
+                g.AddText("cRed", "文本符号")
+                g.AddText("yp", "的独立配置")
+                g.AddText("xs", "-----------------------------------------------------------------------------------------------------------------------")
 
+                if (info.i) {
+                    return g
+                }
+
+                configList := [{
+                    config: "font_family",
+                    textOpt: "xs",
+                    editOpt: "",
+                    tip: "字符的字体"
+                }, {
+                    config: "font_size",
+                    textOpt: "yp",
+                    editOpt: "Number",
+                    tip: "字符的大小"
+                }, {
+                    config: "font_weight",
+                    textOpt: "yp",
+                    editOpt: "",
+                    tip: "字符的粗细"
+                }, {
+                    config: "font_color",
+                    textOpt: "xs",
+                    editOpt: "",
+                    tip: "字符的颜色"
+                }, {
+                    config: "textSymbol_offset_x",
+                    textOpt: "yp",
+                    editOpt: "",
+                    tip: "水平偏移量"
+                }, {
+                    config: "textSymbol_offset_y",
+                    textOpt: "yp",
+                    editOpt: "Number Limit3",
+                    tip: "垂直偏移量"
+                }, {
+                    config: "textSymbol_transparent",
+                    textOpt: "xs",
+                    editOpt: "Number Limit3",
+                    tip: "字符透明度"
+                }]
+                for state in ["CN", "EN", "Caps"] {
+                    g.AddText("xs cRed", stateMap.%state%)
+                    g.AddText("yp", "时的独立配置:")
+                    for v in configList {
+                        config := v.config state
+                        g.AddText(v.textOpt, v.tip)
+                        _g := g.AddEdit("yp " v.editOpt)
+                        _g.Value := symbolConfig.%config%
+                        _g._config := config
+                        _g._update := symbolType = 3 && symbolConfig.enableIsolateConfigText
+                        _g.OnEvent("Change", fn_writeIsolateConfig)
+                    }
+                    config := "textSymbol_border_type" state
+                    g.AddText("xs", "边框样式: ")
+                    _ := g.AddDropDownList("yp AltSubmit", symbolStyle)
+                    _.Value := symbolConfig.%config% +1
+                    _._config := config
+                    _.OnEvent("Change", fn_border_config)
+                    g.AddText("yp w20")
+                    _._focus := g.AddEdit("yp w1")
+                    _._focus.OnEvent("Focus", fn_clear)
+                    _._focus.OnEvent("LoseFocus", fn_clear)
+                }
+                g.AddText()
+                gc.w.subGui := g
+                return g
+            }
         }
         tab.UseTab(6)
         g.AddText("Section", "1. 所有配置菜单的字体大小: ")
@@ -602,16 +807,4 @@ fn_config(*) {
         return g
     }
     SetTimer(getDirTimer, -1)
-    getDirTimer() {
-        _cursorDir := arrJoin(getCursorDir(), ":")
-        _picDir := arrJoin(getPicDir(), ":")
-        if (cursorDir != _cursorDir) {
-            global cursorDir := _cursorDir
-            writeIni("cursorDir", _cursorDir)
-        }
-        if (picDir != _picDir) {
-            global picDir := _picDir
-            writeIni("picDir", _picDir)
-        }
-    }
 }

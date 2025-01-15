@@ -42,26 +42,8 @@ fn_switch_key(*) {
             _._config := v.config
             _._with := v.with
             _.OnEvent("Change", e_change_hotkey)
-            e_change_hotkey(item, *) {
-                static last := ""
-                if (last = item.value) {
-                    return
-                }
-                last := item.value
-
-                ; 同步修改到「设置组合快捷键」和「手动输入快捷键」
-                if (item.Text = "无") {
-                    key := ""
-                } else {
-                    key := "~" item.Text " Up"
-                }
-                gc.%item._config "2"%.Value := ""
-                gc.%item._config "3"%.Value := key
-                gc.%item._with%.Value := 0
-            }
 
             config := readIni(v.config, "")
-
             if (config ~= "^~\w+\sUp$") {
                 try {
                     _.Text := Trim(StrReplace(StrReplace(config, "~", ""), "Up", ""))
@@ -74,6 +56,23 @@ fn_switch_key(*) {
             } else {
                 _.Text := "无"
             }
+        }
+        e_change_hotkey(item, *) {
+            static last := ""
+            if (last = item.value) {
+                return
+            }
+            last := item.value
+
+            ; 同步修改到「设置组合快捷键」和「手动输入快捷键」
+            if (item.Text = "无") {
+                key := ""
+            } else {
+                key := "~" item.Text " Up"
+            }
+            gc.%item._config "2"%.Value := ""
+            gc.%item._config "3"%.Value := key
+            gc.%item._with%.Value := 0
         }
         tab.UseTab(2)
         g.AddText("Section", "1.")
@@ -91,25 +90,25 @@ fn_switch_key(*) {
             _._config := v.config
             _._with := v.with
             _.OnEvent("Change", e_change_hotkey1)
-            e_change_hotkey1(item, *) {
-                ; 同步修改到「设置单键」和「手动输入快捷键」
-                gc.%item._config%.Text := "无"
-                v := item.value
-                if (gc.%item._with%.Value) {
-                    v := "#" v
-                }
-                gc.%item._config "3"%.Value := v
-            }
             gc.%v.with% := g.AddCheckbox("yp", "Win 键")
             gc.%v.with%._config := v.config
             gc.%v.with%.OnEvent("Click", e_win_key)
-            e_win_key(item, *) {
-                ; 同步修改到「设置单键」和「手动输入快捷键」
-                gc.%item._config%.Text := "无"
-                v := gc.%item._config "2"%.Value
-                gc.%item._config "3"%.Value := item.value ? "#" v : v
-            }
             gc.%v.with%.Value := InStr(value, "#") ? 1 : 0
+        }
+        e_change_hotkey1(item, *) {
+            ; 同步修改到「设置单键」和「手动输入快捷键」
+            gc.%item._config%.Text := "无"
+            v := item.value
+            if (gc.%item._with%.Value) {
+                v := "#" v
+            }
+            gc.%item._config "3"%.Value := v
+        }
+        e_win_key(item, *) {
+            ; 同步修改到「设置单键」和「手动输入快捷键」
+            gc.%item._config%.Text := "无"
+            v := gc.%item._config "2"%.Value
+            gc.%item._config "3"%.Value := item.value ? "#" v : v
         }
         tab.UseTab(3)
         g.AddText("Section", "1.")
@@ -127,24 +126,24 @@ fn_switch_key(*) {
             _._with := v.with
             _.Value := readIni(v.config, '')
             _.OnEvent("Change", e_change_hotkey2)
-            e_change_hotkey2(item, *) {
-                gc.%item._with%.Value := InStr(item.value, "#") ? 1 : 0
-                ; 当输入的快捷键符合单键时，同步修改
-                if (item.value ~= "^~\w+\sUp$") {
-                    try {
-                        gc.%item._config%.Text := Trim(StrReplace(StrReplace(item.value, "~", ""), "Up", ""))
-                    } catch {
-                        gc.%item._config%.Text := "无"
-                    }
-                    gc.%item._config "2"%.Value := ""
-                } else {
+        }
+        e_change_hotkey2(item, *) {
+            gc.%item._with%.Value := InStr(item.value, "#") ? 1 : 0
+            ; 当输入的快捷键符合单键时，同步修改
+            if (item.value ~= "^~\w+\sUp$") {
+                try {
+                    gc.%item._config%.Text := Trim(StrReplace(StrReplace(item.value, "~", ""), "Up", ""))
+                } catch {
                     gc.%item._config%.Text := "无"
-                    ; 当输入的快捷键符合组合快捷键时，同步修改
-                    try {
-                        gc.%item._config "2"%.Value := StrReplace(item.value, "#", "")
-                    } catch {
-                        gc.%item._config "2"%.Value := ""
-                    }
+                }
+                gc.%item._config "2"%.Value := ""
+            } else {
+                gc.%item._config%.Text := "无"
+                ; 当输入的快捷键符合组合快捷键时，同步修改
+                try {
+                    gc.%item._config "2"%.Value := StrReplace(item.value, "#", "")
+                } catch {
+                    gc.%item._config "2"%.Value := ""
                 }
             }
         }

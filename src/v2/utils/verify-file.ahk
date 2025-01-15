@@ -64,6 +64,9 @@ checkIni() {
     if (!FileExist("InputTip.ini")) {
         gc.init := 1
 
+        ; 输入法模式
+        mode := readIni("mode", 1, "InputMethod")
+
         ; 是否使用白名单机制，如果是第一次使用，就直接使用白名单机制
         useWhiteList := readIni("useWhiteList", 1)
 
@@ -76,11 +79,13 @@ checkIni() {
             g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
             g.AddText("xs cRed", "InputTip 会根据不同输入法状态同步修改鼠标样式")
             g.AddEdit("xs Disabled -VScroll", "更多详情，请点击托盘菜单中的「关于」，前往官网或项目中查看")
+
             if (info.i) {
                 return g
             }
             w := info.w
             bw := w - g.MarginX * 2
+
             g.AddButton("xs cRed w" bw, "【是】修改鼠标样式").OnEvent("Click", e_yes)
             e_yes(*) {
                 g.Destroy()
@@ -90,11 +95,13 @@ checkIni() {
                     g.SetFont(fz, "微软雅黑")
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
                     g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 要不要同步修改鼠标样式」的值更改为【否】")
+
                     if (info.i) {
                         return g
                     }
                     w := info.w
                     bw := w - g.MarginX * 2
+
                     g.AddButton("xs cRed w" bw, "【是】对，我很确定").OnEvent("Click", e_yes)
                     e_yes(*) {
                         g.Destroy()
@@ -135,11 +142,13 @@ checkIni() {
             g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
             g.AddLink("cRed", '<a href="https://inputtip.pages.dev/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
             g.AddText(, "建议立即添加你常用的应用进程窗口到白名单中。")
+
             if (info.i) {
                 return g
             }
             w := info.w
             bw := w - g.MarginX * 2
+
             _c := g.AddButton("w" bw, "【是】现在去添加")
             _c.Focus()
             _c.OnEvent("Click", add_white_list)

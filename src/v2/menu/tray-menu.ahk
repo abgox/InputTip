@@ -39,9 +39,9 @@ makeTrayMenu() {
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("启用 JAB/JetBrains IDE 支持", fn_JAB)
-    if (enableJetBrainsSupport) {
+    if (enableJABSupport) {
         A_TrayMenu.Check("启用 JAB/JetBrains IDE 支持")
-        runJetBrains()
+        runJAB()
     }
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
@@ -56,7 +56,7 @@ fn_exit(*) {
     ExitApp()
 }
 fn_restart(flag := 0, *) {
-    if (flag || enableJetBrainsSupport) {
+    if (flag || enableJABSupport) {
         RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
     }
     Run(A_ScriptFullPath)
@@ -235,7 +235,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     return g
                 }
             }
-            g.AddButton("Section yp w" w / 2, "刷新应用进程列表").OnEvent("Click", e_refresh)
+            g.AddButton("Section yp w" w / 2, "刷新此界面").OnEvent("Click", e_refresh)
             e_refresh(*) {
                 fn_close()
                 showGui(deep)
@@ -450,7 +450,7 @@ fn_white_list(*) {
     fn(value) {
         global app_show_state := ":" value ":"
         gc.whiteListGui_LV_rm_title.Text := "符号显示白名单 ( " gc.whiteListGui_LV_rm.GetCount() " 个 )"
-        restartJetBrains()
+        restartJAB()
     }
 }
 
@@ -506,13 +506,53 @@ getPicDir() {
     picList.InsertAt(1, '')
     return picList
 }
-
 /**
- * @param runOrStop 1: Run; 0:Stop
+ * 启动 JAB 进程
+ * @returns {Integer} 1/0: 是否存在错误
  */
-runJetBrains() {
-    SetTimer(runAppTimer, -10)
+runJAB() {
+    if (!powershell && enableJABSupport) {
+        writeIni("enableJABSupport", "0")
+        global enableJABSupport := 0
+        A_TrayMenu.Uncheck("启用 JAB/JetBrains IDE 支持")
+        if (A_IsCompiled) {
+            try {
+                FileDelete("InputTip.JAB.JetBrains.exe")
+            }
+        }
+
+
+        if (gc.w.subGui) {
+            gc.w.subGui.Destroy()
+            gc.w.subGui := ""
+        }
+        createGui(errGui).Show()
+        errGui(info) {
+            g := createGuiOpt("InputTip - powershell 调用失败!")
+            g.AddText("cRed", "- 在当前系统环境中，尝试调用 powershell 失败了`n-「启用 JAB/JetBrains IDE 支持」这个功能将会被自动禁用")
+            g.AddText("cRed", "- 如果你想继续使用它，你需要解决 cmd 调用 powershell 失败的问题")
+
+            if (info.i) {
+                return g
+            }
+            w := info.w
+
+            g.AddButton("w" w, "我知道了").OnEvent("Click", e_close)
+            e_close(*) {
+                g.Destroy()
+            }
+            gc.w.subGui := g
+            return g
+        }
+        return 1
+    }
+    FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+    SetTimer(runAppTimer, 50)
     runAppTimer() {
+        if (WinExist("ahk_exe InputTip.JAB.JetBrains.exe")) {
+            SetTimer(, 0)
+            return
+        }
         if (A_IsAdmin) {
             try {
                 RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
@@ -522,4 +562,5 @@ runJetBrains() {
             Run(A_ScriptDir "\InputTip.JAB.JetBrains.exe", , "Hide")
         }
     }
+    return 0
 }

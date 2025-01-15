@@ -4,14 +4,16 @@ fontOpt := ["s" readIni("gui_font_size", "12"), "微软雅黑"]
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
 
-; 指定的英文状态码
-statusModeEN := readIni("statusModeEN", "", "InputMethod")
-; 指定的英文切换码
-conversionModeEN := readIni("conversionModeEN", "", "InputMethod")
+; 以哪一种状态作为判断依据
+baseStatus := readIni("baseStatus", 0, "InputMethod")
+; 指定的状态码
+statusMode := readIni("statusMode", "", "InputMethod")
+; 指定的切换码
+conversionMode := readIni("conversionMode", "", "InputMethod")
 
 ; 是否使用偶数
-evenStatusModeEN := readIni("evenStatusModeEN", "", "InputMethod")
-evenConversionModeEN := readIni("evenConversionModeEN", "", "InputMethod")
+evenStatusMode := readIni("evenStatusMode", "", "InputMethod")
+evenConversionMode := readIni("evenConversionMode", "", "InputMethod")
 
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
@@ -41,7 +43,28 @@ delay := readIni("delay", 50)
 isStartUp := readIni("isStartUp", 0)
 
 ; 启用 JAB/JetBrains 支持
-enableJetBrainsSupport := readIni("enableJetBrainsSupport", 0)
+enableJABSupport := readIni("enableJABSupport", 0)
+
+stateMap := {
+    CN: "中文状态",
+    1: "中文状态",
+    EN: "英文状态",
+    0: "英文状态",
+    Caps: "大写锁定"
+}
+
+left := 0, top := 0
+lastWindow := "", lastSymbol := "", lastCursor := ""
+
+needHide := 0
+exe_name := ""
+exe_str := "::"
+
+leaveDelay := delay + 500
+
+isWait := 0
+
+canShowSymbol := 0
 
 updateList(1)
 
@@ -120,32 +143,13 @@ for v in cursorInfo {
     }
 }
 
-stateMap := {
-    CN: "中文状态",
-    EN: "英文状态",
-    Caps: "大写锁定"
-}
-
-left := 0, top := 0
-lastWindow := "", lastSymbol := "", lastCursor := ""
-
-needHide := 0
-exe_name := ""
-exe_str := "::"
-
-leaveDelay := delay + 500
-
-isWait := 0
-
-canShowSymbol := 0
-
 updateSymbol(1)
 
 updateCursor(init := 0) {
     global CN_cursor, EN_cursor, Caps_cursor, cursorInfo
 
     if (!init) {
-        restartJetBrains()
+        restartJAB()
     }
 
     CN_cursor := readIni("CN_cursor", "InputTipCursor\default\CN")
@@ -169,6 +173,32 @@ updateCursor(init := 0) {
         }
     }
 }
+loadCursor(state, change := 0) {
+    global lastCursor
+    if (changeCursor) {
+        if (state != lastCursor || change) {
+            for v in cursorInfo {
+                if (v.%state%) {
+                    DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%state%, "Ptr"), "Int", v.value)
+                }
+            }
+            lastCursor := state
+        }
+    }
+}
+reloadCursor() {
+    if (changeCursor) {
+        if (GetKeyState("CapsLock", "T")) {
+            loadCursor("Caps", 1)
+        } else {
+            if (isCN()) {
+                loadCursor("CN", 1)
+            } else {
+                loadCursor("EN", 1)
+            }
+        }
+    }
+}
 
 updateSymbol(init := 0) {
     global symbolGui, symbolConfig
@@ -176,7 +206,7 @@ updateSymbol(init := 0) {
     hideSymbol()
 
     if (!init) {
-        restartJetBrains()
+        restartJAB()
     }
     ; 存放不同状态下的符号
     symbolGui := {
@@ -364,24 +394,52 @@ updateSymbol(init := 0) {
             }
         }
     }
-
-    reloadSymbol()
 }
-
-reloadCursor() {
-    if (changeCursor) {
-        if (GetKeyState("CapsLock", "T")) {
-            loadCursor("Caps", 1)
-        } else {
-            if (isCN()) {
-                loadCursor("CN", 1)
-            } else {
-                loadCursor("EN", 1)
-            }
+loadSymbol(state, left, top) {
+    global lastSymbol, isOverSymbol
+    static old_left := 0, old_top := 0
+    if (left = old_left && top = old_top) {
+        if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
+            return
         }
+    } else {
+        isOverSymbol := 0
     }
-}
 
+    hideSymbol()
+    if (!symbolType || !canShowSymbol) {
+        return
+    }
+    showConfig := "NA "
+    if (symbolType = 1) {
+        _ := symbolConfig.enableIsolateConfigPic
+        x := _ ? symbolConfig.%"pic_offset_x" state% : symbolConfig.pic_offset_x
+        y := _ ? symbolConfig.%"pic_offset_y" state% : symbolConfig.pic_offset_y
+
+        showConfig .= "x" left + x "y" top + y
+    } else if (symbolType = 2) {
+        _ := symbolConfig.enableIsolateConfigBlock
+        w := _ ? symbolConfig.%"symbol_width" state% : symbolConfig.symbol_width
+        h := _ ? symbolConfig.%"symbol_height" state% : symbolConfig.symbol_height
+        x := _ ? symbolConfig.%"offset_x" state% : symbolConfig.offset_x
+        y := _ ? symbolConfig.%"offset_y" state% : symbolConfig.offset_y
+
+        showConfig .= "w" w "h" h "x" left + x "y" top + y
+    } else if (symbolType = 3) {
+        _ := symbolConfig.enableIsolateConfigText
+        x := _ ? symbolConfig.%"textSymbol_offset_x" state% : symbolConfig.textSymbol_offset_x
+        y := _ ? symbolConfig.%"textSymbol_offset_y" state% : symbolConfig.textSymbol_offset_y
+
+        showConfig .= "x" left + x "y" top + y
+    }
+    if (symbolGui.%state%) {
+        symbolGui.%state%.Show(showConfig)
+    }
+
+    lastSymbol := state
+    old_top := top
+    old_left := left
+}
 reloadSymbol() {
     if (symbolType) {
         canShowSymbol := returnCanShowSymbol(&left, &top)
@@ -399,6 +457,14 @@ reloadSymbol() {
         }
     }
 }
+hideSymbol() {
+    for state in ["CN", "EN", "Caps"] {
+        try {
+            symbolGui.%state%.Hide()
+        }
+    }
+    global lastSymbol := ""
+}
 
 pauseApp(*) {
     if (A_IsPaused) {
@@ -406,28 +472,30 @@ pauseApp(*) {
         TraySetIcon("InputTipSymbol/default/favicon.png", , 1)
         A_IconTip := "当前状态: 【运行中】`nInputTip - 一个输入法状态提示工具"
         reloadSymbol()
-        if (enableJetBrainsSupport) {
-            runJetBrains()
+        if (enableJABSupport) {
+            runJAB()
         }
     } else {
         A_TrayMenu.Check("暂停/运行")
         TraySetIcon("InputTipSymbol/default/favicon-pause.png", , 1)
         A_IconTip := "当前状态: 【已暂停】`nInputTip - 一个输入法状态提示工具"
         hideSymbol()
-        if (enableJetBrainsSupport) {
+        if (enableJABSupport) {
             RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
         }
     }
     Pause(-1)
 }
-
-restartJetBrains() {
+restartJAB() {
     static done := 1
-    if (done && enableJetBrainsSupport) {
+    if (done && enableJABSupport) {
         SetTimer(restartAppTimer, -10)
         restartAppTimer() {
             done := 0
             RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+            if (!powershell) {
+                return
+            }
             if (A_IsAdmin) {
                 try {
                     RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
@@ -445,7 +513,7 @@ updateList(init := 0) {
     global
 
     if (!init) {
-        restartJetBrains()
+        restartJAB()
     }
     ; 应用列表: 符号显示黑名单
     app_hide_state := ":" readIni('app_hide_state', '') ":"
@@ -460,10 +528,26 @@ updateList(init := 0) {
     ; 应用列表: 自动切换到大写锁定
     app_Caps := ":" readIni('app_Caps', '') ":"
 }
+updateWhiteList(app) {
+    if (!useWhiteList) {
+        return
+    }
+    global app_show_state
+    _app_show_state := readIni("app_show_state", "")
+    if (!InStr(app_show_state, ":" app ":")) {
+        if (_app_show_state) {
+            _app_show_state .= ":" app
+        } else {
+            _app_show_state := app
+        }
+        app_show_state := ":" _app_show_state ":"
+        writeIni("app_show_state", _app_show_state)
+    }
+}
 updateAppOffset(init := 0) {
     global app_offset := {}
     if (!init) {
-        restartJetBrains()
+        restartJAB()
     }
     for i, v in StrSplit(readIni("app_offset", ""), ":") {
         part := StrSplit(v, "|")
@@ -479,7 +563,7 @@ updateAppOffset(init := 0) {
 updateCursorMode(init := 0) {
     global modeList
     if (!init) {
-        restartJetBrains()
+        restartJAB()
     }
     modeList := {
         HOOK: ":" arrJoin(defaultModeList.HOOK, ":") ":",
@@ -509,22 +593,5 @@ updateCursorMode(init := 0) {
     }
     for item in modeNameList {
         modeList.%item% .= %item% ":"
-    }
-}
-
-updateWhiteList(app) {
-    if (!useWhiteList) {
-        return
-    }
-    global app_show_state
-    _app_show_state := readIni("app_show_state", "")
-    if (!InStr(app_show_state, ":" app ":")) {
-        if (_app_show_state) {
-            _app_show_state .= ":" app
-        } else {
-            _app_show_state := app
-        }
-        app_show_state := ":" _app_show_state ":"
-        writeIni("app_show_state", _app_show_state)
     }
 }

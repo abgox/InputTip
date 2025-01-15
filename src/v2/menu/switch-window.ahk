@@ -249,7 +249,7 @@ fn_switch_window(*) {
                 }
             }
 
-            g.AddButton("xs w" bw / 3, "刷新应用进程列表").OnEvent("Click", e_refresh)
+            g.AddButton("xs w" bw / 3, "刷新此界面").OnEvent("Click", e_refresh)
             e_refresh(*) {
                 fn_close()
                 showGui(deep)

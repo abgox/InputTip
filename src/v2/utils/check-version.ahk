@@ -141,7 +141,7 @@ checkUpdate(init := 0, once := false) {
                                 }
                             }
                             if (done) {
-                                if (enableJetBrainsSupport) {
+                                if (enableJABSupport) {
                                     try {
                                         RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
                                         FileDelete("InputTip.JAB.JetBrains.exe")
@@ -203,7 +203,7 @@ checkUpdate(init := 0, once := false) {
                                 g.AddText("yp", "已忽略")
                                 g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
 
-                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
 
                                 if (info.i) {
                                     return g
@@ -273,7 +273,7 @@ checkUpdate(init := 0, once := false) {
                                 g.AddText("yp", "已忽略")
                                 g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
 
-                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 发起一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
 
                                 if (info.i) {
                                     return g
@@ -300,22 +300,32 @@ checkUpdate(init := 0, once := false) {
 checkUpdateDone() {
     if (FileExist(A_AppData "\.abgox-InputTip-update-version.txt")) {
         try {
-            JetBrains_list := IniRead("InputTip.ini", "Config-v2", "JetBrains_list")
-            writeIni("cursor_mode_JAB", JetBrains_list)
+            _ := IniRead("InputTip.ini", "Config-v2", "JetBrains_list")
+            writeIni("cursor_mode_JAB", _)
             IniDelete("InputTip.ini", "Config-v2", "JetBrains_list")
         }
         try {
+            _ := IniRead("InputTip.ini", "Config-v2", "enableJetBrainsSupport")
+            writeIni("enableJABSupport", _)
+            IniDelete("InputTip.ini", "Config-v2", "enableJetBrainsSupport")
+        }
+        try {
             ignoreUpdate := IniRead("InputTip.ini", "Config-v2", "ignoreUpdate")
-            if (ignoreUpdate) {
-                checkUpdateDelay := readIni("checkUpdateDelay", 0)
-            } else {
-                checkUpdateDelay := readIni("checkUpdateDelay", 1440)
-            }
+            _ := ignoreUpdate ? 0 : 1440
+            writeIni("checkUpdateDelay", _)
             IniDelete("InputTip.ini", "Config-v2", "ignoreUpdate")
         }
 
         try {
-            IniRead("InputTip.ini", "InputMethod", "statusModeEN")
+            _ := IniRead("InputTip.ini", "InputMethod", "statusModeEN")
+            writeIni("statusMode", _, "InputMethod")
+            writeIni("conversionMode", readIni("conversionModeEN", "", "InputMethod"), "InputMethod")
+            writeIni("evenStatusMode", readIni("evenStatusModeEN", "", "InputMethod"), "InputMethod")
+            writeIni("evenConversionMode", readIni("evenConversionModeEN", "", "InputMethod"), "InputMethod")
+            IniDelete("InputTip.ini", "InputMethod", "statusModeEN")
+            IniDelete("InputTip.ini", "InputMethod", "conversionModeEN")
+            IniDelete("InputTip.ini", "InputMethod", "evenStatusModeEN")
+            IniDelete("InputTip.ini", "InputMethod", "evenConversionModeEN")
         } catch {
             mode := readIni("mode", 1, "InputMethod")
             switch mode {
@@ -326,13 +336,13 @@ checkUpdateDone() {
                 case 3:
                 {
                     ; 讯飞输入法
-                    writeIni("evenStatusModeEN", "0", "InputMethod")
+                    writeIni("evenStatusMode", "0", "InputMethod")
                     writeIni("mode", 0, "InputMethod")
                 }
                 case 4:
                 {
                     ; 手心输入法
-                    writeIni("conversionModeEN", ":1:", "InputMethod")
+                    writeIni("conversionMode", ":1:", "InputMethod")
                     writeIni("mode", 0, "InputMethod")
                 }
             }

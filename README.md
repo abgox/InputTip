@@ -42,7 +42,7 @@
       - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
       - 在 [更多已适配的鼠标样式](https://inputtip.pages.dev/download/extra) 中有提供它们的左手镜像版本
   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-    - 默认使用 [白名单机制](https://inputtip.pages.dev/FAQ/about-white-list/)
+    - 默认使用 [白名单机制](https://inputtip.pages.dev/FAQ/white-list/)
   - 切换不同应用窗口时，自动切换指定的输入法状态(中文/英文/大写锁定)
   - 快捷键强制切换输入法状态
   - 详尽的自定义配置菜单
@@ -321,12 +321,17 @@
 
 - `【自定义】模式`
 
-  - 一个万能的模式，需要根据实际情况设置状态码和切换码
-  - 详情参考: [关于【自定义】模式](https://inputtip.pages.dev/FAQ/about-input-mode-custom)
-  - `设置输入法模式` => `自定义` 进行配置:
-    - [小狼毫(rime)输入法](https://rime.im/download/): 勾选 `切换码规则` 中的 `使用偶数`
-    - [讯飞输入法](https://srf.xunfei.cn/): 勾选 `状态码规则` 中的 `使用奇数`
-    - [手心输入法](https://www.xinshuru.com/): 在 `切换码数字`的输入框中填入 `1`
+  - 一个万能的模式，需要根据实际情况设置状态码(规则)和切换码(规则)
+  - 详情参考: [关于【自定义】模式](https://inputtip.pages.dev/FAQ/custom-input-mode)
+  - 可以通过 `设置输入法模式` => `自定义` 使用以下已知可用的配置:
+    - [小鹤音形](https://flypy.com/download/)
+      - 经过测试，`v10.11.4` 版本中，在 `切换码数字`的输入框中填入 `257` 即可
+    - [小狼毫(rime)输入法](https://rime.im/download/)
+      - 经过测试，`v0.16.1` 版本中，勾选 `切换码规则` 中的 `使用偶数` 即可
+    - [讯飞输入法](https://srf.xunfei.cn/)
+      - 经过测试，`v3.0` 版本中，勾选 `状态码规则` 中的 `使用奇数` 即可
+    - [手心输入法](https://www.xinshuru.com/)
+      - 经过测试，`v3.1` 版本中，在 `切换码数字`的输入框中填入 `1` 即可
       - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题。
 
 #### [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list)

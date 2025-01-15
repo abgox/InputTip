@@ -64,12 +64,18 @@ fn_startup(item, *) {
                 btnOpt := ' Disabled '
                 tip := ' (以管理员模式运行时可用)'
             }
-            btn := g.AddButton("w" w btnOpt, "使用「任务计划程序」" tip)
+
+            if (!btnOpt && !powershell) {
+                btn := g.AddButton("Disabled w" w btnOpt, "使用「任务计划程序」 (无法调用 powershell)")
+            } else {
+                btn := g.AddButton("w" w btnOpt, "使用「任务计划程序」" tip)
+            }
+
             btn.Focus()
             btn.OnEvent("Click", e_useTask)
             e_useTask(*) {
                 isStartUp := 1
-                FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
+                FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , favicon, , , 7)
                 fn_handle()
             }
             btn := g.AddButton("w" w, "使用应用快捷方式")
@@ -79,7 +85,7 @@ fn_startup(item, *) {
             btn.OnEvent("Click", e_useLnk)
             e_useLnk(*) {
                 isStartUp := 2
-                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , , A_ScriptFullPath, , , 7)
+                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , , favicon, , , 7)
                 fn_handle()
             }
             g.AddButton("w" w btnOpt, "使用「注册表」" tip).OnEvent("Click", e_useReg)

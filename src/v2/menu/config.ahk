@@ -7,16 +7,26 @@ fn_config(*) {
             gc.w.subGui := ""
         }
     }
+    if (gc.tab) {
+        getDirTimer()
+    } else {
+        SetTimer(getDirTimer, -1)
+    }
     line := "-------------------------------------------------------------------------------------------------------------"
     createGui(changeConfigGui).Show()
     changeConfigGui(info) {
         g := createGuiOpt("InputTip - 更改配置")
         ; tab := g.AddTab3("-Wrap 0x100", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号"])
         tab := g.AddTab3("-Wrap", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号", "其他杂项"])
+        tab.OnEvent("Change", e_tab)
+        e_tab(item, *) {
+            gc.tab := item.Value
+        }
+        if (gc.tab) {
+            tab.Value := gc.tab
+        }
         tab.UseTab(1)
-        g.AddLink("Section cRed", '你首先应该查看相关的说明文档: <a href="https://inputtip.pages.dev/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>')
-        g.AddText("xs", line)
-        g.AddText("xs cGray", "所有的配置项修改会实时生效，可以立即看到最新效果，但是更改时不要太快`n比如需要输入值的配置项，输入过快可能因为响应稍慢导致最新修改丢失，需要放缓输入速度`n")
+        g.AddLink("Section cRed", '你首先应该查看相关的说明文档: <a href="https://inputtip.pages.dev/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>                                              ')
 
         if (info.i) {
             return g
@@ -24,6 +34,8 @@ fn_config(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
+        g.AddText("xs", line)
+        g.AddText("xs cGray", "所有的配置项修改会实时生效，可以立即看到最新效果，但是更改时速度不要太快`n比如需要输入值的配置项，输入过快可能因为响应稍慢导致最新修改丢失，需要放缓输入速度`n")
         g.AddText("xs", "1. 要不要同步修改鼠标样式: ")
         _ := g.AddDropDownList("w" bw / 2 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
         g.AddText("xs cGray", "推荐设置为【是】，它与符号一起配合使用才是最完美的输入法状态提示方案")
@@ -75,7 +87,7 @@ fn_config(*) {
                 global changeCursor := 1
                 reloadCursor()
             }
-            restartJetBrains()
+            restartJAB()
         }
 
         g.addText("xs", "2. 在输入光标附近显示什么类型的符号: ")
@@ -84,6 +96,7 @@ fn_config(*) {
             writeIni("symbolType", item.value - 1)
             global symbolType := item.value - 1
             updateSymbol()
+            reloadSymbol()
             if (symbolType) {
                 gc._focusSymbol.Focus()
             }
@@ -113,7 +126,7 @@ fn_config(*) {
             writeIni("HideSymbolDelay", value)
             global HideSymbolDelay := value
             updateDelay()
-            restartJetBrains()
+            restartJAB()
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
         g.AddText("xs", "4. 每多少")
@@ -133,7 +146,7 @@ fn_config(*) {
             }
             writeIni("delay", value)
             global delay := value
-            restartJetBrains()
+            restartJAB()
         }
 
         ; g.AddUpDown("Range1-500", delay)
@@ -145,12 +158,15 @@ fn_config(*) {
         g.AddLink("yp", '的相关说明: <a href="https://inputtip.pages.dev/FAQ/cursor-style">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
         g.AddText("xs", line)
         g.AddText("xs Section cGray", "可以点击「下载鼠标样式扩展包」去下载已经适配的鼠标样式")
-        g.AddText("cRed", "如果列表中显示的鼠标样式文件夹路径不是最新的，请重新打开这个配置界面")
+        g.AddText("xs cGray", "如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
+        g.AddText("xs", line)
+        g.AddText("cRed", "如果列表中显示的鼠标样式文件夹路径不是最新的，请点击左下角的「刷新此界面」")
+        g.AddText("xs cGray", "InputTip 会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
+        g.AddText("Section", "选择鼠标样式文件夹路径:")
         dirList := StrSplit(cursorDir, ":")
         if (dirList.Length = 0) {
             dirList := getCursorDir()
         }
-        g.AddText("Section", "选择鼠标样式文件夹路径，InputTip 会使用其中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
         for i, v in ["CN", "EN", "Caps"] {
             g.AddText("xs", i ".")
             g.AddText("yp cRed", stateMap.%v%)
@@ -168,7 +184,8 @@ fn_config(*) {
             updateCursor()
             reloadCursor()
         }
-        g.AddButton("xs w" bw, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
+        g.AddButton("xs w" bw / 2, "刷新此界面").OnEvent("Click", fn_config)
+        g.AddButton("yp w" bw / 2, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
         e_cursor_package(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -176,10 +193,11 @@ fn_config(*) {
             }
             g := createGuiOpt("下载鼠标样式扩展包")
             g.AddText("Center h30", "从以下任意可用地址中下载鼠标样式扩展包:")
-            g.AddLink("xs", '<a href="https://inputtip.pages.dev/download/extra">https://inputtip.pages.dev/download/extra</a>')
-            g.AddLink("xs", '<a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
+            g.AddLink("xs", '官网: <a href="https://inputtip.pages.dev/download/extra">https://inputtip.pages.dev/download/extra</a>')
+            g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
+            g.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
             g.AddText(, "其中的鼠标样式已经完成适配，解压到 InputTipCursor 目录中即可使用")
+            g.AddText()
             g.Show()
             gc.w.subGui := g
         }
@@ -220,12 +238,14 @@ fn_config(*) {
         e_pic_config(item, *) {
             writeIni(item._config, returnNumber(item.value))
             updateSymbol()
-            restartJetBrains()
+            reloadSymbol()
+            restartJAB()
         }
 
         fn_setIsolateConfig(item, *) {
             writeIni(item._config, item.value - 1)
             updateSymbol()
+            reloadSymbol()
         }
         fn_writeIsolateConfig(item, *) {
             if (InStr(item._config, "color")) {
@@ -235,7 +255,8 @@ fn_config(*) {
             }
             if (item._update) {
                 updateSymbol()
-                restartJetBrains()
+                reloadSymbol()
+                restartJAB()
             }
         }
 
@@ -305,12 +326,12 @@ fn_config(*) {
             }
         }
 
+        g.AddText("xs Section cRed", "如果列表中显示的图片符号路径不是最新的，请点击左下角的「刷新此界面」")
+        g.AddText(, "选择图片符号的文件路径: ")
         dirList := StrSplit(picDir, ":")
         if (dirList.Length = 0) {
             dirList := getPicDir()
         }
-        g.AddText("xs Section cRed", "如果列表中显示的图片符号路径不是最新的，请重新打开这个配置界面")
-        g.AddText(, "选择图片符号的文件路径: ")
         for i, v in ["CN", "EN", "Caps"] {
             __ := g.AddText("xs", i ".")
             _ := g.AddText("yp cRed", stateMap.%v%)
@@ -329,6 +350,7 @@ fn_config(*) {
             e_pic_path(item, *) {
                 writeIni(item._config, item.Text)
                 updateSymbol()
+                reloadSymbol()
                 if (symbolType = 1) {
                     gc._focusSymbolPic.Focus()
                 }
@@ -340,7 +362,8 @@ fn_config(*) {
                 _.Text := ""
             }
         }
-        g.AddButton("xs w" bw, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
+        g.AddButton("xs w" bw / 2, "刷新此界面").OnEvent("Click", fn_config)
+        g.AddButton("yp w" bw / 2, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
         e_pic_package(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -348,10 +371,11 @@ fn_config(*) {
             }
             g := createGuiOpt("下载图片符号扩展包")
             g.AddText("Center h30", "从以下任意可用地址中下载图片符号扩展包:")
-            g.AddLink("xs", '<a href="https://inputtip.pages.dev/download/extra">https://inputtip.pages.dev/download/extra</a>')
-            g.AddLink("xs", '<a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddLink("xs", '<a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddText(, "将其中的图片解压到 InputTipSymbol 目录中即可使用")
+            g.AddLink("xs", '官网: <a href="https://inputtip.pages.dev/download/extra">https://inputtip.pages.dev/download/extra</a>')
+            g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
+            g.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
+            g.AddText(, "只要将其中的图片放到 InputTipSymbol 这个目录下就可以使用了")
+            g.AddText()
             g.Show()
             gc.w.subGui := g
         }
@@ -409,6 +433,7 @@ fn_config(*) {
         e_color_config(item, *) {
             writeIni(item._config, item.Text)
             updateSymbol()
+            reloadSymbol()
         }
         for v in symbolBlockConfig {
             g.AddText("xs", v.tip ": ")
@@ -429,11 +454,13 @@ fn_config(*) {
             }
             writeIni(item._config, returnNumber(value))
             updateSymbol()
+            reloadSymbol()
         }
 
         fn_border_config(item, *) {
             writeIni(item._config, item.value - 1)
             updateSymbol()
+            reloadSymbol()
             if (symbolType) {
                 item._focus.Focus()
             }
@@ -622,6 +649,7 @@ fn_config(*) {
             }
             writeIni(item._config, value)
             updateSymbol()
+            reloadSymbol()
         }
 
         g.AddText("xs", "文本符号的边框样式: ")
@@ -634,7 +662,6 @@ fn_config(*) {
         _._focus.OnEvent("Focus", fn_clear)
         _._focus.OnEvent("LoseFocus", fn_clear)
 
-        g.AddText()
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "文本符号")
         g.AddText("yp", "的独立配置: ")
@@ -797,6 +824,7 @@ fn_config(*) {
         g.OnEvent("Close", e_close)
         e_close(*) {
             g.Destroy()
+            gc.tab := 0
             gc.timer := 0
             try {
                 gc.w.subGui.Destroy()
@@ -806,5 +834,4 @@ fn_config(*) {
         gc.w.configGui := g
         return g
     }
-    SetTimer(getDirTimer, -1)
 }

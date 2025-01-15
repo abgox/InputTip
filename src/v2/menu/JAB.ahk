@@ -1,11 +1,11 @@
 fn_JAB(item, *) {
-    global enableJetBrainsSupport := !enableJetBrainsSupport
-    writeIni("enableJetBrainsSupport", enableJetBrainsSupport)
+    global enableJABSupport := !enableJABSupport
+    writeIni("enableJABSupport", enableJABSupport)
     A_TrayMenu.ToggleCheck(item)
-    if (enableJetBrainsSupport) {
-        FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-        waitFileInstall("InputTip.JAB.JetBrains.exe", 0)
-
+    if (enableJABSupport) {
+        if (runJAB()) {
+            return
+        }
         createGui(JABGui).Show()
         JABGui(info) {
             g := createGuiOpt("InputTip - 启用 JAB/JetBrains IDE 支持")
@@ -30,7 +30,6 @@ fn_JAB(item, *) {
             gc.w.enableJABGui := g
             return g
         }
-        runJetBrains()
     } else {
         if (gc.w.enableJABGui) {
             gc.w.enableJABGui.Destroy()
@@ -42,6 +41,8 @@ fn_JAB(item, *) {
                 RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
                 if (A_IsAdmin) {
                     Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
+                }
+                if (A_IsCompiled) {
                     try {
                         FileDelete("InputTip.JAB.JetBrains.exe")
                     }

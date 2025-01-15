@@ -22,7 +22,7 @@ fn_app_offset(*) {
         gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"
         writeIni("app_offset", "")
         global app_offset := {}
-        restartJetBrains()
+        restartJAB()
     }
 
     addClickFn(LV, RowNumber, tipList) {
@@ -144,7 +144,7 @@ fn_app_offset(*) {
                 _app_offset .= ":" SubStr(_info, 1, StrLen(_info) - 1)
             }
             writeIni("app_offset", SubStr(_app_offset, 2))
-            restartJetBrains()
+            restartJAB()
         }
 
         global app_offset

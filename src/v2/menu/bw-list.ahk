@@ -55,7 +55,7 @@ fn_bw_list(*) {
                 value := item.value - 1
                 writeIni("useWhiteList", value)
                 global useWhiteList := value
-                restartJetBrains()
+                restartJAB()
             }
         }
         g.AddEdit("xs Disabled", "如果使用「黑」名单，你需要承担未知的可能存在的窗口兼容性代价")
@@ -90,7 +90,7 @@ fn_bw_list(*) {
             fn(value) {
                 global app_hide_state := ":" value ":"
                 gc.blackListGui_LV_rm_title.Text := "符号显示黑名单 ( " gc.blackListGui_LV_rm.GetCount() " 个 )"
-                restartJetBrains()
+                restartJAB()
             }
         }
         gc.w.bwListGui := g

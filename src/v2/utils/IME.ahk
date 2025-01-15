@@ -1,18 +1,19 @@
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
- * @Tip 有所修改，外部必须提供变量 checkTimeout,statusModeEN,conversionModeEN,evenStatusModeEN,evenConversionModeEN
+ * @Tip 有所修改，外部必须提供变量 checkTimeout,baseStatus,statusMode,conversionMode,evenStatusMode,evenConversionMode
  * @example
- * statusModeEN := 0 ; 英文状态时的状态码
- * conversionModeEN := 0 ; 英文状态时的转换码
- * evenStatusModeEN := ""
- * evenConversionModeEN := ""
- * checkTimeout := 1000 ; 超时时间 单位：毫秒
+ * checkTimeout := 1000 ; 超时时间(单位：毫秒)
+ * baseStatus := 0 ; 以英文状态作为判断依据
+ * statusMode := 0 ; 状态码
+ * conversionMode := 0 ; 转换码
+ * evenStatusMode := "" ; 状态码规则
+ * evenConversionMode := "" ; 转换码规则
  * IME.GetInputMode() ; 获取当前输入法输入模式
  * IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
  */
 class IME {
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if (statusModeEN = "" && evenStatusModeEN = "" && conversionModeEN = "" && evenConversionModeEN = "") {
+        if (statusMode = "" && evenStatusMode = "" && conversionMode = "" && evenConversionMode = "") {
             if (!this.GetOpenStatus(hwnd)) {
                 return {
                     code: 0,
@@ -30,32 +31,64 @@ class IME {
         ; 切换码
         v := this.GetConversionMode(hwnd)
         flag := v & 1
-        if (evenConversionModeEN != "") {
-            return {
-                code: v,
-                isCN: evenConversionModeEN ? flag : !flag
+
+        if (baseStatus) {
+            if (evenConversionMode != "") {
+                return {
+                    code: v,
+                    isCN: evenConversionMode ? !flag : flag
+                }
             }
-        }
-        if (conversionModeEN != "") {
-            return {
-                code: v,
-                isCN: !(InStr(conversionModeEN, ":" v ":"))
+            if (conversionMode != "") {
+                return {
+                    code: v,
+                    isCN: InStr(conversionMode, ":" v ":")
+                }
+            }
+        } else {
+            if (evenConversionMode != "") {
+                return {
+                    code: v,
+                    isCN: evenConversionMode ? flag : !flag
+                }
+            }
+            if (conversionMode != "") {
+                return {
+                    code: v,
+                    isCN: !(InStr(conversionMode, ":" v ":"))
+                }
             }
         }
 
         ; 状态码
         v := this.GetOpenStatus(hwnd)
         flag := v & 1
-        if (evenStatusModeEN != "") {
-            return {
-                code: v,
-                isCN: evenStatusModeEN ? flag : !flag
+
+        if (baseStatus) {
+            if (evenStatusMode != "") {
+                return {
+                    code: v,
+                    isCN: evenStatusMode ? !flag : flag
+                }
             }
-        }
-        if (statusModeEN != "") {
-            return {
-                code: 0,
-                isCN: !(InStr(statusModeEN, ":" v ":"))
+            if (statusMode != "") {
+                return {
+                    code: 0,
+                    isCN: InStr(statusMode, ":" v ":")
+                }
+            }
+        } else {
+            if (evenStatusMode != "") {
+                return {
+                    code: v,
+                    isCN: evenStatusMode ? flag : !flag
+                }
+            }
+            if (statusMode != "") {
+                return {
+                    code: 0,
+                    isCN: !(InStr(statusMode, ":" v ":"))
+                }
             }
         }
     }

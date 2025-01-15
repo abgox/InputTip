@@ -23,6 +23,7 @@ HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Curre
 gc := {
     init: 0,
     timer: 0,
+    tab: 0,
     ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
     w: {
         ; 开机自启动
@@ -61,17 +62,22 @@ gc := {
 }
 
 if (A_IsCompiled) {
+    favicon := A_ScriptFullPath
     ; 生成特殊的快捷方式，它会通过任务计划程序启动
     if (!FileExist(fileLnk)) {
-        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , A_ScriptFullPath, , , 7)
+        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , favicon, , , 7)
     }
 
     ; 生成任务计划程序
     try {
         Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+        powershell := 1
+    } catch {
+        powershell := 0
     }
 } else {
-    TraySetIcon("InputTipSymbol\default\favicon.png", , 1)
+    favicon := A_ScriptDir "\img\favicon.ico"
+    TraySetIcon(favicon, , 1)
 }
 
 checkIni() ; 检查配置文件

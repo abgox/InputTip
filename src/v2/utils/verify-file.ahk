@@ -1,4 +1,4 @@
-dirList := ["InputTipSymbol", "InputTipSymbol\default"]
+dirList := ["InputTipSymbol", "InputTipSymbol\default", "InputTipCursor", "InputTipCursor\default", "InputTipCursor\default\CN", "InputTipCursor\default\EN", "InputTipCursor\default\Caps"]
 
 for d in dirList {
     if (!DirExist(d)) {
@@ -25,35 +25,143 @@ if (!FileExist("InputTipSymbol\default\favicon-pause.png")) {
     FileInstall("img\favicon-pause.png", "InputTipSymbol\default\favicon-pause.png", 1)
 }
 
-cursor_temp_zip := A_Temp "\abgox-InputTipCursor-temp.zip"
-if (!DirExist("InputTipCursor") || !DirExist("InputTipCursor\default")) {
-    FileInstall("InputTipCursor.zip", cursor_temp_zip, 1)
-    waitFileInstall(cursor_temp_zip)
-    try {
-        RunWait("powershell -NoProfile -Command Expand-Archive -Path '" cursor_temp_zip "' -DestinationPath '" A_ScriptDir "'", , "Hide")
-    } catch {
-        MsgBox("软件相关文件释放失败!", , "0x1000 0x10")
-        ExitApp()
-    }
-    try {
-        FileDelete(cursor_temp_zip)
-    }
+
+if (!FileExist("InputTipCursor\default\CN\AppStarting.ani")) {
+    FileInstall("InputTipCursor\default\CN\AppStarting.ani", "InputTipCursor\default\CN\AppStarting.ani", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\Arrow.cur")) {
+    FileInstall("InputTipCursor\default\CN\Arrow.cur", "InputTipCursor\default\CN\Arrow.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\Cross.cur")) {
+    FileInstall("InputTipCursor\default\CN\Cross.cur", "InputTipCursor\default\CN\Cross.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\Hand.cur")) {
+    FileInstall("InputTipCursor\default\CN\Hand.cur", "InputTipCursor\default\CN\Hand.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\Help.cur")) {
+    FileInstall("InputTipCursor\default\CN\Help.cur", "InputTipCursor\default\CN\Help.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\IBeam.cur")) {
+    FileInstall("InputTipCursor\default\CN\IBeam.cur", "InputTipCursor\default\CN\IBeam.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\No.cur")) {
+    FileInstall("InputTipCursor\default\CN\No.cur", "InputTipCursor\default\CN\No.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\Pen.cur")) {
+    FileInstall("InputTipCursor\default\CN\Pen.cur", "InputTipCursor\default\CN\Pen.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\SizeAll.cur")) {
+    FileInstall("InputTipCursor\default\CN\SizeAll.cur", "InputTipCursor\default\CN\SizeAll.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\SizeNESW.cur")) {
+    FileInstall("InputTipCursor\default\CN\SizeNESW.cur", "InputTipCursor\default\CN\SizeNESW.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\SizeNS.cur")) {
+    FileInstall("InputTipCursor\default\CN\SizeNS.cur", "InputTipCursor\default\CN\SizeNS.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\SizeNWSE.cur")) {
+    FileInstall("InputTipCursor\default\CN\SizeNWSE.cur", "InputTipCursor\default\CN\SizeNWSE.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\SizeWE.cur")) {
+    FileInstall("InputTipCursor\default\CN\SizeWE.cur", "InputTipCursor\default\CN\SizeWE.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\UpArrow.cur")) {
+    FileInstall("InputTipCursor\default\CN\UpArrow.cur", "InputTipCursor\default\CN\UpArrow.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\CN\Wait.ani")) {
+    FileInstall("InputTipCursor\default\CN\Wait.ani", "InputTipCursor\default\CN\Wait.ani", 1)
 }
 
-waitFileInstall(path, isExit := 1) {
-    t := 0
-    while (!FileExist(path)) {
-        if (t > 30) {
-            MsgBox("软件相关文件释放失败!", , "0x1000 0x10")
-            if (isExit) {
-                ExitApp()
-            } else {
-                break
-            }
-        }
-        t++
-        Sleep(1000)
-    }
+if (!FileExist("InputTipCursor\default\EN\AppStarting.ani")) {
+    FileInstall("InputTipCursor\default\EN\AppStarting.ani", "InputTipCursor\default\EN\AppStarting.ani", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\Arrow.cur")) {
+    FileInstall("InputTipCursor\default\EN\Arrow.cur", "InputTipCursor\default\EN\Arrow.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\Cross.cur")) {
+    FileInstall("InputTipCursor\default\EN\Cross.cur", "InputTipCursor\default\EN\Cross.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\Hand.cur")) {
+    FileInstall("InputTipCursor\default\EN\Hand.cur", "InputTipCursor\default\EN\Hand.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\Help.cur")) {
+    FileInstall("InputTipCursor\default\EN\Help.cur", "InputTipCursor\default\EN\Help.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\IBeam.cur")) {
+    FileInstall("InputTipCursor\default\EN\IBeam.cur", "InputTipCursor\default\EN\IBeam.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\No.cur")) {
+    FileInstall("InputTipCursor\default\EN\No.cur", "InputTipCursor\default\EN\No.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\Pen.cur")) {
+    FileInstall("InputTipCursor\default\EN\Pen.cur", "InputTipCursor\default\EN\Pen.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\SizeAll.cur")) {
+    FileInstall("InputTipCursor\default\EN\SizeAll.cur", "InputTipCursor\default\EN\SizeAll.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\SizeNESW.cur")) {
+    FileInstall("InputTipCursor\default\EN\SizeNESW.cur", "InputTipCursor\default\EN\SizeNESW.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\SizeNS.cur")) {
+    FileInstall("InputTipCursor\default\EN\SizeNS.cur", "InputTipCursor\default\EN\SizeNS.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\SizeNWSE.cur")) {
+    FileInstall("InputTipCursor\default\EN\SizeNWSE.cur", "InputTipCursor\default\EN\SizeNWSE.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\SizeWE.cur")) {
+    FileInstall("InputTipCursor\default\EN\SizeWE.cur", "InputTipCursor\default\EN\SizeWE.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\UpArrow.cur")) {
+    FileInstall("InputTipCursor\default\EN\UpArrow.cur", "InputTipCursor\default\EN\UpArrow.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\EN\Wait.ani")) {
+    FileInstall("InputTipCursor\default\EN\Wait.ani", "InputTipCursor\default\EN\Wait.ani", 1)
+}
+
+if (!FileExist("InputTipCursor\default\Caps\AppStarting.ani")) {
+    FileInstall("InputTipCursor\default\Caps\AppStarting.ani", "InputTipCursor\default\Caps\AppStarting.ani", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\Arrow.cur")) {
+    FileInstall("InputTipCursor\default\Caps\Arrow.cur", "InputTipCursor\default\Caps\Arrow.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\Cross.cur")) {
+    FileInstall("InputTipCursor\default\Caps\Cross.cur", "InputTipCursor\default\Caps\Cross.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\Hand.cur")) {
+    FileInstall("InputTipCursor\default\Caps\Hand.cur", "InputTipCursor\default\Caps\Hand.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\Help.cur")) {
+    FileInstall("InputTipCursor\default\Caps\Help.cur", "InputTipCursor\default\Caps\Help.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\IBeam.cur")) {
+    FileInstall("InputTipCursor\default\Caps\IBeam.cur", "InputTipCursor\default\Caps\IBeam.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\No.cur")) {
+    FileInstall("InputTipCursor\default\Caps\No.cur", "InputTipCursor\default\Caps\No.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\Pen.cur")) {
+    FileInstall("InputTipCursor\default\Caps\Pen.cur", "InputTipCursor\default\Caps\Pen.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\SizeAll.cur")) {
+    FileInstall("InputTipCursor\default\Caps\SizeAll.cur", "InputTipCursor\default\Caps\SizeAll.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\SizeNESW.cur")) {
+    FileInstall("InputTipCursor\default\Caps\SizeNESW.cur", "InputTipCursor\default\Caps\SizeNESW.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\SizeNS.cur")) {
+    FileInstall("InputTipCursor\default\Caps\SizeNS.cur", "InputTipCursor\default\Caps\SizeNS.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\SizeNWSE.cur")) {
+    FileInstall("InputTipCursor\default\Caps\SizeNWSE.cur", "InputTipCursor\default\Caps\SizeNWSE.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\SizeWE.cur")) {
+    FileInstall("InputTipCursor\default\Caps\SizeWE.cur", "InputTipCursor\default\Caps\SizeWE.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\UpArrow.cur")) {
+    FileInstall("InputTipCursor\default\Caps\UpArrow.cur", "InputTipCursor\default\Caps\UpArrow.cur", 1)
+}
+if (!FileExist("InputTipCursor\default\Caps\Wait.ani")) {
+    FileInstall("InputTipCursor\default\Caps\Wait.ani", "InputTipCursor\default\Caps\Wait.ani", 1)
 }
 
 /**

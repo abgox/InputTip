@@ -42,7 +42,9 @@ checkVersion(currentVersion, callback, urls := [
                     }
                     info.version := newVersion
                     info.url := url
-                    callback(newVersion, url)
+                    try {
+                        callback(newVersion, url)
+                    }
                 }
             }
         }
@@ -127,28 +129,26 @@ checkUpdate(init := 0, once := false) {
                         e_yes(*) {
                             g.Destroy()
                             releases := [
-                                "https://inputtip.pages.dev/releases/v2/InputTip.exe",
                                 "https://gitee.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe",
+                                "https://inputtip.pages.dev/releases/v2/InputTip.exe",
                                 "https://github.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe"
                             ]
                             done := false
                             for v in releases {
                                 try {
-                                    Download(v, A_AppData "\abgox-InputTip.exe")
+                                    Download(v, A_AppData "\abgox-InputTip-new-version.exe")
                                     ; 尝试获取版本号，成功获取则表示下载没有问题
-                                    done := FileGetVersion(A_AppData "\abgox-InputTip.exe")
+                                    done := FileGetVersion(A_AppData "\abgox-InputTip-new-version.exe")
                                     break
                                 }
                             }
                             if (done) {
                                 if (enableJABSupport) {
-                                    try {
-                                        RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
-                                        FileDelete("InputTip.JAB.JetBrains.exe")
-                                    }
+                                    killJAB(1, A_IsCompiled)
                                 }
                                 try {
-                                    Run("powershell -NoProfile -Command $i=1;while (Get-Process | Where-Object { $_.Path -eq '" A_ScriptFullPath "' }) { Start-Sleep -Milliseconds 500;i++;if($i -gt 30){break}};Move-Item -Force '" A_AppData "\abgox-InputTip.exe' '" A_ScriptDir "\" A_ScriptName "';''| Out-File '" A_AppData "\.abgox-InputTip-update-version.txt' -Force;Start-Process '" A_ScriptDir "\" A_ScriptName "'", , "Hide")
+                                    FileInstall("utils\update.exe", A_AppData "\abgox-InputTip-update-version.exe")
+                                    Run(A_AppData "\abgox-InputTip-update-version.exe " A_ScriptName " " A_ScriptFullPath)
                                     ExitApp()
                                 } catch {
                                     done := false
@@ -298,7 +298,7 @@ checkUpdate(init := 0, once := false) {
  * 当更新完成时弹出提示框
  */
 checkUpdateDone() {
-    if (FileExist(A_AppData "\.abgox-InputTip-update-version.txt")) {
+    if (FileExist(A_AppData "\.abgox-InputTip-update-version-done.txt")) {
         try {
             _ := IniRead("InputTip.ini", "Config-v2", "JetBrains_list")
             writeIni("cursor_mode_JAB", _)
@@ -389,7 +389,8 @@ checkUpdateDone() {
             return g
         }
         try {
-            FileDelete(A_AppData "\.abgox-InputTip-update-version.txt")
+            FileDelete(A_AppData "\.abgox-InputTip-update-version-done.txt")
+            FileDelete(A_AppData "\abgox-InputTip-update-version.exe")
         }
     }
 }

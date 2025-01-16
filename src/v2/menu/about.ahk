@@ -16,16 +16,17 @@ fn_about(*) {
         g.AddEdit("yp ReadOnly", 'abgox')
         g.AddText("xs", 'QQ 账号: ')
         g.AddEdit("yp ReadOnly", '1151676611')
-        g.AddText("xs", 'QQ 群聊(交流反馈): ')
+        g.AddLink("xs", 'QQ 反馈交流群( <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327">点击添加</a> ): ')
         g.AddEdit("yp ReadOnly", '451860327')
-        g.AddText("xs", "-------------------------------------------------------------------------------")
 
         if (info.i) {
+            g.AddText("xs", "-------------------------------------------------------------------------------")
             return g
         }
         w := info.w
         bw := w - g.MarginX * 2
 
+        g.AddText("xs", "-------------------------------------------------------------------------------------")
         g.AddLink("xs", '1. 官网: <a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
         g.AddLink("xs", '2. Github: <a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
         g.AddLink("xs", '3. Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')

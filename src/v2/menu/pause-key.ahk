@@ -3,7 +3,7 @@ fn_pause_key(*) {
         gc.w.pauseHotkeyGui.Destroy()
         gc.w.pauseHotkeyGui := ""
     }
-    line := "----------------------------------------------------------------------------------"
+    line := "------------------------------------------------------------------------------------"
     createGui(pauseKeyGui).Show()
     pauseKeyGui(info) {
         g := createGuiOpt("InputTip - 设置暂停/运行快捷键的快捷键")
@@ -13,7 +13,6 @@ fn_pause_key(*) {
         g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击「确定」后生效")
         g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
         g.AddText("xs", "3.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
-        g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
         if (info.i) {
             return g
@@ -21,6 +20,7 @@ fn_pause_key(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
+        g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
         g.AddText("xs", "设置")
         g.AddText("yp cRed", "暂停/运行")
         g.AddText("yp", "的快捷键: ")

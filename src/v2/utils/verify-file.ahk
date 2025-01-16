@@ -172,6 +172,8 @@ checkIni() {
     if (!FileExist("InputTip.ini")) {
         gc.init := 1
 
+        userName := readIni("userName", A_UserName, "UserInfo")
+
         ; 输入法模式
         mode := readIni("mode", 1, "InputMethod")
 
@@ -202,7 +204,7 @@ checkIni() {
                     g := Gui("AlwaysOnTop")
                     g.SetFont(fz, "微软雅黑")
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
-                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 要不要同步修改鼠标样式」的值更改为【否】")
+                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 是否同步修改鼠标样式」的值更改为【否】")
 
                     if (info.i) {
                         return g
@@ -241,7 +243,9 @@ checkIni() {
             return g
         }
         while (isContinue) {
-            Sleep(500)
+            try {
+                Sleep(500)
+            }
         }
         createGui(listTipGui).Show()
         listTipGui(info) {

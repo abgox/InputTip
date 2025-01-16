@@ -2,7 +2,7 @@
 
 #NoTrayIcon
 ;@AHK2Exe-SetName InputTip.JAB
-;@AHK2Exe-SetDescription InputTip(JAB 进程) - 一个输入法状态提示工具
+;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态提示工具
 
 #Include .\utils\IME.ahk
 #Include .\utils\ini.ahk

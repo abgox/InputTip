@@ -3,7 +3,7 @@ fn_switch_key(*) {
         gc.w.switchKeyGui.Destroy()
         gc.w.switchKeyGui := ""
     }
-    line := "----------------------------------------------------------------------------------------"
+    line := "--------------------------------------------------------------------------------------------"
     createGui(keyGui).Show()
     keyGui(info) {
         g := createGuiOpt("InputTip - 设置强制切换输入法状态的快捷键")
@@ -12,7 +12,7 @@ fn_switch_key(*) {
         g.AddText("Section", "1.")
         g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击「确定」后生效")
         g.AddText("xs", "2.  LShift 指的是左边的 Shift 键，RShift 指的是右边的 Shift 键，其他按键以此类推")
-        g.AddText("xs", "3.  单键不会覆盖原本的按键功能，因为在设置的单键抬起时才会触发强制切换")
+        g.AddText("xs", "3.  使用单键不会覆盖原本的按键功能，因为是在单键抬起时才会触发强制切换")
 
         if (info.i) {
             return g
@@ -20,7 +20,7 @@ fn_switch_key(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddText("xs", "3.  如果要移除快捷键，请选择「无」`n" line)
+        g.AddText("xs", "4.  如果要移除快捷键，请选择「无」`n" line)
         keyConfigList := [{
             config: "hotkey_CN",
             tip: "中文状态",

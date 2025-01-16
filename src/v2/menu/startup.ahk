@@ -1,6 +1,10 @@
 fn_startup(item, *) {
     global isStartUp
     if (isStartUp) {
+        if (gc.w.updateUserGui) {
+            gc.w.updateUserGui.Destroy()
+            gc.w.updateUserGui := ""
+        }
         try {
             FileDelete(A_Startup "\" fileLnk)
         }
@@ -46,8 +50,7 @@ fn_startup(item, *) {
         createGui(startupGui).Show()
         startupGui(info) {
             g := createGuiOpt("InputTip - 设置开机自启动")
-            g.AddLink(, '详情请查看: <a href="https://inputtip.pages.dev/FAQ/startup">关于开机自启动</a>')
-            g.AddText(, "---------------------------------------------------------------------")
+            g.AddLink(, '详情请查看:   <a href="https://inputtip.pages.dev/FAQ/startup">关于开机自启动</a>`n---------------------------------------------------------------------')
 
             if (info.i) {
                 return g
@@ -55,40 +58,41 @@ fn_startup(item, *) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            g.AddEdit("xs ReadOnly -VScroll w" w, "1. 当前有多种方式设置开机自启动，请选择有效的方式 :`n   - 通过「任务计划程序」`n   - 通过应用快捷方式`n   - 通过添加「注册表」`n`n2. 如何避免管理员授权窗口(UAC)的干扰？`n   - 使用「任务计划程序」`n   - 将系统设置中的「更改用户账户控制设置」修改为【从不通知】`n")
+            g.AddEdit("xs ReadOnly -VScroll w" bw, "1. 下方有多种方式设置开机自启动，请选择有效的方式`n2. 如果你不希望每次启动都弹出管理员授权(UAC)窗口:`n   - 将系统设置中的「更改用户账户控制设置」修改为【从不通知】`n   - 或者通过下方的「任务计划程序」设置开机自启动")
 
             if (A_IsAdmin) {
                 btnOpt := ''
                 tip := ''
             } else {
                 btnOpt := ' Disabled '
-                tip := ' (以管理员模式运行时可用)'
+                tip := ' (非管理员身份运行时不可用)'
             }
 
-            if (!btnOpt && !powershell) {
-                btn := g.AddButton("Disabled w" w btnOpt, "使用「任务计划程序」 (无法调用 powershell)")
+            if (!btnOpt && !has_powershell) {
+                btn := g.AddButton("Disabled w" bw btnOpt, "「任务计划程序」(无法调用 powershell)")
             } else {
-                btn := g.AddButton("w" w btnOpt, "使用「任务计划程序」" tip)
+                btn := g.AddButton("xs w" bw btnOpt, "「任务计划程序」" tip)
             }
 
             btn.Focus()
             btn.OnEvent("Click", e_useTask)
             e_useTask(*) {
+                fn_update_user()
                 isStartUp := 1
-                FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , favicon, , , 7)
+                FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
                 fn_handle()
             }
-            btn := g.AddButton("w" w, "使用应用快捷方式")
+            btn := g.AddButton("xs w" bw, "应用快捷方式")
             if (!A_IsAdmin) {
                 btn.Focus()
             }
             btn.OnEvent("Click", e_useLnk)
             e_useLnk(*) {
                 isStartUp := 2
-                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , , favicon, , , 7)
+                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , fileDesc, favicon, , , 7)
                 fn_handle()
             }
-            g.AddButton("w" w btnOpt, "使用「注册表」" tip).OnEvent("Click", e_useReg)
+            g.AddButton("xs w" bw btnOpt, "「注册表」" tip).OnEvent("Click", e_useReg)
             e_useReg(*) {
                 isStartUp := 3
                 try {

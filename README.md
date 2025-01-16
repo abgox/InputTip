@@ -33,6 +33,10 @@
 
 ### 介绍
 
+> [!Tip]
+>
+> QQ 反馈交流群: [451860327](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327)
+
 - 使用 `AutoHotKey` 编写，仅 Windows 系统可用
 - 一个实时的输入法状态(中文/英文/大写锁定)提示工具
 
@@ -324,15 +328,18 @@
   - 一个万能的模式，需要根据实际情况设置状态码(规则)和切换码(规则)
   - 详情参考: [关于【自定义】模式](https://inputtip.pages.dev/FAQ/custom-input-mode)
   - 可以通过 `设置输入法模式` => `自定义` 使用以下已知可用的配置:
-    - [小鹤音形](https://flypy.com/download/)
-      - 经过测试，`v10.11.4` 版本中，在 `切换码数字`的输入框中填入 `257` 即可
-    - [小狼毫(rime)输入法](https://rime.im/download/)
-      - 经过测试，`v0.16.1` 版本中，勾选 `切换码规则` 中的 `使用偶数` 即可
-    - [讯飞输入法](https://srf.xunfei.cn/)
-      - 经过测试，`v3.0` 版本中，勾选 `状态码规则` 中的 `使用奇数` 即可
-    - [手心输入法](https://www.xinshuru.com/)
-      - 经过测试，`v3.1` 版本中，在 `切换码数字`的输入框中填入 `1` 即可
-      - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题。
+
+    - 选择 `英文状态` 作为判断依据( `中文状态` 则相反)
+
+      - [小鹤音形](https://flypy.com/download/)
+        - 经过测试，`v10.11.4` 版本中，在 `切换码数字`的输入框中填入 `257` 即可
+      - [小狼毫(rime)输入法](https://rime.im/download/)
+        - 经过测试，`v0.16.1` 版本中，勾选 `切换码规则` 中的 `使用偶数` 即可
+      - [讯飞输入法](https://srf.xunfei.cn/)
+        - 经过测试，`v3.0` 版本中，勾选 `状态码规则` 中的 `使用奇数` 即可
+      - [手心输入法](https://www.xinshuru.com/)
+        - 经过测试，`v3.1` 版本中，在 `切换码数字`的输入框中填入 `1` 即可
+        - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题
 
 #### [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list)
 

@@ -18,6 +18,8 @@ makeTrayMenu() {
         A_TrayMenu.Check("开机自启动")
     }
     A_TrayMenu.Add("设置更新检查", fn_check_update)
+    A_TrayMenu.Add("更改用户信息", fn_update_user)
+    A_TrayMenu.Add()
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
     A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)
@@ -51,13 +53,44 @@ makeTrayMenu() {
     A_TrayMenu.Add("退出", fn_exit)
 }
 
+fn_update_user(*) {
+    if (gc.w.updateUserGui) {
+        gc.w.updateUserGui.Destroy()
+        gc.w.updateUserGui := ""
+    }
+    createGui(updateUserGui).Show()
+    updateUserGui(info) {
+        g := createGuiOpt()
+        g.AddText("cRed", "- 如果是域用户，用户名需要添加域`n- 如: xxx\abgox")
+        g.AddText(, "用户名: ")
+        _ := g.AddEdit("yp")
+        g.AddText("xs ReadOnly cGray", "设置完成后，关闭此窗口即可")
+        if (info.i) {
+            return g
+        }
+
+        _._config := "userName"
+        _.Value := readIni("userName", A_UserName, "UserInfo")
+        _.Focus()
+        _.OnEvent("Change", fn_change)
+
+        g.OnEvent("Close", createTaskAndLnk)
+        fn_change(item, *) {
+            global userName := readIni("userName", A_UserName, "UserInfo")
+            writeIni("userName", item.value, "UserInfo")
+        }
+        gc.w.updateUserGui := g
+        return g
+    }
+}
+
 fn_exit(*) {
-    RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+    killJAB()
     ExitApp()
 }
-fn_restart(flag := 0, *) {
-    if (flag || enableJABSupport) {
-        RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+fn_restart(*) {
+    if (enableJABSupport) {
+        killJAB()
     }
     Run(A_ScriptFullPath)
 }
@@ -257,7 +290,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         g := createGuiOpt("InputTip - " tipList.tab[1])
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
-                            text .= "`n如果它不在白名单中，则会同步添加到白名单中"
+                            text .= "`n如果它还不在白名单中，则会同步添加到白名单中"
                         }
                         g.AddText("cRed", text)
                         g.AddText("xs", "应用进程名称: ")
@@ -274,7 +307,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         e_yes(*) {
                             exe_name := gc._exe_name.value
                             g.Destroy()
-                            if (!RegExMatch(exe_name, "^.+\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
+                            if (!RegExMatch(exe_name, "^.*\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
                                 if (gc.w.subGui) {
                                     gc.w.subGui.Destroy()
                                     gc.w.subGui := ""
@@ -435,7 +468,7 @@ fn_white_list(*) {
         tip: "你首先应该点击上方的「关于」查看具体的操作说明                                    ",
         list: "符号显示白名单",
         color: "cRed",
-        about: '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 白名单机制: 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
+        about: '1. 如何使用这个管理面板？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 白名单机制: 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
         link: '相关链接: <a href="https://inputtip.pages.dev/FAQ/white-list">白名单机制</a>',
         addConfirm: "是否要将",
         addConfirm2: "添加到「符号显示白名单」中？",
@@ -451,6 +484,40 @@ fn_white_list(*) {
         global app_show_state := ":" value ":"
         gc.whiteListGui_LV_rm_title.Text := "符号显示白名单 ( " gc.whiteListGui_LV_rm.GetCount() " 个 )"
         restartJAB()
+    }
+}
+
+/**
+ * 创建任务计划程序和快捷方式
+ */
+createTaskAndLnk(*) {
+    if (A_IsAdmin) {
+        try {
+            Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' userName '" -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
+            if (A_IsCompiled) {
+                if (isDiff("C:\WINDOWS\system32\schtasks.exe")) {
+                    FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
+                }
+            } else {
+                if (isDiff(A_ScriptFullPath)) {
+                    FileCreateShortcut(A_ScriptFullPath, fileLnk, , , fileDesc, favicon, , , 7)
+                }
+            }
+        } catch {
+            global has_powershell := 0
+        }
+    } else {
+        if (isDiff(A_ScriptFullPath)) {
+            FileCreateShortcut(A_ScriptFullPath, fileLnk, , , fileDesc, favicon, , , 7)
+        }
+    }
+
+    isDiff(new) {
+        if (!FileExist("InputTip.lnk")) {
+            return 1
+        }
+        FileGetShortcut("InputTip.lnk", &old)
+        return new != old
     }
 }
 
@@ -508,19 +575,23 @@ getPicDir() {
 }
 /**
  * 启动 JAB 进程
- * @returns {Integer} 1/0: 是否存在错误
+ * @returns {1|0} 1/0: 是否存在错误
  */
 runJAB() {
-    if (!powershell && enableJABSupport) {
-        writeIni("enableJABSupport", "0")
+    if (!has_powershell && enableJABSupport) {
+        if (isStartUp = 1) {
+            global isStartUp := 0
+            writeIni("isStartUp", 0)
+            A_TrayMenu.Uncheck("开机自启动")
+        }
         global enableJABSupport := 0
+        writeIni("enableJABSupport", 0)
         A_TrayMenu.Uncheck("启用 JAB/JetBrains IDE 支持")
         if (A_IsCompiled) {
             try {
                 FileDelete("InputTip.JAB.JetBrains.exe")
             }
         }
-
 
         if (gc.w.subGui) {
             gc.w.subGui.Destroy()
@@ -529,7 +600,7 @@ runJAB() {
         createGui(errGui).Show()
         errGui(info) {
             g := createGuiOpt("InputTip - powershell 调用失败!")
-            g.AddText("cRed", "- 在当前系统环境中，尝试调用 powershell 失败了`n-「启用 JAB/JetBrains IDE 支持」这个功能将会被自动禁用")
+            g.AddText("cRed", "- 在当前系统环境中，尝试调用 powershell 失败了`n- 以下功能会被自动禁用`n   -「开机自启动」中的「任务计划程序」`n   -「启用 JAB/JetBrains IDE 支持」")
             g.AddText("cRed", "- 如果你想继续使用它，你需要解决 cmd 调用 powershell 失败的问题")
 
             if (info.i) {
@@ -546,21 +617,35 @@ runJAB() {
         }
         return 1
     }
-    FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-    SetTimer(runAppTimer, 50)
+    if (A_IsCompiled && !FileExist("InputTip.JAB.JetBrains.exe")) {
+        FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+    }
+    SetTimer(runAppTimer, -1)
     runAppTimer() {
-        if (WinExist("ahk_exe InputTip.JAB.JetBrains.exe")) {
-            SetTimer(, 0)
-            return
-        }
         if (A_IsAdmin) {
             try {
-                RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+                RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' userName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
             }
-            Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
         } else {
             Run(A_ScriptDir "\InputTip.JAB.JetBrains.exe", , "Hide")
         }
     }
     return 0
+}
+/**
+ * 停止 JAB 进程
+ * @param {1|0} wait 等待停止进程
+ * @param {0|1} delete 停止进程后，是否需要删除进程文件
+ */
+killJAB(wait := 1, delete := 0) {
+    cmd := 'taskkill /f /im InputTip.JAB.JetBrains.exe'
+    try {
+        wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
+    }
+    if (delete) {
+        try {
+            FileDelete("InputTip.JAB.JetBrains.exe")
+        }
+    }
 }

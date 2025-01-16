@@ -3,7 +3,6 @@
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-UpdateManifest 1
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态提示工具
-A_IconTip := "当前状态: 【运行中】`nInputTip - 一个输入法状态提示工具"
 
 #Include .\utils\ini.ahk
 #Include .\utils\IME.ahk
@@ -16,9 +15,13 @@ A_IconTip := "当前状态: 【运行中】`nInputTip - 一个输入法状态提
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
+fileDesc := "InputTip - 一个输入法状态提示工具"
+A_IconTip := "【运行中】" fileDesc
 
 ; 注册表: 开机自启动
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+; 是否有 powershell
+has_powershell := 1
 
 gc := {
     init: 0,
@@ -30,6 +33,8 @@ gc := {
         startupGui: "",
         ; 设置更新检查
         checkUpdateGui: "",
+        ; 更改用户信息
+        updateUserGui: "",
         ; 设置输入法模式
         inputModeGui: "",
         ; 设置光标获取模式
@@ -46,6 +51,7 @@ gc := {
         windowToggleGui: "",
         ; 设置特殊偏移量
         appOffsetGui: "",
+        ; 设置指定应用的特殊偏移量
         offsetGui: "",
         ; 启用 JAB/JetBrains IDE 支持
         enableJABGui: "",
@@ -61,26 +67,18 @@ gc := {
     }
 }
 
+checkIni() ; 检查配置文件
+
+userName := readIni("userName", A_UserName, "UserInfo")
+
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
-    ; 生成特殊的快捷方式，它会通过任务计划程序启动
-    if (!FileExist(fileLnk)) {
-        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", , favicon, , , 7)
-    }
-
-    ; 生成任务计划程序
-    try {
-        Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
-        powershell := 1
-    } catch {
-        powershell := 0
-    }
 } else {
     favicon := A_ScriptDir "\img\favicon.ico"
     TraySetIcon(favicon, , 1)
 }
 
-checkIni() ; 检查配置文件
+createTaskAndLnk()
 
 checkUpdateDone()
 

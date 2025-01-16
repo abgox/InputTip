@@ -1,2 +1,3 @@
-InputTipCursor
-InputTipSymbol
+**/InputTipCursor/default
+**/InputTipSymbol/default
+test/**

@@ -318,7 +318,8 @@ updateSymbol(init := 0) {
         {
             ; 图片字符
             for state in ["CN", "EN", "Caps"] {
-                if (symbolConfig.%state "_pic"%) {
+                pic_path := symbolConfig.%state "_pic"%
+                if (pic_path) {
                     _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
                     __ := symbolConfig.enableIsolateConfigPic
 
@@ -327,7 +328,9 @@ updateSymbol(init := 0) {
 
                     w := __ ? symbolConfig.%"pic_symbol_width" state% : symbolConfig.pic_symbol_width
                     h := __ ? symbolConfig.%"pic_symbol_height" state% : symbolConfig.pic_symbol_height
-                    _.AddPicture("w" w " h" h, symbolConfig.%state "_pic"%)
+                    try {
+                        _.AddPicture("w" w " h" h, pic_path)
+                    }
                 }
             }
         }
@@ -347,11 +350,11 @@ updateSymbol(init := 0) {
                     }
 
                     bt := __ ? symbolConfig.%"border_type" state% : symbolConfig.border_type
+                    _.Opt("-LastFound")
                     switch bt {
-                        case 1: _.Opt("-LastFound +e0x00000001")
-                        case 2: _.Opt("-LastFound +e0x00000200")
-                        case 3: _.Opt("-LastFound +e0x00020000")
-                        default: _.Opt("-LastFound")
+                        case 1: _.Opt("+e0x00000001")
+                        case 2: _.Opt("+e0x00000200")
+                        case 3: _.Opt("+e0x00020000")
                     }
                 }
             }
@@ -399,6 +402,7 @@ loadSymbol(state, left, top) {
     global lastSymbol, isOverSymbol
     static old_left := 0, old_top := 0
     if (left = old_left && top = old_top) {
+        ; XXX: 如果鼠标一直悬浮在符号上，同时有键盘操作，就会出现符号闪烁
         if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
             return
         }
@@ -470,7 +474,7 @@ pauseApp(*) {
     if (A_IsPaused) {
         A_TrayMenu.Uncheck("暂停/运行")
         TraySetIcon("InputTipSymbol/default/favicon.png", , 1)
-        A_IconTip := "当前状态: 【运行中】`nInputTip - 一个输入法状态提示工具"
+        A_IconTip := "【运行中】" fileDesc
         reloadSymbol()
         if (enableJABSupport) {
             runJAB()
@@ -478,10 +482,10 @@ pauseApp(*) {
     } else {
         A_TrayMenu.Check("暂停/运行")
         TraySetIcon("InputTipSymbol/default/favicon-pause.png", , 1)
-        A_IconTip := "当前状态: 【已暂停】`nInputTip - 一个输入法状态提示工具"
+        A_IconTip := "【已暂停】" fileDesc
         hideSymbol()
         if (enableJABSupport) {
-            RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
+            killJAB(0)
         }
     }
     Pause(-1)
@@ -489,18 +493,14 @@ pauseApp(*) {
 restartJAB() {
     static done := 1
     if (done && enableJABSupport) {
-        SetTimer(restartAppTimer, -10)
+        SetTimer(restartAppTimer, -1)
         restartAppTimer() {
             done := 0
-            RunWait('taskkill /f /t /im InputTip.JAB.JetBrains.exe', , "Hide")
-            if (!powershell) {
-                return
-            }
+            killJAB(1, 0)
             if (A_IsAdmin) {
                 try {
-                    RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' A_UserName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+                    Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
                 }
-                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
             } else {
                 Run(A_ScriptDir "\InputTip.JAB.JetBrains.exe", , "Hide")
             }

@@ -12,7 +12,7 @@ fn_config(*) {
     } else {
         SetTimer(getDirTimer, -1)
     }
-    line := "-------------------------------------------------------------------------------------------------------------"
+    line := "------------------------------------------------------------------------------------------------------------------"
     createGui(changeConfigGui).Show()
     changeConfigGui(info) {
         g := createGuiOpt("InputTip - 更改配置")
@@ -26,7 +26,7 @@ fn_config(*) {
             tab.Value := gc.tab
         }
         tab.UseTab(1)
-        g.AddLink("Section cRed", '你首先应该查看相关的说明文档: <a href="https://inputtip.pages.dev/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.pages.dev/FAQ/">一些常见的使用问题</a>                                              ')
+        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.pages.dev/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.pages.dev/FAQ/">常见的使用问题</a>                                              ')
 
         if (info.i) {
             return g
@@ -34,11 +34,11 @@ fn_config(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
+        g.AddText("xs cGray", "- 如果是第一次打开菜单，建议点击上方的「其他杂项」，把配置菜单的字体调整到合适的大小`n- 所有的配置项修改会实时生效，可以立即看到最新效果，但是修改时速度不要太快`n- 特别是需要输入的配置项，输入过快可能因为响应稍慢导致最新修改丢失，需要把输入速度放慢一点")
         g.AddText("xs", line)
-        g.AddText("xs cGray", "所有的配置项修改会实时生效，可以立即看到最新效果，但是更改时速度不要太快`n比如需要输入值的配置项，输入过快可能因为响应稍慢导致最新修改丢失，需要放缓输入速度`n")
-        g.AddText("xs", "1. 要不要同步修改鼠标样式: ")
+        g.AddText("xs", "1. 是否同步修改鼠标样式: ")
         _ := g.AddDropDownList("w" bw / 2 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
-        g.AddText("xs cGray", "推荐设置为【是】，它与符号一起配合使用才是最完美的输入法状态提示方案")
+        g.AddText("xs cGray", "推荐设置为【是】，它与符号一起搭配使用才是最完美的输入法状态提示方案")
         _.Focus()
         _.OnEvent("Change", e_change_cursor)
         e_change_cursor(item, *) {
@@ -91,7 +91,7 @@ fn_config(*) {
         }
 
         g.addText("xs", "2. 在输入光标附近显示什么类型的符号: ")
-        g.AddDropDownList("yp AltSubmit Choose" symbolType + 1 " w" bw / 3, ["【不】显示符号", "显示【图片】符号", "显示【方块】符号", "显示【文本】符号"]).OnEvent("Change", e_symbol_type)
+        g.AddDropDownList("yp AltSubmit Choose" symbolType + 1 " w" bw / 3, [" 【不】显示符号", " 显示【图片】符号", " 显示【方块】符号", " 显示【文本】符号"]).OnEvent("Change", e_symbol_type)
         e_symbol_type(item, *) {
             writeIni("symbolType", item.value - 1)
             global symbolType := item.value - 1
@@ -128,7 +128,7 @@ fn_config(*) {
             updateDelay()
             restartJAB()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上。`n符号隐藏后，下次键盘操作或点击鼠标左键会再次显示符号")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
         g.AddText("xs", "4. 每多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后更新符号的显示位置和状态:")
@@ -150,18 +150,18 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 50 毫秒。一般使用 1-100 之间的值。`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值。`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 50 毫秒一般使用 1-100 之间的值`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
 
         tab.UseTab(2)
-        g.AddText("Section", "你应该首先查看")
+        g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "鼠标样式")
-        g.AddLink("yp", '的相关说明: <a href="https://inputtip.pages.dev/FAQ/cursor-style">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/cursor-style">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddText("xs cGray", "- 如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
+        g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的「下载鼠标样式扩展包」")
         g.AddText("xs", line)
-        g.AddText("xs Section cGray", "可以点击「下载鼠标样式扩展包」去下载已经适配的鼠标样式")
-        g.AddText("xs cGray", "如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
-        g.AddText("xs", line)
-        g.AddText("cRed", "如果列表中显示的鼠标样式文件夹路径不是最新的，请点击左下角的「刷新此界面」")
-        g.AddText("xs cGray", "InputTip 会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
+        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击左下角的「刷新路径列表」")
+        g.AddText("xs cGray", "你需要将「显示形式」页面中的第一个配置「是否同步修改鼠标样式」设置为【是】")
+        g.AddText("xs cGray", "InputTip 就会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
         g.AddText("Section", "选择鼠标样式文件夹路径:")
         dirList := StrSplit(cursorDir, ":")
         if (dirList.Length = 0) {
@@ -184,7 +184,7 @@ fn_config(*) {
             updateCursor()
             reloadCursor()
         }
-        g.AddButton("xs w" bw / 2, "刷新此界面").OnEvent("Click", fn_config)
+        g.AddButton("xs w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
         g.AddButton("yp w" bw / 2, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
         e_cursor_package(*) {
             if (gc.w.subGui) {
@@ -203,9 +203,9 @@ fn_config(*) {
         }
 
         tab.UseTab(3)
-        g.AddText("Section", "你应该首先查看")
+        g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "图片符号")
-        g.AddLink("yp", '的相关说明: <a href="https://inputtip.pages.dev/FAQ/symbol-picture">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/symbol-picture">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
         g.AddText("xs", line)
         symbolPicConfig := [{
             config: "pic_offset_x",
@@ -326,7 +326,7 @@ fn_config(*) {
             }
         }
 
-        g.AddText("xs Section cRed", "如果列表中显示的图片符号路径不是最新的，请点击左下角的「刷新此界面」")
+        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击左下角的「刷新路径列表」")
         g.AddText(, "选择图片符号的文件路径: ")
         dirList := StrSplit(picDir, ":")
         if (dirList.Length = 0) {
@@ -362,7 +362,7 @@ fn_config(*) {
                 _.Text := ""
             }
         }
-        g.AddButton("xs w" bw / 2, "刷新此界面").OnEvent("Click", fn_config)
+        g.AddButton("xs w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
         g.AddButton("yp w" bw / 2, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
         e_pic_package(*) {
             if (gc.w.subGui) {
@@ -418,10 +418,10 @@ fn_config(*) {
             editOpt: "Number",
             tip: "方块符号的宽度"
         }]
-        g.AddText("Section", "1. 你应该首先查看")
+        g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "方块符号")
-        g.AddLink("yp", '的相关说明: <a href="https://inputtip.pages.dev/FAQ/symbol-block">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-        g.AddLink("xs", '2. 颜色设置为空，表示不显示对应的方块符号。 <a href="https://inputtip.pages.dev/FAQ/color-config">关于颜色配置</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/symbol-block">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("xs", '- 颜色设置为空，表示不显示对应的方块符号。 <a href="https://inputtip.pages.dev/FAQ/color-config">关于颜色配置</a>')
         g.AddText("xs", line)
         for v in symbolBlockColorConfig {
             g.AddText("xs", v.tip ": ")
@@ -557,10 +557,10 @@ fn_config(*) {
             }
         }
         tab.UseTab(5)
-        g.AddText("Section", "1. 你应该首先查看")
+        g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "文本符号")
-        g.AddLink("yp", '的相关说明: <a href="https://inputtip.pages.dev/FAQ/symbol-text">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-        g.AddLink("xs", '2. 文本字符可以设置为空，表示不显示对应的文本字符。 <a href="https://inputtip.pages.dev/FAQ/color-config">关于颜色配置</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/symbol-text">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("xs", '- 文本字符可以设置为空，表示不显示对应的文本字符。 <a href="https://inputtip.pages.dev/FAQ/color-config">关于颜色配置</a>')
         g.AddText("xs", line)
         symbolTextConfig := [{
             config: "CN_Text",
@@ -763,7 +763,7 @@ fn_config(*) {
             writeIni("gui_font_size", value)
             global fontOpt := ["s" value, "微软雅黑"]
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20。`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，重新打开配置菜单即可。")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，然后重新打开配置菜单即可")
         g.AddText("xs", "2. 点击下方按钮，实时显示当前激活的窗口进程信息")
         g.AddText("yp", " ").GetPos(, , &__w)
         gc._window_info := g.AddButton("xs w" bw, "获取窗口进程信息")
@@ -783,7 +783,7 @@ fn_config(*) {
             }
 
             gc.timer := 1
-            gc._window_info.Text := "停止获取"
+            gc._window_info.Text := "停止获取窗口进程信息"
 
             SetTimer(statusTimer, 25)
             statusTimer() {

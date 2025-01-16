@@ -218,13 +218,13 @@ fn_cursor_mode(*) {
                         g := createGuiOpt("InputTip - 设置光标获取模式")
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
-                            text .= "`n如果它不在白名单中，则会同步添加到白名单中"
+                            text .= "`n如果它还不在白名单中，则会同步添加到白名单中              "
                         }
                         g.AddText("cRed", text)
-                        g.AddText("xs", "应用进程名称: ")
+                        g.AddText("Section", "应用进程名称: ")
                         gc._exe_name := g.AddEdit("yp", "")
                         gc._exe_name.Value := v
-                        g.AddText("xs cGray", "要将这个应用进程添加到哪一个光标获取模式中？")
+                        g.AddText("xs cGray", "你想要将它添加到哪一个光标获取模式中？")
 
                         if (info.i) {
                             return g
@@ -242,7 +242,7 @@ fn_cursor_mode(*) {
                             to := item._mode
                             exe_name := gc._exe_name.value
                             g.Destroy()
-                            if (!RegExMatch(exe_name, "^.+\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
+                            if (!RegExMatch(exe_name, "^.*\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
                                 if (gc.w.subGui) {
                                     gc.w.subGui.Destroy()
                                     gc.w.subGui := ""
@@ -338,7 +338,7 @@ fn_cursor_mode(*) {
             gc.LV_add.ModifyCol(2, "AutoHdr")
             gc.LV_add.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
-            g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个管理面板？`n   - 最上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果很想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n`n3. JetBrains 系列 IDE`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JAB/JetBrains IDE 支持」中的所有操作步骤')
+            g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个管理面板？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果很想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n`n3. JetBrains 系列 IDE`n`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JAB/JetBrains IDE 支持」中的所有操作步骤')
             g.AddLink(, '相关链接: <a href="https://inputtip.pages.dev/FAQ/cursor-mode">关于光标获取模式</a>')
             g.OnEvent("Close", fn_close)
             fn_close(*) {

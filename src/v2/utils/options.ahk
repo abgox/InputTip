@@ -6,7 +6,7 @@
 #Warn All, Off
 Persistent
 ListLines 0
-KeyHistory 0
+KeyHistory 5
 DetectHiddenWindows 1
 InstallKeybdHook
 CoordMode 'Mouse', 'Screen'

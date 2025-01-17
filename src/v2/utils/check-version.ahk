@@ -203,7 +203,7 @@ checkUpdate(init := 0, once := false) {
                                 g.AddText("yp", "已忽略")
                                 g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
 
-                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件「托盘菜单」的「关于」中找到")
 
                                 if (info.i) {
                                     return g
@@ -273,7 +273,7 @@ checkUpdate(init := 0, once := false) {
                                 g.AddText("yp", "已忽略")
                                 g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
 
-                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件「托盘菜单」的「关于」中找到")
 
                                 if (info.i) {
                                     return g

@@ -16,7 +16,6 @@
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态提示工具"
-A_IconTip := "【运行中】" fileDesc
 
 ; 注册表: 开机自启动
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
@@ -137,6 +136,51 @@ getDirTimer() {
 }
 
 makeTrayMenu() ; 生成托盘菜单
+
+trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
+
+keyCount := 0
+enableKeyCount := readIni("enableKeyCount", 0)
+keyCountTemplate := readIni("keyCountTemplate", "%\n%启动至今，有效的按键次数: %KeyCount%")
+A_IconTip := StrReplace(trayTipTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
+
+updateTip()
+
+updateTip(flag := "") {
+    if (enableKeyCount) {
+        if (flag != "") {
+            tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", flag ? "暂停" : "运行")
+            tip := StrReplace(tip, "%KeyCount%", keyCount)
+            tip := StrReplace(tip, "%\n%", "`n")
+            A_IconTip := tip
+            return
+        }
+        SetTimer(countTimer, delay)
+        countTimer() {
+            static last := ""
+            global keyCount
+            if (!enableKeyCount) {
+                SetTimer(, 0)
+                last := ""
+                keyCount := 0
+                return
+            }
+            if (A_PriorKey != last) {
+                keyCount++
+                last := A_PriorKey
+                tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
+                tip := StrReplace(tip, "%KeyCount%", keyCount)
+                tip := StrReplace(tip, "%\n%", "`n")
+                A_IconTip := tip
+            }
+        }
+    } else {
+        s := flag != "" ? flag : A_IsPaused
+        tip := StrReplace(trayTipTemplate, "%appState%", s ? "暂停" : "运行")
+        tip := StrReplace(tip, "%\n%", "`n")
+        A_IconTip := tip
+    }
+}
 
 needSkip(exe_str) {
     return InStr(modeList.JAB, exe_str)

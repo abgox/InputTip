@@ -147,10 +147,11 @@ fn_config(*) {
             writeIni("delay", value)
             global delay := value
             restartJAB()
+            updateTip()
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 50 毫秒一般使用 1-100 之间的值`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 50 毫秒一般使用 1-100 之间的值`n此值的范围是 1-500，超出范围无效。值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")
@@ -619,7 +620,7 @@ fn_config(*) {
             tip: "文本符号的水平偏移量"
         }, {
             config: "textSymbol_offset_y",
-            textOpt: "yp",
+            textOpt: "xs",
             editOpt: "",
             tip: "文本符号的垂直偏移量"
         }, {
@@ -763,10 +764,45 @@ fn_config(*) {
             writeIni("gui_font_size", value)
             global fontOpt := ["s" value, "微软雅黑"]
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，然后重新打开配置菜单即可")
-        g.AddText("xs", "2. 点击下方按钮，实时显示当前激活的窗口进程信息")
-        g.AddText("yp", " ").GetPos(, , &__w)
-        gc._window_info := g.AddButton("xs w" bw, "获取窗口进程信息")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20。更改后，重新打开配置菜单即可")
+        g.AddText("Section xs", "2. 设置鼠标悬浮在「托盘菜单」上时的文字模板")
+        _ := g.AddEdit("w" bw)
+        _.Value := trayTipTemplate
+        _.OnEvent("Change", e_trayTemplate)
+        e_trayTemplate(item, *) {
+            value := item.value
+            global trayTipTemplate := value
+            writeIni("trayTipTemplate", value)
+            updateTip(A_IsPaused)
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %appState% 会替换为软件运行状态，%\n% 表示换行')
+
+        g.AddText("Section xs", "3. 设置按键次数统计的文字模板")
+        _ := g.AddEdit("w" bw)
+        _.Value := keyCountTemplate
+        _.OnEvent("Change", e_countTemplate)
+        e_countTemplate(item, *) {
+            value := item.value
+            global keyCountTemplate := value
+            writeIni("keyCountTemplate", value)
+            updateTip(A_IsPaused)
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态，%\n% 表示换行')
+
+        g.AddText("Section xs", "4. 是否开启按键次数统计: ")
+        _ := g.AddDropDownList("yp AltSubmit w" bw / 3, ["【否】关闭按键次数统计", "【是】开启按键次数统计"])
+        _.Value := enableKeyCount + 1
+        _.OnEvent("Change", fn_keyCount)
+        fn_keyCount(item, *) {
+            value := item.value - 1
+            global enableKeyCount := value
+            writeIni("enableKeyCount", value)
+            updateTip()
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，当鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
+
+        createGuiOpt().AddText(, " ").GetPos(, , &__w)
+        gc._window_info := g.AddButton("xs w" bw, "实时获取当前激活的窗口进程信息")
         gc._window_info.OnEvent("Click", e_window_info)
         g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
         _width := bw - _w - g.MarginX + __w
@@ -778,12 +814,12 @@ fn_config(*) {
         e_window_info(*) {
             if (gc.timer) {
                 gc.timer := 0
-                gc._window_info.Text := "获取窗口进程信息"
+                gc._window_info.Text := "实时获取当前激活的窗口进程信息"
                 return
             }
 
             gc.timer := 1
-            gc._window_info.Text := "停止获取窗口进程信息"
+            gc._window_info.Text := "停止获取当前激活的窗口进程信息"
 
             SetTimer(statusTimer, 25)
             statusTimer() {

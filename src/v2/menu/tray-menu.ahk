@@ -601,7 +601,7 @@ runJAB() {
         errGui(info) {
             g := createGuiOpt("InputTip - powershell 调用失败!")
             g.AddText("cRed", "- 在当前系统环境中，尝试调用 powershell 失败了`n- 以下功能会被自动禁用`n   -「开机自启动」中的「任务计划程序」`n   -「启用 JAB/JetBrains IDE 支持」")
-            g.AddText("cRed", "- 如果你想继续使用它，你需要解决 cmd 调用 powershell 失败的问题")
+            g.AddText("cRed", "- 如果你想继续使用它们，你需要解决 cmd 调用 powershell 失败的问题")
 
             if (info.i) {
                 return g

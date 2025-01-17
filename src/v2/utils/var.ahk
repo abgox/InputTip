@@ -4,6 +4,8 @@ fontOpt := ["s" readIni("gui_font_size", "12"), "微软雅黑"]
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
 
+modeList := {}
+
 ; 以哪一种状态作为判断依据
 baseStatus := readIni("baseStatus", 0, "InputMethod")
 ; 指定的状态码
@@ -472,17 +474,17 @@ hideSymbol() {
 
 pauseApp(*) {
     if (A_IsPaused) {
+        updateTip(!A_IsPaused)
         A_TrayMenu.Uncheck("暂停/运行")
         TraySetIcon("InputTipSymbol/default/favicon.png", , 1)
-        A_IconTip := "【运行中】" fileDesc
         reloadSymbol()
         if (enableJABSupport) {
             runJAB()
         }
     } else {
+        updateTip(!A_IsPaused)
         A_TrayMenu.Check("暂停/运行")
         TraySetIcon("InputTipSymbol/default/favicon-pause.png", , 1)
-        A_IconTip := "【已暂停】" fileDesc
         hideSymbol()
         if (enableJABSupport) {
             killJAB(0)

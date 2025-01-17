@@ -35,11 +35,18 @@ changeCursor := readIni("changeCursor", 0)
     3: 文本符号
 */
 symbolType := readIni("symbolType", 1)
+symbolPos := readIni("symbolType", 1)
+
+showCursorPos := readIni("showCursorPos", 0)
+showCursorPosList := ":" readIni("showCursorPosList", "wps.exe") ":"
+showCursorPos_x := readIni("showCursorPos_x", 0)
+showCursorPos_y := readIni("showCursorPos_y", -20)
+
 
 ; 在多少毫秒后隐藏符号，0 表示永不隐藏
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
 
-delay := readIni("delay", 50)
+delay := readIni("delay", 20)
 
 ; 开机自启动
 isStartUp := readIni("isStartUp", 0)
@@ -400,20 +407,23 @@ updateSymbol(init := 0) {
         }
     }
 }
-loadSymbol(state, left, top) {
+loadSymbol(state, left, top, isShowCursorPos := 0) {
     global lastSymbol, isOverSymbol
     static old_left := 0, old_top := 0
-    if (left = old_left && top = old_top) {
-        ; XXX: 如果鼠标一直悬浮在符号上，同时有键盘操作，就会出现符号闪烁
-        if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
-            return
+
+    if (!isShowCursorPos) {
+        if (left = old_left && top = old_top) {
+            ; XXX: 如果鼠标一直悬浮在符号上，同时有键盘操作，就会出现符号闪烁
+            if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
+                return
+            }
+        } else {
+            isOverSymbol := 0
         }
-    } else {
-        isOverSymbol := 0
     }
 
-    hideSymbol()
     if (!symbolType || !canShowSymbol) {
+        hideSymbol()
         return
     }
     showConfig := "NA "
@@ -421,7 +431,10 @@ loadSymbol(state, left, top) {
         _ := symbolConfig.enableIsolateConfigPic
         x := _ ? symbolConfig.%"pic_offset_x" state% : symbolConfig.pic_offset_x
         y := _ ? symbolConfig.%"pic_offset_y" state% : symbolConfig.pic_offset_y
-
+        if (isShowCursorPos) {
+            x += showCursorPos_x
+            y += showCursorPos_y
+        }
         showConfig .= "x" left + x "y" top + y
     } else if (symbolType = 2) {
         _ := symbolConfig.enableIsolateConfigBlock
@@ -429,17 +442,31 @@ loadSymbol(state, left, top) {
         h := _ ? symbolConfig.%"symbol_height" state% : symbolConfig.symbol_height
         x := _ ? symbolConfig.%"offset_x" state% : symbolConfig.offset_x
         y := _ ? symbolConfig.%"offset_y" state% : symbolConfig.offset_y
-
+        if (isShowCursorPos) {
+            x += showCursorPos_x
+            y += showCursorPos_y
+        }
         showConfig .= "w" w "h" h "x" left + x "y" top + y
     } else if (symbolType = 3) {
         _ := symbolConfig.enableIsolateConfigText
         x := _ ? symbolConfig.%"textSymbol_offset_x" state% : symbolConfig.textSymbol_offset_x
         y := _ ? symbolConfig.%"textSymbol_offset_y" state% : symbolConfig.textSymbol_offset_y
-
+        if (isShowCursorPos) {
+            x += showCursorPos_x
+            y += showCursorPos_y
+        }
         showConfig .= "x" left + x "y" top + y
     }
     if (symbolGui.%state%) {
         symbolGui.%state%.Show(showConfig)
+
+        for s in ["CN", "EN", "Caps"] {
+            if (s != state) {
+                try {
+                    symbolGui.%s%.Hide()
+                }
+            }
+        }
     }
 
     lastSymbol := state

@@ -41,7 +41,7 @@ while 1 {
                 }
             }
         }
-        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd")) {
+        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd") || !isMouseOver("ahk_exe " lastWindow)) {
             hideSymbol()
             needShow := 0
         }
@@ -54,37 +54,25 @@ while 1 {
                 switch_CN()
                 if (isCN()) {
                     loadCursor("CN", 1)
-                    if (needShow) {
-                        canShowSymbol := returnCanShowSymbol(&left, &top)
-                        loadSymbol("CN", left, top)
-                    }
+                    ShowSymbolEx("CN")
                 }
             } else if (InStr(app_EN, exe_str)) {
                 switch_EN()
                 if (!isCN()) {
                     loadCursor("EN", 1)
-                    if (needShow) {
-                        canShowSymbol := returnCanShowSymbol(&left, &top)
-                        loadSymbol("EN", left, top)
-                    }
+                    ShowSymbolEx("EN")
                 }
             } else if (InStr(app_Caps, exe_str)) {
                 switch_Caps()
                 if (GetKeyState("CapsLock", "T")) {
                     loadCursor("Caps", 1)
-                    if (needShow) {
-                        canShowSymbol := returnCanShowSymbol(&left, &top)
-                        loadSymbol("Caps", left, top)
-                    }
+                    ShowSymbolEx("Caps")
                 }
             }
         }
         if (GetKeyState("CapsLock", "T")) {
             loadCursor("Caps")
-            if (needShow) {
-                canShowSymbol := returnCanShowSymbol(&left, &top)
-                loadSymbol("Caps", left, top)
-            }
+            ShowSymbolEx("Caps")
             continue
         }
         try {
@@ -94,9 +82,28 @@ while 1 {
             continue
         }
         loadCursor(v)
-        if (needShow) {
+        ShowSymbolEx(v)
+    }
+}
+
+ShowSymbolEx(state) {
+    global canShowSymbol
+    if (needShow) {
+        if (showCursorPos || InStr(showCursorPosList, exe_str)) {
+            try {
+                MouseGetPos(&left, &top)
+                canShowSymbol := 1
+                loadSymbol(state, left, top, 1)
+            } catch {
+                hideSymbol()
+            }
+            return
+        }
+        try {
             canShowSymbol := returnCanShowSymbol(&left, &top)
-            loadSymbol(v, left, top)
+            loadSymbol(state, left, top)
+        } catch {
+            hideSymbol()
         }
     }
 }

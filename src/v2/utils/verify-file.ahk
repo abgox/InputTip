@@ -180,7 +180,6 @@ checkIni() {
         ; 是否使用白名单机制，如果是第一次使用，就直接使用白名单机制
         useWhiteList := readIni("useWhiteList", 1)
 
-        isContinue := true
         fz := "s14"
         createGui(confirmGui).Show()
         confirmGui(info) {
@@ -217,14 +216,14 @@ checkIni() {
                         g.Destroy()
                         writeIni("changeCursor", 1)
                         global changeCursor := 1
-                        isContinue := false
+                        initWhiteList()
                     }
                     g.AddButton("w" bw, "【否】不，我点错了").OnEvent("Click", e_no)
                     e_no(*) {
                         g.Destroy()
                         writeIni("changeCursor", 0)
                         global changeCursor := 0
-                        isContinue := false
+                        initWhiteList()
                     }
                     return g
                 }
@@ -234,7 +233,7 @@ checkIni() {
                 g.Destroy()
                 writeIni("changeCursor", 0)
                 global changeCursor := 0
-                isContinue := false
+                initWhiteList()
             }
             g.OnEvent("Close", e_exit)
             e_exit(*) {
@@ -242,39 +241,36 @@ checkIni() {
             }
             return g
         }
-        while (isContinue) {
-            try {
-                Sleep(500)
-            }
-        }
-        createGui(listTipGui).Show()
-        listTipGui(info) {
-            g := Gui("AlwaysOnTop")
-            g.SetFont(fz, "微软雅黑")
-            g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
-            g.AddLink("cRed", '<a href="https://inputtip.pages.dev/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
-            g.AddText(, "建议立即添加你常用的应用进程窗口到白名单中。")
+        initWhiteList() {
+            createGui(listTipGui).Show()
+            listTipGui(info) {
+                g := Gui("AlwaysOnTop")
+                g.SetFont(fz, "微软雅黑")
+                g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
+                g.AddLink("cRed", '<a href="https://inputtip.pages.dev/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
+                g.AddText(, "建议立即添加你常用的应用进程窗口到白名单中。")
 
-            if (info.i) {
+                if (info.i) {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                _c := g.AddButton("w" bw, "【是】现在去添加")
+                _c.Focus()
+                _c.OnEvent("Click", add_white_list)
+                add_white_list(*) {
+                    close()
+                    fn_white_list()
+                }
+                g.AddButton("w" bw, "【否】暂时不添加").OnEvent("Click", close)
+                close(*) {
+                    g.Destroy()
+                    gc.init := 0
+                    checkUpdate(1, 1)
+                }
                 return g
             }
-            w := info.w
-            bw := w - g.MarginX * 2
-
-            _c := g.AddButton("w" bw, "【是】现在去添加")
-            _c.Focus()
-            _c.OnEvent("Click", add_white_list)
-            add_white_list(*) {
-                close()
-                fn_white_list()
-            }
-            g.AddButton("w" bw, "【否】暂时不添加").OnEvent("Click", close)
-            close(*) {
-                g.Destroy()
-                gc.init := 0
-                checkUpdate(1, 1)
-            }
-            return g
         }
     }
 }

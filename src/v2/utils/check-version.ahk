@@ -241,7 +241,7 @@ checkUpdate(init := 0, once := false) {
                         g.AddText("yp cRed", "v" newVersion)
                         g.AddText("xs", "- 你应该使用")
                         g.AddText("yp cRed", "git pull")
-                        g.AddText("yp", "拉取最新的代码更改，并重启 " A_ScriptName)
+                        g.AddText("yp", "拉取最新的代码更改，并重启 InputTip.ahk")
                         g.AddText("xs", "---------------------------------------------------------------------")
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')

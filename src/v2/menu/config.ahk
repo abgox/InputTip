@@ -89,8 +89,7 @@ fn_config(*) {
             }
             restartJAB()
         }
-
-        g.addText("xs", "2. 在输入光标附近显示什么类型的符号: ")
+        g.addText("xs", "2. 显示什么类型的符号: ")
         g.AddDropDownList("yp AltSubmit Choose" symbolType + 1 " w" bw / 3, [" 【不】显示符号", " 显示【图片】符号", " 显示【方块】符号", " 显示【文本】符号"]).OnEvent("Change", e_symbol_type)
         e_symbol_type(item, *) {
             writeIni("symbolType", item.value - 1)
@@ -108,7 +107,7 @@ fn_config(*) {
         fn_clear(item, *) {
             item.value := ""
         }
-        g.AddText("xs cGray", "鼠标悬浮在符号上时，符号会隐藏，下次键盘操作或光标位置变化时再次显示")
+        g.AddText("xs cGray", "鼠标悬浮在符号上时，符号会隐藏，下次键盘操作或光标位置变化时再次显示`n如果某些应用中无法正常显示，可以通过「托盘菜单」中的「设置符号显示位置」，让它在鼠标附近显示")
         g.AddText("xs", "3. 无键盘和鼠标左键点击操作时，符号在多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后隐藏:")
@@ -151,7 +150,7 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 50 毫秒一般使用 1-100 之间的值`n此值的范围是 1-500，超出范围无效。值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，一般使用 1-100 之间的值。此值的范围是 1-500，超出范围无效。`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整`n如果指定了应用进程显示在鼠标附近，如果移动感觉有卡顿，就调低一点")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")
@@ -160,8 +159,8 @@ fn_config(*) {
         g.AddText("xs cGray", "- 如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
         g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的「下载鼠标样式扩展包」")
         g.AddText("xs", line)
-        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击左下角的「刷新路径列表」")
-        g.AddText("xs cGray", "你需要将「显示形式」页面中的第一个配置「是否同步修改鼠标样式」设置为【是】")
+        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击下方的「刷新路径列表」")
+        g.AddText("xs cGray", "如果「显示形式」页面中的第一个配置「是否同步修改鼠标样式」选择了【是】")
         g.AddText("xs cGray", "InputTip 就会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
         g.AddText("Section", "选择鼠标样式文件夹路径:")
         dirList := StrSplit(cursorDir, ":")
@@ -185,8 +184,17 @@ fn_config(*) {
             updateCursor()
             reloadCursor()
         }
-        g.AddButton("xs w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
-        g.AddButton("yp w" bw / 2, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
+        fn_open_dir(item, *) {
+            g.Opt("-AlwaysOnTop")
+            Run("explorer.exe " item._config)
+        }
+        g.AddText()
+        _w := bw / 3 - g.MarginX / 3
+        _ := g.AddButton("xs w" _w, "打开鼠标样式目录")
+        _._config := A_ScriptDir "\InputTipCursor"
+        _.OnEvent("Click", fn_open_dir)
+        g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
+        g.AddButton("yp w" _w, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
         e_cursor_package(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -261,6 +269,7 @@ fn_config(*) {
             }
         }
 
+        g.AddButton("xs w" bw, "设置图片符号在不同状态下的独立配置").OnEvent("Click", e_picIsolateConfig)
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "图片符号")
         g.AddText("yp", "的独立配置: ")
@@ -269,8 +278,6 @@ fn_config(*) {
         _.OnEvent("Change", fn_setIsolateConfig)
         _._config := "enableIsolateConfigPic"
 
-
-        g.AddButton("xs w" bw, "设置图片符号在不同状态下的独立配置").OnEvent("Click", e_picIsolateConfig)
         e_picIsolateConfig(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -326,8 +333,8 @@ fn_config(*) {
                 return g
             }
         }
-
-        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击左下角的「刷新路径列表」")
+        g.AddText("xs", line)
+        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的「刷新路径列表」")
         g.AddText(, "选择图片符号的文件路径: ")
         dirList := StrSplit(picDir, ":")
         if (dirList.Length = 0) {
@@ -363,8 +370,11 @@ fn_config(*) {
                 _.Text := ""
             }
         }
-        g.AddButton("xs w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
-        g.AddButton("yp w" bw / 2, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
+        _ := g.AddButton("xs w" _w, "打开图片符号目录")
+        _._config := A_ScriptDir "\InputTipSymbol"
+        _.OnEvent("Click", fn_open_dir)
+        g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
+        g.AddButton("yp w" _w, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
         e_pic_package(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -477,7 +487,8 @@ fn_config(*) {
         _._focus := g.AddEdit("yp w1")
         _._focus.OnEvent("Focus", fn_clear)
         _._focus.OnEvent("LoseFocus", fn_clear)
-
+        g.AddText()
+        g.AddButton("xs w" bw, "设置方块符号在不同状态下的独立配置").OnEvent("Click", e_blockIsolateConfig)
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "方块符号")
         g.AddText("yp", "的独立配置: ")
@@ -486,7 +497,6 @@ fn_config(*) {
         _.OnEvent("Change", fn_setIsolateConfig)
         _._config := "enableIsolateConfigBlock"
 
-        g.AddButton("xs w" bw, "设置方块符号在不同状态下的独立配置").OnEvent("Click", e_blockIsolateConfig)
         e_blockIsolateConfig(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -662,7 +672,8 @@ fn_config(*) {
         _._focus := g.AddEdit("yp w1")
         _._focus.OnEvent("Focus", fn_clear)
         _._focus.OnEvent("LoseFocus", fn_clear)
-
+        g.AddText()
+        g.AddButton("xs w" bw, "设置文本符号在不同状态下的独立配置").OnEvent("Click", e_textIsolateConfig)
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "文本符号")
         g.AddText("yp", "的独立配置: ")
@@ -670,7 +681,6 @@ fn_config(*) {
         _.Value := symbolConfig.enableIsolateConfigText + 1
         _.OnEvent("Change", fn_setIsolateConfig)
         _._config := "enableIsolateConfigText"
-        g.AddButton("xs w" bw, "设置文本符号在不同状态下的独立配置").OnEvent("Click", e_textIsolateConfig)
         e_textIsolateConfig(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()

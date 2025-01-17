@@ -218,7 +218,7 @@ fn_cursor_mode(*) {
                         g := createGuiOpt("InputTip - 设置光标获取模式")
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
-                            text .= "`n如果它还不在白名单中，则会同步添加到白名单中              "
+                            text .= "`n如果它不在白名单中，则会同步添加到白名单中              "
                         }
                         g.AddText("cRed", text)
                         g.AddText("Section", "应用进程名称: ")

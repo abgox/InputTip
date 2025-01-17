@@ -5,6 +5,7 @@
 #Include bw-list.ahk
 #Include pause-key.ahk
 #Include config.ahk
+#Include symbol-pos.ahk
 #Include app-offset.ahk
 #Include switch-key.ahk
 #Include switch-window.ahk
@@ -22,6 +23,7 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
+    A_TrayMenu.Add("设置符号显示位置", fn_symbol_pos)
     A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)
 
     A_TrayMenu.Add()
@@ -218,11 +220,17 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     bw := w - g.MarginX * 2
 
                     if (from = "add") {
+                        if (useWhiteList && tipList.config = "showCursorPosList") {
+                            g.AddText("xs cRed", "如果它不在白名单中，则会同步添加到白名单中")
+                        }
                         _ := g.AddButton("xs w" bw, "添加")
                         _.Focus()
                         _.OnEvent("Click", fn_add)
                         fn_add(*) {
                             g.Destroy()
+                            if (useWhiteList && tipList.config = "showCursorPosList") {
+                                updateWhiteList(exe_name)
+                            }
                             gc.%_gui "_LV_add"%.Delete(RowNumber)
                             gc.%_gui "_LV_rm"%.Add(, exe_name)
                             config := tipList.config
@@ -290,7 +298,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         g := createGuiOpt("InputTip - " tipList.tab[1])
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
-                            text .= "`n如果它还不在白名单中，则会同步添加到白名单中"
+                            text .= "`n如果它不在白名单中，则会同步添加到白名单中"
                         }
                         g.AddText("cRed", text)
                         g.AddText("xs", "应用进程名称: ")

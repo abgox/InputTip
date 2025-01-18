@@ -50,7 +50,7 @@ fn_startup(item, *) {
         createGui(startupGui).Show()
         startupGui(info) {
             g := createGuiOpt("InputTip - 设置开机自启动")
-            g.AddLink(, '详情请查看:   <a href="https://inputtip.pages.dev/FAQ/startup">关于开机自启动</a>`n---------------------------------------------------------------------')
+            g.AddLink(, '详情请查看:   <a href="https://inputtip.abgox.com/FAQ/startup">关于开机自启动</a>`n---------------------------------------------------------------------')
 
             if (info.i) {
                 return g

@@ -27,7 +27,7 @@ fn_about(*) {
         bw := w - g.MarginX * 2
 
         g.AddText("xs", "-------------------------------------------------------------------------------------")
-        g.AddLink("xs", '1. 官网: <a href="https://inputtip.pages.dev">https://inputtip.pages.dev</a>')
+        g.AddLink("xs", '1. 官网: <a href="https://inputtip.abgox.com">https://inputtip.abgox.com</a>')
         g.AddLink("xs", '2. Github: <a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
         g.AddLink("xs", '3. Gitee: <a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
         tab.UseTab(2)

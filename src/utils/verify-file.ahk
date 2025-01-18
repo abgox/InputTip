@@ -247,7 +247,7 @@ checkIni() {
                 g := Gui("AlwaysOnTop")
                 g.SetFont(fz, "微软雅黑")
                 g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
-                g.AddLink("cRed", '<a href="https://inputtip.pages.dev/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
+                g.AddLink("cRed", '<a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
                 g.AddText(, "建议立即添加你常用的应用进程窗口到白名单中。")
 
                 if (info.i) {

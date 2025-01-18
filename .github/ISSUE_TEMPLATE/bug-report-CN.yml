@@ -12,7 +12,7 @@ body:
           required: true
         - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue。
           required: true
-        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.pages.dev/FAQ/), 其中没有你遇到的问题。
+        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.abgox.com/FAQ/), 其中没有你遇到的问题。
           required: true
   - type: input
     id: version
@@ -20,7 +20,7 @@ body:
       label: 当前使用的 InputTip 版本
       description: |
         在软件的托盘菜单中，点击 **关于** 进行查看。
-        如果不是最新版本(**[点击查看最新版本号](https://inputtip.pages.dev/releases/v2/version.txt)**)，请先更新到最新版本，如果问题依然存在，再提交 issue。
+        如果不是最新版本(**[点击查看最新版本号](https://inputtip.abgox.com/releases/v2/version.txt)**)，请先更新到最新版本，如果问题依然存在，再提交 issue。
     validations:
       required: true
   - type: dropdown

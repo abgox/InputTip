@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">✨<a href="https://inputtip.pages.dev/">InputTip</a>✨</h1>
+  <h1 align="center">✨<a href="https://inputtip.abgox.com/">InputTip</a>✨</h1>
 </p>
 
 <p align="center">
@@ -44,9 +44,9 @@
     - [样式可以自定义](#自定义鼠标样式)
     - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
       - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
-      - 在 [更多已适配的鼠标样式](https://inputtip.pages.dev/download/extra) 中有提供它们的左手镜像版本
+      - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-    - 默认使用 [白名单机制](https://inputtip.pages.dev/FAQ/white-list/)
+    - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
   - 切换不同应用窗口时，自动切换指定的输入法状态(中文/英文/大写锁定)
   - 快捷键强制切换输入法状态
   - 详尽的自定义配置菜单
@@ -66,21 +66,21 @@
   - 在 `托盘菜单` => `关于` 中查看当前版本号
 - 查看相关的文档
   - 本页面中包含的内容
-  - [常见问题(FAQ)](https://inputtip.pages.dev/FAQ/)
+  - [常见问题(FAQ)](https://inputtip.abgox.com/FAQ/)
   - [输入法和应用窗口兼容情况](#兼容情况)
   - [issues](https://github.com/abgox/InputTip/issues)
   - ...
 
 ### 演示
 
-![demo](https://inputtip.pages.dev/releases/v2/demo.gif)
+![demo](https://inputtip.abgox.com/releases/v2/demo.gif)
 
 ---
 
 <details>
 <summary>一个使用方块符号的有趣配置</summary>
-<img style="width: 70%;" src="https://inputtip.pages.dev/releases/v2/config-demo.png" />
-<img style="width: 70%;" src="https://inputtip.pages.dev/releases/v2/config-demo.gif" />
+<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.png" />
+<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.gif" />
 </details>
 
 ### 使用
@@ -101,7 +101,7 @@
 >   3. 直接运行项目中的 `InputTip.ahk` 文件
 >      - `src\InputTip.ahk`
 
-- **[下载](https://inputtip.pages.dev/download) 并运行 `InputTip.exe` 即可**
+- **[下载](https://inputtip.abgox.com/download) 并运行 `InputTip.exe` 即可**
 
   - 你也可以在项目的 Releases 页面下载
   - 推荐做法: **新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它**
@@ -127,7 +127,7 @@
 
 - 设置鼠标样式
 
-  > [更多已适配的鼠标样式](https://inputtip.pages.dev/download/extra)
+  > [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
 
   1. 点击 `托盘菜单` => `更改配置` => `鼠标样式`
   2. 在下拉列表中，选择包含 `.cur` 或 `.ani` 文件的文件夹目录路径
@@ -225,7 +225,7 @@
 > - 以 `WPS` 为例
 >   - 使用 `设置符号显示位置`，根据窗口提示，将它添加到其中，即可实现在鼠标附近显示
 >   - 这是一个折中的处理方案，此前的 `v1` 版本就一直使用它，稳定性非常好
-> - [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list) 会记录这些特别的应用窗口
+> - [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list) 会记录这些特别的应用窗口
 
 #### 图片符号
 
@@ -235,7 +235,7 @@
   - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示图片符号` 时，会显示对应的图片符号
   - 你也可以将自己喜欢的图片符号，或者自己制作图片符号，放入 `InputTipSymbol` 目录下
     - 限制: 图片必须是 `.png` 格式
-    - [更多的符号图片](https://inputtip.pages.dev/download/extra)
+    - [更多的符号图片](https://inputtip.abgox.com/download/extra)
   - 然后，点击 `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择正确的图片路径
   - 如果留空，则不会显示对应状态的图片符号
 
@@ -260,7 +260,7 @@
 
 > [!Tip]
 >
-> - 也可以直接下载 [已经适配的鼠标样式](https://inputtip.pages.dev/download/extra) 来使用
+> - 也可以直接下载 [已经适配的鼠标样式](https://inputtip.abgox.com/download/extra) 来使用
 > - `InputTip.exe` 启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `default` 文件夹
 >   - `default` 用于存放中文/英文/大写锁定状态的 **默认** 鼠标样式
 
@@ -306,7 +306,7 @@
 
 ### 兼容情况
 
-#### [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list)
+#### [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list)
 
 #### 输入法兼容情况
 
@@ -336,7 +336,7 @@
 - **【自定义】**
 
   - 一个万能的模式，需要根据实际情况设置状态码(规则)和切换码(规则)
-  - 详情参考: [关于【自定义】模式](https://inputtip.pages.dev/FAQ/custom-input-mode)
+  - 详情参考: [关于【自定义】模式](https://inputtip.abgox.com/FAQ/custom-input-mode)
   - 可以通过 `设置输入法模式` => `自定义` 使用以下已知可用的配置:
 
     - 选择 `英文状态` 作为判断依据( `中文状态` 相反)

@@ -26,7 +26,7 @@ fn_config(*) {
             tab.Value := gc.tab
         }
         tab.UseTab(1)
-        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.pages.dev/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.pages.dev/FAQ/">常见的使用问题</a>                                              ')
+        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见的使用问题</a>                                              ')
 
         if (info.i) {
             return g
@@ -155,7 +155,7 @@ fn_config(*) {
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "鼠标样式")
-        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/cursor-style">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/cursor-style">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
         g.AddText("xs cGray", "- 如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
         g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的「下载鼠标样式扩展包」")
         g.AddText("xs", line)
@@ -202,7 +202,7 @@ fn_config(*) {
             }
             g := createGuiOpt("下载鼠标样式扩展包")
             g.AddText("Center h30", "从以下任意可用地址中下载鼠标样式扩展包:")
-            g.AddLink("xs", '官网: <a href="https://inputtip.pages.dev/download/extra">https://inputtip.pages.dev/download/extra</a>')
+            g.AddLink("xs", '官网: <a href="https://inputtip.abgox.com/download/extra">https://inputtip.abgox.com/download/extra</a>')
             g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
             g.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
             g.AddText(, "其中的鼠标样式已经完成适配，解压到 InputTipCursor 目录中即可使用")
@@ -214,7 +214,7 @@ fn_config(*) {
         tab.UseTab(3)
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "图片符号")
-        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/symbol-picture">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/symbol-picture">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
         g.AddText("xs", line)
         symbolPicConfig := [{
             config: "pic_offset_x",
@@ -381,7 +381,7 @@ fn_config(*) {
             }
             g := createGuiOpt("下载图片符号扩展包")
             g.AddText("Center h30", "从以下任意可用地址中下载图片符号扩展包:")
-            g.AddLink("xs", '官网: <a href="https://inputtip.pages.dev/download/extra">https://inputtip.pages.dev/download/extra</a>')
+            g.AddLink("xs", '官网: <a href="https://inputtip.abgox.com/download/extra">https://inputtip.abgox.com/download/extra</a>')
             g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
             g.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
             g.AddText(, "只要将其中的图片放到 InputTipSymbol 这个目录下就可以使用了")
@@ -430,8 +430,8 @@ fn_config(*) {
         }]
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "方块符号")
-        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/symbol-block">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-        g.AddLink("xs", '- 颜色设置为空，表示不显示对应的方块符号。 <a href="https://inputtip.pages.dev/FAQ/color-config">关于颜色配置</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/symbol-block">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("xs", '- 颜色设置为空，表示不显示对应的方块符号。 <a href="https://inputtip.abgox.com/FAQ/color-config">关于颜色配置</a>')
         g.AddText("xs", line)
         for v in symbolBlockColorConfig {
             g.AddText("xs", v.tip ": ")
@@ -568,8 +568,8 @@ fn_config(*) {
         tab.UseTab(5)
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "文本符号")
-        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.pages.dev/FAQ/symbol-text">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-        g.AddLink("xs", '- 文本字符可以设置为空，表示不显示对应的文本字符。 <a href="https://inputtip.pages.dev/FAQ/color-config">关于颜色配置</a>')
+        g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/symbol-text">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+        g.AddLink("xs", '- 文本字符可以设置为空，表示不显示对应的文本字符。 <a href="https://inputtip.abgox.com/FAQ/color-config">关于颜色配置</a>')
         g.AddText("xs", line)
         symbolTextConfig := [{
             config: "CN_Text",

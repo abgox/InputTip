@@ -55,7 +55,7 @@ fn_pause_key(*) {
         g.AddText("xs", "2.")
         g.AddText("yp cRed", "优先使用「设置组合快捷键」进行设置，除非因为快捷键占用无法设置")
         g.AddText("xs", '3.  这里会回显它的设置，建议先使用它，然后回到此处适当修改')
-        g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
+        g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
 
         g.AddText("xs", "设置")
         g.AddText("yp cRed", "暂停/运行")

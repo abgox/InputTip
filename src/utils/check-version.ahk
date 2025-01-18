@@ -6,8 +6,8 @@
  */
 checkVersion(currentVersion, callback, urls := [
     "https://inputtip.pages.dev/releases/v2/version.txt",
-    "https://gitee.com/abgox/InputTip/raw/main/src/v2/version.txt",
-    "https://github.com/abgox/InputTip/raw/main/src/v2/version.txt"
+    "https://gitee.com/abgox/InputTip/raw/main/src/version.txt",
+    "https://github.com/abgox/InputTip/raw/main/src/version.txt"
 ]) {
     currentVersion := StrReplace(currentVersion, "v", "")
     for v in urls {
@@ -114,7 +114,7 @@ checkUpdate(init := 0, once := false) {
                         g.AddText("yp", ">")
                         g.AddText("yp cRed", newVersion)
                         g.AddText("xs", "---------------------------------------------------------")
-                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
                         g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n")
 
                         if (info.i) {
@@ -203,7 +203,7 @@ checkUpdate(init := 0, once := false) {
                                 g.AddText("yp", "已忽略")
                                 g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
 
-                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件「托盘菜单」的「关于」中找到")
 
                                 if (info.i) {
                                     return g
@@ -241,10 +241,10 @@ checkUpdate(init := 0, once := false) {
                         g.AddText("yp cRed", "v" newVersion)
                         g.AddText("xs", "- 你应该使用")
                         g.AddText("yp cRed", "git pull")
-                        g.AddText("yp", "拉取最新的代码更改，并重启 " A_ScriptName)
+                        g.AddText("yp", "拉取最新的代码更改，并重启 InputTip.ahk")
                         g.AddText("xs", "---------------------------------------------------------------------")
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
 
                         if (info.i) {
                             return g
@@ -273,7 +273,7 @@ checkUpdate(init := 0, once := false) {
                                 g.AddText("yp", "已忽略")
                                 g.AddText("xs", "修改方式:「托盘菜单」=>「设置更新检查」")
 
-                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件托盘菜单的「关于」中找到")
+                                g.AddText("cGray", "如果你在使用过程中有任何问题，先检查版本是否为最新版本`n如果更新到最新版本，问题依然存在，请前往 Github 新建一个 issue`nGithub 和其他相关地址可以在软件「托盘菜单」的「关于」中找到")
 
                                 if (info.i) {
                                     return g
@@ -372,7 +372,7 @@ checkUpdateDone() {
             g.AddText("yp cRed", currentVersion)
             g.AddText("xs", "-------------------------------------------")
             g.AddText("xs", "建议查看更新日志，了解最新变化")
-            g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/v2/CHANGELOG.md">Gitee</a>')
+            g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.pages.dev/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
 
             if (info.i) {
                 return g

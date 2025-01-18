@@ -9,7 +9,7 @@ fn_startup(item, *) {
             FileDelete(A_Startup "\" fileLnk)
         }
         try {
-            RegDelete(HKEY_startup, A_ScriptName)
+            RegDelete(HKEY_startup, "abgox - " A_ScriptName)
         }
         A_TrayMenu.Uncheck(item)
         isStartUp := 0
@@ -96,7 +96,7 @@ fn_startup(item, *) {
             e_useReg(*) {
                 isStartUp := 3
                 try {
-                    RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", A_ScriptName)
+                    RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", "abgox - " A_ScriptName)
                     fn_handle()
                 } catch {
                     if (gc.w.subGui) {

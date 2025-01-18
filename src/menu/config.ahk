@@ -89,8 +89,7 @@ fn_config(*) {
             }
             restartJAB()
         }
-
-        g.addText("xs", "2. 在输入光标附近显示什么类型的符号: ")
+        g.addText("xs", "2. 显示什么类型的符号: ")
         g.AddDropDownList("yp AltSubmit Choose" symbolType + 1 " w" bw / 3, [" 【不】显示符号", " 显示【图片】符号", " 显示【方块】符号", " 显示【文本】符号"]).OnEvent("Change", e_symbol_type)
         e_symbol_type(item, *) {
             writeIni("symbolType", item.value - 1)
@@ -108,7 +107,7 @@ fn_config(*) {
         fn_clear(item, *) {
             item.value := ""
         }
-        g.AddText("xs cGray", "鼠标悬浮在符号上时，符号会隐藏，下次键盘操作或光标位置变化时再次显示")
+        g.AddText("xs cGray", "鼠标悬浮在符号上时，符号会隐藏，下次键盘操作或光标位置变化时再次显示`n如果某些应用中无法正常显示，可以通过「托盘菜单」中的「设置符号显示位置」，让它在鼠标附近显示")
         g.AddText("xs", "3. 无键盘和鼠标左键点击操作时，符号在多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后隐藏:")
@@ -147,10 +146,11 @@ fn_config(*) {
             writeIni("delay", value)
             global delay := value
             restartJAB()
+            updateTip()
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 50 毫秒一般使用 1-100 之间的值`n此值的范围是 1-500，如果超出范围则无效，会取最近的可用值`n值越小，响应越快，性能消耗越大，根据电脑性能适当调整")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，一般使用 1-100 之间的值。此值的范围是 1-500，超出范围无效。`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整`n如果指定了应用进程显示在鼠标附近，如果移动感觉有卡顿，就调低一点")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")
@@ -159,8 +159,8 @@ fn_config(*) {
         g.AddText("xs cGray", "- 如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
         g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的「下载鼠标样式扩展包」")
         g.AddText("xs", line)
-        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击左下角的「刷新路径列表」")
-        g.AddText("xs cGray", "你需要将「显示形式」页面中的第一个配置「是否同步修改鼠标样式」设置为【是】")
+        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击下方的「刷新路径列表」")
+        g.AddText("xs cGray", "如果「显示形式」页面中的第一个配置「是否同步修改鼠标样式」选择了【是】")
         g.AddText("xs cGray", "InputTip 就会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
         g.AddText("Section", "选择鼠标样式文件夹路径:")
         dirList := StrSplit(cursorDir, ":")
@@ -184,8 +184,17 @@ fn_config(*) {
             updateCursor()
             reloadCursor()
         }
-        g.AddButton("xs w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
-        g.AddButton("yp w" bw / 2, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
+        fn_open_dir(item, *) {
+            g.Opt("-AlwaysOnTop")
+            Run("explorer.exe " item._config)
+        }
+        g.AddText()
+        _w := bw / 3 - g.MarginX / 3
+        _ := g.AddButton("xs w" _w, "打开鼠标样式目录")
+        _._config := A_ScriptDir "\InputTipCursor"
+        _.OnEvent("Click", fn_open_dir)
+        g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
+        g.AddButton("yp w" _w, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
         e_cursor_package(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -267,8 +276,6 @@ fn_config(*) {
         _.Value := symbolConfig.enableIsolateConfigPic + 1
         _.OnEvent("Change", fn_setIsolateConfig)
         _._config := "enableIsolateConfigPic"
-
-
         g.AddButton("xs w" bw, "设置图片符号在不同状态下的独立配置").OnEvent("Click", e_picIsolateConfig)
         e_picIsolateConfig(*) {
             if (gc.w.subGui) {
@@ -325,8 +332,8 @@ fn_config(*) {
                 return g
             }
         }
-
-        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击左下角的「刷新路径列表」")
+        g.AddText("xs", line)
+        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的「刷新路径列表」")
         g.AddText(, "选择图片符号的文件路径: ")
         dirList := StrSplit(picDir, ":")
         if (dirList.Length = 0) {
@@ -362,8 +369,11 @@ fn_config(*) {
                 _.Text := ""
             }
         }
-        g.AddButton("xs w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
-        g.AddButton("yp w" bw / 2, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
+        _ := g.AddButton("xs w" _w, "打开图片符号目录")
+        _._config := A_ScriptDir "\InputTipSymbol"
+        _.OnEvent("Click", fn_open_dir)
+        g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
+        g.AddButton("yp w" _w, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
         e_pic_package(*) {
             if (gc.w.subGui) {
                 gc.w.subGui.Destroy()
@@ -476,7 +486,7 @@ fn_config(*) {
         _._focus := g.AddEdit("yp w1")
         _._focus.OnEvent("Focus", fn_clear)
         _._focus.OnEvent("LoseFocus", fn_clear)
-
+        g.AddText()
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "方块符号")
         g.AddText("yp", "的独立配置: ")
@@ -484,7 +494,6 @@ fn_config(*) {
         _.Value := symbolConfig.enableIsolateConfigBlock + 1
         _.OnEvent("Change", fn_setIsolateConfig)
         _._config := "enableIsolateConfigBlock"
-
         g.AddButton("xs w" bw, "设置方块符号在不同状态下的独立配置").OnEvent("Click", e_blockIsolateConfig)
         e_blockIsolateConfig(*) {
             if (gc.w.subGui) {
@@ -619,7 +628,7 @@ fn_config(*) {
             tip: "文本符号的水平偏移量"
         }, {
             config: "textSymbol_offset_y",
-            textOpt: "yp",
+            textOpt: "xs",
             editOpt: "",
             tip: "文本符号的垂直偏移量"
         }, {
@@ -661,7 +670,7 @@ fn_config(*) {
         _._focus := g.AddEdit("yp w1")
         _._focus.OnEvent("Focus", fn_clear)
         _._focus.OnEvent("LoseFocus", fn_clear)
-
+        g.AddText()
         g.AddText("xs", "是否启用")
         g.AddText("yp cRed", "文本符号")
         g.AddText("yp", "的独立配置: ")
@@ -763,10 +772,45 @@ fn_config(*) {
             writeIni("gui_font_size", value)
             global fontOpt := ["s" value, "微软雅黑"]
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20`n如果觉得配置菜单的字体太大或太小，可以适当调整这个值，然后重新打开配置菜单即可")
-        g.AddText("xs", "2. 点击下方按钮，实时显示当前激活的窗口进程信息")
-        g.AddText("yp", " ").GetPos(, , &__w)
-        gc._window_info := g.AddButton("xs w" bw, "获取窗口进程信息")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20。更改后，重新打开配置菜单即可")
+        g.AddText("Section xs", "2. 设置鼠标悬浮在「托盘菜单」上时的文字模板")
+        _ := g.AddEdit("w" bw)
+        _.Value := trayTipTemplate
+        _.OnEvent("Change", e_trayTemplate)
+        e_trayTemplate(item, *) {
+            value := item.value
+            global trayTipTemplate := value
+            writeIni("trayTipTemplate", value)
+            updateTip(A_IsPaused)
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %appState% 会替换为软件运行状态，%\n% 表示换行')
+
+        g.AddText("Section xs", "3. 设置按键次数统计的文字模板")
+        _ := g.AddEdit("w" bw)
+        _.Value := keyCountTemplate
+        _.OnEvent("Change", e_countTemplate)
+        e_countTemplate(item, *) {
+            value := item.value
+            global keyCountTemplate := value
+            writeIni("keyCountTemplate", value)
+            updateTip(A_IsPaused)
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态，%\n% 表示换行')
+
+        g.AddText("Section xs", "4. 是否开启按键次数统计: ")
+        _ := g.AddDropDownList("yp AltSubmit w" bw / 3, ["【否】关闭按键次数统计", "【是】开启按键次数统计"])
+        _.Value := enableKeyCount + 1
+        _.OnEvent("Change", fn_keyCount)
+        fn_keyCount(item, *) {
+            value := item.value - 1
+            global enableKeyCount := value
+            writeIni("enableKeyCount", value)
+            updateTip()
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，当鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
+
+        createGuiOpt().AddText(, " ").GetPos(, , &__w)
+        gc._window_info := g.AddButton("xs w" bw, "实时获取当前激活的窗口进程信息")
         gc._window_info.OnEvent("Click", e_window_info)
         g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
         _width := bw - _w - g.MarginX + __w
@@ -778,12 +822,12 @@ fn_config(*) {
         e_window_info(*) {
             if (gc.timer) {
                 gc.timer := 0
-                gc._window_info.Text := "获取窗口进程信息"
+                gc._window_info.Text := "实时获取当前激活的窗口进程信息"
                 return
             }
 
             gc.timer := 1
-            gc._window_info.Text := "停止获取窗口进程信息"
+            gc._window_info.Text := "停止获取当前激活的窗口进程信息"
 
             SetTimer(statusTimer, 25)
             statusTimer() {

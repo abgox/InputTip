@@ -5,6 +5,7 @@
 #Include bw-list.ahk
 #Include pause-key.ahk
 #Include config.ahk
+#Include symbol-pos.ahk
 #Include app-offset.ahk
 #Include switch-key.ahk
 #Include switch-window.ahk
@@ -22,6 +23,7 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
+    A_TrayMenu.Add("设置符号显示位置", fn_symbol_pos)
     A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)
 
     A_TrayMenu.Add()
@@ -61,14 +63,14 @@ fn_update_user(*) {
     createGui(updateUserGui).Show()
     updateUserGui(info) {
         g := createGuiOpt()
-        g.AddText("cRed", "- 如果是域用户，用户名需要添加域`n- 如: xxx\abgox")
+        g.AddText("cRed", "- 如果是域用户，在用户名中需要添加域`n- 如: xxx\abgox")
         g.AddText(, "用户名: ")
         _ := g.AddEdit("yp")
-        g.AddText("xs ReadOnly cGray", "设置完成后，关闭此窗口即可")
         if (info.i) {
             return g
         }
 
+        g.AddText("xs ReadOnly cGray", "设置完成后，直接关闭这个窗口即可")
         _._config := "userName"
         _.Value := readIni("userName", A_UserName, "UserInfo")
         _.Focus()
@@ -218,11 +220,17 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     bw := w - g.MarginX * 2
 
                     if (from = "add") {
+                        if (useWhiteList && tipList.config = "showCursorPosList") {
+                            g.AddText("xs cRed", "如果它不在白名单中，则会同步添加到白名单中")
+                        }
                         _ := g.AddButton("xs w" bw, "添加")
                         _.Focus()
                         _.OnEvent("Click", fn_add)
                         fn_add(*) {
                             g.Destroy()
+                            if (useWhiteList && tipList.config = "showCursorPosList") {
+                                updateWhiteList(exe_name)
+                            }
                             gc.%_gui "_LV_add"%.Delete(RowNumber)
                             gc.%_gui "_LV_rm"%.Add(, exe_name)
                             config := tipList.config
@@ -290,7 +298,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         g := createGuiOpt("InputTip - " tipList.tab[1])
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
-                            text .= "`n如果它还不在白名单中，则会同步添加到白名单中"
+                            text .= "`n如果它不在白名单中，则会同步添加到白名单中"
                         }
                         g.AddText("cRed", text)
                         g.AddText("xs", "应用进程名称: ")
@@ -601,7 +609,7 @@ runJAB() {
         errGui(info) {
             g := createGuiOpt("InputTip - powershell 调用失败!")
             g.AddText("cRed", "- 在当前系统环境中，尝试调用 powershell 失败了`n- 以下功能会被自动禁用`n   -「开机自启动」中的「任务计划程序」`n   -「启用 JAB/JetBrains IDE 支持」")
-            g.AddText("cRed", "- 如果你想继续使用它，你需要解决 cmd 调用 powershell 失败的问题")
+            g.AddText("cRed", "- 如果你想继续使用它们，你需要解决 cmd 调用 powershell 失败的问题")
 
             if (info.i) {
                 return g

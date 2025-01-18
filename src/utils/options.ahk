@@ -6,11 +6,11 @@
 #Warn All, Off
 Persistent
 ListLines 0
-KeyHistory 0
+KeyHistory 5
 DetectHiddenWindows 1
 InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.32.0
-currentVersion := "2.32.0"
+;@AHK2Exe-SetVersion 2.33.0
+currentVersion := "2.33.0"

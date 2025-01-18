@@ -11,7 +11,7 @@
 #Include .\utils\tools.ahk
 
 needSkip(exe_str) {
-    return !InStr(modeList.JAB, exe_str)
+    return showCursorPos || !InStr(modeList.JAB, exe_str)
 }
 
 returnCanShowSymbol(&left, &top) {

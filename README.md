@@ -52,19 +52,21 @@
   - 详尽的自定义配置菜单
     - 所有配置的修改，都在 `托盘菜单` 中进行
 
-> - [查看 v1 老版本](./src/v1/README.md) (此版本已经没啥用了，不再更新)
-
 [**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**](#stars)
 
 ### 新的变化
 
-- 请查阅 [更新日志](./src/v2/CHANGELOG.md)
+- 请查阅 [更新日志](./src/CHANGELOG.md)
 
 ### 常见问题
 
 - 如果有使用上的任何问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
   - 在 `托盘菜单` => `关于` 中查看当前版本号
-- 然后查看相关的说明文档、[常见问题(FAQ)](https://inputtip.pages.dev/FAQ/)、[issues](https://github.com/abgox/InputTip/issues) 等等
+- 查看相关的文档
+  - 本页面中包含的内容
+  - [常见问题(FAQ)](https://inputtip.pages.dev/FAQ/)
+  - [输入法和应用窗口兼容情况](#兼容情况)
+  - [issues](https://github.com/abgox/InputTip/issues)
 
 ### 演示
 
@@ -94,15 +96,7 @@
 >      ```
 >   2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
 >   3. 直接运行项目中的 `InputTip.ahk` 文件
->      - `src\v2\InputTip.ahk`
-
-> [!Warning]
->
-> - 软件中使用到了 `powershell`，请确保你的电脑环境中有 `powershell`
-> - 现在的 Windows，都内置了 `powershell`，但总有一些特殊环境没有，可能导致运行报错
-> - 如何确认是否有 `powershell`？
->   - 打开 `cmd` 输入 `powershell` 回车，如果出现报错，说明没有 `powershell`
->   - 你需要让 `cmd` 能够使用 `powershell`
+>      - `src\InputTip.ahk`
 
 - **[下载](https://inputtip.pages.dev/download) 并运行 `InputTip.exe` 即可**
 
@@ -159,11 +153,11 @@
    ```
 
 2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
-   - 这一步完成后，你也可以直接运行 `src\v2\InputTip.ahk` 来使用 `InputTip`
+   - 这一步完成后，你也可以直接运行 `src\InputTip.ahk` 来使用 `InputTip`
 3. 打开 `AutoHotKey Dash`
 4. 点击左边的 `Compile`，等待编译器下载完成
 5. 重新点击左边的 `Compile`
-6. 将 `src\v2\InputTip.ahk` 拖入弹出的编译窗口中
+6. 将 `src\InputTip.ahk` 拖入弹出的编译窗口中
 7. 点击左下角的 `Convert` 完成编译
 8. 运行编译后的 `InputTip.exe`
 
@@ -183,7 +177,7 @@
    - 如果使用了 `开机自启动` 中的 `任务计划程序`，你需要打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 和 `abgox.InputTip.JAB.JetBrains` 任务，删除它们
    - 也可以忽略，它们不会造成任何影响，但尽量删除，让电脑更清洁
 2. 退出 `InputTip.exe`
-   - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为否，会尝试进行恢复
+   - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为 `【否】`，会尝试进行恢复
    - 如果未完全恢复，请根据弹窗提示信息进行操作
 3. 删除以上所有文件或目录
 
@@ -224,7 +218,7 @@
 - `InputTip.exe` 启动后，会在同级目录下生成 `InputTipSymbol` 目录，其中包括 `default` 文件夹
 
   - `default` 文件夹中包含了默认的图片符号
-  - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 在输入光标附近显示什么类型的符号`，选择 `显示图片符号` 时，会在输入光标附近显示对应的图片符号
+  - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示图片符号` 时，会显示对应的图片符号
   - 你也可以将自己喜欢的图片符号，或者自己制作图片符号，放入 `InputTipSymbol` 目录下
     - 限制: 图片必须是 `.png` 格式
     - [更多的符号图片](https://inputtip.pages.dev/download/extra)
@@ -233,7 +227,7 @@
 
 #### 方块符号
 
-- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 在输入光标附近显示什么类型的符号`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
+- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
 - 默认中文状态为**红色**，英文状态为**蓝色**，大写锁定为**绿色**
 - 方块符号相关的配置: `托盘菜单` => `更改配置` => `方块符号`
 - 当其中的方块符号的颜色设置修改为空时，则不会显示该状态的方块符号
@@ -242,7 +236,7 @@
 
 #### 文本符号
 
-- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 在输入光标附近显示什么类型的符号`，选择 `显示文本符号` 时，会在输入光标附近显示对应的文本符号
+- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示文本符号` 时，会显示对应的文本符号
 - 默认中文状态为 `中`，英文状态为 `英`，大写锁定为 `大`
 - 文本符号相关的配置: `托盘菜单` => `更改配置` => `文本符号`
 - 当其中的文本字符设置修改为空时，则不会显示该状态的文本符号
@@ -298,13 +292,15 @@
 
 ### 兼容情况
 
+#### [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list)
+
 #### 输入法兼容情况
 
 > [!Tip]
 >
-> 现在，InputTip 使用【通用】和【自定义】模式兼容输入法，默认使用【通用】模式
+> 现在，InputTip 使用 **【通用】** 和 **【自定义】** 模式兼容输入法，默认使用 **【通用】** 模式
 
-- `【通用】模式`
+- **【通用】**
 
   - [微信输入法](https://z.weixin.qq.com/)
   - [搜狗输入法](https://shurufa.sogou.com/)，[搜狗五笔输入法](https://wubi.sogou.com/)
@@ -323,7 +319,7 @@
   - [可可五笔](https://suke.kim/)
   - 谷歌输入法
 
-- `【自定义】模式`
+- **【自定义】**
 
   - 一个万能的模式，需要根据实际情况设置状态码(规则)和切换码(规则)
   - 详情参考: [关于【自定义】模式](https://inputtip.pages.dev/FAQ/custom-input-mode)
@@ -341,8 +337,6 @@
         - 经过测试，`v3.1` 版本中，在 `切换码数字`的输入框中填入 `1` 即可
         - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题
 
-#### [应用窗口兼容情况](https://inputtip.pages.dev/FAQ/support-app-list)
-
 ### 参考项目
 
 - [ImTip - aardio](https://github.com/aardio/ImTip)
@@ -350,9 +344,9 @@
 - [AutoHotkeyScripts - Tebayaki](https://github.com/Tebayaki/AutoHotkeyScripts)
 - [language-indicator - yakunins](https://github.com/yakunins/language-indicator)
 - [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot)
-  - [InputTip v1](./src/v1/README.md) 在鼠标附近显示带文字的方块符号，后来 [InputTip v2](./) 版本默认通过不同颜色的鼠标样式来区分
+  - [InputTip v1](../v1) 在鼠标附近显示带文字的方块符号，后来 [InputTip v2](./) 版本默认通过不同颜色的鼠标样式来区分
   - 之后看到了 [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot) 和 [language-indicator - yakunins](https://github.com/yakunins/language-indicator) 的设计，通过不同颜色加上小符号来判断不同输入法状态
-  - InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](./src/v1/README.md) 中带文字的方块符号，去掉文字，加上不同的背景颜色
+  - InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](../v1) 中带文字的方块符号，去掉文字，加上不同的背景颜色
 
 ### Stars
 

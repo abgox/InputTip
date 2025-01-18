@@ -6,8 +6,8 @@
  */
 checkVersion(currentVersion, callback, urls := [
     "https://inputtip.pages.dev/releases/v2/version.txt",
-    "https://gitee.com/abgox/InputTip/raw/main/src/v2/version.txt",
-    "https://github.com/abgox/InputTip/raw/main/src/v2/version.txt"
+    "https://gitee.com/abgox/InputTip/raw/main/src/version.txt",
+    "https://github.com/abgox/InputTip/raw/main/src/version.txt"
 ]) {
     currentVersion := StrReplace(currentVersion, "v", "")
     for v in urls {

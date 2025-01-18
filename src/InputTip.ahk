@@ -2,7 +2,7 @@
 ;@AHK2Exe-SetName InputTip v1
 ;@AHK2Exe-SetVersion 1.10.2
 ;@AHK2Exe-SetLanguage 0x0804
-;@Ahk2Exe-SetMainIcon ..\favicon.ico
+;@Ahk2Exe-SetMainIcon favicon.ico
 ;@AHK2Exe-SetDescription InputTip v1 - 在鼠标处实时显示输入法中英文以及大写锁定状态的小工具
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 ;@Ahk2Exe-UpdateManifest 1

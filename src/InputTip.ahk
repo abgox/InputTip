@@ -124,7 +124,7 @@ if (hotkey_Pause) {
 keyCount := 0
 enableKeyCount := readIni("enableKeyCount", 0)
 trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
-keyCountTemplate := readIni("keyCountTemplate", "%\n%启动至今，有效的按键次数: %KeyCount%")
+keyCountTemplate := readIni("keyCountTemplate", "%\n%启动至今，有效的按键次数: %keyCount%")
 A_IconTip := StrReplace(trayTipTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
 
 updateTip()
@@ -133,7 +133,7 @@ updateTip(flag := "") {
     if (enableKeyCount) {
         if (flag != "") {
             tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", flag ? "暂停" : "运行")
-            tip := StrReplace(tip, "%KeyCount%", keyCount)
+            tip := StrReplace(tip, "%keyCount%", keyCount)
             tip := StrReplace(tip, "%\n%", "`n")
             A_IconTip := tip
             return
@@ -152,7 +152,7 @@ updateTip(flag := "") {
                 keyCount++
                 last := A_PriorKey
                 tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
-                tip := StrReplace(tip, "%KeyCount%", keyCount)
+                tip := StrReplace(tip, "%keyCount%", keyCount)
                 tip := StrReplace(tip, "%\n%", "`n")
                 A_IconTip := tip
             }

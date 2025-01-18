@@ -63,14 +63,14 @@ fn_update_user(*) {
     createGui(updateUserGui).Show()
     updateUserGui(info) {
         g := createGuiOpt()
-        g.AddText("cRed", "- 如果是域用户，用户名需要添加域`n- 如: xxx\abgox")
+        g.AddText("cRed", "- 如果是域用户，在用户名中需要添加域`n- 如: xxx\abgox")
         g.AddText(, "用户名: ")
         _ := g.AddEdit("yp")
-        g.AddText("xs ReadOnly cGray", "设置完成后，关闭此窗口即可")
         if (info.i) {
             return g
         }
 
+        g.AddText("xs ReadOnly cGray", "设置完成后，直接关闭这个窗口即可")
         _._config := "userName"
         _.Value := readIni("userName", A_UserName, "UserInfo")
         _.Focus()

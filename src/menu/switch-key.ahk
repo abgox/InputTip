@@ -20,7 +20,8 @@ fn_switch_key(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddText("xs", "4.  如果要移除快捷键，请选择「无」`n" line)
+        g.AddLink("xs", "4.  如果要移除快捷键，请选择「无」")
+        g.AddLink("xs", '5.  <a href="https://inputtip.pages.dev/FAQ/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
         keyConfigList := [{
             config: "hotkey_CN",
             tip: "中文状态",
@@ -34,11 +35,32 @@ fn_switch_key(*) {
             tip: "大写锁定",
             with: "win_Caps",
         }]
+
+
+        keyList := []
+        keyList.Push(["无", "Esc", "Shift", "LShift", "RShift", "Ctrl", "LCtrl", "RCtrl", "Alt", "LAlt", "RAlt"]*)
+        keyList.Push(["MButton", "LButton", "RButton"]*)
+        keyList.Push(["Space", "Tab", "Enter", "Backspace", "Delete", "Insert", "Home", "End", "PgUp", "PgDn", "Up", "Down", "Left", "Right"]*)
+
+        i := 0
+        while (i <= 9) {
+            keyList.Push("Numpad" i)
+            i++
+        }
+        keyList.Push(["NumpadDot", "NumLock", "NumpadDiv", "NumpadMult", "NumpadAdd", "NumpadSub", "NumpadEnter"]*)
+
+        i := 1
+        while (i <= 24) {
+            keyList.Push("F" i)
+            i++
+        }
+
         for v in keyConfigList {
             g.AddText("xs", "强制切换到")
             g.AddText("yp cRed", v.tip)
             g.AddText("yp", ":")
-            _ := gc.%v.config% := g.AddDropDownList("yp", ["无", "LShift", "RShift", "LCtrl", "RCtrl", "LAlt", "RAlt", "Esc"])
+
+            _ := gc.%v.config% := g.AddDropDownList("yp r9", keyList)
             _._config := v.config
             _._with := v.with
             _.OnEvent("Change", e_change_hotkey)
@@ -115,8 +137,8 @@ fn_switch_key(*) {
         g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击「确定」后生效")
         g.AddText("xs", "2.")
         g.AddText("yp cRed", "优先使用「设置单键」或「设置组合快捷键」设置，除非因为快捷键占用无法设置")
-        g.AddLink("xs", '3.  你需要首先查看 <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>')
-        g.AddText("xs", '4.  建议先使用「设置单键」或「设置组合快捷键」，然后回到此处适当修改`n' line)
+        g.AddText("xs", '3.  这里会回显它们的设置，建议先使用它们，然后回到此处适当修改')
+        g.AddLink("xs", '3.  你需要首先查看 <a href="https://inputtip.pages.dev/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
         for v in keyConfigList {
             g.AddText("xs", "强制切换到")
             g.AddText("yp cRed", v.tip)

@@ -21,7 +21,8 @@ body:
       label: 当前使用的 InputTip 版本
       description: |
         在软件的托盘菜单中，点击 **关于** 进行查看。
-        如果不是最新版本(**[点击查看最新版本号](https://inputtip.abgox.com/releases/v2/version.txt)**)，请先更新到最新版本，如果问题依然存在，再提交 issue。
+        如果不是右边的最新版本，请先更新到最新版本，如果问题依然存在，再提交 issue。
+        <a href="https://github.com/abgox/InputTip"><img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version" alt="version" /></a>
     validations:
       required: true
   - type: dropdown

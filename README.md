@@ -246,7 +246,6 @@
 - 方块符号相关的配置: `托盘菜单` => `更改配置` => `方块符号`
 - 当其中的方块符号的颜色设置修改为空时，则不会显示该状态的方块符号
   - 比如: 你只希望在中文状态下显示方块符号，那么就将 `英文状态时方块符号的颜色` 和 `大写锁定时方块符号的颜色` 的值都设置为空
-  - 如果选择 `显示文本符号`，方块符号的颜色为空会导致文本符号无法显示
 
 #### 文本符号
 
@@ -375,6 +374,6 @@
 
 ### 赞赏支持
 
-<a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://abgox.pages.dev/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://me.abgox.com/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-![赞赏支持](https://abgox.pages.dev/support.png)
+![赞赏支持](https://me.abgox.com/support.png)

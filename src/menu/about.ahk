@@ -46,7 +46,7 @@ fn_about(*) {
         g.AddText("xs", '- 因为实现很简单，就是去掉 v1 中方块符号的文字，加上不同的背景颜色')
 
         tab.UseTab(4)
-        g.AddLink("Section w" bw, '1. <a href="https://pscompletions.pages.dev/">PSCompletions</a> : 一个 PowerShell 补全模块，它能让你在 PowerShell 中更简单、更方便地使用命令补全。')
+        g.AddLink("Section w" bw, '1. <a href="https://pscompletions.abgox.com/">PSCompletions</a> : 一个 PowerShell 补全模块，它能让你在 PowerShell 中更简单、更方便地使用命令补全。')
         g.AddLink("Section w" bw, '2. ...')
 
         tab.UseTab(0)

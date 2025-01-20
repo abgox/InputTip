@@ -13,7 +13,7 @@ fn_about(*) {
         g.AddText("Section", '当前版本: ')
         g.AddEdit("yp ReadOnly cRed", currentVersion)
         g.AddText("xs", '开发人员: ')
-        g.AddEdit("yp ReadOnly", 'abgox')
+        g.AddLink("yp", '<a href="https://me.abgox.com">abgox</a>')
         g.AddText("xs", 'QQ 账号: ')
         g.AddEdit("yp ReadOnly", '1151676611')
         g.AddLink("xs", 'QQ 反馈交流群( <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327">点击添加</a> ): ')

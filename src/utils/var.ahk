@@ -46,6 +46,7 @@ showCursorPos_y := readIni("showCursorPos_y", -20)
 ; 在多少毫秒后隐藏符号，0 表示永不隐藏
 HideSymbolDelay := readIni("HideSymbolDelay", 0)
 
+; 每多少毫秒后更新符号的显示位置和状态
 delay := readIni("delay", 20)
 
 ; 开机自启动
@@ -457,16 +458,10 @@ loadSymbol(state, left, top, isShowCursorPos := 0) {
         }
         showConfig .= "x" left + x "y" top + y
     }
+    hideSymbol()
+
     if (symbolGui.%state%) {
         symbolGui.%state%.Show(showConfig)
-
-        for s in ["CN", "EN", "Caps"] {
-            if (s != state) {
-                try {
-                    symbolGui.%s%.Hide()
-                }
-            }
-        }
     }
 
     lastSymbol := state

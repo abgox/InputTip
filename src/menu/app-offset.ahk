@@ -134,7 +134,9 @@ fn_app_offset(*) {
 
     handleClick(LV, RowNumber, tipList, action, app := "") {
         fn_write_offset() {
-            gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"
+            try {
+                gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"
+            }
             _app_offset := ""
             for v in app_offset.OwnProps() {
                 _info := v "|"
@@ -250,6 +252,67 @@ fn_app_offset(*) {
                     }
                     app_offset.DeleteProp(app)
                     fn_write_offset()
+                }
+            }
+            _ := g.AddButton("Section w" bw, "批量设置")
+            _._exe_name := app
+            _.OnEvent("Click", e_setAll)
+            e_setAll(item, *) {
+                close()
+                createGui(setAllGui).Show()
+                setAllGui(info) {
+                    offset := { x: 0, y: 0 }
+                    g := createGuiOpt("批量设置 " item._exe_name " 在多个屏幕的特殊偏移量")
+                    g.AddText("cRed", "如果偏移量为空，将自动设置为 0")
+
+                    if (info.i) {
+                        return g
+                    }
+
+                    g.AddText("Section", "水平方向的偏移量: ")
+                    _ := g.AddEdit("yp")
+                    _.Value := 0
+                    _._o := "x"
+                    _.OnEvent("Change", e_change_offset)
+
+                    g.AddText("xs", "垂直方向的偏移量: ")
+                    _ := g.AddEdit("yp")
+                    _.Value := 0
+                    _._o := "y"
+                    _.OnEvent("Change", e_change_offset)
+                    e_change_offset(item, *) {
+                        offset.%item._o% := item.value
+                    }
+                    g.AddText("xs cRed", "所有勾选的屏幕将使用上方的偏移量设置")
+
+                    flag := 0
+                    for i, v in screenList {
+                        opt := i = 1 ? "xs" : "yp"
+                        if (flag = 5) {
+                            opt := "xs"
+                            flag := 0
+                        }
+                        _ := g.AddCheckbox(opt " v" v.num, "屏幕 " v.num)
+                        _.Value := 1
+                        _._v_num := v.num
+                        _.OnEvent("Click", e_check)
+                        e_check(item, *) {
+                            offset.%item._v_num% := item.Value
+                        }
+                        flag++
+                    }
+                    g.AddButton("xs w" w, "确认").OnEvent("Click", e_yes)
+                    e_yes(item, *) {
+                        info := g.Submit()
+                        for v in screenList {
+                            if (info.%v.num%) {
+                                app_offset.%app%.%v.num%.x := returnNumber(offset.x)
+                                app_offset.%app%.%v.num%.y := returnNumber(offset.y)
+                            }
+                        }
+                        fn_write_offset()
+                    }
+                    return g
                 }
             }
             g.OnEvent("Close", close)

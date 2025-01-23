@@ -24,26 +24,28 @@ checkVersion(currentVersion, callback, urls := [
             callback(info.version, info.url)
             return 1
         }
-        req := ComObject("Msxml2.XMLHTTP")
-        req.open("GET", url, true)
-        req.onreadystatechange := Ready
-        req.send()
-        Ready() {
-            if (req.readyState != 4)  ; 没有完成.
-                return
-            if (req.status == 200) {
-                if (info.version) {
+        try {
+            req := ComObject("Msxml2.XMLHTTP")
+            req.open("GET", url, true)
+            req.onreadystatechange := Ready
+            req.send()
+            Ready() {
+                if (req.readyState != 4)  ; 没有完成.
                     return
-                }
-                newVersion := Trim(StrReplace(StrReplace(StrReplace(req.responseText, "`r", ""), "`n", ""), "v", ""))
-                if (newVersion ~= "^[\d\.]+$" && compareVersion(newVersion, currentVersion) > 0) {
+                if (req.status == 200) {
                     if (info.version) {
                         return
                     }
-                    info.version := newVersion
-                    info.url := url
-                    try {
-                        callback(newVersion, url)
+                    newVersion := Trim(StrReplace(StrReplace(StrReplace(req.responseText, "`r", ""), "`n", ""), "v", ""))
+                    if (newVersion ~= "^[\d\.]+$" && compareVersion(newVersion, currentVersion) > 0) {
+                        if (info.version) {
+                            return
+                        }
+                        info.version := newVersion
+                        info.url := url
+                        try {
+                            callback(newVersion, url)
+                        }
                     }
                 }
             }

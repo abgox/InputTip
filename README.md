@@ -103,7 +103,11 @@
 
 > [!Tip]
 >
-> 使用 [WinGet](https://github.com/microsoft/winget-cli) 安装: `winget install abgox.InputTip`
+> 使用 [WinGet](https://github.com/microsoft/winget-cli) 安装:
+>
+> ```shell
+> winget install abgox.InputTip
+> ```
 >
 > 注意: 配置信息保存在 `InputTip.exe` 同级目录下的 `InputTip.ini` 配置文件中
 

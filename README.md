@@ -40,7 +40,7 @@
 - 使用 `AutoHotKey` 编写，仅 Windows 系统可用
 - 一个实时的输入法状态(中文/英文/大写锁定)提示工具
 
-  - 根据输入法状态改变鼠标样式
+  - 根据输入法状态同步修改鼠标样式
     - [样式可以自定义](#自定义鼠标样式)
     - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
       - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
@@ -49,7 +49,7 @@
     - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
   - 切换不同应用窗口时，自动切换指定的输入法状态(中文/英文/大写锁定)
   - 快捷键强制切换输入法状态
-  - 详尽的自定义配置菜单
+  - 详细便捷的配置菜单
     - 所有配置的修改，都在 `托盘菜单` 中进行
     - 你可以设置字体大小来解决屏幕过小导致菜单显示不完全或屏幕过大导致菜单显示过小的问题
       - `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
@@ -100,6 +100,12 @@
 >   2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
 >   3. 直接运行项目中的 `InputTip.ahk` 文件
 >      - `src\InputTip.ahk`
+
+> [!Tip]
+>
+> 使用 [WinGet](https://github.com/microsoft/winget-cli) 安装: `winget install abgox.InputTip`
+>
+> 注意: 配置信息保存在 `InputTip.exe` 同级目录下的 `InputTip.ini` 配置文件中
 
 - **[下载](https://inputtip.abgox.com/download) 并运行 `InputTip.exe` 即可**
 

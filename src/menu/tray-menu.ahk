@@ -581,6 +581,22 @@ getPicDir() {
     picList.InsertAt(1, '')
     return picList
 }
+
+/**
+ * 获取字体名称列表
+ */
+getFontList() {
+    list := []
+    for v in ["HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE"] {
+        loop reg v "\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
+        {
+            ; 去除注册表项中的括号及后缀（如 "(TrueType)"）
+            list.Push(RegExReplace(A_LoopRegName, "\s*\(.*?\)$", ""))
+        }
+    }
+    return list
+}
+
 /**
  * 启动 JAB 进程
  * @returns {1|0} 1/0: 是否存在错误

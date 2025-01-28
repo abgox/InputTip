@@ -80,6 +80,9 @@ updateList(1)
 
 screenList := getScreenInfo()
 
+fontList := getFontList()
+fontList.InsertAt(1, "微软雅黑")
+
 updateAppOffset(1)
 
 updateCursorMode(1)

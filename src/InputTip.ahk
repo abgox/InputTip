@@ -165,7 +165,7 @@ updateTip(flag := "") {
     }
 }
 
-picDir := readIni("picDir", ":")
+picDir := readIni("picDir", "")
 cursorDir := readIni("cursorDir", "")
 
 SetTimer(getDirTimer, -1)

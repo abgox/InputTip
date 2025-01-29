@@ -38,16 +38,16 @@
 > QQ 反馈交流群: [451860327](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327)
 
 - 使用 `AutoHotKey` 编写，仅 Windows 系统可用
-- 一个实时的输入法状态(中文/英文/大写锁定)提示工具
+- 一个实时的输入法状态提示工具
 
   - 根据输入法状态同步修改鼠标样式
-    - [样式可以自定义](#自定义鼠标样式)
+    - [自定义鼠标样式](#自定义鼠标样式)
     - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
       - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
       - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
     - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
-  - 切换不同应用窗口时，自动切换指定的输入法状态(中文/英文/大写锁定)
+  - 切换不同应用窗口时，自动切换指定的输入法状态
   - 快捷键强制切换输入法状态
   - 详细便捷的配置菜单
     - 所有配置的修改，都在 `托盘菜单` 中进行
@@ -83,6 +83,48 @@
 <img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.gif" />
 </details>
 
+### 安装
+
+> [!Tip]
+>
+> 配置信息保存在 `InputTip.exe` 同级目录下的 `InputTip.ini` 配置文件中
+
+> [!Warning]
+>
+> 如果使用 WinGet 安装，不要通过 WinGet 进行二次安装或更新
+>
+> 这会导致配置文件丢失，请使用 InputTip 内置的更新检查进行更新
+
+1. 使用 [Scoop](https://scoop.sh/) 安装:
+
+   ```shell
+   scoop install https://inputtip.abgox.com/installer/scoop/InputTip.json
+   ```
+
+2. 使用 [WinGet](https://github.com/microsoft/winget-cli) 安装:
+
+   ```shell
+   winget install abgox.InputTip
+   ```
+
+3. [手动下载 InputTip.exe 或 InputTip.zip](https://inputtip.abgox.com/download)
+
+   - 下载 `InputTip.zip` 解压并运行其中的 `InputTip.exe`
+
+   - 下载 `InputTip.exe` 并运行它
+
+     - **建议首先新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它**
+       - 因为运行 `InputTip.exe` 后，会产生以下文件或文件夹
+         - `InputTipCursor` 鼠标样式文件夹
+         - `InputTipSymbol` 图片符号文件夹
+         - `InputTip.ini` 配置文件
+         - `InputTip.lnk` 快捷方式
+           - 通过任务计划程序生成的特殊快捷方式
+           - 运行此快捷方式不会弹出 `UAC` 权限提示窗口
+           - 此快捷方式被删除后，会随着 `InputTip.exe` 启动重新生成
+           - 详情查看 [关于 UAC](https://inputtip.abgox.com/FAQ/UAC-window)
+       - **这样做，所有相关的文件或文件夹都在同一个目录中，方便管理**
+
 ### 使用
 
 > [!Tip]
@@ -101,56 +143,24 @@
 >   3. 直接运行项目中的 `InputTip.ahk` 文件
 >      - `src\InputTip.ahk`
 
+1. 完成 [安装](#安装) 后，运行 `InputTip.exe` 即可
+
+2. 设置开机自启动: 点击 `托盘菜单` => `开机自启动`
+
+3. 设置鼠标样式
+
+   > [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
+
+   1. 点击 `托盘菜单` => `更改配置` => `鼠标样式`
+   2. 在下拉列表中，选择包含 `.cur` 或 `.ani` 文件的文件夹目录路径
+
+   - 比如默认的中文鼠标样式文件夹目录路径: `InputTipCursor\default\CN`
+
+   3. 点击 `确认`
+
 > [!Tip]
 >
-> 使用 [WinGet](https://github.com/microsoft/winget-cli) 安装:
->
-> ```shell
-> winget install abgox.InputTip
-> ```
->
-> 注意: 配置信息保存在 `InputTip.exe` 同级目录下的 `InputTip.ini` 配置文件中
-
-- **[下载](https://inputtip.abgox.com/download) 并运行 `InputTip.exe` 即可**
-
-  - 你也可以在项目的 Releases 页面下载
-  - 推荐做法: **新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它**
-    - 因为运行 `InputTip.exe` 后，会产生以下文件或文件夹
-      - `InputTipCursor` 鼠标样式文件夹
-      - `InputTipSymbol` 图片符号文件夹
-      - `InputTip.ini` 配置文件
-      - `InputTip.lnk` 快捷方式
-        - 通过任务计划程序生成的特殊快捷方式
-        - 运行此快捷方式不会弹出 `UAC` 权限提示窗口
-        - 此快捷方式被删除后，会随着 `InputTip.exe` 启动重新生成
-    - **这样做，所有相关的文件或文件夹都在同一个目录中，方便管理**
-      - 或者直接下载 `InputTip.zip`
-
-- 关于 `UAC` 权限提示窗口
-
-  - 由于 `InputTip.exe` 需要管理员权限才能正常运行，所以会弹出 `UAC` 权限提示窗口
-  - 如果你希望不弹出此窗口
-    - 请运行由 `InputTip.exe` 生成的 `InputTip.lnk` 快捷方式
-    - 或者将 `系统设置` 中的 `更改用户账户控制设置` 设置为 `从不通知`
-
-- 设置开机自启动: 点击 `托盘菜单` => `开机自启动`
-
-- 设置鼠标样式
-
-  > [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
-
-  1. 点击 `托盘菜单` => `更改配置` => `鼠标样式`
-  2. 在下拉列表中，选择包含 `.cur` 或 `.ani` 文件的文件夹目录路径
-     - 比如默认的中文鼠标样式文件夹目录路径: `InputTipCursor\default\CN`
-  3. 点击 `确认`
-
-> [!Warning]
->
-> - 你应该尽量让三种状态下的鼠标样式文件夹中包含的鼠标样式文件的数量和类型是一致的
-> - 比如：
->   - 如果中文状态的目录路径下有 `IBeam.cur` 或 `IBeam.ani` 文件，英文状态或大写锁定的目录路径下没有。
->   - 则切换到中文状态时，会加载中文状态的 `IBeam.cur`
->   - 但是再切换到英文或大写锁定时，`IBeam` 类型的鼠标样式不会变化，因为英文和大写锁定缺少对应的样式文件
+> 使用鼠标右键点击 `托盘菜单` 查看其他相关设置
 
 ### 编译
 

@@ -12,6 +12,9 @@
 #Include JAB.ahk
 #Include about.ahk
 
+fontList := getFontList()
+fontList.InsertAt(1, "微软雅黑")
+
 makeTrayMenu() {
     A_TrayMenu.Delete()
     A_TrayMenu.Add("开机自启动", fn_startup)
@@ -486,7 +489,7 @@ fn_white_list(*) {
         rmConfirm2: "从「符号显示白名单」中移除？",
         rmConfirm3: "移除后，白名单机制下，在此应用窗口中时，不会显示符号",
     },
-    fn
+        fn
     )
     fn(value) {
         global app_show_state := ":" value ":"

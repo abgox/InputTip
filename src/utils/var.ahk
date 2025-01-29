@@ -80,9 +80,6 @@ updateList(1)
 
 screenList := getScreenInfo()
 
-fontList := getFontList()
-fontList.InsertAt(1, "微软雅黑")
-
 updateAppOffset(1)
 
 updateCursorMode(1)
@@ -347,68 +344,68 @@ updateSymbol(init := 0) {
                 }
             }
         }
-        case 2:
-        {
-            ; 方块符号
-            for state in ["CN", "EN", "Caps"] {
-                if (symbolConfig.%state "_color"%) {
-                    _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                    __ := symbolConfig.enableIsolateConfigBlock
+            case 2:
+            {
+                ; 方块符号
+                for state in ["CN", "EN", "Caps"] {
+                    if (symbolConfig.%state "_color"%) {
+                        _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                        __ := symbolConfig.enableIsolateConfigBlock
 
-                    t := __ ? symbolConfig.%"transparent" state% : symbolConfig.transparent
-                    WinSetTransparent(t)
+                        t := __ ? symbolConfig.%"transparent" state% : symbolConfig.transparent
+                        WinSetTransparent(t)
 
-                    try {
-                        _.BackColor := symbolConfig.%state "_color"%
-                    }
+                        try {
+                            _.BackColor := symbolConfig.%state "_color"%
+                        }
 
-                    bt := __ ? symbolConfig.%"border_type" state% : symbolConfig.border_type
-                    _.Opt("-LastFound")
-                    switch bt {
-                        case 1: _.Opt("+e0x00000001")
-                        case 2: _.Opt("+e0x00000200")
-                        case 3: _.Opt("+e0x00020000")
-                    }
-                }
-            }
-        }
-        case 3:
-        {
-            ; 文本符号
-            for state in ["CN", "EN", "Caps"] {
-                if (symbolConfig.%state "_Text"%) {
-                    _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                    __ := symbolConfig.enableIsolateConfigText
-
-                    _.MarginX := 0, _.MarginY := 0
-
-                    ff := __ ? symbolConfig.%"font_family" state% : symbolConfig.font_family
-                    fz := __ ? symbolConfig.%"font_size" state% : symbolConfig.font_size
-                    fc := __ ? symbolConfig.%"font_color" state% : symbolConfig.font_color
-                    fw := __ ? symbolConfig.%"font_weight" state% : symbolConfig.font_weight
-                    try {
-                        _.SetFont('s' fz ' c' fc ' w' fw, ff)
-                    }
-
-                    _.AddText(, symbolConfig.%state "_Text"%)
-
-                    t := __ ? symbolConfig.%"textSymbol_transparent" state% : symbolConfig.textSymbol_transparent
-                    WinSetTransparent(t)
-
-                    try {
-                        _.BackColor := symbolConfig.%"textSymbol_" state "_color"%
-                    }
-
-                    bt := __ ? symbolConfig.%"textSymbol_border_type" state% : symbolConfig.textSymbol_border_type
-                    switch bt {
-                        case 1: _.Opt("-LastFound +e0x00000001")
-                        case 2: _.Opt("-LastFound +e0x00000200")
-                        case 3: _.Opt("-LastFound +e0x00020000")
-                        default: _.Opt("-LastFound")
+                        bt := __ ? symbolConfig.%"border_type" state% : symbolConfig.border_type
+                        _.Opt("-LastFound")
+                        switch bt {
+                            case 1: _.Opt("+e0x00000001")
+                            case 2: _.Opt("+e0x00000200")
+                            case 3: _.Opt("+e0x00020000")
+                        }
                     }
                 }
             }
-        }
+                case 3:
+                {
+                    ; 文本符号
+                    for state in ["CN", "EN", "Caps"] {
+                        if (symbolConfig.%state "_Text"%) {
+                            _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                            __ := symbolConfig.enableIsolateConfigText
+
+                            _.MarginX := 0, _.MarginY := 0
+
+                            ff := __ ? symbolConfig.%"font_family" state% : symbolConfig.font_family
+                            fz := __ ? symbolConfig.%"font_size" state% : symbolConfig.font_size
+                            fc := __ ? symbolConfig.%"font_color" state% : symbolConfig.font_color
+                            fw := __ ? symbolConfig.%"font_weight" state% : symbolConfig.font_weight
+                            try {
+                                _.SetFont('s' fz ' c' fc ' w' fw, ff)
+                            }
+
+                            _.AddText(, symbolConfig.%state "_Text"%)
+
+                            t := __ ? symbolConfig.%"textSymbol_transparent" state% : symbolConfig.textSymbol_transparent
+                            WinSetTransparent(t)
+
+                            try {
+                                _.BackColor := symbolConfig.%"textSymbol_" state "_color"%
+                            }
+
+                            bt := __ ? symbolConfig.%"textSymbol_border_type" state% : symbolConfig.textSymbol_border_type
+                            switch bt {
+                                case 1: _.Opt("-LastFound +e0x00000001")
+                                case 2: _.Opt("-LastFound +e0x00000200")
+                                case 3: _.Opt("-LastFound +e0x00020000")
+                                default: _.Opt("-LastFound")
+                            }
+                        }
+                    }
+                }
     }
 }
 loadSymbol(state, left, top, isShowCursorPos := 0) {

@@ -166,10 +166,12 @@ if (!FileExist("InputTipCursor\default\Caps\Wait.ani")) {
 
 /**
  * - 检查配置文件
- * - 当配置文件不存在时，选择是否修改鼠标样式
+ * - 当配置文件不存在(无法读取 mode 配置项)时，进入初始化引导
  */
 checkIni() {
-    if (!FileExist("InputTip.ini")) {
+    try {
+        mode := IniRead("InputTip.ini", "InputMethod", "mode")
+    } catch {
         gc.init := 1
 
         userName := readIni("userName", A_UserName, "UserInfo")

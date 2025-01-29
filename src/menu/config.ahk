@@ -257,10 +257,10 @@ fn_config(*) {
             reloadSymbol()
         }
         fn_writeIsolateConfig(item, *) {
-            if (InStr(item._config, "color")) {
-                writeIni(item._config, item.Value)
+            if (RegExMatch(item._config, "(color)|(font)")) {
+                writeIni(item._config, item.Text)
             } else {
-                writeIni(item._config, returnNumber(item.Value))
+                writeIni(item._config, returnNumber(item.Text))
             }
             if (item._update) {
                 updateSymbol()
@@ -639,13 +639,18 @@ fn_config(*) {
         }]
         for v in symbolTextConfig {
             g.AddText(v.textOpt, v.tip ": ")
-            _ := g.AddEdit("yp " v.editOpt)
+            if (v.config = "font_family") {
+                _ := g.AddComboBox("yp AltSubmit r9" v.editOpt, fontList)
+            } else {
+                _ := g.AddEdit("yp " v.editOpt)
+            }
             _._config := v.config
-            _.Value := symbolConfig.%v.config%
+            _.Text := symbolConfig.%v.config%
             _.OnEvent("Change", e_text_config)
+
         }
         e_text_config(item, *) {
-            value := item.value
+            value := item.Text
             if (item._config = "textSymbol_transparent") {
                 if (value = "") {
                     return
@@ -737,8 +742,13 @@ fn_config(*) {
                     for v in configList {
                         config := v.config state
                         g.AddText(v.textOpt, v.tip)
-                        _g := g.AddEdit("yp " v.editOpt)
-                        _g.Value := symbolConfig.%config%
+
+                        if (v.config = "font_family") {
+                            _g := g.AddComboBox("yp AltSubmit r9 " v.editOpt, fontList)
+                        } else {
+                            _g := g.AddEdit("yp " v.editOpt)
+                        }
+                        _g.Text := symbolConfig.%config%
                         _g._config := config
                         _g._update := symbolType = 3 && symbolConfig.enableIsolateConfigText
                         _g.OnEvent("Change", fn_writeIsolateConfig)
@@ -783,7 +793,7 @@ fn_config(*) {
             writeIni("trayTipTemplate", value)
             updateTip(A_IsPaused)
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %appState% 会替换为软件运行状态，%\n% 表示换行')
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %appState% 会替换为软件运行状态(运行/暂停)，%\n% 表示换行')
 
         g.AddText("Section xs", "3. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)

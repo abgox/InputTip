@@ -91,9 +91,9 @@
 
 > [!Warning]
 >
-> 如果使用 WinGet 安装，不要通过 WinGet 进行二次安装或更新
->
-> 这会导致配置文件丢失，请使用 InputTip 内置的更新检查进行更新
+> - 如果使用下方的 Scoop 安装命令，无法通过 scoop update InputTip 进行更新
+> - 如果使用下方的 WinGet 安装命令，不要通过 WinGet 进行二次安装或更新，这会导致配置文件丢失
+> - 因此，以下方式都只建议首次下载安装时使用，然后使用 InputTip 内置的更新检查进行更新
 
 1. 使用 [Scoop](https://scoop.sh/) 安装:
 

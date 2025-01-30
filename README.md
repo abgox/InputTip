@@ -29,7 +29,8 @@
 
 > [!Tip]
 >
-> `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
+> - `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
+> - 在 InputTip 的 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
 
 ### 介绍
 
@@ -38,6 +39,8 @@
 > QQ 反馈交流群: [451860327](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327)
 
 - 使用 `AutoHotKey` 编写，仅 Windows 系统可用
+  - **Win10** 以上可用
+  - **Win7** 未知
 - 一个实时的输入法状态提示工具
 
   - 根据输入法状态同步修改鼠标样式
@@ -51,8 +54,6 @@
   - 快捷键强制切换输入法状态
   - 详细便捷的配置菜单
     - 所有配置的修改，都在 `托盘菜单` 中进行
-    - 你可以设置字体大小来解决屏幕过小导致菜单显示不完全或屏幕过大导致菜单显示过小的问题
-      - `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
 
 [**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**](#stars)
 
@@ -91,9 +92,9 @@
 
 > [!Warning]
 >
-> - 如果使用下方的 Scoop 安装命令，无法通过 scoop update InputTip 进行更新
-> - 如果使用下方的 WinGet 安装命令，不要通过 WinGet 进行二次安装或更新，这会导致配置文件丢失
-> - 因此，以下方式都只建议首次下载安装时使用，然后使用 InputTip 内置的更新检查进行更新
+> - 如果使用下方的 [Scoop](https://scoop.sh/) 安装命令，无法通过 `scoop update InputTip` 进行更新
+> - 如果使用下方的 [WinGet](https://github.com/microsoft/winget-cli) 安装命令，不要通过 [WinGet](https://github.com/microsoft/winget-cli) 进行二次安装或更新，这会导致配置文件丢失
+> - 因此，以下安装方式都只建议首次下载安装时使用，然后使用 InputTip 内置的 [更新检查](https://inputtip.abgox.com/FAQ/check-update) 进行更新
 
 1. 使用 [Scoop](https://scoop.sh/) 安装:
 
@@ -145,22 +146,25 @@
 
 1. 完成 [安装](#安装) 后，运行 `InputTip.exe` 即可
 
-2. 设置开机自启动: 点击 `托盘菜单` => `开机自启动`
+2. 设置开机自启动: `托盘菜单` => `开机自启动`
 
-3. 设置鼠标样式
+   - 建议使用 `任务计划程序` 或 `注册表`
+   - `应用快捷方式` 可能会无效
+   - 详情请查看 [关于开机自启动](https://inputtip.abgox.com/FAQ/startup)
+
+3. 设置 `所有配置菜单的字体大小`
+
+   - 你可以设置字体大小来解决屏幕过小导致菜单显示不完全或屏幕过大导致菜单显示过小的问题
+   - `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
+
+4. 设置鼠标样式
 
    > [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
 
-   1. 点击 `托盘菜单` => `更改配置` => `鼠标样式`
-   2. 在下拉列表中，选择包含 `.cur` 或 `.ani` 文件的文件夹目录路径
+   - `托盘菜单` => `更改配置` => `鼠标样式`，在下拉列表中选择鼠标样式文件夹路径
+   - 比如默认的中文鼠标样式文件夹路径: `InputTipCursor\default\CN`
 
-   - 比如默认的中文鼠标样式文件夹目录路径: `InputTipCursor\default\CN`
-
-   3. 点击 `确认`
-
-> [!Tip]
->
-> 使用鼠标右键点击 `托盘菜单` 查看其他相关设置
+5. 更多相关配置在 `托盘菜单` 中查看
 
 ### 编译
 
@@ -198,7 +202,7 @@
 
 ---
 
-1. 取消 `开机自启动`: 点击 `托盘菜单` => `设置` => `开机自启动`
+1. 取消 `开机自启动`: `托盘菜单` => `设置` => `开机自启动`
    - 如果使用了 `开机自启动` 中的 `任务计划程序`，你需要打开 `任务计划程序`，找到 `abgox.InputTip.noUAC` 和 `abgox.InputTip.JAB.JetBrains` 任务，删除它们
    - 也可以忽略，它们不会造成任何影响，但尽量删除，让电脑更清洁
 2. 退出 `InputTip.exe`
@@ -222,12 +226,12 @@
      jabswitch -enable
    ```
 
-2. 点击 `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
+2. `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
 
    - 会在 `InputTip.exe` 同级目录下生成 `InputTip.JAB.JetBrains.exe`
    - 它由 `InputTip.exe` 控制，不需要手动启动/终止
 
-3. 点击 `托盘菜单` => `设置光标获取模式`，将 JetBrains IDE 应用添加到其中的 `JAB` 列表中
+3. `托盘菜单` => `设置光标获取模式`，将 JetBrains IDE 应用添加到其中的 `JAB` 列表中
 
 4. 如果未生效，请重启正在使用的 JetBrains IDE
 
@@ -256,8 +260,8 @@
   - 你也可以将自己喜欢的图片符号，或者自己制作图片符号，放入 `InputTipSymbol` 目录下
     - 限制: 图片必须是 `.png` 格式
     - [更多的符号图片](https://inputtip.abgox.com/download/extra)
-  - 然后，点击 `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择正确的图片路径
-  - 如果留空，则不会显示对应状态的图片符号
+  - 设置方法: `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择图片路径
+  - 如果选择第一个空白路径，则不会显示对应状态的图片符号
 
 #### 方块符号
 
@@ -313,7 +317,7 @@
 
    - 详情参考 [微软文档: 关于光标(游标)](https://learn.microsoft.com/windows/win32/menurc/about-cursors)
 
-2. 点击 `托盘菜单` => `更改配置` => `鼠标样式` => 在下拉列表中选择对应文件夹目录路径
+2. `托盘菜单` => `更改配置` => `鼠标样式` => 在下拉列表中选择对应文件夹目录路径
 
 > [!Warning]
 >
@@ -339,7 +343,7 @@
   - [搜狗输入法](https://shurufa.sogou.com/)，[搜狗五笔输入法](https://wubi.sogou.com/)
   - [QQ 输入法](https://qq.pinyin.cn/)
   - [百度输入法](https://shurufa.baidu.com/)
-  - 微软拼音，微软五笔，微软仓颉
+  - 微软拼音，微软五笔，微软仓颉...
   - [冰凌输入法](https://icesofts.com/)
   - 小鹤音形输入法
     - 需要使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成

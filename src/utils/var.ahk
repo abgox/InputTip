@@ -42,9 +42,11 @@ showCursorPosList := ":" readIni("showCursorPosList", "wps.exe") ":"
 showCursorPos_x := readIni("showCursorPos_x", 0)
 showCursorPos_y := readIni("showCursorPos_y", -20)
 
+; 当鼠标悬浮在符号上时，符号是否需要隐藏
+hoverHide := readIni("hoverHide", 1)
 
 ; 在多少毫秒后隐藏符号，0 表示永不隐藏
-HideSymbolDelay := readIni("HideSymbolDelay", 0)
+hideSymbolDelay := readIni("hideSymbolDelay", 0)
 
 ; 每多少毫秒后更新符号的显示位置和状态
 delay := readIni("delay", 20)
@@ -513,6 +515,7 @@ pauseApp(*) {
         }
     }
     Pause(-1)
+    Suspend(-1)
 }
 restartJAB() {
     static done := 1

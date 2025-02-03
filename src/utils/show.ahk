@@ -7,7 +7,7 @@ while 1 {
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
         needShow := 1
-        if (symbolType) {
+        if (symbolType && hoverHide) {
             if (isMouseOver("abgox-InputTip-Symbol-Window")) {
                 hideSymbol()
                 isOverSymbol := 1
@@ -109,27 +109,27 @@ ShowSymbolEx(state) {
 }
 
 updateDelay() {
-    if (HideSymbolDelay) {
+    if (hideSymbolDelay) {
         SetTimer(updateDelayTimer, 25)
         updateDelayTimer() {
             global needHide, isWait
             if (GetKeyState("LButton", "P")) {
                 needHide := 0
                 isWait := 1
-                SetTimer(_timer, -HideSymbolDelay)
+                SetTimer(_timer, -hideSymbolDelay)
                 _timer() {
                     isWait := 0
                 }
             }
             if (!isWait) {
-                if (A_TimeIdleKeyboard >= HideSymbolDelay - delay) {
+                if (A_TimeIdleKeyboard >= hideSymbolDelay - delay) {
                     needHide := 1
                     hideSymbol()
                 } else {
                     needHide := 0
                 }
             }
-            if (HideSymbolDelay = 0) {
+            if (hideSymbolDelay = 0) {
                 SetTimer(updateDelayTimer, 0)
                 needHide := 0
                 isWait := 0

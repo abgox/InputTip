@@ -150,7 +150,7 @@ checkUpdate(init := 0, once := false) {
                                 }
                                 try {
                                     FileInstall("utils\update.exe", A_AppData "\abgox-InputTip-update-version.exe", 1)
-                                    Run(A_AppData "\abgox-InputTip-update-version.exe " A_ScriptName " " A_ScriptFullPath)
+                                    Run(A_AppData "\abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '"')
                                     ExitApp()
                                 } catch {
                                     done := false

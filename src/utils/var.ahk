@@ -460,7 +460,9 @@ loadSymbol(state, left, top, isShowCursorPos := 0) {
         }
         showConfig .= "x" left + x "y" top + y
     }
-    hideSymbol()
+    if (lastSymbol != state) {
+        hideSymbol()
+    }
 
     if (symbolGui.%state%) {
         symbolGui.%state%.Show(showConfig)

@@ -5,8 +5,8 @@
  * @param urls 版本检查 URL 列表
  */
 checkVersion(currentVersion, callback, urls := [
-    "https://inputtip.abgox.com/releases/v2/version.txt",
     "https://gitee.com/abgox/InputTip/raw/main/src/version.txt",
+    "https://inputtip.abgox.com/releases/v2/version.txt",
     "https://github.com/abgox/InputTip/raw/main/src/version.txt"
 ]) {
     currentVersion := StrReplace(currentVersion, "v", "")
@@ -149,7 +149,7 @@ checkUpdate(init := 0, once := false) {
                                     killJAB(1, A_IsCompiled)
                                 }
                                 try {
-                                    FileInstall("utils\update.exe", A_AppData "\abgox-InputTip-update-version.exe")
+                                    FileInstall("utils\update.exe", A_AppData "\abgox-InputTip-update-version.exe", 1)
                                     Run(A_AppData "\abgox-InputTip-update-version.exe " A_ScriptName " " A_ScriptFullPath)
                                     ExitApp()
                                 } catch {
@@ -335,18 +335,18 @@ checkUpdateDone() {
                 {
                     writeIni("mode", 1, "InputMethod")
                 }
-                case 3:
-                {
-                    ; 讯飞输入法
-                    writeIni("evenStatusMode", "0", "InputMethod")
-                    writeIni("mode", 0, "InputMethod")
-                }
-                case 4:
-                {
-                    ; 手心输入法
-                    writeIni("conversionMode", ":1:", "InputMethod")
-                    writeIni("mode", 0, "InputMethod")
-                }
+                    case 3:
+                    {
+                        ; 讯飞输入法
+                        writeIni("evenStatusMode", "0", "InputMethod")
+                        writeIni("mode", 0, "InputMethod")
+                    }
+                        case 4:
+                        {
+                            ; 手心输入法
+                            writeIni("conversionMode", ":1:", "InputMethod")
+                            writeIni("mode", 0, "InputMethod")
+                        }
             }
             border_type := readIni('border_type', 1)
             if (border_type = 4) {

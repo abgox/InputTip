@@ -517,7 +517,14 @@ pauseApp(*) {
         }
     }
     Pause(-1)
-    Suspend(-1)
+
+    for state in ["CN", "EN", "Caps"] {
+        if (%"hotkey_" state%) {
+            try {
+                Hotkey(%"hotkey_" state%, "Toggle")
+            }
+        }
+    }
 }
 restartJAB() {
     static done := 1

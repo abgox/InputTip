@@ -30,7 +30,7 @@
 > [!Tip]
 >
 > - `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
-> - 在 InputTip 的 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
+> - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
 
 ### 介绍
 
@@ -38,9 +38,7 @@
 >
 > QQ 反馈交流群: [451860327](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327)
 
-- 使用 `AutoHotKey` 编写，仅 Windows 系统可用
-  - **Win10** 以上可用
-  - **Win7** 未知
+- 使用 `AutoHotKey` 编写，仅 Windows 系统可用(**Win10** 以上可用，以下未知)
 - 一个实时的输入法状态提示工具
 
   - 根据输入法状态同步修改鼠标样式
@@ -165,6 +163,16 @@
    - 比如默认的中文鼠标样式文件夹路径: `InputTipCursor\default\CN`
 
 5. 更多相关配置在 `托盘菜单` 中查看
+
+> [!Warning]
+>
+> 需要注意: `InputTip` 是使用 `AutoHotkey` 编写的
+>
+> 在游戏领域，`AutoHotkey` 更多时候会被当做外挂，可能会导致 `InputTip` 被误判为外挂
+>
+> 这也是推荐使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 的一个原因，使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 会降低这种误判几率
+>
+> 但是更建议，使用 `暂停/运行` 或 `暂停/运行快捷键` 先暂停 `InputTip` 再运行游戏
 
 ### 编译
 

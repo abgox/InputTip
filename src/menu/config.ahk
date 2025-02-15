@@ -167,7 +167,7 @@ fn_config(*) {
         g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的「下载鼠标样式扩展包」")
         g.AddText("xs", line)
         g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击下方的「刷新路径列表」")
-        g.AddText("xs cGray", "如果「显示形式」页面中的第一个配置「是否同步修改鼠标样式」选择了【是】")
+        g.AddText("xs cGray", "如果「显示形式」页面中的第 1 个配置「是否同步修改鼠标样式」选择了【是】")
         g.AddText("xs cGray", "InputTip 就会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
         g.AddText("Section", "选择鼠标样式文件夹路径:")
         dirList := StrSplit(cursorDir, ":")
@@ -340,7 +340,7 @@ fn_config(*) {
             }
         }
         g.AddText("xs", line)
-        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的「刷新路径列表」`n如果选择第一个空白路径，则不会显示对应状态的图片符号")
+        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的「刷新路径列表」`n如果选择第 1 个空白路径，则不会显示对应状态的图片符号")
         g.AddText(, "选择图片符号的文件路径: ")
         dirList := StrSplit(picDir, ":")
         if (dirList.Length = 0) {
@@ -800,7 +800,7 @@ fn_config(*) {
             writeIni("trayTipTemplate", value)
             updateTip(A_IsPaused)
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %appState% 会替换为软件运行状态(运行/暂停)，%\n% 表示换行')
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %appState% 会替换为软件运行状态(运行/暂停)，%\n% 表示换行')
 
         g.AddText("Section xs", "3. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)
@@ -812,7 +812,7 @@ fn_config(*) {
             writeIni("keyCountTemplate", value)
             updateTip(A_IsPaused)
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '可使用的模板变量: %keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态，%\n% 表示换行')
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态，%\n% 表示换行')
 
         g.AddText("Section xs", "4. 是否开启按键次数统计: ")
         _ := g.AddDropDownList("yp AltSubmit w" bw / 3, ["【否】关闭按键次数统计", "【是】开启按键次数统计"])

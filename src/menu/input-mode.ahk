@@ -23,7 +23,7 @@ fn_input_mode(*) {
         gc.modeList := ["【自定义】", "【通用】"]
         tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义"])
         tab.UseTab(1)
-        g.AddText("Section cRed", "如果【通用】模式不可用，需要前往「自定义」标签页去配置【自定义】模式          ")
+        g.AddText("Section cRed", "如果【通用】模式不可用，需要点击上方的「自定义」标签页去配置【自定义】模式")
 
         if (info.i) {
             return g

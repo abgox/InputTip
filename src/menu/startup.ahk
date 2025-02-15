@@ -58,7 +58,7 @@ fn_startup(item, *) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            g.AddEdit("xs ReadOnly -VScroll w" bw, "1. 下方有多种方式设置开机自启动，请选择有效的方式`n2. 如果你不希望每次启动都弹出管理员授权(UAC)窗口:`n   - 将系统设置中的「更改用户账户控制设置」修改为【从不通知】`n   - 或者通过下方的「任务计划程序」设置开机自启动")
+            g.AddEdit("xs ReadOnly -VScroll w" bw, "1. 下方有多种方式设置开机自启动，请选择有效的方式`n2. 推荐「任务计划程序」或「注册表」，应用快捷方式可能无效`n3. 如果你不希望每次启动都弹出管理员授权(UAC)窗口:`n   - 将系统设置中的「更改用户账户控制设置」修改为【从不通知】`n   - 或者直接使用下方的「任务计划程序」设置开机自启动")
 
             if (A_IsAdmin) {
                 btnOpt := ''
@@ -80,16 +80,6 @@ fn_startup(item, *) {
                 fn_update_user()
                 isStartUp := 1
                 FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
-                fn_handle()
-            }
-            btn := g.AddButton("xs w" bw, "应用快捷方式")
-            if (!A_IsAdmin) {
-                btn.Focus()
-            }
-            btn.OnEvent("Click", e_useLnk)
-            e_useLnk(*) {
-                isStartUp := 2
-                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , fileDesc, favicon, , , 7)
                 fn_handle()
             }
             g.AddButton("xs w" bw btnOpt, "「注册表」" tip).OnEvent("Click", e_useReg)
@@ -124,6 +114,16 @@ fn_startup(item, *) {
                         return g
                     }
                 }
+            }
+            btn := g.AddButton("xs w" bw, "应用快捷方式")
+            if (!A_IsAdmin) {
+                btn.Focus()
+            }
+            btn.OnEvent("Click", e_useLnk)
+            e_useLnk(*) {
+                isStartUp := 2
+                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , fileDesc, favicon, , , 7)
+                fn_handle()
             }
             fn_handle(*) {
                 g.Destroy()

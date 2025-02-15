@@ -41,7 +41,7 @@ while 1 {
                 }
             }
         }
-        if (!symbolType || needHide || isMouseOver("ahk_class Shell_TrayWnd")) {
+        if (!symbolType || needHide || (!showCursorPos && isMouseOver("ahk_class Shell_TrayWnd"))) {
             hideSymbol()
             needShow := 0
         }

@@ -5,7 +5,7 @@ fn_check_update(*) {
     }
     gc.checkUpdateDelay := checkUpdateDelay
     g := createGuiOpt("InputTip - 设置更新检查的间隔时间")
-    g.AddText("cGray", "1. 单位: 分钟，默认 1440 分钟(1 天)`n2. 避免程序错误，可以设置的最大范围是 0-50000 分钟`n3. 如果为 0，则表示不检查版本更新`n4. 如果不为 0，在 InputTip 启动时，会立即检查一次`n5. 如果大于 50000，则生效的值为 50000")
+    g.AddText("cGray", "1. 单位: 分钟，默认 1440 分钟(1 天)`n2. 避免程序错误，可以设置的最大范围是 0-50000 分钟`n3. 如果为 0，则表示不检查版本更新`n4. 如果不为 0，在 InputTip 启动时，会立即检查一次`n5. 如果大于 50000，则生效的值是 50000")
     g.AddText(, "每隔多少分钟检查一次更新: ")
     _ := g.AddEdit("yp Number Limit5")
     _.Value := readIni("checkUpdateDelay", 1440)

@@ -10,7 +10,7 @@ fn_pause_key(*) {
         tab := g.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
         tab.UseTab(1)
         g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击「确定」后生效")
+        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
         g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
         g.AddText("xs", "3.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
 
@@ -51,7 +51,7 @@ fn_pause_key(*) {
 
         tab.UseTab(2)
         g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击「确定」后生效")
+        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
         g.AddText("xs", "2.")
         g.AddText("yp cRed", "优先使用「设置组合快捷键」进行设置，除非因为快捷键占用无法设置")
         g.AddText("xs", '3.  这里会回显它的设置，建议先使用它，然后回到此处适当修改')

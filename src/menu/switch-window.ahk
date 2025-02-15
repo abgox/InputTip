@@ -197,27 +197,27 @@ fn_switch_window(*) {
                             g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
                             g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
                         }
-                        case "CN":
-                        {
-                            g.AddButton("xs Disabled w" bw, "「中文状态」").OnEvent("Click", fn_CN)
-                            g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
-                            g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                            g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
-                        }
-                        case "EN":
-                        {
-                            g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
-                            g.AddButton("xs Disabled w" bw, "「英文状态」").OnEvent("Click", fn_EN)
-                            g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                            g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
-                        }
-                        case "Caps":
-                        {
-                            g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
-                            g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
-                            g.AddButton("xs Disabled w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                            g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
-                        }
+                            case "CN":
+                            {
+                                g.AddButton("xs Disabled w" bw, "「中文状态」").OnEvent("Click", fn_CN)
+                                g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
+                                g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
+                                g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
+                            }
+                                case "EN":
+                                {
+                                    g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
+                                    g.AddButton("xs Disabled w" bw, "「英文状态」").OnEvent("Click", fn_EN)
+                                    g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
+                                    g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
+                                }
+                                    case "Caps":
+                                    {
+                                        g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
+                                        g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
+                                        g.AddButton("xs Disabled w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
+                                        g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
+                                    }
                     }
                     fn_rm(*) {
                         g.Destroy()
@@ -392,7 +392,8 @@ fn_switch_window(*) {
             gc.LV_add.ModifyCol(2, "AutoHdr")
             gc.LV_add.ModifyCol(3, "AutoHdr")
             tab.UseTab(2)
-            g.AddEdit("ReadOnly -VScroll w" w, "1. 如何使用这个管理面板？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方分别是中文、英文、大写锁定这三个自动切换列表`n   - 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 需要特别注意:`n   - 自动切换生效的前提是当前选择的输入法可以切换状态`n   - 以【美式键盘 ENG】为例`n   - 它只有英文状态和大写锁定，所以只有英文状态的和大写锁定的自动切换有效")
+            g.AddEdit("ReadOnly -VScroll w" w, "1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方分别是中文、英文、大写锁定这三个自动切换列表`n   - 在自动切换列表中的应用窗口被激活时，会自动切换到对应的输入法状态`n      - 如果对自动切换的逻辑不理解，请查看下方的相关链接`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 需要特别注意:`n   - 自动切换生效的前提是当前选择的输入法可以切换状态`n   - 以【美式键盘 ENG】为例`n   - 它只有英文状态和大写锁定，所以只有英文状态的和大写锁定的自动切换有效")
+            g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/switch-state">关于指定窗口自动切换状态</a>')
 
             g.OnEvent("Close", fn_close)
             fn_close(*) {

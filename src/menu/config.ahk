@@ -26,7 +26,7 @@ fn_config(*) {
             tab.Value := gc.tab
         }
         tab.UseTab(1)
-        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见的使用问题</a>                                              ')
+        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见问题(FAQ)</a>                                              ')
 
         if (info.i) {
             return g
@@ -34,7 +34,7 @@ fn_config(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddText("xs cGray", "- 如果是第一次打开菜单，建议点击上方的「其他杂项」，把配置菜单的字体调整到合适的大小`n- 所有的配置项修改会实时生效，可以立即看到最新效果，但是修改时速度不要太快`n- 特别是需要输入的配置项，输入过快可能因为响应稍慢导致最新修改丢失，需要把输入速度放慢一点")
+        g.AddText("xs cGray", "- 如果是第一次打开配置菜单，建议点击上方的「其他杂项」，把配置菜单的字体调整到合适的大小`n- 所有的配置修改会实时生效，可以立即看到最新效果，但是修改时速度不要太快`n- 特别是需要输入内容的配置，输入过快可能因为响应稍慢导致最新修改丢失，需要把输入速度放慢一点")
         g.AddText("xs", line)
         g.AddText("xs", "1. 是否同步修改鼠标样式: ")
         _ := g.AddDropDownList("w" bw / 2 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
@@ -134,7 +134,7 @@ fn_config(*) {
             updateDelay()
             restartJAB()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号`n当不为 0 时，此值不能小于 150，若小于 150，则使用 150。建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号`n当不为 0 时，此值不能小于 150，若小于 150，则生效的值是 150。建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
         g.AddText("xs", "4. 每多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后更新符号的显示位置和状态:")
@@ -157,7 +157,7 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，一般使用 1-100 之间的值。此值的范围是 1-500，超出范围无效。`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整`n如果指定了应用进程显示在鼠标附近，如果移动感觉有卡顿，就调低一点")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整`n如果指定了应用进程显示在鼠标附近，如果移动感觉有卡顿，就调低一点")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")
@@ -789,7 +789,7 @@ fn_config(*) {
             writeIni("gui_font_size", value)
             global fontOpt := ["s" value, "微软雅黑"]
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，超出范围的值无效，建议 12-20。更改后，重新打开配置菜单即可")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，建议 12-20 之间，超出范围则使用最近的有效值。更改后，重新打开配置菜单即可")
         g.AddText("Section xs", "2. 设置鼠标悬浮在「托盘菜单」上时的文字模板")
         _ := g.AddEdit("w" bw)
         _.Value := trayTipTemplate
@@ -800,7 +800,7 @@ fn_config(*) {
             writeIni("trayTipTemplate", value)
             updateTip(A_IsPaused)
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %appState% 会替换为软件运行状态(运行/暂停)，%\n% 表示换行')
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %\n% 表示换行，%appState% 会替换为软件运行状态(运行/暂停)')
 
         g.AddText("Section xs", "3. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)
@@ -812,7 +812,7 @@ fn_config(*) {
             writeIni("keyCountTemplate", value)
             updateTip(A_IsPaused)
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态，%\n% 表示换行')
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %\n% 表示换行，%keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态')
 
         g.AddText("Section xs", "4. 是否开启按键次数统计: ")
         _ := g.AddDropDownList("yp AltSubmit w" bw / 3, ["【否】关闭按键次数统计", "【是】开启按键次数统计"])

@@ -63,7 +63,7 @@
 
 - 如果有使用上的任何问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
   - 在 `托盘菜单` => `关于` 中查看当前版本号
-- 查看相关的文档
+- 然后再查看相关的文档
   - 本页面中包含的内容
   - [常见问题(FAQ)](https://inputtip.abgox.com/FAQ/)
   - [输入法和应用窗口兼容情况](#兼容情况)
@@ -73,14 +73,6 @@
 ### 演示
 
 ![demo](https://inputtip.abgox.com/releases/v2/demo.gif)
-
----
-
-<details>
-<summary>一个使用方块符号的有趣配置</summary>
-<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.png" />
-<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.gif" />
-</details>
 
 ### 安装
 
@@ -92,7 +84,7 @@
 >
 > - 如果使用下方的 [Scoop](https://scoop.sh/) 安装命令，无法通过 `scoop update InputTip` 进行更新
 > - 如果使用下方的 [WinGet](https://github.com/microsoft/winget-cli) 安装命令，不要通过 [WinGet](https://github.com/microsoft/winget-cli) 进行二次安装或更新，这会导致配置文件丢失
-> - 因此，以下安装方式都只建议首次下载安装时使用，然后使用 InputTip 内置的 [更新检查](https://inputtip.abgox.com/FAQ/check-update) 进行更新
+> - 因此，以下安装方式都只建议首次下载安装时使用，然后通过 InputTip 内置的 [更新检查](https://inputtip.abgox.com/FAQ/check-update) 进行更新
 
 1. 使用 [Scoop](https://scoop.sh/) 安装:
 
@@ -173,6 +165,12 @@
 > 这也是推荐使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 的一个原因，使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 会降低这种误判几率
 >
 > 但是更建议，使用 `暂停/运行` 或 `暂停/运行快捷键` 先暂停 `InputTip` 再运行游戏
+
+<details>
+<summary>一个通过方块符号实现的有趣的配置</summary>
+<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.png" />
+<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.gif" />
+</details>
 
 ### 编译
 
@@ -274,7 +272,7 @@
 #### 方块符号
 
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
-- 默认中文状态为**红色**，英文状态为**蓝色**，大写锁定为**绿色**
+- 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
 - 方块符号相关的配置: `托盘菜单` => `更改配置` => `方块符号`
 - 当其中的方块符号的颜色设置修改为空时，则不会显示该状态的方块符号
   - 比如: 你只希望在中文状态下显示方块符号，那么就将 `英文状态时方块符号的颜色` 和 `大写锁定时方块符号的颜色` 的值都设置为空
@@ -284,8 +282,8 @@
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示文本符号` 时，会显示对应的文本符号
 - 默认中文状态为 `中`，英文状态为 `英`，大写锁定为 `大`
 - 文本符号相关的配置: `托盘菜单` => `更改配置` => `文本符号`
-- 当其中的文本字符设置修改为空时，则不会显示该状态的文本符号
-  - 比如: 你只希望在中文状态下显示文本字符，那么就将 `英文状态时显示的文本字符` 和 `大写锁定时显示的文本字符` 的值都设置为空
+- 当其中的文本字符的值为空时，则不会显示该状态的文本符号
+  - 比如: 你只希望在中文状态下显示文本字符，那么就将 `英文状态时的文本字符` 和 `大写锁定时的文本字符` 的值都设置为空
 
 ### 自定义鼠标样式
 
@@ -380,7 +378,7 @@
         - 经过测试，`v3.0` 版本中，勾选 `状态码规则` 中的 `使用奇数` 即可
       - [手心输入法](https://www.xinshuru.com/)
         - 经过测试，`v3.1` 版本中，在 `切换码数字`的输入框中填入 `1` 即可
-        - 兼容性一般，因为获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题
+        - 获取到的输入法状态可能有误，导致基于此的相关功能都可能有问题
 
 ### 参考项目
 
@@ -399,8 +397,8 @@
 
 <a href="https://github.com/abgox/InputTip">
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="https://reporoster.com/stars/abgox/InputTip"> <!-- light theme -->
-    <img alt="stargazer-widget" src="https://reporoster.com/stars/dark/abgox/InputTip"> <!-- dark theme -->
+    <source media="(prefers-color-scheme: light)" srcset="http://reporoster.com/stars/abgox/InputTip"> <!-- light theme -->
+    <img alt="stargazer-widget" src="http://reporoster.com/stars/dark/abgox/InputTip"> <!-- dark theme -->
   </picture>
 </a>
 

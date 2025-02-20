@@ -192,32 +192,24 @@ fn_switch_window(*) {
 
                     switch from {
                         case "add":
-                        {
                             g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
                             g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
                             g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                        }
-                            case "CN":
-                            {
-                                g.AddButton("xs Disabled w" bw, "「中文状态」").OnEvent("Click", fn_CN)
-                                g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
-                                g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                                g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
-                            }
-                                case "EN":
-                                {
-                                    g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
-                                    g.AddButton("xs Disabled w" bw, "「英文状态」").OnEvent("Click", fn_EN)
-                                    g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                                    g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
-                                }
-                                    case "Caps":
-                                    {
-                                        g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
-                                        g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
-                                        g.AddButton("xs Disabled w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
-                                        g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
-                                    }
+                        case "CN":
+                            g.AddButton("xs Disabled w" bw, "「中文状态」").OnEvent("Click", fn_CN)
+                            g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
+                            g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
+                            g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
+                        case "EN":
+                            g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
+                            g.AddButton("xs Disabled w" bw, "「英文状态」").OnEvent("Click", fn_EN)
+                            g.AddButton("xs w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
+                            g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
+                        case "Caps":
+                            g.AddButton("xs w" bw, "「中文状态」").OnEvent("Click", fn_CN)
+                            g.AddButton("xs w" bw, "「英文状态」").OnEvent("Click", fn_EN)
+                            g.AddButton("xs Disabled w" bw, "「大写锁定」").OnEvent("Click", fn_Caps)
+                            g.AddButton("xs w" bw, "将它移除").OnEvent("Click", fn_rm)
                     }
                     fn_rm(*) {
                         g.Destroy()

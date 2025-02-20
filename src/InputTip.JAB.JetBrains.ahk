@@ -14,8 +14,16 @@ needSkip(exe_str) {
     return showCursorPos || !InStr(modeList.JAB, exe_str)
 }
 
-returnCanShowSymbol(&left, &top) {
-    GetCaretPosFromJAB(&left, &top)
+returnCanShowSymbol(&left, &top, &right, &bottom) {
+    try {
+        GetCaretPosFromJAB(&left, &top, &right, &bottom)
+    } catch {
+        left := 0
+        top := 0
+        right := 0
+        bottom := 0
+        return 0
+    }
     try {
         left += app_offset.%exe_name%.%isWhichScreen(screenList).num%.x
         top += app_offset.%exe_name%.%isWhichScreen(screenList).num%.y

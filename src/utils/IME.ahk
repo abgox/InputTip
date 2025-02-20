@@ -211,6 +211,10 @@ isCN() {
  * switch_CN()
  */
 switch_CN(*) {
+    ; 当按下 shift + 任意键，取消强制切换
+    if (InStr(hotkey_CN, "shift") && !InStr(A_PriorKey, "shift")) {
+        return
+    }
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -237,6 +241,10 @@ switch_CN(*) {
  * switch_EN()
  */
 switch_EN(*) {
+    ; 当按下 shift + 任意键，取消强制切换
+    if (InStr(hotkey_EN, "shift") && !InStr(A_PriorKey, "shift")) {
+        return
+    }
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
@@ -262,6 +270,10 @@ switch_EN(*) {
  * switch_Caps()
  */
 switch_Caps(*) {
+    ; 当按下 shift + 任意键，取消强制切换
+    if (InStr(hotkey_Caps, "shift") && !InStr(A_PriorKey, "shift")) {
+        return
+    }
     if (!GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }

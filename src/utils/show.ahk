@@ -93,15 +93,21 @@ ShowSymbolEx(state) {
             try {
                 MouseGetPos(&left, &top)
                 canShowSymbol := 1
-                loadSymbol(state, left, top, 1)
+                loadSymbol(state, left, top, left, top, 1)
             } catch {
                 hideSymbol()
             }
             return
         }
         try {
-            canShowSymbol := returnCanShowSymbol(&left, &top)
-            loadSymbol(state, left, top)
+            canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
+
+            WinGetPos(&x, &y, &w, &h, "A")
+            if (top < y || top > y + h) {
+                hideSymbol()
+                return
+            }
+            loadSymbol(state, left, top, right, bottom)
         } catch {
             hideSymbol()
         }

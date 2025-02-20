@@ -36,6 +36,7 @@ changeCursor := readIni("changeCursor", 0)
 */
 symbolType := readIni("symbolType", 1)
 symbolPos := readIni("symbolType", 1)
+symbolOffsetBase := readIni("symbolOffsetBase", 0)
 
 showCursorPos := readIni("showCursorPos", 0)
 showCursorPosList := ":" readIni("showCursorPosList", "wps.exe") ":"
@@ -65,7 +66,7 @@ stateMap := {
     Caps: "大写锁定"
 }
 
-left := 0, top := 0
+left := 0, top := 0, right := 0, bottom := 0
 lastWindow := "", lastSymbol := "", lastCursor := ""
 
 needHide := 0
@@ -316,7 +317,7 @@ updateSymbol(init := 0) {
         _ := "textSymbol_offset_x" state
         symbolConfig.%_% := readIni(_, 0)
         _ := "textSymbol_offset_y" state
-        symbolConfig.%_% := readIni(_, 45)
+        symbolConfig.%_% := readIni(_, -45)
         ; 透明度
         _ := "textSymbol_transparent" state
         symbolConfig.%_% := readIni(_, 222)
@@ -327,90 +328,87 @@ updateSymbol(init := 0) {
 
     switch symbolType {
         case 1:
-        {
             ; 图片字符
             for state in ["CN", "EN", "Caps"] {
                 pic_path := symbolConfig.%state "_pic"%
                 if (pic_path) {
                     _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                    __ := symbolConfig.enableIsolateConfigPic
-
                     _.BackColor := "000000"
                     WinSetTransColor("000000", _)
 
-                    w := __ ? symbolConfig.%"pic_symbol_width" state% : symbolConfig.pic_symbol_width
-                    h := __ ? symbolConfig.%"pic_symbol_height" state% : symbolConfig.pic_symbol_height
+                    if (symbolConfig.enableIsolateConfigPic) {
+                        w := symbolConfig.%"pic_symbol_width" state%
+                        h := symbolConfig.%"pic_symbol_height" state%
+                    } else {
+                        w := symbolConfig.pic_symbol_width
+                        h := symbolConfig.pic_symbol_height
+                    }
                     try {
                         _.AddPicture("w" w " h" h, pic_path)
                     }
                 }
             }
-        }
-            case 2:
-            {
-                ; 方块符号
-                for state in ["CN", "EN", "Caps"] {
-                    if (symbolConfig.%state "_color"%) {
-                        _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                        __ := symbolConfig.enableIsolateConfigBlock
+        case 2:
+            ; 方块符号
+            for state in ["CN", "EN", "Caps"] {
+                if (symbolConfig.%state "_color"%) {
+                    _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                    __ := symbolConfig.enableIsolateConfigBlock
 
-                        t := __ ? symbolConfig.%"transparent" state% : symbolConfig.transparent
-                        WinSetTransparent(t)
+                    t := __ ? symbolConfig.%"transparent" state% : symbolConfig.transparent
+                    WinSetTransparent(t)
 
-                        try {
-                            _.BackColor := symbolConfig.%state "_color"%
-                        }
+                    try {
+                        _.BackColor := symbolConfig.%state "_color"%
+                    }
 
-                        bt := __ ? symbolConfig.%"border_type" state% : symbolConfig.border_type
-                        _.Opt("-LastFound")
-                        switch bt {
-                            case 1: _.Opt("+e0x00000001")
-                            case 2: _.Opt("+e0x00000200")
-                            case 3: _.Opt("+e0x00020000")
-                        }
+                    bt := __ ? symbolConfig.%"border_type" state% : symbolConfig.border_type
+                    _.Opt("-LastFound")
+                    switch bt {
+                        case 1: _.Opt("+e0x00000001")
+                        case 2: _.Opt("+e0x00000200")
+                        case 3: _.Opt("+e0x00020000")
                     }
                 }
             }
-                case 3:
-                {
-                    ; 文本符号
-                    for state in ["CN", "EN", "Caps"] {
-                        if (symbolConfig.%state "_Text"%) {
-                            _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
-                            __ := symbolConfig.enableIsolateConfigText
+        case 3:
+            ; 文本符号
+            for state in ["CN", "EN", "Caps"] {
+                if (symbolConfig.%state "_Text"%) {
+                    _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                    __ := symbolConfig.enableIsolateConfigText
 
-                            _.MarginX := 0, _.MarginY := 0
+                    _.MarginX := 0, _.MarginY := 0
 
-                            ff := __ ? symbolConfig.%"font_family" state% : symbolConfig.font_family
-                            fz := __ ? symbolConfig.%"font_size" state% : symbolConfig.font_size
-                            fc := __ ? symbolConfig.%"font_color" state% : symbolConfig.font_color
-                            fw := __ ? symbolConfig.%"font_weight" state% : symbolConfig.font_weight
-                            try {
-                                _.SetFont('s' fz ' c' fc ' w' fw, ff)
-                            }
+                    ff := __ ? symbolConfig.%"font_family" state% : symbolConfig.font_family
+                    fz := __ ? symbolConfig.%"font_size" state% : symbolConfig.font_size
+                    fc := __ ? symbolConfig.%"font_color" state% : symbolConfig.font_color
+                    fw := __ ? symbolConfig.%"font_weight" state% : symbolConfig.font_weight
+                    try {
+                        _.SetFont('s' fz ' c' fc ' w' fw, ff)
+                    }
 
-                            _.AddText(, symbolConfig.%state "_Text"%)
+                    _.AddText(, symbolConfig.%state "_Text"%)
 
-                            t := __ ? symbolConfig.%"textSymbol_transparent" state% : symbolConfig.textSymbol_transparent
-                            WinSetTransparent(t)
+                    t := __ ? symbolConfig.%"textSymbol_transparent" state% : symbolConfig.textSymbol_transparent
+                    WinSetTransparent(t)
 
-                            try {
-                                _.BackColor := symbolConfig.%"textSymbol_" state "_color"%
-                            }
+                    try {
+                        _.BackColor := symbolConfig.%"textSymbol_" state "_color"%
+                    }
 
-                            bt := __ ? symbolConfig.%"textSymbol_border_type" state% : symbolConfig.textSymbol_border_type
-                            switch bt {
-                                case 1: _.Opt("-LastFound +e0x00000001")
-                                case 2: _.Opt("-LastFound +e0x00000200")
-                                case 3: _.Opt("-LastFound +e0x00020000")
-                                default: _.Opt("-LastFound")
-                            }
-                        }
+                    bt := __ ? symbolConfig.%"textSymbol_border_type" state% : symbolConfig.textSymbol_border_type
+                    switch bt {
+                        case 1: _.Opt("-LastFound +e0x00000001")
+                        case 2: _.Opt("-LastFound +e0x00000200")
+                        case 3: _.Opt("-LastFound +e0x00020000")
+                        default: _.Opt("-LastFound")
                     }
                 }
+            }
     }
 }
-loadSymbol(state, left, top, isShowCursorPos := 0) {
+loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
     global lastSymbol, isOverSymbol
     static old_left := 0, old_top := 0
 
@@ -430,35 +428,57 @@ loadSymbol(state, left, top, isShowCursorPos := 0) {
         return
     }
     showConfig := "NA "
+    ; 在 JAB 程序中获取到的 bottom 有误，因此始终使用 top
+    if (InStr(modeList.JAB, exe_str)) {
+        offsetY := top
+    } else {
+        offsetY := symbolOffsetBase ? bottom : top
+    }
     if (symbolType = 1) {
-        _ := symbolConfig.enableIsolateConfigPic
-        x := _ ? symbolConfig.%"pic_offset_x" state% : symbolConfig.pic_offset_x
-        y := _ ? symbolConfig.%"pic_offset_y" state% : symbolConfig.pic_offset_y
+        if (symbolConfig.enableIsolateConfigPic) {
+            x := symbolConfig.%"pic_offset_x" state%
+            y := symbolConfig.%"pic_offset_y" state%
+        } else {
+            x := symbolConfig.pic_offset_x
+            y := symbolConfig.pic_offset_y
+        }
         if (isShowCursorPos) {
             x += showCursorPos_x
             y += showCursorPos_y
         }
-        showConfig .= "x" left + x "y" top + y
+        showConfig .= "x" left + x " y" y + offsetY
     } else if (symbolType = 2) {
-        _ := symbolConfig.enableIsolateConfigBlock
-        w := _ ? symbolConfig.%"symbol_width" state% : symbolConfig.symbol_width
-        h := _ ? symbolConfig.%"symbol_height" state% : symbolConfig.symbol_height
-        x := _ ? symbolConfig.%"offset_x" state% : symbolConfig.offset_x
-        y := _ ? symbolConfig.%"offset_y" state% : symbolConfig.offset_y
+        if (symbolConfig.enableIsolateConfigBlock) {
+            w := symbolConfig.%"symbol_width" state%
+            h := symbolConfig.%"symbol_height" state%
+            x := symbolConfig.%"offset_x" state%
+            y := symbolConfig.%"offset_y" state%
+        } else {
+            w := symbolConfig.symbol_width
+            h := symbolConfig.symbol_height
+            x := symbolConfig.offset_x
+            y := symbolConfig.offset_y
+        }
+
         if (isShowCursorPos) {
             x += showCursorPos_x
             y += showCursorPos_y
         }
-        showConfig .= "w" w "h" h "x" left + x "y" top + y
+        showConfig .= "w" w "h" h "x" left + x " y" y + offsetY
     } else if (symbolType = 3) {
-        _ := symbolConfig.enableIsolateConfigText
-        x := _ ? symbolConfig.%"textSymbol_offset_x" state% : symbolConfig.textSymbol_offset_x
-        y := _ ? symbolConfig.%"textSymbol_offset_y" state% : symbolConfig.textSymbol_offset_y
+        if (symbolConfig.enableIsolateConfigText) {
+            x := symbolConfig.%"textSymbol_offset_x" state%
+            y := symbolConfig.%"textSymbol_offset_y" state%
+        } else {
+            x := symbolConfig.textSymbol_offset_x
+            y := symbolConfig.textSymbol_offset_y
+        }
+
         if (isShowCursorPos) {
             x += showCursorPos_x
             y += showCursorPos_y
         }
-        showConfig .= "x" left + x "y" top + y
+        showConfig .= "x" left + x " y" y + offsetY
     }
     if (lastSymbol != state) {
         hideSymbol()
@@ -474,7 +494,7 @@ loadSymbol(state, left, top, isShowCursorPos := 0) {
 }
 reloadSymbol() {
     if (symbolType) {
-        canShowSymbol := returnCanShowSymbol(&left, &top)
+        canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
         if (GetKeyState("CapsLock", "T")) {
             type := "Caps"
         } else {
@@ -485,7 +505,7 @@ reloadSymbol() {
             }
         }
         if (canShowSymbol) {
-            loadSymbol(type, left, top)
+            loadSymbol(type, left, top, right, bottom)
         }
     }
 }

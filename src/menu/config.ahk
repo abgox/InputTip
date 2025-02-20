@@ -26,7 +26,7 @@ fn_config(*) {
             tab.Value := gc.tab
         }
         tab.UseTab(1)
-        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/v2/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见问题(FAQ)</a>                                              ')
+        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见问题(FAQ)</a>                                              ')
 
         if (info.i) {
             return g
@@ -115,7 +115,17 @@ fn_config(*) {
             writeIni("hoverHide", item.value)
         }
         g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以通过「托盘菜单」中的「设置符号显示位置」，让它在鼠标附近显示")
-        g.AddText("xs", "3. 无键盘和鼠标左键点击操作时，符号在多少")
+        g.AddText("xs", "3. 符号的垂直偏移量的参考原点: ")
+        g.AddDropDownList("yp AltSubmit Choose" symbolOffsetBase + 1, [" 输入光标上方", " 输入光标下方"]).OnEvent("Change", e_offset_base)
+        e_offset_base(item, *) {
+            writeIni("symbolOffsetBase", item.value - 1)
+            global symbolOffsetBase := item.value - 1
+            updateSymbol()
+            reloadSymbol()
+            gc._focusSymbol.Focus()
+        }
+        g.AddLink("xs cGray", '输入光标附近显示的符号的垂直偏移量会基于这个参考原点进行偏移。JAB 程序无效，<a href="https://inputtip.abgox.com/FAQ/symbol-pos-base">点击查看详细说明</a>')
+        g.AddText("xs", "4. 无键盘和鼠标左键点击操作时，符号在多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后隐藏:")
         _ := g.AddEdit("yp Number")
@@ -134,8 +144,8 @@ fn_config(*) {
             updateDelay()
             restartJAB()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号`n当不为 0 时，此值不能小于 150，若小于 150，则生效的值是 150。建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
-        g.AddText("xs", "4. 每多少")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。不为 0 时，它不能小于 150，建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
+        g.AddText("xs", "5. 每多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后更新符号的显示位置和状态:")
         _ := g.AddEdit("yp Number Limit3")
@@ -157,7 +167,7 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整`n如果指定了应用进程显示在鼠标附近，如果移动感觉有卡顿，就调低一点")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")

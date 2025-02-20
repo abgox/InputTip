@@ -188,12 +188,14 @@ needSkip(exe_str) {
     return !showCursorPos && InStr(modeList.JAB, exe_str)
 }
 
-returnCanShowSymbol(&left, &top) {
+returnCanShowSymbol(&left, &top, &right, &bottom) {
     try {
-        res := GetCaretPosEx(&left, &top)
+        res := GetCaretPosEx(&left, &top, &right, &bottom)
     } catch {
         left := 0
         top := 0
+        right := 0
+        bottom := 0
         return 0
     }
     try {

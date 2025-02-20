@@ -332,21 +332,15 @@ checkUpdateDone() {
             mode := readIni("mode", 1, "InputMethod")
             switch mode {
                 case 2:
-                {
                     writeIni("mode", 1, "InputMethod")
-                }
-                    case 3:
-                    {
-                        ; 讯飞输入法
-                        writeIni("evenStatusMode", "0", "InputMethod")
-                        writeIni("mode", 0, "InputMethod")
-                    }
-                        case 4:
-                        {
-                            ; 手心输入法
-                            writeIni("conversionMode", ":1:", "InputMethod")
-                            writeIni("mode", 0, "InputMethod")
-                        }
+                case 3:
+                    ; 讯飞输入法
+                    writeIni("evenStatusMode", "0", "InputMethod")
+                    writeIni("mode", 0, "InputMethod")
+                case 4:
+                    ; 手心输入法
+                    writeIni("conversionMode", ":1:", "InputMethod")
+                    writeIni("mode", 0, "InputMethod")
             }
             border_type := readIni('border_type', 1)
             if (border_type = 4) {

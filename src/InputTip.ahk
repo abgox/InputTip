@@ -90,16 +90,6 @@ checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 
 checkUpdate(1)
 
-; XXX: 快捷键修改后，必须重启再生效，不重启动态修改 Hotkey 会存在问题
-; 中文快捷键
-hotkey_CN := readIni('hotkey_CN', '')
-; 英文快捷键
-hotkey_EN := readIni('hotkey_EN', '')
-; 大写锁定快捷键
-hotkey_Caps := readIni('hotkey_Caps', '')
-; 软件启停快捷键
-hotkey_Pause := readIni('hotkey_Pause', '')
-
 if (hotkey_CN) {
     try {
         Hotkey(hotkey_CN, switch_CN)

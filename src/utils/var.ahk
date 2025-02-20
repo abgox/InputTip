@@ -58,6 +58,16 @@ isStartUp := readIni("isStartUp", 0)
 ; 启用 JAB/JetBrains 支持
 enableJABSupport := readIni("enableJABSupport", 0)
 
+; XXX: 快捷键修改后，必须重启再生效，不重启动态修改 Hotkey 会存在问题
+; 中文快捷键
+hotkey_CN := readIni('hotkey_CN', '')
+; 英文快捷键
+hotkey_EN := readIni('hotkey_EN', '')
+; 大写锁定快捷键
+hotkey_Caps := readIni('hotkey_Caps', '')
+; 软件启停快捷键
+hotkey_Pause := readIni('hotkey_Pause', '')
+
 stateMap := {
     CN: "中文状态",
     1: "中文状态",

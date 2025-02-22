@@ -144,7 +144,7 @@ fn_config(*) {
             updateDelay()
             restartJAB()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。不为 0 时，它不能小于 150，建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
+        g.AddText("xs cGray w" bw, "单位: 毫秒，默认为 0 毫秒，表示不隐藏符号。不为 0 时，它不能小于 150，建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
         g.AddText("xs", "5. 每多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后更新符号的显示位置和状态:")
@@ -167,7 +167,7 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整")
+        g.AddText("xs cGray w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会大一点点，根据电脑性能适当调整")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")

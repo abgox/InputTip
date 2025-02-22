@@ -82,11 +82,11 @@ checkVersion(currentVersion, callback, urls := [
 /**
  * 检查更新并弹出确认框
  */
-checkUpdate(init := 0, once := false) {
-    if (checkUpdateDelay) {
+checkUpdate(init := 0, once := false, force := 0) {
+    if (checkUpdateDelay || force) {
         updateTitle := "InputTip - 有新版本啦，快点击更新体验新版本吧!   "
         if (once) {
-            checkUpdateTimer()
+            _checkUpdate()
             return
         }
         if (init) {
@@ -101,11 +101,13 @@ checkUpdate(init := 0, once := false) {
             if (gc.init) {
                 return
             }
+            _checkUpdate()
+        }
+        _checkUpdate() {
             if (A_IsCompiled) {
                 checkVersion(currentVersion, updateConfirm)
                 updateConfirm(newVersion, url) {
                     if (WinExist(updateTitle)) {
-                        SetTimer(checkUpdateTimer, 0)
                         return
                     }
                     createGui(updateGui).Show()
@@ -183,7 +185,6 @@ checkUpdate(init := 0, once := false) {
                                     g.OnEvent("Close", yes)
                                     yes(*) {
                                         g.Destroy()
-                                        checkUpdate()
                                         try {
                                             FileDelete(A_AppData "\abgox-InputTip.exe")
                                         }
@@ -197,6 +198,8 @@ checkUpdate(init := 0, once := false) {
                             g.Destroy()
                             global checkUpdateDelay := 0
                             writeIni("checkUpdateDelay", 0)
+                            SetTimer(checkUpdateTimer, 0)
+
                             createGui(doneGui).Show()
                             doneGui(info) {
                                 g := createGuiOpt()
@@ -230,7 +233,6 @@ checkUpdate(init := 0, once := false) {
                 checkVersion(currentVersion, updatePrompt)
                 updatePrompt(newVersion, url) {
                     if (WinExist(updateTitle)) {
-                        SetTimer(checkUpdateTimer, 0)
                         return
                     }
                     createGui(fn).Show()
@@ -260,13 +262,14 @@ checkUpdate(init := 0, once := false) {
                         g.OnEvent("Close", yes)
                         yes(*) {
                             g.Destroy()
-                            checkUpdate()
                         }
                         g.AddButton("xs w" bw, "忽略更新").OnEvent("Click", no)
                         no(*) {
                             g.Destroy()
                             global checkUpdateDelay := 0
                             writeIni("checkUpdateDelay", 0)
+                            SetTimer(checkUpdateTimer, 0)
+
                             createGui(doneGui).Show()
                             doneGui(info) {
                                 g := createGuiOpt()

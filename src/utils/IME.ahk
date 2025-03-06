@@ -212,7 +212,7 @@ isCN() {
  */
 switch_CN(*) {
     ; 当按下 shift + 任意键，取消强制切换
-    if (InStr(hotkey_CN, "shift") && !InStr(A_PriorKey, "shift")) {
+    if (InStr(hotkey_CN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
     if (GetKeyState("CapsLock", "T")) {
@@ -242,7 +242,7 @@ switch_CN(*) {
  */
 switch_EN(*) {
     ; 当按下 shift + 任意键，取消强制切换
-    if (InStr(hotkey_EN, "shift") && !InStr(A_PriorKey, "shift")) {
+    if (InStr(hotkey_EN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
     if (GetKeyState("CapsLock", "T")) {
@@ -271,7 +271,7 @@ switch_EN(*) {
  */
 switch_Caps(*) {
     ; 当按下 shift + 任意键，取消强制切换
-    if (InStr(hotkey_Caps, "shift") && !InStr(A_PriorKey, "shift")) {
+    if (InStr(hotkey_Caps, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
     if (!GetKeyState("CapsLock", "T")) {

@@ -2,6 +2,14 @@
 
 - 没有特别说明的版本都是修复问题
 
+## 2.35.4
+
+- 优化了托盘图标的加载逻辑
+  - 在 **运行** 状态时，托盘图标加载的是 `InputTipSymbol\default\favicon.png`
+  - 在 **暂停** 状态时，托盘图标加载的是 `InputTipSymbol\default\favicon-pause.png`
+  - 可以通过替换这两个图片来实现自定义托盘图标的效果
+  - `favicon.png` 和 `favicon-pause.png` 文件不存在时，重启 InputTip 会重新生成默认的图标图片
+
 ## 2.35.3
 
 - 修复了 `指定窗口自动切换状态` 失效的问题

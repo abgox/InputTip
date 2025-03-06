@@ -77,8 +77,9 @@ if (A_IsCompiled) {
     favicon := A_ScriptFullPath
 } else {
     favicon := A_ScriptDir "\img\favicon.ico"
-    TraySetIcon(favicon, , 1)
 }
+
+TraySetIcon(A_ScriptDir "\InputTipSymbol\default\favicon.png", , 1)
 
 createTaskAndLnk()
 

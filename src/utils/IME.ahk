@@ -204,15 +204,16 @@ isCN() {
 
 /**
  * 将输入法状态切换为中文
+ * @param pressKey 触发此函数的按键，如果非按键触发，则为空
  * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
  * @example
  * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
  * ; ...
  * switch_CN()
  */
-switch_CN(*) {
+switch_CN(pressKey := "", *) {
     ; 当按下 shift + 任意键，取消强制切换
-    if (InStr(hotkey_CN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
+    if (pressKey && InStr(hotkey_CN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
     if (GetKeyState("CapsLock", "T")) {
@@ -234,15 +235,16 @@ switch_CN(*) {
 }
 /**
  * 将输入法状态切换为英文
+ * @param pressKey 触发此函数的按键，如果非按键触发，则为空
  * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
  * @example
  * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
  * ; ...
  * switch_EN()
  */
-switch_EN(*) {
+switch_EN(pressKey := "", *) {
     ; 当按下 shift + 任意键，取消强制切换
-    if (InStr(hotkey_EN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
+    if (pressKey && InStr(hotkey_EN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
     if (GetKeyState("CapsLock", "T")) {
@@ -264,14 +266,15 @@ switch_EN(*) {
 }
 /**
  * 将输入法状态切换为大写锁定
+ * @param pressKey 触发此函数的按键，如果非按键触发，则为空
  * @example
  * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
  * ; ...
  * switch_Caps()
  */
-switch_Caps(*) {
+switch_Caps(pressKey := "", *) {
     ; 当按下 shift + 任意键，取消强制切换
-    if (InStr(hotkey_Caps, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
+    if (pressKey && InStr(hotkey_Caps, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
     if (!GetKeyState("CapsLock", "T")) {

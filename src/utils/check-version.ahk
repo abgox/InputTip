@@ -366,7 +366,7 @@ checkUpdateDone() {
         createGui(doneGui).Show()
         doneGui(info) {
             g := Gui("AlwaysOnTop", "InputTip - 版本更新完成")
-            g.SetFont("s14", "微软雅黑")
+            g.SetFont("s14", "Microsoft YaHei")
             g.AddText(, "版本更新完成，当前版本: ")
             g.AddText("yp cRed", currentVersion)
             g.AddText("xs", "-------------------------------------------")

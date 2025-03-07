@@ -33,7 +33,7 @@ createGui(callback) {
 
 /**
  * @param title Gui 标题
- * @param {Array} fontOption 字体配置(如: ["s12", "微软雅黑"])
+ * @param {Array} fontOption 字体配置(如: ["s12", "Microsoft YaHei"])
  * - 这里为了方便 InputTip 使用，默认值使用了外部的 fontOpt 变量
  * @param {String} guiOption Gui 初始化配置
  * @returns {Gui} 返回 Gui 对象

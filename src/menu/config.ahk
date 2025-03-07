@@ -797,7 +797,7 @@ fn_config(*) {
                 return
             }
             writeIni("gui_font_size", value)
-            global fontOpt := ["s" value, "微软雅黑"]
+            global fontOpt := ["s" value, "Microsoft YaHei"]
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，建议 12-20 之间，超出范围则使用最近的有效值。更改后，重新打开配置菜单即可")
         g.AddText("Section xs", "2. 设置鼠标悬浮在「托盘菜单」上时的文字模板")

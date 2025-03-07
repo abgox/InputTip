@@ -1,5 +1,5 @@
 ; g.SetFont(fontOpt*)
-fontOpt := ["s" readIni("gui_font_size", "12"), "微软雅黑"]
+fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
@@ -313,7 +313,7 @@ updateSymbol(init := 0) {
         }
         ; 字体
         _ := "font_family" state
-        symbolConfig.%_% := readIni(_, '微软雅黑')
+        symbolConfig.%_% := readIni(_, 'Microsoft YaHei')
         ; 大小
         _ := "font_size" state
         symbolConfig.%_% := readIni(_, 12)

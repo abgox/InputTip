@@ -13,7 +13,7 @@
 #Include about.ahk
 
 fontList := getFontList()
-fontList.InsertAt(1, "微软雅黑")
+fontList.InsertAt(1, "Microsoft YaHei")
 
 makeTrayMenu() {
     A_TrayMenu.Delete()

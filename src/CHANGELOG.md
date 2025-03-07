@@ -2,6 +2,10 @@
 
 - 没有特别说明的版本都是修复问题
 
+## 2.35.6
+
+- 使用 [AutoHotkey 2.0.18](https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.0.18) 重新编译，降低病毒误判概率
+
 ## 2.35.5
 
 - 修复了 `指定窗口自动切换状态` 失效的问题

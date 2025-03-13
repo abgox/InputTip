@@ -29,6 +29,9 @@
 
 > [!Tip]
 >
+> - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 编写
+>   - [InputTip 可能被错误判断为病毒程序或游戏外挂](https://inputtip.abgox.com/FAQ/about-virus)
+> - InputTip 只适用于 **Windows** 系统(**Win10** 以上可用，以下未知)
 > - `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
 
@@ -120,34 +123,21 @@
 
 > [!Tip]
 >
-> - 因为以下原因，可能无法正常运行 `InputTip.exe`
->   - 没有管理员权限
->   - 杀毒软件或防火墙阻止了 `InputTip.exe` 运行
->   - 特殊的系统环境
->   - ...
-> - 你可以尝试以下方案:
->   1. 克隆项目仓库到本地
->      ```shell
->       git clone --depth 1 https://github.com/abgox/InputTip.git
->      ```
->   2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
->   3. 直接运行项目中的 `InputTip.ahk` 文件
->      - `src\InputTip.ahk`
+> [你也可以直接通过运行项目源代码的方式使用 InputTip](https://inputtip.abgox.com/FAQ/run-source-code)
 
 1. 完成 [安装](#安装) 后，运行 `InputTip.exe` 即可
 
 2. 设置开机自启动: `托盘菜单` => `开机自启动`
 
    - 建议使用 `任务计划程序` 或 `注册表`
-   - `应用快捷方式` 可能会无效
-   - 详情请查看 [关于开机自启动](https://inputtip.abgox.com/FAQ/startup)
+   - `应用快捷方式` 可能会无效，详情请查看 [关于开机自启动](https://inputtip.abgox.com/FAQ/startup)
 
 3. 设置 `所有配置菜单的字体大小`
 
    - 你可以设置字体大小来解决屏幕过小导致菜单显示不完全或屏幕过大导致菜单显示过小的问题
    - `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
 
-4. 设置鼠标样式
+4. [设置鼠标样式](https://inputtip.abgox.com/FAQ/cursor-style)
 
    > [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
 
@@ -156,15 +146,7 @@
 
 5. 更多相关配置在 `托盘菜单` 中查看
 
-> [!Warning]
->
-> 需要注意: `InputTip` 是使用 `AutoHotkey` 编写的
->
-> 在游戏领域，`AutoHotkey` 更多时候会被当做外挂，可能会导致 `InputTip` 被误判为外挂
->
-> 这也是推荐使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 的一个原因，使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 会降低这种误判几率
->
-> 但是更建议，使用 `暂停/运行` 或 `暂停/运行快捷键` 先暂停 `InputTip` 再运行游戏
+6. [自定义托盘菜单](https://inputtip.abgox.com/FAQ/custom-tray-menu)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、...
 
 <details>
 <summary>一个通过方块符号实现的有趣的配置</summary>
@@ -341,7 +323,7 @@
 
 > [!Tip]
 >
-> 现在，InputTip 使用 **【通用】** 和 **【自定义】** 模式兼容输入法，默认使用 **【通用】** 模式
+> InputTip 使用 **【通用】** 和 **【自定义】** 模式兼容各类输入法，默认使用 **【通用】** 模式
 
 - **【通用】**
 
@@ -355,16 +337,18 @@
     - 需要使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成
     - 使用 [多多输入法生成器](https://duo.ink/ddimegen/ddimegen-desc.html) 生成的输入法都可用
   - [小小输入法](http://yongim.ysepan.com/)
+  - [华宇拼音输入法](https://pinyin.thunisoft.com/)
   - [影子输入法](https://gitee.com/orz707/Yzime)
     - 需要关闭影子输入法中的 `tsf`
     - 在键盘布局中，选择一个能正常识别状态的输入法(建议选择微信输入法、搜狗输入法等)
     - 然后正常使用影子输入法即可
   - [可可五笔](https://suke.kim/)
   - 谷歌输入法
+  - ...
 
 - **【自定义】**
 
-  - 一个万能的模式，需要根据实际情况设置状态码(规则)和切换码(规则)
+  - 一个万能的模式，需要根据实际情况设置 **状态码(规则)** 和 **切换码(规则)**
   - 详情参考: [关于【自定义】模式](https://inputtip.abgox.com/FAQ/custom-input-mode)
   - 可以通过 `设置输入法模式` => `自定义` 使用以下已知可用的配置:
 

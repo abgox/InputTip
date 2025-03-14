@@ -41,7 +41,6 @@
 >
 > QQ 反馈交流群: [451860327](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327)
 
-- 使用 `AutoHotKey` 编写，仅 Windows 系统可用(**Win10** 以上可用，以下未知)
 - 一个实时的输入法状态提示工具
 
   - 根据输入法状态同步修改鼠标样式
@@ -146,7 +145,7 @@
 
 5. 更多相关配置在 `托盘菜单` 中查看
 
-6. [自定义托盘菜单](https://inputtip.abgox.com/FAQ/custom-tray-menu)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、...
+6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单](https://inputtip.abgox.com/FAQ/custom-tray-menu)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、...
 
 <details>
 <summary>一个通过方块符号实现的有趣的配置</summary>

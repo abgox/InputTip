@@ -145,7 +145,7 @@
 
 5. 更多相关配置在 `托盘菜单` 中查看
 
-6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单](https://inputtip.abgox.com/FAQ/custom-tray-menu)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、...
+6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单图标](https://inputtip.abgox.com/FAQ/custom-tray-menu-icon)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、...
 
 <details>
 <summary>一个通过方块符号实现的有趣的配置</summary>

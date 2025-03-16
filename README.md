@@ -29,17 +29,13 @@
 
 > [!Tip]
 >
-> - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 编写
+> - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被错误判断为病毒程序或游戏外挂](https://inputtip.abgox.com/FAQ/about-virus)
 > - InputTip 只适用于 **Windows** 系统(**Win10** 以上可用，以下未知)
 > - `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
 
 ### 介绍
-
-> [!Tip]
->
-> QQ 反馈交流群: [451860327](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327)
 
 - 一个实时的输入法状态提示工具
 
@@ -63,14 +59,16 @@
 
 ### 常见问题
 
-- 如果有使用上的任何问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
+- 如果有使用问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
   - 在 `托盘菜单` => `关于` 中查看当前版本号
-- 然后再查看相关的文档
+  - 如果不是最新版本，你应该先更新到最新版本，检查问题是否仍然存在
+- 然后查看相关的文档
   - 本页面中包含的内容
   - [常见问题(FAQ)](https://inputtip.abgox.com/FAQ/)
   - [输入法和应用窗口兼容情况](#兼容情况)
   - [issues](https://github.com/abgox/InputTip/issues)
   - ...
+- 如果仍有问题，可以前往 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 或 [QQ 频道](https://pd.qq.com/s/gyers18g6?businessType=5) 求助
 
 ### 演示
 

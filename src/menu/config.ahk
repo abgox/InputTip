@@ -812,7 +812,18 @@ fn_config(*) {
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %\n% 表示换行，%appState% 会替换为软件运行状态(运行/暂停)')
 
-        g.AddText("Section xs", "3. 设置按键次数统计的文字模板")
+        g.AddText("Section xs", "3. 是否开启按键次数统计: ")
+        _ := g.AddDropDownList("yp AltSubmit w" bw / 3, ["【否】关闭按键次数统计", "【是】开启按键次数统计"])
+        _.Value := enableKeyCount + 1
+        _.OnEvent("Change", fn_keyCount)
+        fn_keyCount(item, *) {
+            value := item.value - 1
+            global enableKeyCount := value
+            writeIni("enableKeyCount", value)
+            updateTip()
+        }
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，当鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计相关文本，可通过下方的模板进行自定义`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
+        g.AddText("Section xs", "4. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)
         _.Value := keyCountTemplate
         _.OnEvent("Change", e_countTemplate)
@@ -823,18 +834,6 @@ fn_config(*) {
             updateTip(A_IsPaused)
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %\n% 表示换行，%keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态')
-
-        g.AddText("Section xs", "4. 是否开启按键次数统计: ")
-        _ := g.AddDropDownList("yp AltSubmit w" bw / 3, ["【否】关闭按键次数统计", "【是】开启按键次数统计"])
-        _.Value := enableKeyCount + 1
-        _.OnEvent("Change", fn_keyCount)
-        fn_keyCount(item, *) {
-            value := item.value - 1
-            global enableKeyCount := value
-            writeIni("enableKeyCount", value)
-            updateTip()
-        }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，当鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
 
         createGuiOpt().AddText(, " ").GetPos(, , &__w)
         gc._window_info := g.AddButton("xs w" bw, "实时获取当前激活的窗口进程信息")

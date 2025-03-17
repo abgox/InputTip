@@ -103,7 +103,7 @@ fn_restart(*) {
     if (enableJABSupport) {
         killJAB()
     }
-    Run(A_ScriptFullPath)
+    Run(A_ScriptFullPath " " keyCount)
 }
 
 fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {

@@ -104,7 +104,11 @@ if (hotkey_Pause) {
     }
 }
 
-keyCount := 0
+try {
+    keyCount := A_Args[1]
+} catch {
+    keyCount := 0
+}
 enableKeyCount := readIni("enableKeyCount", 0)
 trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
 keyCountTemplate := readIni("keyCountTemplate", "%\n%启动至今，有效的按键次数: %keyCount%")
@@ -121,7 +125,7 @@ updateTip(flag := "") {
             A_IconTip := tip
             return
         }
-        SetTimer(countTimer, delay)
+        SetTimer(countTimer, 50)
         countTimer() {
             static last := ""
             global keyCount

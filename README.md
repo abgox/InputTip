@@ -178,7 +178,6 @@
   - 鼠标样式文件夹 `InputTipCursor` (软件本体的同级目录下)
   - 图片符号文件夹 `InputTipSymbol` (软件本体的同级目录下)
   - 配置文件 `InputTip.ini` (软件本体的同级目录下)
-  - 快捷方式 `InputTip.lnk` (软件本体的同级目录下)
 
 ---
 

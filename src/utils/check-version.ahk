@@ -1,4 +1,31 @@
 /**
+ * 比对版本号
+ * @param new 新版本号
+ * @param old 旧版本号
+ * @returns {Number}
+ * - new > old : 1
+ * - new < old : -1
+ * - new = old : 0
+ */
+compareVersion(new, old) {
+    newParts := StrSplit(new, ".")
+    oldParts := StrSplit(old, ".")
+    for i, part1 in newParts {
+        try {
+            part2 := oldParts[i]
+        } catch {
+            part2 := 0
+        }
+        if (part1 > part2) {
+            return 1  ; new > old
+        } else if (part1 < part2) {
+            return -1  ; new < old
+        }
+    }
+    return 0  ; new = old
+}
+
+/**
  * 检查版本更新(异步)
  * @param currentVersion 当前版本号
  * @param callback 版本检查完成后的回调函数
@@ -51,32 +78,6 @@ checkVersion(currentVersion, callback, urls := [
             }
         }
     }
-    /**
-     * 比对版本号
-     * @param new 新版本号
-     * @param old 旧版本号
-     * @returns {Number}
-     * - new > old : 1
-     * - new < old : -1
-     * - new = old : 0
-     */
-    compareVersion(new, old) {
-        newParts := StrSplit(new, ".")
-        oldParts := StrSplit(old, ".")
-        for i, part1 in newParts {
-            try {
-                part2 := oldParts[i]
-            } catch {
-                part2 := 0
-            }
-            if (part1 > part2) {
-                return 1  ; new > old
-            } else if (part1 < part2) {
-                return -1  ; new < old
-            }
-        }
-        return 0  ; new = old
-    }
 }
 
 /**
@@ -107,7 +108,7 @@ checkUpdate(init := 0, once := false, force := 0) {
             if (A_IsCompiled) {
                 checkVersion(currentVersion, updateConfirm)
                 updateConfirm(newVersion, url) {
-                    if (WinExist(updateTitle)) {
+                    if (WinExist(updateTitle) || compareVersion(newVersion, currentVersion) <= 0) {
                         return
                     }
                     createGui(updateGui).Show()
@@ -151,8 +152,8 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     killJAB(1, A_IsCompiled)
                                 }
                                 try {
-                                    FileInstall("utils\update.exe", A_AppData "\abgox-InputTip-update-version.exe", 1)
-                                    Run(A_AppData "\abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '"')
+                                    FileInstall("utils\app-update\target\release\app-update.exe", A_AppData "\abgox-InputTip-update-version.exe", 1)
+                                    Run(A_AppData "\abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '"', , "Hide")
                                     ExitApp()
                                 } catch {
                                     done := false
@@ -186,7 +187,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     yes(*) {
                                         g.Destroy()
                                         try {
-                                            FileDelete(A_AppData "\abgox-InputTip.exe")
+                                            FileDelete(A_AppData "\abgox-InputTip-new-version.exe")
                                         }
                                     }
                                     return g
@@ -232,7 +233,7 @@ checkUpdate(init := 0, once := false, force := 0) {
             } else {
                 checkVersion(currentVersion, updatePrompt)
                 updatePrompt(newVersion, url) {
-                    if (WinExist(updateTitle)) {
+                    if (WinExist(updateTitle) || compareVersion(newVersion, currentVersion) <= 0) {
                         return
                     }
                     createGui(fn).Show()

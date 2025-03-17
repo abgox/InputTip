@@ -79,7 +79,13 @@ fn_update_user(*) {
         _.Focus()
         _.OnEvent("Change", fn_change)
 
-        g.OnEvent("Close", createTaskAndLnk)
+        g.OnEvent("Close", e_close)
+        e_close(*) {
+            createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
+            if (enableJABSupport) {
+                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains")
+            }
+        }
         fn_change(item, *) {
             global userName := readIni("userName", A_UserName, "UserInfo")
             writeIni("userName", item.value, "UserInfo")
@@ -499,40 +505,6 @@ fn_white_list(*) {
 }
 
 /**
- * 创建任务计划程序和快捷方式
- */
-createTaskAndLnk(*) {
-    if (A_IsAdmin) {
-        try {
-            Run('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptFullPath '\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' userName '" -RunLevel Highest;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.noUAC" -InputObject $task -Force', , "Hide")
-            if (A_IsCompiled) {
-                if (isDiff("C:\WINDOWS\system32\schtasks.exe")) {
-                    FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
-                }
-            } else {
-                if (isDiff(A_ScriptFullPath)) {
-                    FileCreateShortcut(A_ScriptFullPath, fileLnk, , , fileDesc, favicon, , , 7)
-                }
-            }
-        } catch {
-            global has_powershell := 0
-        }
-    } else {
-        if (isDiff(A_ScriptFullPath)) {
-            FileCreateShortcut(A_ScriptFullPath, fileLnk, , , fileDesc, favicon, , , 7)
-        }
-    }
-
-    isDiff(new) {
-        if (!FileExist("InputTip.lnk")) {
-            return 1
-        }
-        FileGetShortcut("InputTip.lnk", &old)
-        return new != old
-    }
-}
-
-/**
  * 解析鼠标样式文件夹目录，并生成目录列表
  * @returns {Array} 目录路径列表
  */
@@ -605,7 +577,7 @@ getFontList() {
  * @returns {1|0} 1/0: 是否存在错误
  */
 runJAB() {
-    if (!has_powershell && enableJABSupport) {
+    if (!createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains") && enableJABSupport) {
         if (isStartUp = 1) {
             global isStartUp := 0
             writeIni("isStartUp", 0)

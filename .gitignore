@@ -1,3 +1,8 @@
 **/InputTipCursor/default
 **/InputTipSymbol/default
 test/**
+
+src/utils/app-update/target/*
+!src/utils/app-update/target/release/
+src/utils/app-update/target/release/*
+!src/utils/app-update/target/release/app-update.exe

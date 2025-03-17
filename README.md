@@ -106,14 +106,9 @@
 
      - **建议首先新建一个目录，将 `InputTip.exe` 放入其中，然后再运行它**
        - 因为运行 `InputTip.exe` 后，会产生以下文件或文件夹
-         - `InputTipCursor` 鼠标样式文件夹
-         - `InputTipSymbol` 图片符号文件夹
          - `InputTip.ini` 配置文件
-         - `InputTip.lnk` 快捷方式
-           - 通过任务计划程序生成的特殊快捷方式
-           - 运行此快捷方式不会弹出 `UAC` 权限提示窗口
-           - 此快捷方式被删除后，会随着 `InputTip.exe` 启动重新生成
-           - 详情查看 [关于 UAC](https://inputtip.abgox.com/FAQ/UAC-window)
+         - `InputTipSymbol` 图片符号文件夹
+         - `InputTipCursor` 鼠标样式文件夹
        - **这样做，所有相关的文件或文件夹都在同一个目录中，方便管理**
 
 ### 使用

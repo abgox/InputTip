@@ -1,3 +1,44 @@
+isWaitStart := 1
+
+if (!FileExist("InputTip.ini")) {
+    fz := "s14"
+    createGui(confirmGui).Show()
+    confirmGui(info) {
+        g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
+        g.SetFont(fz, "Microsoft YaHei")
+        g.AddText(, "即将释放 InputTip 运行所需文件，是否继续？")
+        g.AddText("xs", " - InputTip.ini (配置文件)")
+        g.AddText("xs", " - InputTipSymbol (图片符号文件夹)")
+        g.AddText("xs", " - InputTipCursor (鼠标样式文件夹)")
+        g.AddText("xs ReadOnly cGray", "这些文件或文件夹都在 InputTip.exe 的同级目录下")
+
+        if (info.i) {
+            return g
+        }
+        w := info.w
+        bw := w - g.MarginX * 2
+
+        g.AddButton("xs cRed w" bw, "继续").OnEvent("Click", e_yes)
+        e_yes(*) {
+            g.Destroy()
+            global isWaitStart := 0
+        }
+        g.AddButton("w" bw, "取消").OnEvent("Click", e_no)
+        e_no(*) {
+            e_exit()
+        }
+        g.OnEvent("Close", e_exit)
+        e_exit(*) {
+            ExitApp()
+        }
+        return g
+    }
+
+    while isWaitStart {
+        Sleep(500)
+    }
+}
+
 dirList := ["InputTipSymbol", "InputTipSymbol\default", "InputTipCursor", "InputTipCursor\default", "InputTipCursor\default\CN", "InputTipCursor\default\EN", "InputTipCursor\default\Caps"]
 
 for d in dirList {
@@ -185,7 +226,7 @@ checkIni() {
         fz := "s14"
         createGui(confirmGui).Show()
         confirmGui(info) {
-            g := Gui("AlwaysOnTop")
+            g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
             g.SetFont(fz, "Microsoft YaHei")
             g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
             g.AddText("xs cRed", "InputTip 会根据不同输入法状态同步修改鼠标样式")
@@ -246,7 +287,7 @@ checkIni() {
         initWhiteList() {
             createGui(listTipGui).Show()
             listTipGui(info) {
-                g := Gui("AlwaysOnTop")
+                g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
                 g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
                 g.AddLink("cRed", '<a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')

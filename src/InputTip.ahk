@@ -19,8 +19,6 @@ fileDesc := "InputTip - 一个输入法状态提示工具"
 
 ; 注册表: 开机自启动
 HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
-; 是否有 powershell
-has_powershell := 1
 
 gc := {
     init: 0,
@@ -76,8 +74,6 @@ userName := readIni("userName", A_UserName, "UserInfo")
 favicon := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\img\favicon.ico"
 
 TraySetIcon(A_ScriptDir "\InputTipSymbol\default\favicon.png", , 1)
-
-createTaskAndLnk()
 
 checkUpdateDone()
 

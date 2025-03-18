@@ -139,6 +139,25 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 "https://github.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe"
                             ]
                             done := false
+
+                            downloading(*) {
+                                g := createGuiOpt("InputTip - 版本更新中 " currentVersion " > " newVersion)
+                                g.AddText("cRed", "InputTip 新版本 " newVersion " 下载中...")
+                                g.AddText(, "--------------------------------------------------")
+                                g.AddText("xs", "官网:")
+                                g.AddLink("yp", '<a href="https://inputtip.abgox.com">https://inputtip.abgox.com</a>')
+                                g.AddText("xs", "Github:")
+                                g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
+                                g.AddText("xs", "Gitee: :")
+                                g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+                                g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+                                g.Show()
+                                g.OnEvent("Close", downloading)
+                                return g
+                            }
+                            downloadingGui := downloading()
+
+
                             for v in releases {
                                 try {
                                     Download(v, A_AppData "\abgox-InputTip-new-version.exe")
@@ -147,13 +166,16 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     break
                                 }
                             }
+
+                            downloadingGui.Destroy()
+
                             if (done) {
                                 if (enableJABSupport) {
                                     killJAB(1, A_IsCompiled)
                                 }
                                 try {
                                     FileInstall("utils\app-update\target\release\app-update.exe", A_AppData "\abgox-InputTip-update-version.exe", 1)
-                                    Run(A_AppData "\abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '"', , "Hide")
+                                    Run(A_AppData "\abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '" ' keyCount, , "Hide")
                                     ExitApp()
                                 } catch {
                                     done := false
@@ -390,6 +412,8 @@ checkUpdateDone() {
         }
         try {
             FileDelete(A_AppData "\.abgox-InputTip-update-version-done.txt")
+        }
+        try {
             FileDelete(A_AppData "\abgox-InputTip-update-version.exe")
         }
     }

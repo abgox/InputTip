@@ -1,3 +1,5 @@
+modeNameList := ["HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"]
+
 ; 内部的默认模式应用列表，优先级最低，会被通过「设置光标获取模式」设置的配置覆盖
 defaultModeList := {
     HOOK: [],
@@ -71,16 +73,4 @@ defaultModeList := {
     ACC: [],
     ; 需要使用 Java Access Bridge
     JAB: []
-}
-
-modeNameList := ["HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"]
-modeListMap := {
-    HOOK: 1,
-    UIA: 2,
-    GUI_UIA: 3,
-    MSAA: 4,
-    HOOK_DLL: 5,
-    WPF: 6,
-    ACC: 7,
-    JAB: 8
 }

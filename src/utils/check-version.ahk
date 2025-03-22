@@ -300,10 +300,10 @@ checkUpdate(init := 0, once := false, force := 0) {
                             baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
 
                             for u in baseUrl {
-                                out := "file.ini"
+                                out := "files.ini"
                                 dir := RegExReplace(out, "/[^/]*$", "")
                                 try {
-                                    Download(u v, out)
+                                    Download(u "/src/files.ini", out)
                                     break
                                 }
                             }

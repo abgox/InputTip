@@ -23,6 +23,24 @@ makeTrayMenu() {
     }
     A_TrayMenu.Add("设置更新检查", fn_check_update)
     A_TrayMenu.Add("更改用户信息", fn_update_user)
+    if (!A_IsCompiled) {
+        A_TrayMenu.Add("以管理员模式启动", fn_admin_mode)
+        fn_admin_mode(*) {
+            A_TrayMenu.ToggleCheck("以管理员模式启动")
+            writeIni("runCodeWithAdmin", !runCodeWithAdmin)
+            fn_restart()
+        }
+        if (runCodeWithAdmin) {
+            A_TrayMenu.Check("以管理员模式启动")
+        }
+    }
+
+    A_TrayMenu.Add("创建快捷方式到桌面", fn_create_shortcut)
+    fn_create_shortcut(*) {
+        target := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\..\InputTip.bat"
+        FileCreateShortcut(target, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+    }
+
     A_TrayMenu.Add()
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
@@ -81,9 +99,18 @@ fn_update_user(*) {
 
         g.OnEvent("Close", e_close)
         e_close(*) {
-            createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
-            if (enableJABSupport) {
-                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains")
+            if (A_IsAdmin) {
+                if (A_IsCompiled) {
+                    createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
+                    if (enableJABSupport) {
+                        createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
+                    }
+                } else {
+                    createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", A_ScriptFullPath)
+                    if (enableJABSupport) {
+                        createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited")
+                    }
+                }
             }
         }
         fn_change(item, *) {
@@ -577,58 +604,65 @@ getFontList() {
  * @returns {1|0} 1/0: 是否存在错误
  */
 runJAB() {
-    if (!createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains") && enableJABSupport) {
-        if (isStartUp = 1) {
-            global isStartUp := 0
-            writeIni("isStartUp", 0)
-            A_TrayMenu.Uncheck("开机自启动")
+    if (A_IsCompiled) {
+        if (!FileExist("InputTip.JAB.JetBrains.exe")) {
+            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
         }
-        global enableJABSupport := 0
-        writeIni("enableJABSupport", 0)
-        A_TrayMenu.Uncheck("启用 JAB/JetBrains IDE 支持")
-        if (A_IsCompiled) {
+        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
+        if (enableJABSupport) {
+            createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
+        }
+    } else if (A_IsAdmin) {
+        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", A_ScriptFullPath)
+        if (enableJABSupport) {
+            createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited")
+        }
+
+        hasPowerShell := 1
+        ; 尝试调用 powershell
+        try {
+            Run("powershell.exe", , "Hide")
+        } catch {
+            hasPowerShell := 0
+        }
+
+        if (!hasPowerShell && enableJABSupport) {
+            if (isStartUp = 1) {
+                global isStartUp := 0
+                writeIni("isStartUp", 0)
+                A_TrayMenu.Uncheck("开机自启动")
+            }
+            global enableJABSupport := 0
+            writeIni("enableJABSupport", 0)
+            A_TrayMenu.Uncheck("启用 JAB/JetBrains IDE 支持")
+            if (A_IsCompiled) {
+                try {
+                    FileDelete("InputTip.JAB.JetBrains.exe")
+                }
+            }
+
+            createTipGui([{
+                opt: "cRed",
+                text: "- 在当前系统环境中，尝试调用 powershell 失败了`n- 以下功能会被自动禁用`n   -「开机自启动」中的「任务计划程序」`n   -「启用 JAB/JetBrains IDE 支持」",
+            }, {
+                opt: "cRed",
+                text: "- 如果你想继续使用它们，你需要解决 cmd 调用 powershell 失败的问题",
+            }
+            ], "InputTip - powershell 调用失败!").Show()
+
+            return 1
+        }
+
+        SetTimer(runAppTimer, -1)
+        runAppTimer() {
             try {
-                FileDelete("InputTip.JAB.JetBrains.exe")
-            }
-        }
-
-        if (gc.w.subGui) {
-            gc.w.subGui.Destroy()
-            gc.w.subGui := ""
-        }
-        createGui(errGui).Show()
-        errGui(info) {
-            g := createGuiOpt("InputTip - powershell 调用失败!")
-            g.AddText("cRed", "- 在当前系统环境中，尝试调用 powershell 失败了`n- 以下功能会被自动禁用`n   -「开机自启动」中的「任务计划程序」`n   -「启用 JAB/JetBrains IDE 支持」")
-            g.AddText("cRed", "- 如果你想继续使用它们，你需要解决 cmd 调用 powershell 失败的问题")
-
-            if (info.i) {
-                return g
-            }
-            w := info.w
-
-            g.AddButton("w" w, "我知道了").OnEvent("Click", e_close)
-            e_close(*) {
-                g.Destroy()
-            }
-            gc.w.subGui := g
-            return g
-        }
-        return 1
-    }
-    if (A_IsCompiled && !FileExist("InputTip.JAB.JetBrains.exe")) {
-        FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-    }
-    SetTimer(runAppTimer, -1)
-    runAppTimer() {
-        if (A_IsAdmin) {
-            try {
-                RunWait('powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' A_ScriptDir '\InputTip.JAB.JetBrains.exe\"`'";$principal = New-ScheduledTaskPrincipal -UserId "' userName '" -LogonType ServiceAccount -RunLevel Limited;$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;Register-ScheduledTask -TaskName "abgox.InputTip.JAB.JetBrains" -InputObject $task -Force', , "Hide")
+                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited", 1)
                 Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
             }
-        } else {
-            Run(A_ScriptDir "\InputTip.JAB.JetBrains.exe", , "Hide")
         }
+    } else {
+        global JAB_PID
+        Run(A_AhkPath " InputTip.JAB.JetBrains.ahk", , "Hide", &JAB_PID)
     }
     return 0
 }
@@ -638,13 +672,22 @@ runJAB() {
  * @param {0|1} delete 停止进程后，是否需要删除进程文件
  */
 killJAB(wait := 1, delete := 0) {
-    cmd := 'taskkill /f /im InputTip.JAB.JetBrains.exe'
-    try {
-        wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
-    }
-    if (delete) {
+    if (A_IsAdmin) {
+        cmd := 'schtasks /End /tn "abgox.InputTip.JAB.JetBrains"'
         try {
-            FileDelete("InputTip.JAB.JetBrains.exe")
+            wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
         }
+        if (delete) {
+            if (A_IsCompiled) {
+                try {
+                    FileDelete("InputTip.JAB.JetBrains.exe")
+                }
+            }
+            try {
+                Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
+            }
+        }
+    } else {
+        ProcessClose(JAB_PID)
     }
 }

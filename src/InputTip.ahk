@@ -17,9 +17,6 @@ filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态提示工具"
 
-; 注册表: 开机自启动
-HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
-
 gc := {
     init: 0,
     timer: 0,

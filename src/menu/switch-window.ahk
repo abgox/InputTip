@@ -11,7 +11,7 @@ fn_switch_window(*) {
         }
         createGui(switchWindowGui).Show()
         switchWindowGui(info) {
-            g := createGuiOpt()
+            g := createGuiOpt("InputTip - 设置指定窗口状态自动切换")
             tab := g.AddTab3("-Wrap", ["设置状态自动切换", "关于"])
             tab.UseTab(1)
             g.AddText("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
@@ -166,7 +166,7 @@ fn_switch_window(*) {
                         global app_EN := ":" readIni('app_EN', '') ":"
                         global app_Caps := ":" readIni('app_Caps', '') ":"
                     }
-                    g := createGuiOpt()
+                    g := createGuiOpt("InputTip - 添加")
                     g.AddText(, "要将进程")
                     g.AddText("yp cRed", exe_name)
                     g.AddText("yp", "添加到哪一个自动切换列表中？")
@@ -296,7 +296,7 @@ fn_switch_window(*) {
                                 }
                                 createGui(errGui).Show()
                                 errGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 警告")
                                     g.AddText("cRed", exe_name)
                                     g.AddText("yp", "是一个错误的应用进程名称")
                                     g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
@@ -330,7 +330,7 @@ fn_switch_window(*) {
                                 }
                                 createGui(existGui).Show()
                                 existGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 警告")
                                     g.AddText("cRed", exe_name)
                                     g.AddText("yp", "这个应用进程已经存在了")
 

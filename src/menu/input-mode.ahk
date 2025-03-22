@@ -63,7 +63,7 @@ fn_input_mode(*) {
                 warningGui(info) {
                     gc.useShift.Value := useShift + 1
 
-                    g := createGuiOpt()
+                    g := createGuiOpt("InputTip - 警告")
                     g.AddText(, "确定要使用【否】吗？")
                     g.AddText("cRed", "除非你的输入法自定义了切换状态的按键，且禁用了 Shift 切换，才需要选择【否】`n如果选择【否】，在美式键盘(ENG)或部分特殊输入法中，可能会导致状态提示间歇性错误")
                     g.AddText("cRed", "建议不要使用【否】，而是启用 Shift 切换状态，这也是几乎所有输入法的默认设置")

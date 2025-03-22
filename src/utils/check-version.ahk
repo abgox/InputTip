@@ -185,7 +185,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                             if (!done) {
                                 createGui(errGui).Show()
                                 errGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 新版本下载错误")
                                     g.AddText("cRed", "InputTip 新版本下载错误!")
                                     g.AddText("xs cRed", "请手动下载最新版本的 InputTip.exe 文件并替换。")
                                     g.AddText(, "--------------------------------------------------")
@@ -225,7 +225,7 @@ checkUpdate(init := 0, once := false, force := 0) {
 
                             createGui(doneGui).Show()
                             doneGui(info) {
-                                g := createGuiOpt()
+                                g := createGuiOpt("InputTip - 忽略更新检查")
                                 g.AddText(, "InputTip 的")
                                 g.AddText("yp cRed", "版本更新检查")
                                 g.AddText("yp", "已忽略")
@@ -295,7 +295,7 @@ checkUpdate(init := 0, once := false, force := 0) {
 
                             createGui(doneGui).Show()
                             doneGui(info) {
-                                g := createGuiOpt()
+                                g := createGuiOpt("InputTip - 忽略更新检查")
                                 g.AddText(, "InputTip 的")
                                 g.AddText("yp cRed", "版本更新检查")
                                 g.AddText("yp", "已忽略")

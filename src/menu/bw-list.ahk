@@ -27,7 +27,7 @@ fn_bw_list(*) {
                 createGui(warningGui).Show()
                 warningGui(info) {
                     gc._bw_list.Value := useWhiteList + 1
-                    _g := createGuiOpt()
+                    _g := createGuiOpt("InputTip - 警告")
                     _g.AddText(, "确定要使用「黑」名单吗？")
                     _g.AddText("cRed", "这是不建议的，更建议继续使用「白」名单`n因为「黑」名单机制下，你需要承担未知的可能存在的窗口兼容性代价")
                     _g.AddLink("cGray", '详情请查看 <a href="https://inputtip.abgox.com/FAQ/white-list">为什么建议使用白名单机制</a>')

@@ -1,4 +1,7 @@
 fn_startup(item, *) {
+    ; 注册表: 开机自启动
+    HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+
     global isStartUp
     if (isStartUp) {
         if (gc.w.updateUserGui) {
@@ -25,7 +28,7 @@ fn_startup(item, *) {
         }
         createGui(cancelGui).Show()
         cancelGui(info) {
-            g := createGuiOpt()
+            g := createGuiOpt("InputTip - 取消开机自启动")
             g.AddText(, "InputTip 的")
             g.AddText("yp cRed", "开机自启动")
             g.AddText("yp", "已取消")
@@ -92,7 +95,7 @@ fn_startup(item, *) {
             e_useReg(*) {
                 isStartUp := 3
                 try {
-                    RegWrite(A_ScriptFullPath, "REG_SZ", "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", "abgox - " A_ScriptName)
+                    RegWrite(A_ScriptFullPath, "REG_SZ", HKEY_startup, "abgox - " A_ScriptName)
                     fn_handle()
                 } catch {
                     if (gc.w.subGui) {
@@ -121,7 +124,7 @@ fn_startup(item, *) {
             fn_err_msg(msg, *) {
                 createGui(errGui).Show()
                 errGui(info) {
-                    g := createGuiOpt()
+                    g := createGuiOpt("InputTip - 错误")
                     g.AddText("cRed", msg)
                     g.AddText("cRed", "你需要考虑使用其他方式设置开机自启动")
 

@@ -67,7 +67,7 @@ fn_app_offset(*) {
                         }
                         createGui(errGui).Show()
                         errGui(info) {
-                            g := createGuiOpt()
+                            g := createGuiOpt("InputTip - 警告")
                             g.AddText("cRed", exe_name)
                             g.AddText("yp", "是一个错误的应用进程名称")
                             g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
@@ -104,7 +104,7 @@ fn_app_offset(*) {
                         }
                         createGui(existGui).Show()
                         existGui(info) {
-                            g := createGuiOpt()
+                            g := createGuiOpt("InputTip - 警告")
                             g.AddText("cRed", exe_name)
                             g.AddText("yp", "这个应用进程已经存在了")
 
@@ -262,7 +262,7 @@ fn_app_offset(*) {
                 createGui(setAllGui).Show()
                 setAllGui(info) {
                     offset := { x: 0, y: 0 }
-                    g := createGuiOpt("批量设置 " item._exe_name " 在多个屏幕的特殊偏移量")
+                    g := createGuiOpt("InputTip - 批量设置 " item._exe_name " 在多个屏幕的特殊偏移量")
                     g.AddText("cRed", "如果偏移量为空，将自动设置为 0")
 
                     if (info.i) {

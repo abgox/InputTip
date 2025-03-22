@@ -65,7 +65,7 @@ fn_update_user(*) {
     }
     createGui(updateUserGui).Show()
     updateUserGui(info) {
-        g := createGuiOpt()
+        g := createGuiOpt("InputTip - 更改用户信息")
         g.AddText("cRed", "- 如果是域用户，在用户名中需要添加域`n- 如: xxx\abgox")
         g.AddText(, "用户名: ")
         _ := g.AddEdit("yp")
@@ -119,7 +119,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
         }
         createGui(commonGui).Show()
         commonGui(info) {
-            g := createGuiOpt()
+            g := createGuiOpt("InputTip - 配置")
             tab := g.AddTab3("-Wrap", tipList.tab)
             tab.UseTab(1)
             g.AddLink("Section cRed", tipList.tip)
@@ -216,7 +216,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 }
                 createGui(addGui).Show()
                 addGui(info) {
-                    g := createGuiOpt()
+                    g := createGuiOpt("InputTip - 配置")
                     g.AddLink(, tipList.%from "Confirm"%)
                     g.AddLink("yp cRed", exe_name)
                     g.AddLink("yp", tipList.%from "Confirm2"%)
@@ -331,7 +331,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                                 }
                                 createGui(errGui).Show()
                                 errGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 警告")
                                     g.AddText("cRed", exe_name)
                                     g.AddText("yp", "是一个错误的应用进程名称")
                                     g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
@@ -373,7 +373,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                                 }
                                 createGui(existGui).Show()
                                 existGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 警告")
                                     g.AddText("cRed", exe_name)
                                     g.AddText("yp", "这个应用进程已经存在了")
 
@@ -413,7 +413,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 }
                 createGui(clearGui).Show()
                 clearGui(info) {
-                    g := createGuiOpt()
+                    g := createGuiOpt("InputTip - 警告")
                     g.AddText(, "确定要清空「" tipList.list "」吗？")
                     g.AddText("cRed", "请谨慎选择，它会移除其中的 " count " 个应用进程`n一旦清空，无法恢复，只能重新一个一个添加")
 

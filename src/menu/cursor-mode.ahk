@@ -11,7 +11,7 @@ fn_cursor_mode(*) {
         }
         createGui(modeGui).Show()
         modeGui(info) {
-            g := createGuiOpt()
+            g := createGuiOpt("InputTip - 设置光标获取模式")
             tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
             tab.UseTab(1)
             g.AddText("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
@@ -141,7 +141,7 @@ fn_cursor_mode(*) {
                         updateWhiteList(exe_name)
                         updateCursorMode(config != "cursor_mode_JAB")
                     }
-                    g := createGuiOpt()
+                    g := createGuiOpt("InputTip - 添加")
                     g.AddText(, "要将进程")
                     g.AddText("yp cRed", exe_name)
                     g.AddText("yp", "添加到哪一个光标获取模式中？")
@@ -249,7 +249,7 @@ fn_cursor_mode(*) {
                                 }
                                 createGui(errGui).Show()
                                 errGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 警告")
                                     g.AddText("cRed", exe_name)
                                     g.AddText("yp", "是一个错误的应用进程名称")
                                     g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
@@ -283,7 +283,7 @@ fn_cursor_mode(*) {
                                 }
                                 createGui(existGui).Show()
                                 existGui(info) {
-                                    g := createGuiOpt()
+                                    g := createGuiOpt("InputTip - 警告")
                                     g.AddText("cRed", exe_name)
                                     g.AddText("yp", "这个应用进程已经存在了")
 

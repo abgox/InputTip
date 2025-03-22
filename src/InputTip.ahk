@@ -1,6 +1,7 @@
 #Include .\utils\options.ahk
 
 ;@AHK2Exe-SetName InputTip
+;@Ahk2Exe-SetOrigFilename InputTip.ahk
 ;@Ahk2Exe-UpdateManifest 1
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态提示工具
 
@@ -16,9 +17,7 @@
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态提示工具"
-
-; 注册表: 开机自启动
-HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+JAB_PID := ""
 
 gc := {
     init: 0,
@@ -71,7 +70,19 @@ checkIni() ; 检查配置文件
 
 userName := readIni("userName", A_UserName, "UserInfo")
 
-favicon := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\img\favicon.ico"
+if (A_IsCompiled) {
+    favicon := A_ScriptFullPath
+} else {
+    favicon := A_ScriptDir "\img\favicon.ico"
+
+    ; 当运行源代码时，是否直接以管理员权限运行
+    runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
+    if (!A_IsCompiled && runCodeWithAdmin && !A_IsAdmin) {
+        try {
+            Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '"'
+        }
+    }
+}
 
 TraySetIcon(A_ScriptDir "\InputTipSymbol\default\favicon.png", , 1)
 

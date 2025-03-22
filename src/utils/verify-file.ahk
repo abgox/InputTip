@@ -1,41 +1,46 @@
-isWaitStart := 1
+if (A_IsCompiled) {
+    if (!FileExist("InputTip.ini")) {
+        isWaitStart := 1
+        fz := "s14"
+        createGui(confirmGui).Show()
+        confirmGui(info) {
+            g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
+            g.SetFont(fz, "Microsoft YaHei")
+            g.AddText(, "即将释放 InputTip 运行所需文件，是否继续？")
+            g.AddText("xs", " - InputTip.ini (配置文件)")
+            g.AddText("xs", " - InputTipSymbol (图片符号文件夹)")
+            g.AddText("xs", " - InputTipCursor (鼠标样式文件夹)")
+            g.AddText("xs ReadOnly cGray", "这些文件或文件夹都在 InputTip.exe 的同级目录下")
 
-if (!FileExist("InputTip.ini")) {
-    fz := "s14"
-    createGui(confirmGui).Show()
-    confirmGui(info) {
-        g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
-        g.SetFont(fz, "Microsoft YaHei")
-        g.AddText(, "即将释放 InputTip 运行所需文件，是否继续？")
-        g.AddText("xs", " - InputTip.ini (配置文件)")
-        g.AddText("xs", " - InputTipSymbol (图片符号文件夹)")
-        g.AddText("xs", " - InputTipCursor (鼠标样式文件夹)")
-        g.AddText("xs ReadOnly cGray", "这些文件或文件夹都在 InputTip.exe 的同级目录下")
+            if (info.i) {
+                return g
+            }
+            w := info.w
+            bw := w - g.MarginX * 2
 
-        if (info.i) {
+            g.AddButton("xs cRed w" bw, "继续").OnEvent("Click", e_yes)
+            e_yes(*) {
+                g.Destroy()
+                global isWaitStart := 0
+            }
+            g.AddButton("w" bw, "取消").OnEvent("Click", e_no)
+            e_no(*) {
+                e_exit()
+            }
+            g.OnEvent("Close", e_exit)
+            e_exit(*) {
+                ExitApp()
+            }
             return g
         }
-        w := info.w
-        bw := w - g.MarginX * 2
 
-        g.AddButton("xs cRed w" bw, "继续").OnEvent("Click", e_yes)
-        e_yes(*) {
-            g.Destroy()
-            global isWaitStart := 0
+        while isWaitStart {
+            Sleep(500)
         }
-        g.AddButton("w" bw, "取消").OnEvent("Click", e_no)
-        e_no(*) {
-            e_exit()
-        }
-        g.OnEvent("Close", e_exit)
-        e_exit(*) {
-            ExitApp()
-        }
-        return g
     }
-
-    while isWaitStart {
-        Sleep(500)
+} else {
+    if (!FileExist("..\InputTip.bat")) {
+        FileAppend('@echo off' "`n" 'set "SCRIPT_DIR=%~dp0"' "`n" 'start "" /min "%SCRIPT_DIR%\src\AutoHotkey\AutoHotkey64.exe" "%SCRIPT_DIR%\src\InputTip.ahk"', "..\InputTip.bat", "`n UTF-8-Raw")
     }
 }
 
@@ -60,10 +65,10 @@ if (!FileExist("InputTipSymbol\default\offer.png")) {
     FileInstall("InputTipSymbol\default\offer.png", "InputTipSymbol\default\offer.png", 1)
 }
 if (!FileExist("InputTipSymbol\default\favicon.png")) {
-    FileInstall("img\favicon.png", "InputTipSymbol\default\favicon.png", 1)
+    FileInstall("InputTipSymbol\default\favicon.png", "InputTipSymbol\default\favicon.png", 1)
 }
 if (!FileExist("InputTipSymbol\default\favicon-pause.png")) {
-    FileInstall("img\favicon-pause.png", "InputTipSymbol\default\favicon-pause.png", 1)
+    FileInstall("InputTipSymbol\default\favicon-pause.png", "InputTipSymbol\default\favicon-pause.png", 1)
 }
 
 

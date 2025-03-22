@@ -40,8 +40,7 @@ while 1 {
                     needShow := 0
                 }
             }
-        }
-        if (!symbolType || needHide || (!showCursorPos && isMouseOver("ahk_class Shell_TrayWnd"))) {
+        } else if (needHide || (!showCursorPos && isMouseOver("ahk_class Shell_TrayWnd"))) {
             hideSymbol()
             needShow := 0
         }

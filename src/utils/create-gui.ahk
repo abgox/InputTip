@@ -43,3 +43,40 @@ createGuiOpt(title := A_ScriptName, fontOption := fontOpt, guiOption := "AlwaysO
     g.SetFont(fontOption*)
     return g
 }
+
+
+/**
+ * 创建一个提示 Gui
+ * @param {Array} Tips 显示的提示信息
+ * @param {String} title Gui 标题
+ * @param {String} btnText 按钮文本
+ * @returns {Gui} 返回 Gui 对象
+ */
+createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
+    if (gc.w.subGui) {
+        gc.w.subGui.Destroy()
+        gc.w.subGui := ""
+    }
+    tipGui(info) {
+        g := createGuiOpt(title)
+
+        for v in Tips {
+            g.AddLink(v.opt, v.text)
+        }
+
+        if (info.i) {
+            return g
+        }
+        w := info.w
+
+        btn := g.AddButton("xs w" w, btnText)
+        btn.OnEvent("Click", e_close)
+        btn.Focus()
+        e_close(*) {
+            g.Destroy()
+        }
+        gc.w.subGui := g
+        return g
+    }
+    return createGui(tipGui)
+}

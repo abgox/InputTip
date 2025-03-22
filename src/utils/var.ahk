@@ -568,7 +568,7 @@ restartJAB() {
                     Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
                 }
             } else {
-                Run(A_ScriptDir "\InputTip.JAB.JetBrains.exe", , "Hide")
+                Run("InputTip.JAB.JetBrains.ahk", , "Hide", &JAB_PID)
             }
             done := 1
         }

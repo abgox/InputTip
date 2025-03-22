@@ -1,8 +1,7 @@
-**/InputTipCursor/default
-**/InputTipSymbol/default
+src/InputTipCursor/default
+src/InputTipSymbol/default
+src/InputTip.ini
+src/InputTip.JAB.JetBrains.exe
 test/**
 
 src/utils/app-update/target/*
-!src/utils/app-update/target/release/
-src/utils/app-update/target/release/*
-!src/utils/app-update/target/release/app-update.exe

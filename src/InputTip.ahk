@@ -19,6 +19,12 @@ fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态提示工具"
 JAB_PID := ""
 
+try {
+    keyCount := A_Args[1]
+} catch {
+    keyCount := 0
+}
+
 gc := {
     init: 0,
     timer: 0,
@@ -77,7 +83,7 @@ if (A_IsCompiled) {
 
     ; 当运行源代码时，是否直接以管理员权限运行
     runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
-    if (!A_IsCompiled && runCodeWithAdmin && !A_IsAdmin) {
+    if (runCodeWithAdmin && !A_IsAdmin) {
         try {
             Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
         }
@@ -115,11 +121,6 @@ if (hotkey_Pause) {
     }
 }
 
-try {
-    keyCount := A_Args[1]
-} catch {
-    keyCount := 0
-}
 enableKeyCount := readIni("enableKeyCount", 0)
 trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
 keyCountTemplate := readIni("keyCountTemplate", "%\n%启动至今，有效的按键次数: %keyCount%")

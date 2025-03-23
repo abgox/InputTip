@@ -79,7 +79,7 @@ if (A_IsCompiled) {
     runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
     if (!A_IsCompiled && runCodeWithAdmin && !A_IsAdmin) {
         try {
-            Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '"'
+            Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
         }
     }
 }

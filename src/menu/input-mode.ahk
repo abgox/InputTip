@@ -13,11 +13,7 @@ fn_input_mode(*) {
     }
     createGui(inputModeGui).Show()
     inputModeGui(info) {
-        global statusMode, conversionMode, mode
-
-        statusMode := readIni("statusMode", "", "InputMethod")
-        conversionMode := readIni("conversionMode", "", "InputMethod")
-        mode := readIni("mode", 1, "InputMethod")
+        global mode := readIni("mode", 1, "InputMethod")
 
         g := createGuiOpt("InputTip - 设置输入法模式")
         gc.modeList := ["【自定义】", "【通用】"]
@@ -99,130 +95,240 @@ fn_input_mode(*) {
         tab.UseTab(2)
 
         g.AddText("Section ReadOnly cRed -VScroll w" w, "首先需要点击上方的「关于自定义」标签页，查看帮助说明，了解如何设置")
-        g.AddText("Section", "优先级顺序: 切换码规则(4) > 切换码数字(3) > 状态码规则(2) > 状态码数字(1)")
-        g.AddText("xs cGray", "输入框中有值的或规则有勾选的，取其中优先级最高的生效`n如果都没有设置或勾选，则自动变回【通用】模式，反之变为【自定义】模式")
+        g.AddText("xs cGray", "如果添加了至少一条规则，则自动变为【自定义】模式，反之变回【通用】模式")
 
-        g.AddText("Section", "以哪一种状态作为判断依据: ")
+        g.AddText("Section", "如果所有规则都不匹配，应该判断为: ")
         g.AddDropDownList("yp Choose" baseStatus + 1, [" 英文状态", " 中文状态"]).OnEvent("Change", e_changeBaseStatus)
         e_changeBaseStatus(item, *) {
             value := item.Value - 1
             writeIni("baseStatus", value, "InputMethod")
             global baseStatus := value
-            for v in gc.statusText {
-                v.value := Trim(item.text)
-            }
-        }
-        gc.statusText := []
-        g.AddText("xs", "1.")
-        gc.statusText.push(g.AddText("yp cRed", stateMap.%baseStatus%))
-        g.AddText("yp", "的状态码数字: ")
-        gc.statusMode := g.AddEdit("yp", "")
-        gc.statusMode.Value := Trim(StrReplace(statusMode, ":", " "))
-        gc.statusMode.OnEvent("Change", e_statusMode)
-        e_statusMode(item, *) {
-            if (Trim(item.value) = "") {
-                writeIni("statusMode", "", "InputMethod")
-                statusMode := ""
-            } else {
-                value := ":"
-                for v in StrSplit(item.value, " ") {
-                    value .= v ":"
-                }
-                writeIni("statusMode", value, "InputMethod")
-                statusMode := value
-            }
-            checkModeChange()
-        }
-        checkModeChange() {
-            if (gc.statusMode.Value = "" && gc.conversionMode.Value = "" && evenStatusMode = "" && evenConversionMode = "") {
-                gc.mode.Value := gc.modeList[2]
-                if (mode != 1) {
-                    writeIni("mode", 1, "InputMethod")
-                    global mode := 1
-                }
-            } else {
-                gc.mode.Value := gc.modeList[1]
-                if (mode != 0) {
-                    writeIni("mode", 0, "InputMethod")
-                    global mode := 0
-                }
-            }
-            restartJAB()
         }
 
-        handle_mode(value, config, checkbox, default) {
-            if (value) {
-                gc.%checkbox%.value := 0
-                writeIni(config, default, "InputMethod")
-            } else {
-                if (!gc.%checkbox%.value) {
-                    writeIni(config, "", "InputMethod")
-                }
+        gc.input_mode_LV := _ := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Grid w" w, ["顺序", "状态码规则", "切换码规则", "输入法状态"])
+        fn_reloading_LV(_)
+
+        _.OnEvent("DoubleClick", e_edit)
+        e_edit(LV, RowNumber) {
+            fn_edit(LV, RowNumber)
+        }
+
+        g.AddButton("xs w" w, "添加规则").OnEvent("Click", e_addRule)
+        e_addRule(*) {
+            fn_edit(gc.input_mode_LV, modeRules.Length + 1, 1)
+        }
+
+        fn_edit(LV, RowNumber, add := 0) {
+            if (!RowNumber) {
+                return
             }
-            global evenStatusMode := readIni("evenStatusMode", "", "InputMethod")
-            global evenConversionMode := readIni("evenConversionMode", "", "InputMethod")
-            checkModeChange()
-        }
-
-        g.AddText("xs", "2.")
-        gc.statusText.push(g.AddText("yp cRed", stateMap.%baseStatus%))
-        g.AddText("yp", "的状态码规则: ")
-        gc.oddStatusMode := g.AddCheckbox("yp", "使用奇数")
-        if (evenStatusMode != "") {
-            gc.oddStatusMode.Value := !evenStatusMode
-        }
-        gc.oddStatusMode.OnEvent("Click", e_oddStatusMode)
-        e_oddStatusMode(item, *) {
-            handle_mode(item.value, "evenStatusMode", "evenStatusMode", 0)
-        }
-        gc.evenStatusMode := g.AddCheckbox("yp", "使用偶数")
-        if (evenStatusMode != "") {
-            gc.evenStatusMode.Value := evenStatusMode
-        }
-        gc.evenStatusMode.OnEvent("Click", e_evenStatusMode)
-        e_evenStatusMode(item, *) {
-            handle_mode(item.value, "evenStatusMode", "oddStatusMode", 1)
-        }
-
-        g.AddText("xs", "3.")
-        gc.statusText.push(g.AddText("yp cRed", stateMap.%baseStatus%))
-        g.AddText("yp", "的切换码数字: ")
-        gc.conversionMode := g.AddEdit("yp")
-        gc.conversionMode.Value := Trim(StrReplace(conversionMode, ":", " "))
-        gc.conversionMode.OnEvent("Change", e_conversionMode)
-        e_conversionMode(item, *) {
-            if (Trim(item.value) = "") {
-                writeIni("conversionMode", "", "InputMethod")
-                conversionMode := ""
-            } else {
-                value := ":"
-                for v in StrSplit(item.value, " ") {
-                    value .= v ":"
+            if (add) {
+                ruleInfo := {
+                    statusRule: "",
+                    conversionRule: "",
+                    status: !baseStatus,
                 }
-                writeIni("conversionMode", value, "InputMethod")
-                conversionMode := value
+                typeText := "添加"
+            } else {
+                rule := modeRules[RowNumber]
+                r := StrSplit(rule, "*")
+
+                ruleInfo := {
+                    statusRule: r[1],
+                    conversionRule: r[2],
+                    status: r[3],
+                }
+                typeText := "编辑"
             }
-            checkModeChange()
+
+            createGui(editRuleGui).Show()
+            editRuleGui(info) {
+                g := createGuiOpt("InputTip - " typeText "规则")
+
+                _gc := {
+                    statusNum: "",
+                    statusRule: "",
+                    conversionNum: "",
+                    conversionRule: "",
+                    order: RowNumber,
+                }
+
+                g.AddText(, "1. 顺序: ")
+
+                num := 1
+                list := []
+                while (num <= modeRules.Length + add) {
+                    list.Push(" " num)
+                    num++
+                }
+                _ := g.AddDropDownList("yp r9", list)
+                _.Value := _gc.order
+                _.OnEvent("Change", e_changeOrder)
+                e_changeOrder(item, *) {
+                    _gc.order := Trim(item.Value)
+                }
+
+                g.AddText("xs", "2. 状态码规则: ")
+                g.AddText("xs", "     - 指定数字: ")
+
+                _gc.statusNum := _ := g.AddEdit("yp", "")
+
+                if (info.i) {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                if (!InStr(ruleInfo.statusRule, "oddNum") && !InStr(ruleInfo.statusRule, "evenNum")) {
+                    _.Value := ruleInfo.statusRule
+                }
+                _.OnEvent("Change", e_statusMode)
+                e_statusMode(item, *) {
+                    ruleInfo.statusRule := item.value
+                    _gc.statusRule.value := 0
+                }
+
+                g.AddText("xs", "     - 指定规律: ")
+
+                _gc.statusRule := _ := g.AddDropDownList("yp", ["", "使用奇数", "使用偶数"])
+                if (ruleInfo.statusRule == "oddNum") {
+                    _.Value := 2
+                } else if (ruleInfo.statusRule == "evenNum") {
+                    _.Value := 3
+                }
+                _.OnEvent("Change", e_statusRule)
+                e_statusRule(item, *) {
+                    v := item.Value
+                    if (v == 2) {
+                        ruleInfo.statusRule := "oddNum"
+                    } else if (v == 3) {
+                        ruleInfo.statusRule := "evenNum"
+                    } else {
+                        ruleInfo.statusRule := ""
+                    }
+                    _gc.statusNum.value := ""
+                }
+
+                g.addText("xs", "3. 切换码规则: ")
+                g.AddText("xs", "     - 指定数字: ")
+                _gc.conversionNum := _ := g.AddEdit("yp", "")
+                if (!InStr(ruleInfo.conversionRule, "oddNum") && !InStr(ruleInfo.conversionRule, "evenNum")) {
+                    _.Value := ruleInfo.conversionRule
+                }
+                _.OnEvent("Change", e_conversionMode)
+                e_conversionMode(item, *) {
+                    ruleInfo.conversionRule := item.value
+                    _gc.conversionRule.value := 0
+                }
+
+                g.AddText("xs", "     - 指定规律: ")
+                _gc.conversionRule := _ := g.AddDropDownList("yp", ["", "使用奇数", "使用偶数"])
+                if (ruleInfo.conversionRule == "oddNum") {
+                    _.Value := 2
+                } else if (ruleInfo.conversionRule == "evenNum") {
+                    _.Value := 3
+                }
+                _.OnEvent("Change", e_conversionRule)
+                e_conversionRule(item, *) {
+                    v := item.Value
+                    if (v == 2) {
+                        ruleInfo.conversionRule := "oddNum"
+                    } else if (v == 3) {
+                        ruleInfo.conversionRule := "evenNum"
+                    } else {
+                        ruleInfo.conversionRule := ""
+                    }
+                    _gc.conversionNum.value := ""
+                }
+
+                g.AddText("xs", "4. 输入法状态: ")
+                _ := g.AddDropDownList("yp", ["英文", "中文"])
+                _.value := ruleInfo.status + 1
+                _.OnEvent("Change", e_changeStatus)
+                e_changeStatus(item, *) {
+                    v := item.Value
+                    ruleInfo.status := v - 1
+                }
+
+                g.AddButton("xs w" bw, "完成" typeText).OnEvent("Click", e_set)
+                e_set(*) {
+                    g.Destroy()
+
+                    ; 状态码
+                    sm := ruleInfo.statusRule
+                    ; 切换码
+                    cm := ruleInfo.conversionRule
+                    ; 输入法状态
+                    status := ruleInfo.status
+
+                    if (add) {
+                        modeRules.InsertAt(_gc.order, sm "*" cm "*" status)
+                    } else {
+                        if (_gc.order != RowNumber) {
+                            modeRules.RemoveAt(RowNumber)
+                            modeRules.InsertAt(_gc.order, sm "*" cm "*" status)
+                        } else {
+                            modeRules[RowNumber] := sm "*" cm "*" status
+                        }
+                    }
+
+                    global modeRule := arrJoin(modeRules, ":")
+                    writeIni("modeRule", modeRule, "InputMethod")
+                    if (modeRules.Length) {
+                        global mode := 0
+                        writeIni("mode", 0, "InputMethod")
+                        gc.mode.Value := gc.modeList[1]
+                    }
+
+                    fn_reloading_LV(LV)
+                }
+                if (!add) {
+                    g.AddButton("xs w" bw, "删除此条规则").OnEvent("Click", e_del)
+                    e_del(*) {
+                        g.Destroy()
+                        LV.Delete(RowNumber)
+                        autoHdrLV(LV)
+                        modeRules.RemoveAt(RowNumber)
+                        if (!modeRules.Length) {
+                            global mode := 1
+                            writeIni("mode", 1, "InputMethod")
+                            gc.mode.Value := gc.modeList[2]
+                        }
+                        global modeRule := arrJoin(modeRules, ":")
+                        writeIni("modeRule", modeRule, "InputMethod")
+                        fn_reloading_LV(LV)
+                    }
+                }
+
+                return g
+            }
         }
 
-        g.AddText("xs", "4.")
-        gc.statusText.push(g.AddText("yp cRed", stateMap.%baseStatus%))
-        g.AddText("yp", "的切换码规则: ")
-        gc.oddConversionMode := g.AddCheckbox("yp", "使用奇数")
-        if (evenConversionMode != "") {
-            gc.oddConversionMode.Value := !evenConversionMode
+        fn_reloading_LV(LV) {
+            LV.Delete()
+            LV.Opt("-Redraw")
+
+            for i, v in modeRules {
+                r := StrSplit(v, "*")
+                LV.Add(, i, generateCol(r*)*)
+            }
+            LV.Opt("+Redraw")
+            autoHdrLV(LV)
         }
-        gc.oddConversionMode.OnEvent("Click", e_oddConversionMode)
-        e_oddConversionMode(item, *) {
-            handle_mode(item.value, "evenConversionMode", "evenConversionMode", 0)
-        }
-        gc.evenConversionMode := g.AddCheckbox("yp", "使用偶数")
-        if (evenConversionMode != "") {
-            gc.evenConversionMode.Value := evenConversionMode
-        }
-        gc.evenConversionMode.OnEvent("Click", e_evenConversionMode)
-        e_evenConversionMode(item, *) {
-            handle_mode(item.value, "evenConversionMode", "oddConversionMode", 1)
+
+        /**
+         * 生成列信息
+         * @param sm 状态码
+         * @param cm 切换码
+         * @param status 输入法状态
+         * @returns {Array} 列信息
+         */
+        generateCol(sm, cm, status) {
+            colList := []
+            colList.Push(sm == "oddNum" ? "奇数" : sm == "evenNum" ? "偶数" : sm)
+            colList.Push(cm == "oddNum" ? "奇数" : cm == "evenNum" ? "偶数" : cm)
+            colList.Push(status ? "中文" : "英文")
+            return colList
         }
 
         gc.status_btn := g.AddButton("xs w" w, "显示实时的状态码和切换码")
@@ -249,10 +355,9 @@ fn_input_mode(*) {
                 ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
             }
         }
-
         tab.UseTab(3)
-        g.AddText("cRed", "下方以讯飞，小狼毫(rime)，手心，小鹤音形，ENG(美式键盘)这几种输入法进行举例说明`n你需要完整阅读整个帮助说明，看完之后，你自然就知道应该如何设置了")
-        g.AddEdit("Section r12 ReadOnly w" w, "1. 如何进行设置？(选择英文状态作为判断依据)`n   - 首先以【讯飞输入法】为例`n   - 点击按钮「显示实时的状态码和切换码」，它会在光标处显示状态码和切换码`n   - 来回切换输入法的中英文状态观察它们的变化`n   - 会发现切换码始终为 1，而状态码在英文时为 1，中文时为 2`n   - 于是，在状态码数字的输入框中填入 1，就可以正常识别状态了`n   - 这里更推荐勾选状态码规则中的「使用奇数」，它包含 1，且范围更大`n   - 再比如【小狼毫(rime)输入法】，按照同样的操作流程，你会发现很大的不同`n   - 它的状态码始终为 1，而切换码在英文时是随机的偶数，中文时是随机的奇数`n   - 于是，勾选切换码规则中的「使用偶数」后，就可以正常识别状态了`n   - 当然，不要盲目的使用规则扩大范围，比如【手心输入法】就不能这样做`n   - 当使用【手心输入法】按照同样的流程操作时，你会发现又有不同`n   - 它的状态码始终为 1，而切换码在英文时为 1，中文时为 1025`n   - 于是，在切换码数字的输入框中填入 1，就可以正常识别状态了`n   - 但是，这里就不能勾选「使用奇数」，因为中文时的 1025 也是奇数`n`n2. 关于配置项「以哪一种状态作为判断依据」`n   - 需要根据实际情况选择合适的值`n   - 上方的这几个例子，是围绕英文状态来设置的`n   - 如果你需要围绕中文状态来设置，你就需要选择中文状态`n   - 以【小鹤音形输入法】为例`n   - 它的状态码始终为 1，而切换码在英文时为 257，中文时为 1025`n   - 因此，将 257 填入切换码即可`n   - 但是如果你同时使用多个输入法，比如它和【ENG 美式键盘】`n   - 而【ENG 美式键盘】的切换码为 1，这就没有办法兼顾这两个输入法`n   - 这时，就可以换个思路，选择以中文状态为判断依据`n   - 将 1025 填入切换码后，【小鹤音形输入法】能正常识别`n   - 切换到【ENG 美式键盘】时，由于切换码不等于 1025，也会识别成英文状态`n`n3. 什么是优先级顺序？`n   - 优先级顺序: 切换码规则(4) > 切换码数字(3) > 状态码规则(2) > 状态码数字(1)`n   - 假如你使用了切换码规则，勾选了「使用偶数」`n   - 那么切换码数字，状态码规则，状态码数字即使有勾选或填入了值，也不会生效`n   - 因为切换码规则优先级更高，InputTip 就直接使用它去判断了`n`n4. 关于「状态码数字」和「切换码数字」`n   - 在它们的输入框中，可以填入许多个数字，如果遇到以下情况就可以这样做`n   - 假如你发现状态码都是 1，区分不了状态，无法使用`n   - 而切换码在英文时不唯一，有时为 0，有时为 3，但中文时没有 0 或 3`n   - 这种情况下，有奇数也有偶数，使用规则也无法区分`n   - 就可以直接在切换码数字的输入框中填入它们，以空格分割它们即可")
+        g.AddText("cRed", "下方以讯飞，小狼毫(rime)，手心这几种输入法进行举例说明`n你需要完整阅读整个帮助说明，看完之后，你自然就知道应该如何设置了")
+        g.AddEdit("Section r12 ReadOnly w" w, "1. 【自定义】模式的核心逻辑`n   - 通过系统返回的状态码和切换码，通过规则匹配，告诉 InputTip 当前是什么状态`n   - 通过「添加规则」按钮添加，只要有一条规则存在，就会自动变为【自定义】模式`n   - 双击规则列表中的任意一条规则，可以进行修改`n   - 规则会按照顺序匹配，如果匹配成功，将判断输入法为对应状态   `n2. 如何进行设置？`n   - 下方示例中，「如果所有规则都不匹配，应该判断为」这个配置选择 「英文状态」`n   - 首先以【讯飞输入法】为例`n   - 点击「显示实时的状态码和切换码」按钮，会在鼠标光标处显示状态码和切换码`n   - 来回切换输入法的中英文状态观察它们的变化`n   - 会发现切换码始终为 1，而状态码在英文时为 1，中文时为 2`n   - 因此，可以添加一条规则，状态码规则中指定数字 2，输入法状态选择中文`n   - 当状态码为 2 时，就会匹配到这条规则，于是 InputTip 会判断当前输入法状态为中文`n   - 再比如【小狼毫(rime)输入法】，按照同样的操作流程，你会发现很大的不同`n   - 它的状态码始终为 1，而切换码在英文时是随机的偶数，中文时是随机的奇数`n   - 因此，在切换码规则中直接指定规律「使用奇数」即可`n   - 当然，不要盲目的使用指定规律扩大范围，比如【手心输入法】就不能这样做`n   - 当使用【手心输入法】按照同样的流程操作时`n   - 它的状态码始终为 1，而切换码在英文时为 1，中文时为 1025`n   - 因此，在切换码规则中指定数字 1025 即可`n   - 但是，这里就不能指定规律「使用奇数」，因为英文时的 1 也是奇数`n3. 关于状态码规则和切换码规则`n   - 你可以同时设置状态码和切换码的规则`n   - 比如: 我希望匹配状态码为 1，切换码为 2，将它们分别填入两者的指定数字中即可`n4. 关于指定数字`n   - 如果你希望规则可以匹配多个数字，在指定数字中，用 / 分割即可`n   - 假如你希望状态码不管是 1 还是 2 都应该匹配成功，直接指定数字 1/2 即可")
         g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/custom-input-mode">自定义模式</a>')
         g.OnEvent("Close", e_close)
         e_close(*) {

@@ -427,6 +427,37 @@ checkUpdate(init := 0, once := false, force := 0) {
  */
 checkUpdateDone() {
     if (FileExist(A_AppData "\.abgox-InputTip-update-version-done.txt")) {
+        modeRules := []
+        try {
+            _ := IniRead("InputTip.ini", "InputMethod", "statusMode")
+            modeRules.Push(StrReplace(RegExReplace(_, "(^:)|(:$)", ""), ":", "/"))
+            IniDelete("InputTip.ini", "InputMethod", "statusMode")
+        }
+        try {
+            _ := IniRead("InputTip.ini", "InputMethod", "conversionMode")
+            modeRules.Push(StrReplace(RegExReplace(_, "(^:)|(:$)", ""), ":", "/"))
+            IniDelete("InputTip.ini", "InputMethod", "conversionMode")
+        }
+        try {
+            _ := IniRead("InputTip.ini", "InputMethod", "evenStatusMode")
+            if (_ != "") {
+                modeRules[1] := _ ? "evenNum" : "oddNum"
+            }
+            IniDelete("InputTip.ini", "InputMethod", "evenStatusMode")
+        }
+        try {
+            _ := IniRead("InputTip.ini", "InputMethod", "evenConversionMode")
+            if (_ != "") {
+                modeRules[2] := _ ? "evenNum" : "oddNum"
+            }
+            IniDelete("InputTip.ini", "InputMethod", "evenConversionMode")
+        }
+        if (modeRules.Length) {
+            baseStatus := readIni("baseStatus", 0, "InputMethod")
+            modeRules.Push(baseStatus)
+            writeIni("baseStatus", !baseStatus, "InputMethod")
+            writeIni("modeRule", arrJoin(modeRules, "*"), "InputMethod")
+        }
         try {
             _ := IniRead("InputTip.ini", "Config-v2", "JetBrains_list")
             writeIni("cursor_mode_JAB", _)

@@ -1,96 +1,80 @@
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
- * @Tip 有所修改，外部必须提供变量 checkTimeout,baseStatus,statusMode,conversionMode,evenStatusMode,evenConversionMode
+ * @Tip 有所修改，外部必须提供变量 checkTimeout,modeRule,defaultStatus
  * @example
  * checkTimeout := 1000 ; 超时时间(单位：毫秒)
- * baseStatus := 0 ; 以英文状态作为判断依据
- * statusMode := 0 ; 状态码
- * conversionMode := 0 ; 转换码
- * evenStatusMode := "" ; 状态码规则
- * evenConversionMode := "" ; 转换码规则
+ * modeRules := [] ; 状态规则
+ * baseStatus := 0 ; 默认状态为英文
  * IME.GetInputMode() ; 获取当前输入法输入模式
  * IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
  */
 class IME {
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if (statusMode = "" && evenStatusMode = "" && conversionMode = "" && evenConversionMode = "") {
+        if (mode = 1) {
             if (!this.GetOpenStatus(hwnd)) {
-                return {
-                    code: 0,
-                    isCN: 0
-                }
+                return 0
             }
 
             v := this.GetConversionMode(hwnd)
-            return {
-                code: v,
-                isCN: v & 1
+            return v & 1
+        }
+
+        defaultStatus := baseStatus
+
+        ; 系统返回的状态码
+        statusMode := this.GetOpenStatus(hwnd)
+        ; 系统返回的切换码
+        conversionMode := this.GetConversionMode(hwnd)
+
+        for v in modeRules {
+            r := StrSplit(v, "*")
+
+            ; 状态码
+            sm := r[1]
+            ; 切换码
+            cm := r[2]
+            ; 状态
+            status := r[3]
+
+            ; 是否匹配
+            isMatch := true
+
+            if (matchRule(statusMode, sm) && matchRule(conversionMode, cm)) {
+                ; 匹配成功
+                defaultStatus := status
+                break
             }
         }
 
-        ; 切换码
-        v := this.GetConversionMode(hwnd)
-        flag := v & 1
+        /**
+         * 匹配规则
+         * @param value 实际的值
+         * @param ruleValue 规则的值
+         * @returns
+         */
+        matchRule(value, ruleValue) {
+            ; 规则为空，默认匹配成功
+            if (ruleValue == "") {
+                return 1
+            } else {
+                ; 是否是奇数
+                isOdd := value & 1
 
-        if (baseStatus) {
-            if (evenConversionMode != "") {
-                return {
-                    code: v,
-                    isCN: evenConversionMode ? !flag : flag
+                if (ruleValue == "evenNum") {
+                    ; 如果状态码规则是偶数
+                    isMatch := !isOdd
+                } else if (ruleValue == "oddNum") {
+                    ; 如果状态码规则是奇数
+                    isMatch := isOdd
+                } else {
+                    str := "/" value "/"
+                    isMatch := InStr(str, "/" ruleValue "/")
                 }
-            }
-            if (conversionMode != "") {
-                return {
-                    code: v,
-                    isCN: InStr(conversionMode, ":" v ":")
-                }
-            }
-        } else {
-            if (evenConversionMode != "") {
-                return {
-                    code: v,
-                    isCN: evenConversionMode ? flag : !flag
-                }
-            }
-            if (conversionMode != "") {
-                return {
-                    code: v,
-                    isCN: !(InStr(conversionMode, ":" v ":"))
-                }
+                return isMatch
             }
         }
 
-        ; 状态码
-        v := this.GetOpenStatus(hwnd)
-        flag := v & 1
-
-        if (baseStatus) {
-            if (evenStatusMode != "") {
-                return {
-                    code: v,
-                    isCN: evenStatusMode ? !flag : flag
-                }
-            }
-            if (statusMode != "") {
-                return {
-                    code: 0,
-                    isCN: InStr(statusMode, ":" v ":")
-                }
-            }
-        } else {
-            if (evenStatusMode != "") {
-                return {
-                    code: v,
-                    isCN: evenStatusMode ? flag : !flag
-                }
-            }
-            if (statusMode != "") {
-                return {
-                    code: 0,
-                    isCN: !(InStr(statusMode, ":" v ":"))
-                }
-            }
-        }
+        return defaultStatus
     }
 
     static CheckInputMode(hwnd := this.GetFocusedWindow()) {
@@ -199,7 +183,7 @@ class IME {
  * MsgBox isCN()
  */
 isCN() {
-    return IME.GetInputMode().isCN
+    return IME.GetInputMode()
 }
 
 /**

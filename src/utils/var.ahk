@@ -8,14 +8,9 @@ modeList := {}
 
 ; 以哪一种状态作为判断依据
 baseStatus := readIni("baseStatus", 0, "InputMethod")
-; 指定的状态码
-statusMode := readIni("statusMode", "", "InputMethod")
-; 指定的切换码
-conversionMode := readIni("conversionMode", "", "InputMethod")
 
-; 是否使用偶数
-evenStatusMode := readIni("evenStatusMode", "", "InputMethod")
-evenConversionMode := readIni("evenConversionMode", "", "InputMethod")
+modeRule := readIni("modeRule", "", "InputMethod")
+modeRules := StrSplit(modeRule, ":")
 
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 

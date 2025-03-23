@@ -69,6 +69,7 @@ fn_cursor_mode(*) {
                 }
                 gc.%"LV_" mode%.Opt("+Redraw")
                 gc.%mode "_title"%.Value .= " ( " gc.%"LV_" mode%.GetCount() " 个 )"
+                autoHdrLV(gc.%"LV_" mode%)
             }
 
             for i, v in modeNameList {
@@ -111,6 +112,7 @@ fn_cursor_mode(*) {
                     _handle(to) {
                         g.Destroy()
                         gc.%"LV_" from%.Delete(RowNumber)
+                        autoHdrLV(gc.%"LV_" from%)
                         if (from != "add") {
                             v := gc.%from "_title"%.Value
                             gc.%from "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" from%.GetCount() " 个 )"
@@ -130,6 +132,7 @@ fn_cursor_mode(*) {
 
                         if (!InStr(":" value ":", ":" exe_name ":")) {
                             gc.%"LV_" to%.Add(, exe_name)
+                            autoHdrLV(gc.%"LV_" to%)
                             v := gc.%to "_title"%.Value
                             gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
                             if (value) {
@@ -172,10 +175,12 @@ fn_cursor_mode(*) {
                         e_rm(*) {
                             g.Destroy()
                             LV.Delete(RowNumber)
+                            autoHdrLV(LV)
                             v := gc.%from "_title"%.Value
                             gc.%from "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" from%.GetCount() " 个 )"
                             try {
                                 gc.LV_add.Add(, exe_name, WinGetTitle("ahk_exe " exe_name))
+                                autoHdrLV(gc.LV_add)
                             }
                             config := "cursor_mode_" from
                             value := readIni(config, "")
@@ -305,6 +310,7 @@ fn_cursor_mode(*) {
                             }
 
                             gc.%"LV_" to%.Add(, exe_name)
+                            autoHdrLV(gc.%"LV_" to%)
                             v := gc.%to "_title"%.Value
                             gc.%to "_title"%.Value := SubStr(v, 1, InStr(v, " ")) "( " gc.%"LV_" to%.GetCount() " 个 )"
                             if (value) {
@@ -333,10 +339,7 @@ fn_cursor_mode(*) {
                     showGui(1)
                 }
             }
-
-            gc.LV_add.ModifyCol(1, "AutoHdr")
-            gc.LV_add.ModifyCol(2, "AutoHdr")
-            gc.LV_add.ModifyCol(3, "AutoHdr")
+            autoHdrLV(gc.LV_add)
             tab.UseTab(2)
             g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n  - 此时，可以尝试使用「设置符号显示位置」这个配置菜单，让符号显示在鼠标附近`n`n3. JetBrains 系列 IDE`n`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JAB/JetBrains IDE 支持」中的所有操作步骤')
             g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/cursor-mode">关于光标获取模式</a>')

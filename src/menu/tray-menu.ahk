@@ -131,6 +131,7 @@ fn_restart(*) {
         killJAB()
     }
     Run(A_ScriptFullPath " " keyCount)
+    ExitApp()
 }
 
 fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
@@ -205,6 +206,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
 
             LV_add.Opt("+Redraw")
             DetectHiddenWindows 1
+            autoHdrLV(LV_add)
 
             gc.%_gui "_LV_rm_title"% := g.AddText("w" w, tipList.list)
             LV_rm := gc.%_gui "_LV_rm"% := g.AddListView("xs -Hdr -LV0x10 -Multi r8 NoSortHdr Sort Grid w" w / 2 " " tipList.color, [tipList.list])
@@ -223,7 +225,8 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             }
             LV_rm.Opt("+Redraw")
             gc.%_gui "_LV_rm_title"%.Text := tipList.list " ( " LV_rm.GetCount() " 个 )"
-            LV_rm.ModifyCol(1, "AutoHdr")
+
+            autoHdrLV(LV_rm)
             LV_rm.OnEvent("DoubleClick", e_rm_dbClick)
             e_rm_dbClick(LV, RowNumber) {
                 if (rmClickFn) {
@@ -268,7 +271,9 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                                 updateWhiteList(exe_name)
                             }
                             gc.%_gui "_LV_add"%.Delete(RowNumber)
+                            autoHdrLV(gc.%_gui "_LV_add"%)
                             gc.%_gui "_LV_rm"%.Add(, exe_name)
+                            autoHdrLV(gc.%_gui "_LV_rm"%)
                             config := tipList.config
                             value := readIni(config, "")
                             if (value) {
@@ -287,9 +292,11 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                         e_rm(*) {
                             g.Destroy()
                             LV.Delete(RowNumber)
+                            autoHdrLV(LV)
                             gc.%_gui "_LV_rm_title"%.Text := tipList.list " ( " gc.%_gui "_LV_rm"%.GetCount() " 个 )"
                             try {
                                 gc.%_gui "_LV_add"%.Add(, exe_name, WinGetTitle("ahk_exe " exe_name))
+                                autoHdrLV(gc.%_gui "_LV_add"%)
                             }
                             config := tipList.config
                             value := readIni(config, "")
@@ -421,6 +428,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                             } else {
                                 updateWhiteList(exe_name)
                                 gc.%_gui "_LV_rm"%.Add(, exe_name)
+                                autoHdrLV(gc.%_gui "_LV_rm"%)
                                 result := res exe_name
                                 writeIni(tipList.config, result)
                                 handleFn(result)
@@ -457,6 +465,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     yes(*) {
                         g.Destroy()
                         gc.%_gui "_LV_rm"%.Delete()
+                        autoHdrLV(gc.%_gui "_LV_rm"%)
                         writeIni(tipList.config, "")
                         handleFn("")
                         fn_close()
@@ -482,9 +491,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     showGui(1)
                 }
             }
-            LV_add.ModifyCol(1, "AutoHdr")
-            LV_add.ModifyCol(2, "AutoHdr")
-            LV_add.ModifyCol(3, "AutoHdr")
+            autoHdrLV(LV_add)
             tab.UseTab(2)
             g.AddEdit("ReadOnly -VScroll w" w, tipList.about)
             if (tipList.link) {
@@ -608,49 +615,12 @@ runJAB() {
         if (!FileExist("InputTip.JAB.JetBrains.exe")) {
             FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
         }
-        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
         if (enableJABSupport) {
             createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
         }
     } else if (A_IsAdmin) {
-        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", A_ScriptFullPath)
         if (enableJABSupport) {
             createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited")
-        }
-
-        hasPowerShell := 1
-        ; 尝试调用 powershell
-        try {
-            Run("powershell.exe", , "Hide")
-        } catch {
-            hasPowerShell := 0
-        }
-
-        if (!hasPowerShell && enableJABSupport) {
-            if (isStartUp = 1) {
-                global isStartUp := 0
-                writeIni("isStartUp", 0)
-                A_TrayMenu.Uncheck("开机自启动")
-            }
-            global enableJABSupport := 0
-            writeIni("enableJABSupport", 0)
-            A_TrayMenu.Uncheck("启用 JAB/JetBrains IDE 支持")
-            if (A_IsCompiled) {
-                try {
-                    FileDelete("InputTip.JAB.JetBrains.exe")
-                }
-            }
-
-            createTipGui([{
-                opt: "cRed",
-                text: "- 在当前系统环境中，尝试调用 powershell 失败了`n- 以下功能会被自动禁用`n   -「开机自启动」中的「任务计划程序」`n   -「启用 JAB/JetBrains IDE 支持」",
-            }, {
-                opt: "cRed",
-                text: "- 如果你想继续使用它们，你需要解决 cmd 调用 powershell 失败的问题",
-            }
-            ], "InputTip - powershell 调用失败!").Show()
-
-            return 1
         }
 
         SetTimer(runAppTimer, -1)
@@ -689,5 +659,17 @@ killJAB(wait := 1, delete := 0) {
         }
     } else {
         ProcessClose(JAB_PID)
+    }
+}
+
+/**
+ * 自动设置列的宽度
+ * @param LV 
+ */
+autoHdrLV(LV) {
+    col := LV.GetCount("Col")
+    while (col >= 1) {
+        LV.ModifyCol(col, "AutoHdr")
+        col--
     }
 }

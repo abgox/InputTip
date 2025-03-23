@@ -164,9 +164,11 @@ fn_app_offset(*) {
             }
             if (!isExist) {
                 gc.appOffsetGui_LV_rm.Add(, app)
+                autoHdrLV(gc.appOffsetGui_LV_rm)
             }
             if (action = "add") {
                 LV.Delete(RowNumber)
+                autoHdrLV(LV)
             }
             app_offset.%app% := {}
             for v in screenList {
@@ -247,8 +249,10 @@ fn_app_offset(*) {
                     close()
                     exe_name := LV.GetText(RowNumber)
                     LV.Delete(RowNumber)
+                    autoHdrLV(LV)
                     try {
                         gc.%tipList.gui "_LV_add"%.Add(, exe_name, WinGetTitle("ahk_exe " exe_name))
+                        autoHdrLV(gc.%tipList.gui "_LV_add"%)
                     }
                     app_offset.DeleteProp(app)
                     fn_write_offset()

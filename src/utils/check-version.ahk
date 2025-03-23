@@ -351,6 +351,8 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     }
                                 }
                                 downloadingGui.Destroy()
+                                FileAppend("", A_AppData "\.abgox-InputTip-update-version-done.txt")
+                                fn_restart()
                             } catch {
                                 done := 0
                             }

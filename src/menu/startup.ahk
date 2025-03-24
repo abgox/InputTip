@@ -1,3 +1,5 @@
+; InputTip
+
 fn_startup(item, *) {
     ; 注册表: 开机自启动
     HKEY_startup := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
@@ -22,7 +24,7 @@ fn_startup(item, *) {
         }
 
         try {
-            FileDelete(A_Startup "\" fileLnk)
+            FileDelete(A_Startup "/" fileLnk)
         }
         try {
             RegDelete(HKEY_startup, "abgox - " A_ScriptName)
@@ -102,7 +104,7 @@ fn_startup(item, *) {
                 }
 
                 if (flag) {
-                    fn_update_user()
+                    fn_update_user(A_UserName)
                     isStartUp := 1
                     FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
                     fn_handle()
@@ -128,7 +130,11 @@ fn_startup(item, *) {
             btn.OnEvent("Click", e_useLnk)
             e_useLnk(*) {
                 isStartUp := 2
-                FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , fileDesc, favicon, , , 7)
+                if (A_IsCompiled) {
+                    FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , fileDesc, favicon, , , 7)
+                } else {
+                    FileCreateShortcut(A_AhkPath, A_Startup "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
+                }
                 fn_handle()
             }
 

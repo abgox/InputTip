@@ -1,15 +1,18 @@
-#Include .\utils\options.ahk
+; InputTip
+
+#Include ./utils/options.ahk
 
 #NoTrayIcon
 ;@AHK2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
 ;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态提示工具
+#Warn All, Off
 
-#Include .\utils\IME.ahk
-#Include .\utils\ini.ahk
-#Include .\utils\app-list.ahk
-#Include .\utils\var.ahk
-#Include .\utils\tools.ahk
+#Include ./utils/IME.ahk
+#Include ./utils/ini.ahk
+#Include ./utils/app-list.ahk
+#Include ./utils/var.ahk
+#Include ./utils/tools.ahk
 
 needSkip(exe_str) {
     return showCursorPos || !InStr(modeList.JAB, exe_str)
@@ -32,7 +35,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     return left
 }
 
-#Include .\utils\show.ahk
+#Include ./utils/show.ahk
 
 /**
  * Gets the position of the caret with UIA, Acc or CaretGetPos.

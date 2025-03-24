@@ -1,3 +1,5 @@
+; InputTip
+
 updateDelay()
 
 ; 鼠标悬浮在符号上

@@ -1,3 +1,5 @@
+; InputTip
+
 fn_about(*) {
     if (gc.w.aboutGui) {
         gc.w.aboutGui.Destroy()
@@ -5,7 +7,7 @@ fn_about(*) {
     }
     createGui(aboutGui).Show()
     aboutGui(info) {
-        g := createGuiOpt("InputTip - v" currentVersion)
+        g := createGuiOpt("InputTip - v" currentVersion " - " (A_IsAdmin ? "以管理员权限启动" : "以当前用户权限启动"))
 
         g.AddText("Center w" info.w, "InputTip - 一个输入法状态实时提示工具")
         tab := g.AddTab3("-Wrap", ["关于项目", "赞赏支持", "参考项目", "其他项目"])
@@ -34,7 +36,7 @@ fn_about(*) {
         tab.UseTab(2)
         g.AddLink("Section", '- 通过 <a href="https://ko-fi.com/W7W817R6Z3">ko-fi.com</a> 赞赏支持')
         g.AddText("xs", '- 通过微信和支付宝赞赏支持')
-        g.AddPicture("h-1 w" w / 4 * 3, "InputTipSymbol\default\offer.png")
+        g.AddPicture("h-1 w" w / 4 * 3, "InputTipSymbol/default/offer.png")
         tab.UseTab(3)
         g.AddLink("Section", '1. <a href="https://github.com/aardio/ImTip">ImTip - aardio</a>')
         g.AddLink("xs", '2. <a href="https://github.com/flyinclouds/KBLAutoSwitch">KBLAutoSwitch - flyinclouds</a>')

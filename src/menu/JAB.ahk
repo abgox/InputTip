@@ -1,3 +1,5 @@
+; InputTip
+
 fn_JAB(item, *) {
     global enableJABSupport := !enableJABSupport
     writeIni("enableJABSupport", enableJABSupport)

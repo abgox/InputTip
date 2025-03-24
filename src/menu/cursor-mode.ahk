@@ -1,3 +1,5 @@
+; InputTip
+
 fn_cursor_mode(*) {
     showGui()
     showGui(deep := "") {

@@ -1,3 +1,5 @@
+; InputTip
+
 fn_switch_window(*) {
     showGui()
     showGui(deep := "") {

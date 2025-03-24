@@ -1,3 +1,5 @@
+; InputTip
+
 fn_switch_key(*) {
     if (gc.w.switchKeyGui) {
         gc.w.switchKeyGui.Destroy()

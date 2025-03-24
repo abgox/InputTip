@@ -1,3 +1,5 @@
+; InputTip
+
 fn_check_update(*) {
     if (gc.w.checkUpdateGui) {
         gc.w.checkUpdateGui.Destroy()

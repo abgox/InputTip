@@ -1,3 +1,5 @@
+; InputTip
+
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
  * @Tip 有所修改，外部必须提供变量 checkTimeout,modeRule,defaultStatus

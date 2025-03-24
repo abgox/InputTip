@@ -1,3 +1,5 @@
+; InputTip
+
 /**
  * 读取配置文件
  * @param {String}key 配置文件中的键名

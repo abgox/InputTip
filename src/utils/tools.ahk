@@ -1,3 +1,5 @@
+; InputTip
+
 arrJoin(arr, separator := ",") {
     res := ""
     for i, v in arr {

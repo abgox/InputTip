@@ -1,3 +1,5 @@
+; InputTip
+
 fn_symbol_pos(*) {
     if (gc.w.symbolPosGui) {
         gc.w.symbolPosGui.Destroy()

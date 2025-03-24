@@ -1,3 +1,5 @@
+; InputTip
+
 fn_pause_key(*) {
     if (gc.w.pauseHotkeyGui) {
         gc.w.pauseHotkeyGui.Destroy()

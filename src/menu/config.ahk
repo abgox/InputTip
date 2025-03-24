@@ -1,3 +1,5 @@
+; InputTip
+
 fn_config(*) {
     if (gc.w.configGui) {
         gc.w.configGui.Destroy()
@@ -208,7 +210,7 @@ fn_config(*) {
         g.AddText()
         _w := bw / 3 - g.MarginX / 3
         _ := g.AddButton("xs w" _w, "打开鼠标样式目录")
-        _._config := A_ScriptDir "\InputTipCursor"
+        _._config := "InputTipCursor"
         _.OnEvent("Click", fn_open_dir)
         g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
         g.AddButton("yp w" _w, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
@@ -387,7 +389,7 @@ fn_config(*) {
             }
         }
         _ := g.AddButton("xs w" _w, "打开图片符号目录")
-        _._config := A_ScriptDir "\InputTipSymbol"
+        _._config := "InputTipSymbol"
         _.OnEvent("Click", fn_open_dir)
         g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
         g.AddButton("yp w" _w, "下载图片符号扩展包").OnEvent("Click", e_pic_package)

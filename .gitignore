@@ -1,6 +1,7 @@
 src/InputTipCursor/default
 src/InputTipSymbol/default
 src/InputTip.ini
+src/InputTip.exe
 src/InputTip.JAB.JetBrains.exe
 test/**
 

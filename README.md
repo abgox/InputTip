@@ -68,7 +68,7 @@
   - [输入法和应用窗口兼容情况](#兼容情况)
   - [issues](https://github.com/abgox/InputTip/issues)
   - ...
-- 如果仍有问题，可以前往 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 或 [QQ 频道](https://pd.qq.com/s/gyers18g6?businessType=5) 求助
+- 如果仍有问题，可以前往 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 或 [QQ 频道](https://pd.qq.com/s/gyers18g6?businessType=5) 交流反馈
 
 ### 演示
 
@@ -78,7 +78,10 @@
 
 > [!Tip]
 >
-> 配置信息保存在 `InputTip.exe` 同级目录下的 `InputTip.ini` 配置文件中
+> - [关于 zip 与 exe 版本的区别以及相关说明](https://inputtip.abgox.com/FAQ/zip-vs-exe)
+> - 配置文件所在位置
+>   - zip 版本: 解压后的 `src` 目录下的 `InputTip.ini`
+>   - exe 版本: `InputTip.exe` 同级目录下的 `InputTip.ini`
 
 > [!Warning]
 >

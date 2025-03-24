@@ -1,23 +1,29 @@
-#Include .\utils\options.ahk
+; InputTip
+
+#Include ./utils/options.ahk
 
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-SetOrigFilename InputTip.ahk
 ;@Ahk2Exe-UpdateManifest 1
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态提示工具
 
-#Include .\utils\ini.ahk
-#Include .\utils\IME.ahk
-#Include .\utils\check-version.ahk
-#Include .\menu\tray-menu.ahk
-#Include .\utils\tools.ahk
-#Include .\utils\app-list.ahk
-#Include .\utils\verify-file.ahk
-#Include .\utils\create-gui.ahk
+#Include ./utils/ini.ahk
+#Include ./utils/IME.ahk
+#Include ./utils/check-version.ahk
+#Include ./menu/tray-menu.ahk
+#Include ./utils/tools.ahk
+#Include ./utils/app-list.ahk
+
+baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
+
+#Include ./utils/verify-file.ahk
+#Include ./utils/create-gui.ahk
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态提示工具"
 JAB_PID := ""
+
 
 try {
     keyCount := A_Args[1]
@@ -79,7 +85,7 @@ userName := readIni("userName", A_UserName, "UserInfo")
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
 } else {
-    favicon := A_ScriptDir "\img\favicon.ico"
+    favicon := A_ScriptDir "\InputTipSymbol\default\favicon.png"
 
     ; 当运行源代码时，是否直接以管理员权限运行
     runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
@@ -96,7 +102,7 @@ checkUpdateDone()
 
 checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 
-#Include .\utils\var.ahk
+#Include ./utils/var.ahk
 
 checkUpdate(1)
 
@@ -204,7 +210,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     return res && left
 }
 
-#Include .\utils\show.ahk
+#Include ./utils/show.ahk
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk

@@ -1,3 +1,5 @@
+; InputTip
+
 fn_input_mode(*) {
     if (gc.w.inputModeGui) {
         gc.w.inputModeGui.Destroy()

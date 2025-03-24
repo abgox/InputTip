@@ -1,3 +1,5 @@
+; InputTip
+
 fn_bw_list(*) {
     if (gc.w.bwListGui) {
         gc.w.bwListGui.Destroy()

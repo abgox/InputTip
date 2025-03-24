@@ -1,3 +1,5 @@
+; InputTip
+
 /**
  * 比对版本号
  * @param new 新版本号
@@ -160,9 +162,9 @@ checkUpdate(init := 0, once := false, force := 0) {
 
                             for v in releases {
                                 try {
-                                    Download(v, A_AppData "\abgox-InputTip-new-version.exe")
+                                    Download(v, A_AppData "/abgox-InputTip-new-version.exe")
                                     ; 尝试获取版本号，成功获取则表示下载没有问题
-                                    done := FileGetVersion(A_AppData "\abgox-InputTip-new-version.exe")
+                                    done := FileGetVersion(A_AppData "/abgox-InputTip-new-version.exe")
                                     break
                                 }
                             }
@@ -174,8 +176,8 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     killJAB(1, A_IsCompiled)
                                 }
                                 try {
-                                    FileInstall("utils\app-update\target\release\app-update.exe", A_AppData "\abgox-InputTip-update-version.exe", 1)
-                                    Run(A_AppData "\abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '" ' keyCount, , "Hide")
+                                    FileInstall("utils/app-update/target/release/app-update.exe", A_AppData "/abgox-InputTip-update-version.exe", 1)
+                                    Run(A_AppData "/abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '" ' keyCount, , "Hide")
                                     ExitApp()
                                 } catch {
                                     done := false
@@ -209,7 +211,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     yes(*) {
                                         g.Destroy()
                                         try {
-                                            FileDelete(A_AppData "\abgox-InputTip-new-version.exe")
+                                            FileDelete(A_AppData "/abgox-InputTip-new-version.exe")
                                         }
                                     }
                                     return g
@@ -265,17 +267,19 @@ checkUpdate(init := 0, once := false, force := 0) {
                         g.AddText("yp cff5050", "v" currentVersion)
                         g.AddText("yp ", ">")
                         g.AddText("yp cRed", "v" newVersion)
-                        g.AddText("xs", "- 你正在通过项目源代码启动 InputTip")
-
-
-                        g.AddText("xs", "- 如果你是通过")
+                        g.AddText("xs cGray", "- 你正在使用 zip 版本(项目源代码运行方案)")
+                        g.AddText("xs", "--------------------------------------------------------------------------------")
+                        g.AddLink("xs", '- 使用 <a href="https://git-scm.com/">git</a> (推荐方式)')
+                        g.AddText("xs", "   - 建议通过")
                         g.AddText("yp cRed", "git clone")
-                        g.AddText("yp", "下载的 InputTip")
-                        g.AddText("xs", "   - 你应该使用")
+                        g.AddText("yp", "项目仓库来使用 InputTip")
+                        g.AddText("xs", "   - 可以通过")
                         g.AddText("yp cRed", "git pull")
-                        g.AddText("yp", "拉取最新的代码更改，并重启 InputTip.ahk")
-                        g.AddLink("xs", '- 如果不会使用 <a href="https://git-scm.com/">git</a>，你应该使用下方的「确认更新」进行更新')
-                        g.AddText("xs", "---------------------------------------------------------------------")
+                        g.AddText("yp", "拉取最新的代码更改，然后「托盘菜单」=>「重启」")
+                        g.AddLink("xs", '- 不用 <a href="https://git-scm.com/">git</a>')
+                        g.AddLink("xs", '   - 可以使用下方的「确认更新」进行更新')
+                        g.AddLink("xs", '   - 或者前往官网或代码仓库下载 InputTip.zip 解压后进行文件目录覆盖')
+                        g.AddText("xs", "--------------------------------------------------------------------------------")
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
 
@@ -293,17 +297,16 @@ checkUpdate(init := 0, once := false, force := 0) {
                         y.OnEvent("Click", e_yes)
                         e_yes(*) {
                             g.Destroy()
+
+                            done := 1
+
                             try {
                                 FileDelete("files.ini")
                             }
-                            done := 1
-                            baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
-
                             for u in baseUrl {
                                 out := "files.ini"
-                                dir := RegExReplace(out, "/[^/]*$", "")
                                 try {
-                                    Download(u "/src/files.ini", out)
+                                    Download(u "src/files.ini", out)
                                     break
                                 }
                             }
@@ -313,7 +316,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 downloading(*) {
                                     g := createGuiOpt("InputTip - 版本更新中 " currentVersion " > " newVersion)
                                     g.AddText("cRed", "InputTip 新版本 " newVersion " 下载中...")
-                                    g.AddText("xs", "正在下载文件: ")
+                                    g.validate := g.AddText("xs", "正在下载文件: ")
                                     g.tip := g.AddText("xs cRed", "------------------------------------------------------------")
 
                                     g.AddText("xs", "------------------------------------------------------------")
@@ -330,34 +333,68 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 }
                                 downloadingGui := downloading()
 
+                                doneFileList := []
                                 for kv in files {
                                     p := StrSplit(kv, "=")
                                     for u in baseUrl {
                                         downloadingGui.tip.Text := p[1]
-                                        out := p[2]
-                                        dir := RegExReplace(out, "/[^/]*$", "")
+                                        out := p[2] ".new"
+                                        if (InStr(out, "/")) {
+                                            dir := RegExReplace(out, "/[^/]*$", "")
+                                        } else {
+                                            dir := ""
+                                        }
                                         try {
-                                            if (!DirExist(dir)) {
-                                                DirCreate(dir)
+                                            if (dir) {
+                                                if (!DirExist(dir)) {
+                                                    DirCreate(dir)
+                                                }
                                             }
                                             Download(u p[1], out)
                                             break
                                         }
                                     }
-
-                                    if (!FileExist(out)) {
+                                    downloadingGui.validate.Text := "正在校验文件: "
+                                    if (FileExist(out)) {
+                                        doneFileList.Push(out)
+                                        if (InStr(out, ".ahk")) {
+                                            try {
+                                                if (!InStr(FileOpen(out, "r").ReadLine(), "InputTip")) {
+                                                    done := 0
+                                                    break
+                                                }
+                                            } catch {
+                                                done := 0
+                                                break
+                                            }
+                                        }
+                                    } else {
                                         done := 0
                                         break
                                     }
                                 }
+
                                 downloadingGui.Destroy()
-                                FileAppend("", A_AppData "\.abgox-InputTip-update-version-done.txt")
-                                fn_restart()
+
+                                if (done) {
+                                    for v in doneFileList {
+                                        FileMove(v, RegExReplace(v, "\.new$", ""), 1)
+                                    }
+
+                                    FileAppend("", A_AppData "/.abgox-InputTip-update-version-done.txt")
+                                    fn_restart()
+                                }
                             } catch {
                                 done := 0
                             }
 
                             if (!done) {
+                                try {
+                                    for v in doneFileList {
+                                        FileDelete(v)
+                                    }
+                                }
+
                                 createGui(errGui).Show()
                                 errGui(info) {
                                     g := createGuiOpt("InputTip - 新版本下载错误")
@@ -428,7 +465,7 @@ checkUpdate(init := 0, once := false, force := 0) {
  * 当更新完成时弹出提示框
  */
 checkUpdateDone() {
-    if (FileExist(A_AppData "\.abgox-InputTip-update-version-done.txt")) {
+    if (FileExist(A_AppData "/.abgox-InputTip-update-version-done.txt")) {
         modeRules := []
         try {
             _ := IniRead("InputTip.ini", "InputMethod", "statusMode")
@@ -544,10 +581,10 @@ checkUpdateDone() {
             return g
         }
         try {
-            FileDelete(A_AppData "\.abgox-InputTip-update-version-done.txt")
+            FileDelete(A_AppData "/.abgox-InputTip-update-version-done.txt")
         }
         try {
-            FileDelete(A_AppData "\abgox-InputTip-update-version.exe")
+            FileDelete(A_AppData "/abgox-InputTip-update-version.exe")
         }
     }
 }

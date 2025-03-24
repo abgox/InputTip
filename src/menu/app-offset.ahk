@@ -1,3 +1,5 @@
+; InputTip
+
 fn_app_offset(*) {
     fn_common({
         gui: "appOffsetGui",

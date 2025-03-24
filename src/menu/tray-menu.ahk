@@ -1,3 +1,5 @@
+; InputTip
+
 #Include startup.ahk
 #Include check-update.ahk
 #Include input-mode.ahk
@@ -22,7 +24,10 @@ makeTrayMenu() {
         A_TrayMenu.Check("开机自启动")
     }
     A_TrayMenu.Add("设置更新检查", fn_check_update)
-    A_TrayMenu.Add("更改用户信息", fn_update_user)
+    A_TrayMenu.Add("更改用户信息", e_update_user)
+    e_update_user(*) {
+        fn_update_user(userName)
+    }
     if (!A_IsCompiled) {
         A_TrayMenu.Add("以管理员模式启动", fn_admin_mode)
         fn_admin_mode(*) {
@@ -76,7 +81,8 @@ makeTrayMenu() {
     A_TrayMenu.Add("退出", fn_exit)
 }
 
-fn_update_user(*) {
+fn_update_user(uname, *) {
+    global userName := uname
     if (gc.w.updateUserGui) {
         gc.w.updateUserGui.Destroy()
         gc.w.updateUserGui := ""
@@ -93,12 +99,16 @@ fn_update_user(*) {
 
         g.AddText("xs ReadOnly cGray", "设置完成后，直接关闭这个窗口即可")
         _._config := "userName"
-        _.Value := readIni("userName", A_UserName, "UserInfo")
+        _.Value := uname
         _.Focus()
         _.OnEvent("Change", fn_change)
+        fn_change(item, *) {
+            global userName := item.value
+        }
 
         g.OnEvent("Close", e_close)
         e_close(*) {
+            writeIni("userName", userName, "UserInfo")
             if (A_IsAdmin) {
                 if (A_IsCompiled) {
                     createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
@@ -113,10 +123,6 @@ fn_update_user(*) {
                 }
             }
         }
-        fn_change(item, *) {
-            global userName := readIni("userName", A_UserName, "UserInfo")
-            writeIni("userName", item.value, "UserInfo")
-        }
         gc.w.updateUserGui := g
         return g
     }
@@ -130,7 +136,7 @@ fn_restart(*) {
     if (enableJABSupport) {
         killJAB()
     }
-    Run(A_ScriptFullPath " " keyCount)
+    Run(A_AhkPath " " A_ScriptFullPath " " keyCount)
     ExitApp()
 }
 

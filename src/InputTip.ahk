@@ -87,7 +87,7 @@ userName := readIni("userName", A_UserName, "UserInfo")
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
 } else {
-    favicon := A_ScriptDir "\InputTipSymbol\default\favicon.png"
+    favicon := A_ScriptDir "\img\favicon.ico"
 
     ; 当运行源代码时，是否直接以管理员权限运行
     runCodeWithAdmin := readIni("runCodeWithAdmin", 0)

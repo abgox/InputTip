@@ -179,7 +179,8 @@ if (A_IsCompiled) {
         "InputTipSymbol/default/Caps.png",
         "InputTipSymbol/default/offer.png",
         "InputTipSymbol/default/favicon.png",
-        "InputTipSymbol/default/favicon-pause.png"
+        "InputTipSymbol/default/favicon-pause.png",
+        "img/favicon.ico"
     ]
     for v in pngList {
         if (!FileExist(v)) {

@@ -83,21 +83,21 @@
 >   - zip 版本: 解压后的 `src` 目录下的 `InputTip.ini`
 >   - exe 版本: `InputTip.exe` 同级目录下的 `InputTip.ini`
 
-1. 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装(exe 版本) <img src="https://img.shields.io/badge/-推荐-4CAF50" alt="推荐安装方式" />
+1. [前往官网下载 InputTip](https://inputtip.abgox.com/download)
+
+   - 也可以在仓库的 Releases 中下载
+
+2. 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装(exe 版本)
 
    ```shell
    winget install abgox.InputTip
    ```
 
-2. 使用 [Scoop](https://scoop.sh/) 安装(exe 版本)
+3. 使用 [Scoop](https://scoop.sh/) 安装(exe 版本)
 
    ```shell
    scoop install https://inputtip.abgox.com/installer/scoop/InputTip.json
    ```
-
-3. [前往官网下载 InputTip](https://inputtip.abgox.com/download)
-   - 也可以在仓库的 Releases 中下载
-   - 如果需要下载 exe 版本，更建议通过上方的 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装
 
 ### 使用
 

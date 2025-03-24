@@ -14,6 +14,7 @@ fn_check_update(*) {
         g.AddText(, "每隔多少分钟检查一次更新: ")
 
         if (info.i) {
+            g.AddText("cGray", "点击后，如果没有更新弹窗且不是网络问题，则当前是最新版本")
             return g
         }
 
@@ -39,6 +40,14 @@ fn_check_update(*) {
         e_check_update(*) {
             g.Destroy()
             checkUpdate(1, 1, 1)
+        }
+        if (!A_IsCompiled) {
+            g.AddButton("xs w" info.w, "获取最新更改").OnEvent("Click", e_get_update)
+            g.AddText("cGray", "点击后，会直接从代码仓库获取最新的源代码文件")
+            e_get_update(*) {
+                g.Destroy()
+                getRepoCode(0)
+            }
         }
         g.OnEvent("Close", e_close)
         e_close(*) {

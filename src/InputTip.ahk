@@ -78,6 +78,8 @@ gc := {
     }
 }
 
+TraySetIcon(A_ScriptDir "\InputTipSymbol\default\favicon.png", , 1)
+
 checkIni() ; 检查配置文件
 
 userName := readIni("userName", A_UserName, "UserInfo")
@@ -95,8 +97,6 @@ if (A_IsCompiled) {
         }
     }
 }
-
-TraySetIcon(A_ScriptDir "\InputTipSymbol\default\favicon.png", , 1)
 
 checkUpdateDone()
 

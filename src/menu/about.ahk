@@ -20,7 +20,7 @@ fn_about(*) {
         g.AddEdit("yp ReadOnly", '1151676611')
         g.AddLink("xs", 'QQ 反馈交流群( <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327">点击加入</a> ): ')
         g.AddEdit("yp ReadOnly", '451860327')
-        g.AddLink("xs", 'QQ 反馈交流频道( <a href="https://pd.qq.com/s/gyers18g6?businessType=5">点击加入</a> )')
+        g.AddLink("xs", '腾讯频道( <a href="https://pd.qq.com/s/gyers18g6?businessType=5">点击加入</a> )')
 
         if (info.i) {
             g.AddText("xs", "-------------------------------------------------------------------------------")

@@ -68,7 +68,7 @@
   - [输入法和应用窗口兼容情况](#兼容情况)
   - [issues](https://github.com/abgox/InputTip/issues)
   - ...
-- 如果仍有问题，可以前往 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 或 [QQ 频道](https://pd.qq.com/s/gyers18g6?businessType=5) 交流反馈
+- 如果仍有问题，可以前往 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 或 [腾讯频道](https://pd.qq.com/s/gyers18g6?businessType=5) 交流反馈
 
 ### 演示
 
@@ -83,31 +83,27 @@
 >   - zip 版本: 解压后的 `src` 目录下的 `InputTip.ini`
 >   - exe 版本: `InputTip.exe` 同级目录下的 `InputTip.ini`
 
-> [!Warning]
->
-> - 如果使用下方的 [Scoop](https://scoop.sh/) 安装命令，无法通过 `scoop update InputTip` 进行更新
-> - 如果使用下方的 [WinGet](https://github.com/microsoft/winget-cli) 安装命令，不要通过 [WinGet](https://github.com/microsoft/winget-cli) 进行二次安装或更新，这会导致配置文件丢失
-> - 因此，以下安装方式都只建议首次下载安装时使用，然后通过 InputTip 内置的 [更新检查](https://inputtip.abgox.com/FAQ/check-update) 进行更新
-
-1. 使用 [Scoop](https://scoop.sh/) 安装:
-
-   ```shell
-   scoop install https://inputtip.abgox.com/installer/scoop/InputTip.json
-   ```
-
-2. 使用 [WinGet](https://github.com/microsoft/winget-cli) 安装:
+1. 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装(exe 版本) <img src="https://img.shields.io/badge/-推荐-4CAF50" alt="推荐安装方式" />
 
    ```shell
    winget install abgox.InputTip
    ```
 
-3. [手动下载 InputTip](https://inputtip.abgox.com/download)
+2. 使用 [Scoop](https://scoop.sh/) 安装(exe 版本)
+
+   ```shell
+   scoop install https://inputtip.abgox.com/installer/scoop/InputTip.json
+   ```
+
+3. [前往官网下载 InputTip](https://inputtip.abgox.com/download)
+   - 也可以在仓库的 Releases 中下载
+   - 如果需要下载 exe 版本，更建议通过上方的 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装
 
 ### 使用
 
 > [!Tip]
 >
-> [你也可以直接通过运行项目源代码的方式使用 InputTip](https://inputtip.abgox.com/FAQ/run-source-code)
+> [下载 zip 版本(InputTip.zip)，直接运行项目源代码](https://inputtip.abgox.com/FAQ/run-source-code)
 
 1. 完成 [安装](#安装) 后，运行 `InputTip.exe` 即可
 

@@ -316,7 +316,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 downloading(*) {
                                     g := createGuiOpt("InputTip - 版本更新中 " currentVersion " > " newVersion)
                                     g.AddText("cRed", "InputTip 新版本 " newVersion " 下载中...")
-                                    g.validate := g.AddText("xs", "正在下载文件: ")
+                                    g.AddText("xs", "正在下载和校验文件: ")
                                     g.tip := g.AddText("xs cRed", "------------------------------------------------------------")
 
                                     g.AddText("xs", "------------------------------------------------------------")
@@ -354,7 +354,6 @@ checkUpdate(init := 0, once := false, force := 0) {
                                             break
                                         }
                                     }
-                                    downloadingGui.validate.Text := "正在校验文件: "
                                     if (FileExist(out)) {
                                         doneFileList.Push(out)
                                         if (InStr(out, ".ahk")) {
@@ -386,6 +385,9 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 }
                             } catch {
                                 done := 0
+                                try {
+                                    downloadingGui.Destroy()
+                                }
                             }
 
                             if (!done) {

@@ -167,7 +167,7 @@ if (A_IsCompiled) {
     }
 } else {
     if (!FileExist("../InputTip.bat")) {
-        FileAppend('@echo off' "`n" 'set "SCRIPT_DIR=%~dp0"' "`n" 'start "" /min "%SCRIPT_DIR%\src\AutoHotkey\AutoHotkey64.exe" "%SCRIPT_DIR%\src\InputTip.ahk"', "..\InputTip.bat", "`n UTF-8-Raw")
+        FileAppend('@echo off' "`n" 'start "" /min "%~dp0\src\AutoHotkey\AutoHotkey64.exe" "%~dp0\src\InputTip.ahk"', "..\InputTip.bat", "`n UTF-8-Raw")
     }
 
     ; 丢失的文件列表

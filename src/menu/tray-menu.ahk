@@ -136,7 +136,12 @@ fn_restart(*) {
     if (enableJABSupport) {
         killJAB()
     }
-    Run(A_AhkPath " " A_ScriptFullPath " " keyCount)
+
+    if (A_IsCompiled) {
+        Run('"' A_ScriptFullPath '" ' keyCount)
+    } else {
+        Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' keyCount)
+    }
     ExitApp()
 }
 
@@ -621,16 +626,16 @@ runJAB() {
         if (!FileExist("InputTip.JAB.JetBrains.exe")) {
             FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
         }
-        if (enableJABSupport) {
-            createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
+        SetTimer(runAppTimer1, -1)
+        runAppTimer1() {
+            try {
+                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited", 1)
+                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            }
         }
     } else if (A_IsAdmin) {
-        if (enableJABSupport) {
-            createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited")
-        }
-
-        SetTimer(runAppTimer, -1)
-        runAppTimer() {
+        SetTimer(runAppTimer2, -1)
+        runAppTimer2() {
             try {
                 createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited", 1)
                 Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
@@ -638,7 +643,7 @@ runJAB() {
         }
     } else {
         global JAB_PID
-        Run(A_AhkPath " InputTip.JAB.JetBrains.ahk", , "Hide", &JAB_PID)
+        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
     }
     return 0
 }
@@ -670,7 +675,7 @@ killJAB(wait := 1, delete := 0) {
 
 /**
  * 自动设置列的宽度
- * @param LV 
+ * @param LV
  */
 autoHdrLV(LV) {
     col := LV.GetCount("Col")

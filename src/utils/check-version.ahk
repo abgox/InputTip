@@ -137,7 +137,6 @@ checkUpdate(init := 0, once := false, force := 0) {
                             g.Destroy()
                             releases := [
                                 "https://gitee.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe",
-                                "https://inputtip.abgox.com/releases/v2/InputTip.exe",
                                 "https://github.com/abgox/InputTip/releases/download/v" newVersion "/InputTip.exe"
                             ]
                             done := false
@@ -164,7 +163,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 try {
                                     Download(v, A_AppData "/abgox-InputTip-new-version.exe")
                                     ; 尝试获取版本号，成功获取则表示下载没有问题
-                                    done := FileGetVersion(A_AppData "/abgox-InputTip-new-version.exe")
+                                    done := compareVersion(FileGetVersion(A_AppData "/abgox-InputTip-new-version.exe"), currentVersion) > 0
                                     break
                                 }
                             }
@@ -182,9 +181,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                                 } catch {
                                     done := false
                                 }
-                            }
-
-                            if (!done) {
+                            } else {
                                 createGui(errGui).Show()
                                 errGui(info) {
                                     g := createGuiOpt("InputTip - 新版本下载错误")

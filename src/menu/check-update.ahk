@@ -11,7 +11,7 @@ fn_check_update(*) {
     checkUpdateGui(info) {
         g := createGuiOpt("InputTip - 设置更新检查的间隔时间")
         g.AddText("cGray", "1. 单位: 分钟，默认 1440 分钟(1 天)`n2. 避免程序错误，可以设置的最大范围是 0-50000 分钟`n3. 如果为 0，则表示不检查版本更新`n4. 如果不为 0，在 InputTip 启动时，会立即检查一次`n5. 如果大于 50000，则生效的值是 50000")
-        g.AddText(, "每隔多少分钟检查一次更新: ")
+        g.AddText(, "每隔多少分钟检查一次版本更新: ")
 
         if (info.i) {
             g.AddText("cGray", "点击后，如果没有更新弹窗且不是网络问题，则当前是最新版本")
@@ -35,15 +35,15 @@ fn_check_update(*) {
                 }
             }
         }
-        g.AddButton("xs w" info.w, "立即检查更新").OnEvent("Click", e_check_update)
+        g.AddButton("xs w" info.w, "立即检查版本更新").OnEvent("Click", e_check_update)
         g.AddText("cGray", "点击后，如果没有更新弹窗且不是网络问题，则当前是最新版本")
         e_check_update(*) {
             g.Destroy()
             checkUpdate(1, 1, 1)
         }
         if (!A_IsCompiled) {
-            g.AddButton("xs w" info.w, "获取最新更改").OnEvent("Click", e_get_update)
-            g.AddText("cGray", "点击后，会直接从代码仓库获取最新的源代码文件")
+            g.AddButton("xs w" info.w, "与源代码仓库同步").OnEvent("Click", e_get_update)
+            g.AddText("cGray", "点击后，不检查版本，直接从源代码仓库下载最新的源代码文件")
             e_get_update(*) {
                 g.Destroy()
                 getRepoCode(0)

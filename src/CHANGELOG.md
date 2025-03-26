@@ -4,6 +4,13 @@
 
 - 没有特别说明的版本都是修复问题
 
+## 2.36.5
+
+- 修复了 zip 版本中的 JAB 相关功能，未明确指定 ahk 运行环境的问题
+- `firefox.exe`(火狐浏览器) 默认的光标获取模式从 `GUI_UIA` 修改为 `MSAA`
+  - https://inputtip.abgox.com/FAQ/support-app-list
+- 其他的修复和优化
+
 ## 2.36.4
 
 - 修复了运行路径带有空格时可能出现的运行错误

@@ -26,8 +26,6 @@ defaultModeList := {
         "POWERPNT.EXE",
         ;
         "Notepad++.exe",
-        ; 火狐浏览器
-        "firefox.exe",
         ; Visual Studio
         "devenv.exe",
         ; 腾讯会议
@@ -36,6 +34,8 @@ defaultModeList := {
         "Weixin.exe",
     ],
     MSAA: [
+        ; 火狐浏览器
+        "firefox.exe",
         ; Excel
         "EXCEL.EXE",
         ; 钉钉

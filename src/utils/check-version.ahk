@@ -373,10 +373,11 @@ getRepoCode(newVersion) {
         downloadingGui := downloading()
 
         doneFileList := []
-        for kv in files {
+        fileCount := files.Length
+        for i, kv in files {
             p := StrSplit(kv, "=")
             for u in baseUrl {
-                tip.Text := p[1]
+                tip.Text := i '/' fileCount " : " p[1]
                 out := p[2] ".new"
                 if (InStr(out, "/")) {
                     dir := RegExReplace(out, "/[^/]*$", "")

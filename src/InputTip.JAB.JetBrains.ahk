@@ -29,8 +29,11 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         return 0
     }
     try {
-        left += app_offset.%exe_name%.%isWhichScreen(screenList).num%.x
-        top += app_offset.%exe_name%.%isWhichScreen(screenList).num%.y
+        s := isWhichScreen(screenList)
+        if (s != "") {
+            left += app_offset.%exe_name%.%s.num%.x
+            top += app_offset.%exe_name%.%s.num%.y
+        }
     }
     return left
 }

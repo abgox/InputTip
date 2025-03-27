@@ -623,7 +623,11 @@ getFontList() {
  */
 runJAB() {
     if (A_IsCompiled) {
-        if (!FileExist("InputTip.JAB.JetBrains.exe")) {
+        try {
+            if (compareVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
+                FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+            }
+        } catch {
             FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
         }
         SetTimer(runAppTimer1, -1)

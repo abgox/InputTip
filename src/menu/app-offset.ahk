@@ -135,6 +135,9 @@ fn_app_offset(*) {
     }
 
     handleClick(LV, RowNumber, tipList, action, app := "") {
+        if (!RowNumber) {
+            return
+        }
         fn_write_offset() {
             try {
                 gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"

@@ -5,6 +5,7 @@
 ;@Ahk2Exe-SetMainIcon img/favicon.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 #SingleInstance Force
+#Warn All, Off
 
 Persistent
 ListLines 0
@@ -14,5 +15,5 @@ InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.36.6
-currentVersion := "2.36.6"
+;@AHK2Exe-SetVersion 2.36.7
+currentVersion := "2.36.7"

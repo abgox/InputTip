@@ -6,7 +6,6 @@
 ;@AHK2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
 ;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态提示工具
-#Warn All, Off
 
 #Include ./utils/IME.ahk
 #Include ./utils/ini.ahk

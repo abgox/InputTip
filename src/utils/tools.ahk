@@ -68,13 +68,17 @@ getScreenInfo() {
  */
 isWhichScreen(screenList) {
     try {
-        WinGetPos(&x, &y, , , "A")
+        WinGetClientPos(&x, &y, &w, &h, "A")
+
+        ; 窗口的中心坐标
+        cx := x + w / 2
+        cy := y + h / 2
     } catch {
         return ""
     }
 
     for v in screenList {
-        if (x >= v.left && x <= v.right && y >= v.top && y <= v.bottom) {
+        if (cx >= v.left && cx <= v.right && cy >= v.top && cy <= v.bottom) {
             return v
         }
     }

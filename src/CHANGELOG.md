@@ -4,6 +4,14 @@
 
 - 没有特别说明的版本都是修复问题
 
+## 2.36.8
+
+- 优化了 exe 版本的更新逻辑
+- exe 版本使用 [AutoHotkey 2.0.19](https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.0.19) 进行编译
+  - 在 [AutoHotkey 2.0.19](https://github.com/AutoHotkey/AutoHotkey/releases/tag/v2.0.19) 中有对内存相关的修复
+  - 这或许能解决极少数情况下可能出现的 `Invalid memory read/write` 的报错
+- 其他的修复和优化
+
 ## 2.36.7
 
 - 为 zip 版本更新时的文件下载添加待下载数量及进度提示

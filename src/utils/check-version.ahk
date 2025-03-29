@@ -122,7 +122,7 @@ checkUpdate(init := 0, once := false, force := 0) {
                         g.AddText("yp cRed", newVersion)
                         g.AddText("xs", "---------------------------------------------------------")
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
-                        g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n")
+                        g.AddText("cRed", "点击确认更新后，会自动下载新版本替代旧版本并重启`n如果只是暂时不想更新，可以直接关闭此窗口`n")
 
                         if (info.i) {
                             return g
@@ -161,9 +161,10 @@ checkUpdate(init := 0, once := false, force := 0) {
 
                             for v in releases {
                                 try {
-                                    Download(v, A_AppData "/abgox-InputTip-new-version.exe")
+                                    out := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-new-version.exe"
+                                    Download(v, out)
                                     ; 尝试获取版本号，成功获取则表示下载没有问题
-                                    done := compareVersion(FileGetVersion(A_AppData "/abgox-InputTip-new-version.exe"), currentVersion) > 0
+                                    done := compareVersion(FileGetVersion(out), currentVersion) > 0
                                     break
                                 }
                             }
@@ -175,13 +176,15 @@ checkUpdate(init := 0, once := false, force := 0) {
                                     killJAB(1, A_IsCompiled)
                                 }
                                 try {
-                                    FileInstall("utils/app-update/target/release/app-update.exe", A_AppData "/abgox-InputTip-update-version.exe", 1)
-                                    Run(A_AppData "/abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '" ' keyCount, , "Hide")
+                                    FileInstall("utils/app-update/target/release/app-update.exe", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version.exe", 1)
+                                    Run(A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version.exe " '"' A_ScriptName '" "' A_ScriptFullPath '" ' keyCount, , "Hide")
                                     ExitApp()
                                 } catch {
                                     done := false
                                 }
-                            } else {
+                            }
+
+                            if (!done) {
                                 createGui(errGui).Show()
                                 errGui(info) {
                                     g := createGuiOpt("InputTip - 新版本下载错误")
@@ -420,7 +423,7 @@ getRepoCode(newVersion) {
                 FileMove(v, RegExReplace(v, "\.new$", ""), 1)
             }
             if (newVersion) {
-                FileAppend("", A_AppData "/.abgox-InputTip-update-version-done.txt")
+                FileAppend("", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt")
             }
             fn_restart()
         }
@@ -480,7 +483,9 @@ getRepoCode(newVersion) {
  * 当更新完成时弹出提示框
  */
 checkUpdateDone() {
-    if (FileExist(A_AppData "/.abgox-InputTip-update-version-done.txt")) {
+    flagFile := A_AppData "/.abgox-InputTip-update-version-done.txt"
+    flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
+    if (FileExist(flagFile) || FileExist(flagFile2)) {
         modeRules := []
         try {
             _ := IniRead("InputTip.ini", "InputMethod", "statusMode")
@@ -589,17 +594,18 @@ checkUpdateDone() {
 
             y := g.AddButton("xs w" bw, "我知道了")
             y.Focus()
+            g.OnEvent("Close", yes)
             y.OnEvent("Click", yes)
             yes(*) {
                 g.Destroy()
+
+                for v in [flagFile, flagFile2, A_AppData "/abgox-InputTip-update-version.exe", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version.exe"] {
+                    try {
+                        FileDelete(v)
+                    }
+                }
             }
             return g
-        }
-        try {
-            FileDelete(A_AppData "/.abgox-InputTip-update-version-done.txt")
-        }
-        try {
-            FileDelete(A_AppData "/abgox-InputTip-update-version.exe")
         }
     }
 }

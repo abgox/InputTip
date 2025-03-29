@@ -12,7 +12,14 @@ readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
     try {
         return IniRead(path, section, key)
     } catch {
-        IniWrite('"' default '"', path, section, key)
+        try {
+            IniWrite('"' default '"', path, section, key)
+        } catch {
+            createTipGui([{
+                opt: "cRed",
+                text: "配置文件写入失败`n请重启 InputTip",
+            }], "InputTip - 错误").Show()
+        }
         return default
     }
 }
@@ -24,5 +31,12 @@ readIni(key, default, section := "Config-v2", path := "InputTip.ini") {
  * @param {String} path 配置文件的路径
  */
 writeIni(key, value, section := "Config-v2", path := "InputTip.ini") {
-    IniWrite('"' value '"', path, section, key)
+    try {
+        IniWrite('"' value '"', path, section, key)
+    } catch {
+        createTipGui([{
+            opt: "cRed",
+            text: "配置文件写入失败`n请重启 InputTip",
+        }], "InputTip - 错误").Show()
+    }
 }

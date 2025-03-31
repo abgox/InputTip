@@ -197,6 +197,7 @@
 1. 打开 Java Access Bridge (java 访问桥)
 
    - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
+   - 请确保环境变量中已经添加 `JAVA_HOME`，`PATH` 中已经添加 java 可执行文件路径
 
    ```cmd
      jabswitch -enable

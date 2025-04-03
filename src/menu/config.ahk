@@ -17,7 +17,7 @@ fn_config(*) {
     line := "------------------------------------------------------------------------------------------------------------------"
     createGui(changeConfigGui).Show()
     changeConfigGui(info) {
-        g := createGuiOpt("InputTip - 更改配置")
+        g := createGuiOpt("InputTip - 更改核心配置(包括鼠标样式、符号显示及样式自定义等)")
         ; tab := g.AddTab3("-Wrap 0x100", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号"])
         tab := g.AddTab3("-Wrap", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号", "其他杂项"])
         tab.OnEvent("Change", e_tab)
@@ -28,7 +28,7 @@ fn_config(*) {
             tab.Value := gc.tab
         }
         tab.UseTab(1)
-        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见问题(FAQ)</a>                                              ')
+        g.AddLink("Section cRed", '- 你应该首先查看相关的说明文档:   <a href="https://inputtip.abgox.com/">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>   <a href="https://inputtip.abgox.com/FAQ/">常见问题(FAQ)</a>                                          ')
 
         if (info.i) {
             return g
@@ -276,7 +276,7 @@ fn_config(*) {
             reloadSymbol()
         }
         fn_writeIsolateConfig(item, *) {
-            if (RegExMatch(item._config, "(color)|(font)")) {
+            if (RegExMatch(item._config, "color|font|Text")) {
                 writeIni(item._config, item.Text)
             } else {
                 writeIni(item._config, returnNumber(item.Text))
@@ -435,17 +435,17 @@ fn_config(*) {
             editOpt: "",
             tip: "方块符号的垂直偏移量"
         }, {
-            config: "transparent",
-            editOpt: "Number Limit3",
-            tip: "方块符号的透明度"
+            config: "symbol_width",
+            editOpt: "Number",
+            tip: "方块符号的宽度"
         }, {
             config: "symbol_height",
             editOpt: "Number",
             tip: "方块符号的高度"
         }, {
-            config: "symbol_width",
-            editOpt: "Number",
-            tip: "方块符号的宽度"
+            config: "transparent",
+            editOpt: "Number Limit3",
+            tip: "方块符号的透明度"
         }]
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "方块符号")
@@ -524,7 +524,7 @@ fn_config(*) {
                 g := createGuiOpt("InputTip - 设置方块符号的独立配置")
                 g.AddText("cRed", "方块符号")
                 g.AddText("yp", "的独立配置")
-                g.AddText("xs", "------------------------------------------------------------------------")
+                g.AddText("xs", "-----------------------------------------------")
 
                 if (info.i) {
                     return g
@@ -536,18 +536,18 @@ fn_config(*) {
                     editOpt: "",
                     tip: "水平偏移量"
                 }, {
-                    config: "symbol_width",
-                    textOpt: "yp",
-                    editOpt: "Number",
-                    tip: "宽度"
-                }, {
                     config: "offset_y",
                     textOpt: "xs",
                     editOpt: "",
                     tip: "垂直偏移量"
                 }, {
+                    config: "symbol_width",
+                    textOpt: "xs",
+                    editOpt: "Number",
+                    tip: "宽度"
+                }, {
                     config: "symbol_height",
-                    textOpt: "yp",
+                    textOpt: "xs",
                     editOpt: "Number",
                     tip: "高度"
                 }, {
@@ -556,9 +556,22 @@ fn_config(*) {
                     editOpt: "Number Limit3",
                     tip: "透明度"
                 }]
-                for state in ["CN", "EN", "Caps"] {
-                    g.AddText("xs cRed", stateMap.%state%)
-                    g.AddText("yp", "时的独立配置:")
+
+                tab := g.AddTab3("-Wrap", ["中文状态", "英文状态", "大写锁定"])
+                for i, state in ["CN", "EN", "Caps"] {
+                    tab.UseTab(i)
+                    g.AddText("Section cRed", stateMap.%state%)
+                    g.AddText("yp", "时的独立配置:`n")
+
+                    ; 颜色
+                    config := state "_color"
+                    g.AddText("xs", "颜色")
+                    _g := g.AddEdit("yp")
+                    _g.Value := symbolConfig.%config%
+                    _g._config := config
+                    _g._update := symbolType = 2 && symbolConfig.enableIsolateConfigBlock
+                    _g.OnEvent("Change", fn_writeIsolateConfig)
+
                     for v in configList {
                         config := v.config state
                         g.AddText(v.textOpt, v.tip)
@@ -713,7 +726,7 @@ fn_config(*) {
                 g := createGuiOpt("InputTip - 设置文本符号的独立配置")
                 g.AddText("cRed", "文本符号")
                 g.AddText("yp", "的独立配置")
-                g.AddText("xs", "-----------------------------------------------------------------------------------------------------------------------")
+                g.AddText("xs", "----------------------------------------------------")
 
                 if (info.i) {
                     return g
@@ -726,12 +739,12 @@ fn_config(*) {
                     tip: "字符的字体"
                 }, {
                     config: "font_size",
-                    textOpt: "yp",
+                    textOpt: "xs",
                     editOpt: "Number",
                     tip: "字符的大小"
                 }, {
                     config: "font_weight",
-                    textOpt: "yp",
+                    textOpt: "xs",
                     editOpt: "",
                     tip: "字符的粗细"
                 }, {
@@ -741,12 +754,12 @@ fn_config(*) {
                     tip: "字符的颜色"
                 }, {
                     config: "textSymbol_offset_x",
-                    textOpt: "yp",
+                    textOpt: "xs",
                     editOpt: "",
                     tip: "水平偏移量"
                 }, {
                     config: "textSymbol_offset_y",
-                    textOpt: "yp",
+                    textOpt: "xs",
                     editOpt: "Number Limit3",
                     tip: "垂直偏移量"
                 }, {
@@ -755,9 +768,33 @@ fn_config(*) {
                     editOpt: "Number Limit3",
                     tip: "字符透明度"
                 }]
-                for state in ["CN", "EN", "Caps"] {
-                    g.AddText("xs cRed", stateMap.%state%)
-                    g.AddText("yp", "时的独立配置:")
+
+                tab := g.AddTab3("-Wrap", ["中文状态", "英文状态", "大写锁定"])
+                for i, state in ["CN", "EN", "Caps"] {
+                    tab.UseTab(i)
+                    g.AddText("Section cRed", stateMap.%state%)
+                    g.AddText("yp", "时的独立配置:`n")
+
+
+                    ; 文本字符
+                    config := state "_Text"
+                    g.AddText("xs", "文本字符")
+                    _g := g.AddEdit("yp")
+                    _g.Text := symbolConfig.%config%
+                    _g._config := config
+                    _g._update := symbolType = 3 && symbolConfig.enableIsolateConfigText
+                    _g.OnEvent("Change", fn_writeIsolateConfig)
+
+                    ; 背景颜色
+                    config := "textSymbol_" state "_color"
+                    g.AddText("xs", "背景颜色")
+                    _g := g.AddEdit("yp")
+                    _g.Text := symbolConfig.%config%
+                    _g._config := config
+                    _g._update := symbolType = 3 && symbolConfig.enableIsolateConfigText
+                    _g.OnEvent("Change", fn_writeIsolateConfig)
+
+
                     for v in configList {
                         config := v.config state
                         g.AddText(v.textOpt, v.tip)

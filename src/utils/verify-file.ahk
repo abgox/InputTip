@@ -221,9 +221,10 @@ if (A_IsCompiled) {
         downloadingGui := downloading()
 
         done := 1
-        for f in missFileList {
+        fileCount := missFileList.Length
+        for i, f in missFileList {
             for u in baseUrl {
-                downloadingGui.tip.Text := f
+                downloadingGui.tip.Text := i '/' fileCount " : " f
                 dir := RegExReplace(f, "/[^/]*$", "")
                 try {
                     if (!DirExist(dir)) {

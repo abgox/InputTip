@@ -15,6 +15,11 @@
 #Include ./utils/app-list.ahk
 
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
+favicon_png := A_ScriptDir "\InputTipSymbol\default\favicon.png"
+
+if (FileExist(favicon_png)) {
+    TraySetIcon(favicon_png, , 1)
+}
 
 #Include ./utils/verify-file.ahk
 #Include ./utils/create-gui.ahk
@@ -78,7 +83,7 @@ gc := {
     }
 }
 
-TraySetIcon(A_ScriptDir "\InputTipSymbol\default\favicon.png", , 1)
+TraySetIcon(favicon_png, , 1)
 
 checkIni() ; 检查配置文件
 

@@ -35,6 +35,7 @@ body:
       options:
         - zip
         - exe
+      multiple: true
     validations:
       required: true
   - type: dropdown
@@ -46,6 +47,7 @@ body:
         - Windows 11
         - Windows 10
         - 其他
+      multiple: true
     validations:
       required: true
   - type: input

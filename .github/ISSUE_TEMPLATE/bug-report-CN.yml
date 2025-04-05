@@ -20,29 +20,42 @@ body:
     attributes:
       label: 当前使用的 InputTip 版本
       description: |
-        在软件的托盘菜单中，点击 **关于** 进行查看。
-        如果不是右边的最新版本，请先更新到最新版本，如果问题依然存在，再提交 issue。
-        <a href="https://github.com/abgox/InputTip"><img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version" alt="version" /></a>
+        - 在软件的托盘菜单中，点击 **关于** 进行查看。
+        - 如果不是最新版本，请先更新。<a href="https://github.com/abgox/InputTip"><img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version" alt="最新版本" /></a>
+        - 如果问题依然存在，再提交 issue。
+      placeholder: v2.36.9
+    validations:
+      required: true
+  - type: dropdown
+    id: InputTip-type
+    attributes:
+      label: 你正在使用哪种类型的安装包?
+      description: |
+        [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/FAQ/zip-vs-exe)
+      options:
+        - zip
+        - exe
     validations:
       required: true
   - type: dropdown
     id: windows-version
     attributes:
       label: 你正在使用什么 Windows 系统版本?
-      description: 如果是 Windows 10 以前的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本。
+      description: 如果是 Windows 10 以下的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本。
       options:
         - Windows 11
         - Windows 10
         - 其他
-      multiple: true
     validations:
       required: true
   - type: input
     id: exe
     attributes:
-      label: 哪一个软件出现了问题?软件进程名叫什么？(比如：QQ.exe)
+      label: 哪一个软件出现了问题?软件进程名叫什么?
       description: |
-        你可以在 `任务管理器` 中找到出现问题的软件进程，右键点击进程名，点击 `打开文件所在的位置` 找到软件的运行进程 exe 文件。
+        - 使用 `托盘菜单` => `更改配置` => `其他杂项` => `实时获取当前激活的窗口进程信息`
+        - 或者在 `任务管理器` 中找到出现问题的软件进程，右键点击进程名，点击 `打开文件所在的位置` 找到软件的运行进程 exe 文件。
+      placeholder: wps.exe
     validations:
       required: true
   - type: textarea

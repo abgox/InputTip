@@ -9,9 +9,9 @@ body:
     attributes:
       label: 描述这个功能请求
       description: |
-        请详细描述您的功能要求或增强。
-        它解决了 InputTip 中的哪些不足?
-        哪些用例支持您的请求?
+        - 目前 InputTip 存在哪些不足？
+        - 详细描述你需要的功能需求或想法。
+        - 你认为有哪些可行的实现方案作为参考？
     validations:
       required: true
   - type: dropdown
@@ -23,7 +23,6 @@ body:
         - Windows 11
         - Windows 10
         - 其他
-      multiple: true
     validations:
       required: true
   - type: textarea

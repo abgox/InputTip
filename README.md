@@ -85,7 +85,7 @@
 
 - zip 版本
 
-  - 直接下载仓库的最新代码压缩包 `InputTip-main.zip`
+  - 下载仓库的最新代码压缩包 `InputTip-main.zip`
   - 在仓库的 Releases 中下载 `InputTip.zip`
   - [前往官网下载 InputTip.zip](https://inputtip.abgox.com/download)
 
@@ -124,14 +124,13 @@
 
 4. [设置鼠标样式](https://inputtip.abgox.com/FAQ/cursor-style)
 
-   > [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
-
    - `托盘菜单` => `更改配置` => `鼠标样式`，在下拉列表中选择鼠标样式文件夹路径
    - 比如默认的中文鼠标样式文件夹路径: `InputTipCursor\default\CN`
+   - [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
 
 5. 更多相关配置在 `托盘菜单` 中查看
 
-6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单图标](https://inputtip.abgox.com/FAQ/custom-tray-menu-icon)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、...
+6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单图标](https://inputtip.abgox.com/FAQ/custom-tray-menu-icon)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、[运行项目源代码](https://inputtip.abgox.com/FAQ/run-source-code)...
 
 <details>
 <summary>一个通过方块符号实现的有趣的配置</summary>
@@ -188,31 +187,36 @@
 
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
 
-> [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
-
 > [!Tip]
+>
+> https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains
+>
+> [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 >
 > 如果有其他 JAB 程序，也可以按照此步骤进行设置
 
 1. 打开 Java Access Bridge (java 访问桥)
 
-   - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8)
-   - 请确保环境变量中已经添加 `JAVA_HOME`，`PATH` 中已经添加 java 可执行文件路径
+   - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8) 或其他 JDK
+   - 请确保下方两个命令能正常运行。如果不能，请检查环境变量是否配置正确
 
-   ```cmd
+   ```powershell
+     java -version
+   ```
+
+   ```powershell
      jabswitch -enable
    ```
 
 2. `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
 
-   - 会在 `InputTip.exe` 同级目录下生成 `InputTip.JAB.JetBrains.exe`
-   - 它由 `InputTip.exe` 控制，不需要手动启动/终止
-
 3. `托盘菜单` => `设置光标获取模式`，将 JetBrains IDE 应用添加到其中的 `JAB` 列表中
 
-4. 如果未生效，请重启正在使用的 JetBrains IDE
+4. 如果未生效，请依次尝试以下操作并查看是否生效
 
-5. 如果仍未生效，请重启 InputTip 或重启系统
+   - 重启正在运行的 JetBrains IDE
+   - 重启 InputTip : `托盘菜单` => `重启`
+   - 重启系统
 
 > [!Tip]
 > 如果有多块屏幕，副屏幕上可能有坐标偏差，需要通过 `托盘菜单` => `设置特殊偏移量` 手动调整
@@ -222,25 +226,32 @@
 > [!Tip]
 >
 > - 部分应用窗口可能无法准确获取到输入光标位置，会导致符号无法显示
-> - 你可以使用 `2.33.0` 版本中新增的 `设置符号显示位置` 来解决此问题
+>   - [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list) 会记录这些特别的应用窗口
+> - 你可以使用 `v2.33.0` 版本中新增的 `设置符号显示位置` 来解决此问题
 > - 以 `WPS` 为例
 >   - 使用 `设置符号显示位置`，根据窗口提示，将它添加到其中，即可实现在鼠标附近显示
 >   - 这是一个折中的处理方案，此前的 `v1` 版本就一直使用它，稳定性非常好
-> - [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list) 会记录这些特别的应用窗口
 
 #### 图片符号
 
-- `InputTip.exe` 启动后，会在同级目录下生成 `InputTipSymbol` 目录，其中包括 `default` 文件夹
+> [!Tip]
+>
+> https://inputtip.abgox.com/FAQ/symbol-picture
 
-  - `default` 文件夹中包含了默认的图片符号
-  - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示图片符号` 时，会显示对应的图片符号
-  - 你也可以将自己喜欢的图片符号，或者自己制作图片符号，放入 `InputTipSymbol` 目录下
-    - 限制: 图片必须是 `.png` 格式
-    - [更多的符号图片](https://inputtip.abgox.com/download/extra)
-  - 设置方法: `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择图片路径
-  - 如果选择第一个空白路径，则不会显示对应状态的图片符号
+- `InputTipSymbol\default` 文件夹中包含了默认的图片符号
+- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示图片符号` 时，会显示对应的图片符号
+- 你也可以自己制作符号图片，或者将喜欢的符号图片放入 `InputTipSymbol` 目录下
+  - 不应该放到 `default` 文件夹下
+  - 图片必须是 `.png` 格式
+  - [更多的符号图片](https://inputtip.abgox.com/download/extra)
+- 设置方法: `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择图片路径
+- 如果选择第一个空白路径，则不会显示对应状态的图片符号
 
 #### 方块符号
+
+> [!Tip]
+>
+> https://inputtip.abgox.com/FAQ/symbol-block
 
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
 - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
@@ -249,6 +260,10 @@
   - 比如: 你只希望在中文状态下显示方块符号，那么就将 `英文状态时方块符号的颜色` 和 `大写锁定时方块符号的颜色` 的值都设置为空
 
 #### 文本符号
+
+> [!Tip]
+>
+> https://inputtip.abgox.com/FAQ/symbol-text
 
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示文本符号` 时，会显示对应的文本符号
 - 默认中文状态为 `中`，英文状态为 `英`，大写锁定为 `大`

@@ -32,7 +32,7 @@
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被错误判断为病毒程序或游戏外挂](https://inputtip.abgox.com/FAQ/about-virus)
 > - InputTip 只适用于 **Windows** 系统(**Win10** 以上可用，以下未知)
-> - `托盘菜单` 指的是在底部任务栏右边的 `InputTip` 软件托盘菜单
+> - `托盘菜单` 指的是在底部任务栏右边的 InputTip 软件托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
 
 ### 介绍
@@ -46,10 +46,10 @@
       - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
     - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
-  - 切换不同应用窗口时，自动切换指定的输入法状态
-  - 快捷键强制切换输入法状态
+  - 切换不同应用窗口时，自动切换到指定的输入法状态
+  - 指定按键强制切换输入法状态
   - 详细便捷的配置菜单
-    - 所有的配置变动，都在 `托盘菜单` 中进行
+    - 所有的配置变动，都只应该在 `托盘菜单` 中进行
 
 [**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**](#stars)
 
@@ -107,7 +107,7 @@
 
 ### 使用
 
-1. 完成 [下载安装](#安装) 后，运行对应文件即可
+1. 完成 [安装](#安装) 后，运行对应文件即可
 
    - zip 版本: 运行解压后的目录下的 `InputTip.bat`
    - exe 版本: 运行 `InputTip.exe`
@@ -127,10 +127,11 @@
    - `托盘菜单` => `更改配置` => `鼠标样式`，在下拉列表中选择鼠标样式文件夹路径
    - 比如默认的中文鼠标样式文件夹路径: `InputTipCursor\default\CN`
    - [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra)
+   - [自定义鼠标样式](#自定义鼠标样式)
 
 5. 更多相关配置在 `托盘菜单` 中查看
 
-6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单图标](https://inputtip.abgox.com/FAQ/custom-tray-menu-icon)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、[运行项目源代码](https://inputtip.abgox.com/FAQ/run-source-code)...
+6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单图标](https://inputtip.abgox.com/FAQ/custom-tray-menu-icon)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、[运行项目源代码](https://inputtip.abgox.com/FAQ/run-source-code)、...
 
 <details>
 <summary>一个通过方块符号实现的有趣的配置</summary>
@@ -151,13 +152,16 @@
 
    - 完成项目克隆后，你也可以直接运行目录下的 `InputTip.bat` 来使用 `InputTip`
    - [Github](https://github.com/abgox/InputTip)
-     - ```shell
-       git clone --depth 1 https://github.com/abgox/InputTip.git
-       ```
+
+     ```shell
+     git clone --depth 1 https://github.com/abgox/InputTip.git
+     ```
+
    - [Gitee](https://gitee.com/abgox/InputTip)
-     - ```shell
-       git clone --depth 1 https://gitee.com/abgox/InputTip.git
-       ```
+
+     ```shell
+     git clone --depth 1 https://gitee.com/abgox/InputTip.git
+     ```
 
 2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
 3. 打开 `AutoHotKey Dash`
@@ -172,10 +176,18 @@
 
 - 所有相关的文件或目录
 
-  - 软件本体 `InputTip.exe`
-  - 鼠标样式文件夹 `InputTipCursor` (软件本体的同级目录下)
-  - 图片符号文件夹 `InputTipSymbol` (软件本体的同级目录下)
-  - 配置文件 `InputTip.ini` (软件本体的同级目录下)
+  - zip 版本
+
+    - 解压后的整个 `InputTip-main` 目录
+      - 鼠标样式文件夹 `src\InputTipCursor`
+      - 图片符号文件夹 `src\InputTipSymbol`
+      - 配置文件 `src\InputTip.ini`
+
+  - exe 版本
+    - 软件本体 `InputTip.exe`
+    - 鼠标样式文件夹 `InputTipCursor`
+    - 图片符号文件夹 `InputTipSymbol`
+    - 配置文件 `InputTip.ini`
 
 ---
 
@@ -189,24 +201,22 @@
 
 > [!Tip]
 >
-> https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains
->
-> [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
->
-> 如果有其他 JAB 程序，也可以按照此步骤进行设置
+> - https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains
+> - [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
+> - 如果有其他 JAB 程序，也可以按照此步骤进行设置
 
 1. 打开 Java Access Bridge (java 访问桥)
 
    - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8) 或其他 JDK
    - 请确保下方两个命令能正常运行。如果不能，请检查环境变量是否配置正确
 
-   ```powershell
+     ```shell
      java -version
-   ```
+     ```
 
-   ```powershell
+     ```shell
      jabswitch -enable
-   ```
+     ```
 
 2. `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
 

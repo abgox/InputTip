@@ -483,9 +483,10 @@ getRepoCode(newVersion) {
  * 当更新完成时弹出提示框
  */
 checkUpdateDone() {
+    oldVersion := readIni("version", currentVersion, "UserInfo")
     flagFile := A_AppData "/.abgox-InputTip-update-version-done.txt"
     flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
-    if (FileExist(flagFile) || FileExist(flagFile2)) {
+    if (compareVersion(currentVersion, oldVersion) || FileExist(flagFile) || FileExist(flagFile2)) {
         try {
             ignoreUpdate := IniRead("InputTip.ini", "Config-v2", "ignoreUpdate")
             _ := ignoreUpdate ? 0 : 1440
@@ -603,6 +604,7 @@ checkUpdateDone() {
                         FileDelete(v)
                     }
                 }
+                writeIni("version", currentVersion, "UserInfo")
             }
             return g
         }

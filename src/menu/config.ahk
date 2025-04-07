@@ -861,7 +861,7 @@ fn_config(*) {
             writeIni("enableKeyCount", value)
             updateTip()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，当鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计相关文本，可通过下方的模板进行自定义`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计相关文本。`n可通过下方的模板进行自定义。只有当上一次按键和当前按键不同时，才会记为一次有效按键")
         g.AddText("Section xs", "4. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)
         _.Value := keyCountTemplate

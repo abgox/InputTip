@@ -425,6 +425,10 @@
 
 ### 赞赏支持
 
+> [!Tip]
+>
+> 这里是 [赞赏名单](https://inputtip.abgox.com/sponsor)，非常感谢所有赞助者！
+
 <a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://me.abgox.com/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ![赞赏支持](https://me.abgox.com/support.png)

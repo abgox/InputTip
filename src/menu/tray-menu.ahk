@@ -111,7 +111,7 @@ fn_update_user(uname, *) {
             writeIni("userName", userName, "UserInfo")
             if (A_IsAdmin) {
                 if (A_IsCompiled) {
-                    createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC")
+                    createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", 0)
                     if (enableJABSupport) {
                         createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
                     }

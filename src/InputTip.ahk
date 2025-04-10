@@ -107,9 +107,10 @@ if (A_IsCompiled) {
     }
 }
 
-checkUpdateDone()
+; 是否静默自动更新
+silentUpdate := readIni("silentUpdate", 0)
 
-checkUpdateDelay := readIni("checkUpdateDelay", 1440)
+checkUpdateDone()
 
 #Include ./utils/var.ahk
 

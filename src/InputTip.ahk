@@ -49,6 +49,7 @@ gc := {
         startupGui: "",
         ; 设置更新检查
         checkUpdateGui: "",
+        updateGui: "",
         ; 更改用户信息
         updateUserGui: "",
         ; 设置输入法模式

@@ -17,7 +17,7 @@ fn_startup(item, *) {
         if (isStartUp != 2 && !A_IsAdmin) {
             createTipGui([{
                 opt: "cRed",
-                text: "你需要以管理员模式运行来取消开机自启动",
+                text: "你需要以管理员模式运行来取消「开机自启动」`n设置: 「托盘菜单」=>「以管理员模式启动」",
             }], "InputTip - 错误").Show()
 
             return

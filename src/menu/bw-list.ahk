@@ -8,7 +8,7 @@ fn_bw_list(*) {
     createGui(bwListGui).Show()
     bwListGui(info) {
         g := createGuiOpt("InputTip - 设置符号显示的黑/白名单")
-        g.AddText("cRed", "白名单机制 : 只有在「白」名单中的应用进程窗口会显示符号`n黑名单机制 : 只有不在「黑」名单中的应用进程窗口会显示符号")
+        g.AddText("cRed", "白名单机制: 只有在「白」名单中的应用进程窗口会尝试显示符号`n黑名单机制: 不在「黑」名单中的应用进程窗口都会尝试显示符号")
         g.AddLink("cGray", '如果使用 <a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a>，为了便于配置，InputTip 提供了同步添加机制`n当使用以下配置菜单时，添加的应用进程会同步添加到「白」名单中`n  -「设置光标获取模式」`n  -「设置特殊偏移量」`n  -「指定窗口自动切换状态」')
         g.AddText(, "选择符号显示的名单机制: ")
 
@@ -31,7 +31,7 @@ fn_bw_list(*) {
                     gc._bw_list.Value := useWhiteList + 1
                     _g := createGuiOpt("InputTip - 警告")
                     _g.AddText(, "确定要使用「黑」名单吗？")
-                    _g.AddText("cRed", "这是不建议的，更建议继续使用「白」名单`n因为「黑」名单机制下，你需要承担未知的可能存在的窗口兼容性代价")
+                    _g.AddText("cRed", "和「白」名单相比,「黑」名单存在以下缺点`n1. 对电脑的性能消耗更高`n2. 需要你承担未知的可能存在的窗口兼容性代价")
                     _g.AddLink("cGray", '详情请查看 <a href="https://inputtip.abgox.com/FAQ/white-list">为什么建议使用白名单机制</a>')
 
                     if (info.i) {

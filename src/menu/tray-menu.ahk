@@ -29,14 +29,25 @@ makeTrayMenu() {
         fn_update_user(userName)
     }
     if (!A_IsCompiled) {
-        A_TrayMenu.Add("以管理员模式启动", fn_admin_mode)
+        A_TrayMenu.Add("以管理员权限启动", fn_admin_mode)
         fn_admin_mode(*) {
-            A_TrayMenu.ToggleCheck("以管理员模式启动")
-            writeIni("runCodeWithAdmin", !runCodeWithAdmin)
-            fn_restart()
+            A_TrayMenu.ToggleCheck("以管理员权限启动")
+            value := !runCodeWithAdmin
+            writeIni("runCodeWithAdmin", value)
+            if (value) {
+                fn_restart()
+            } else {
+                createTipGui([{
+                    opt: "cRed",
+                    text: "管理员权限无法直接降权至当前用户权限",
+                }, {
+                    opt: "cRed",
+                    text: "如果想要立即生效，你需要手动退出并重新启动 InputTip"
+                }], "InputTip - 取消以管理员权限启动").Show()
+            }
         }
         if (runCodeWithAdmin) {
-            A_TrayMenu.Check("以管理员模式启动")
+            A_TrayMenu.Check("以管理员权限启动")
         }
     }
 
@@ -90,7 +101,7 @@ fn_update_user(uname, *) {
     createGui(updateUserGui).Show()
     updateUserGui(info) {
         g := createGuiOpt("InputTip - 更改用户信息")
-        g.AddText("cRed", "- 如果是域用户，在用户名中需要添加域`n- 如: xxx\abgox")
+        g.AddText("cRed", "- 如果是普通用户，确保用户名正确即可`n- 如果是域用户，在用户名中需要添加域`n   - 如: xxx\abgox")
         g.AddText(, "用户名: ")
         _ := g.AddEdit("yp")
         if (info.i) {
@@ -111,12 +122,16 @@ fn_update_user(uname, *) {
             writeIni("userName", userName, "UserInfo")
             if (A_IsAdmin) {
                 if (A_IsCompiled) {
-                    createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", 0)
+                    if (isStartUp = 1) {
+                        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", 0, , , 1)
+                    }
                     if (enableJABSupport) {
                         createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
                     }
                 } else {
-                    createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", A_ScriptFullPath)
+                    if (isStartUp = 1) {
+                        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", A_ScriptFullPath, , , 1)
+                    }
                     if (enableJABSupport) {
                         createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited")
                     }

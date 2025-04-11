@@ -1,5 +1,8 @@
 ; InputTip
 
+; 更新检查时间间隔
+checkUpdateDelay := readIni("checkUpdateDelay", 1440)
+
 ; g.SetFont(fontOpt*)
 fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 

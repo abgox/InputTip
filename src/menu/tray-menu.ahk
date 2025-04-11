@@ -53,8 +53,12 @@ makeTrayMenu() {
 
     A_TrayMenu.Add("创建快捷方式到桌面", fn_create_shortcut)
     fn_create_shortcut(*) {
-        target := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\..\InputTip.bat"
-        FileCreateShortcut(target, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+        if (isStartUp = 1) {
+            FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
+        } else {
+            target := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\..\InputTip.bat"
+            FileCreateShortcut(target, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+        }
     }
 
     A_TrayMenu.Add()

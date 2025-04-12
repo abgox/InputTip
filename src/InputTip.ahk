@@ -20,7 +20,6 @@ favicon_png := A_ScriptDir "\InputTipSymbol\default\favicon.png"
 if (FileExist(favicon_png)) {
     TraySetIcon(favicon_png, , 1)
 }
-A_IconHidden := 0
 
 #Include ./utils/verify-file.ahk
 #Include ./utils/create-gui.ahk

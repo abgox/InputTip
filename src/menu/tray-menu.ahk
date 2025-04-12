@@ -94,6 +94,9 @@ makeTrayMenu() {
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("退出", fn_exit)
+
+    ; 强制显示托盘图标
+    A_IconHidden := 0
 }
 
 fn_update_user(uname, *) {

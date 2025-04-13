@@ -37,8 +37,6 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     return left
 }
 
-#Include ./utils/show.ahk
-
 /**
  * Gets the position of the caret with UIA, Acc or CaretGetPos.
  * @link https://www.reddit.com/r/AutoHotkey/comments/ysuawq/get_the_caret_location_in_any_program/
@@ -79,3 +77,7 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
         return ret
     }
 }
+
+; 如果有修改代码的需求，你应该写在此行之前
+; 此行之后的普通代码，都会因为死循环而无效
+#Include ./utils/show.ahk

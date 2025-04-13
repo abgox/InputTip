@@ -32,9 +32,9 @@ makeTrayMenu() {
         A_TrayMenu.Add("以管理员权限启动", fn_admin_mode)
         fn_admin_mode(*) {
             A_TrayMenu.ToggleCheck("以管理员权限启动")
-            value := !runCodeWithAdmin
-            writeIni("runCodeWithAdmin", value)
-            if (value) {
+            global runCodeWithAdmin := !runCodeWithAdmin
+            writeIni("runCodeWithAdmin", runCodeWithAdmin)
+            if (runCodeWithAdmin) {
                 fn_restart()
             } else {
                 createTipGui([{
@@ -94,6 +94,7 @@ makeTrayMenu() {
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("退出", fn_exit)
+
 }
 
 fn_update_user(uname, *) {
@@ -127,17 +128,17 @@ fn_update_user(uname, *) {
             if (A_IsAdmin) {
                 if (A_IsCompiled) {
                     if (isStartUp = 1) {
-                        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", 0, , , 1)
+                        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0, 1], , , 1)
                     }
                     if (enableJABSupport) {
                         createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
                     }
                 } else {
                     if (isStartUp = 1) {
-                        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", A_ScriptFullPath, , , 1)
+                        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0, 1], , , 1)
                     }
                     if (enableJABSupport) {
-                        createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited")
+                        createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited")
                     }
                 }
             }
@@ -660,7 +661,7 @@ runJAB() {
         SetTimer(runAppTimer2, -1)
         runAppTimer2() {
             try {
-                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", A_ScriptDir "\InputTip.JAB.JetBrains.ahk", "Limited", 1)
+                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited", 1)
                 Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
             }
         }

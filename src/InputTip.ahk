@@ -114,6 +114,17 @@ checkUpdateDone()
 
 #Include ./utils/var.ahk
 
+; 当开机自启动使用「任务计划程序」时，系统启动后，InputTip 的托盘菜单可能无法正常显示
+; 当通过任务计划程序运行时，执行一次自重启，避免托盘菜单图标无法显示
+try {
+    needRestart := A_Args[2]
+} catch {
+    needRestart := 0
+}
+if (needRestart) {
+    fn_restart()
+}
+
 checkUpdate(1)
 
 if (hotkey_CN) {
@@ -223,7 +234,6 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     return res && left
 }
 
-#Include ./utils/show.ahk
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
@@ -632,3 +642,8 @@ end:
         bottom := top + h
     }
 }
+
+
+; 如果有修改代码的需求，你应该写在此行之前
+; 此行之后的普通代码，都会因为死循环而无效
+#Include ./utils/show.ahk

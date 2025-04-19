@@ -366,6 +366,9 @@ checkIni() {
             }
             g.OnEvent("Close", e_exit)
             e_exit(*) {
+                try {
+                    IniDelete("InputTip.ini", "InputMethod", "mode")
+                }
                 ExitApp()
             }
             return g

@@ -13,6 +13,11 @@
 #Include ./utils/var.ahk
 #Include ./utils/tools.ahk
 
+/**
+ * 跳过非 JAB/JetBrains IDE 程序，交由 InputTip 处理
+ * @param exe_str 进程字符串，如 ":webstorm64.exe:"
+ * @returns {1 | 0} 是否需要跳过
+ */
 needSkip(exe_str) {
     return showCursorPos || !InStr(modeList.JAB, exe_str)
 }

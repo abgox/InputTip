@@ -128,14 +128,14 @@ fn_update_user(uname, *) {
             if (A_IsAdmin) {
                 if (A_IsCompiled) {
                     if (isStartUp = 1) {
-                        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0, 1], , , 1)
+                        createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0], , , 1)
                     }
                     if (enableJABSupport) {
                         createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited")
                     }
                 } else {
                     if (isStartUp = 1) {
-                        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0, 1], , , 1)
+                        createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0], , , 1)
                     }
                     if (enableJABSupport) {
                         createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited")

@@ -97,9 +97,9 @@ fn_startup(item, *) {
             btn.OnEvent("Click", e_useTask)
             e_useTask(*) {
                 if (A_IsCompiled) {
-                    flag := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0, 1], , , 1)
+                    flag := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0], , , 1)
                 } else {
-                    flag := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0, 1], , , 1)
+                    flag := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0], , , 1)
                 }
 
                 if (flag) {

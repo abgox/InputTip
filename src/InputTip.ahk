@@ -29,7 +29,6 @@ fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态提示工具"
 JAB_PID := ""
 
-
 try {
     keyCount := A_Args[1]
     if (!IsNumber(keyCount)) {
@@ -113,17 +112,6 @@ silentUpdate := readIni("silentUpdate", 0)
 checkUpdateDone()
 
 #Include ./utils/var.ahk
-
-; 当开机自启动使用「任务计划程序」时，系统启动后，InputTip 的托盘菜单可能无法正常显示
-; 当通过任务计划程序运行时，执行一次自重启，避免托盘菜单图标无法显示
-try {
-    needRestart := A_Args[2]
-} catch {
-    needRestart := 0
-}
-if (needRestart) {
-    fn_restart()
-}
 
 checkUpdate(1)
 
@@ -210,6 +198,12 @@ getDirTimer() {
 
 makeTrayMenu() ; 生成托盘菜单
 
+
+/**
+ * 跳过 JAB/JetBrains IDE 程序，交由 InputTip.JAB 处理
+ * @param exe_str 进程字符串，如 ":webstorm64.exe:"
+ * @returns {1 | 0} 是否需要跳过
+ */
 needSkip(exe_str) {
     return !showCursorPos && InStr(modeList.JAB, exe_str)
 }
@@ -643,6 +637,17 @@ end:
     }
 }
 
+
+; 强制显示托盘菜单图标
+SetTimer(showIconTimer, 30000)
+showIconTimer() {
+    static n := 0
+    if (n >= 10) {
+        SetTimer(, 0)
+    }
+    A_IconHidden := 0 ; 强制显示托盘菜单图标
+    n++
+}
 
 ; 如果有修改代码的需求，你应该写在此行之前
 ; 此行之后的普通代码，都会因为死循环而无效

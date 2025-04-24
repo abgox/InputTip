@@ -50,6 +50,7 @@
   - 指定按键强制切换输入法状态
   - 详细便捷的配置菜单
     - 所有的配置变动，都只应该在 `托盘菜单` 中进行
+    - 不要手动修改 `InputTip.ini` 文件
 
 [**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**](#stars)
 
@@ -88,6 +89,15 @@
   - 下载仓库的最新代码压缩包 `InputTip-main.zip`
   - 在仓库的 Releases 中下载 `InputTip.zip`
   - [前往官网下载 InputTip.zip](https://inputtip.abgox.com/download)
+  - 使用 [Scoop](https://scoop.sh/) 安装
+
+    ```shell
+    scoop bucket add abgox-bucket https://github.com/abgox/abgox-bucket
+    ```
+
+    ```shell
+    scoop install abgox-bucket/InputTip-zip
+    ```
 
 - exe 版本
 
@@ -211,8 +221,8 @@
 
 1. 打开 Java Access Bridge (java 访问桥)
 
-   - 如果命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8) 或其他 JDK
-   - 请确保下方两个命令能正常运行。如果不能，请检查环境变量是否配置正确
+   - 如果以下命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8) 或其他 JDK
+   - 如果以下命令不能正常运行，请检查环境变量是否配置正确
 
      ```shell
      java -version

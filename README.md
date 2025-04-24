@@ -102,7 +102,11 @@
   - 使用 [Scoop](https://scoop.sh/) 安装
 
     ```shell
-    scoop install https://inputtip.abgox.com/installer/scoop/InputTip.json
+    scoop bucket add abgox-bucket https://github.com/abgox/abgox-bucket
+    ```
+
+    ```shell
+    scoop install abgox-bucket/InputTip
     ```
 
 ### 使用

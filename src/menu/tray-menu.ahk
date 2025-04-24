@@ -56,8 +56,11 @@ makeTrayMenu() {
         if (isStartUp = 1) {
             FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
         } else {
-            target := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\..\InputTip.bat"
-            FileCreateShortcut(target, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+            if (A_IsCompiled) {
+                FileCreateShortcut(A_ScriptFullPath, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+            } else {
+                FileCreateShortcut(A_AhkPath, A_Desktop "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
+            }
         }
     }
 

@@ -167,7 +167,7 @@ if (A_IsCompiled) {
     }
 } else {
     if (!FileExist("../InputTip.bat")) {
-        FileAppend('@echo off' "`n" 'start "" /min "%~dp0\src\AutoHotkey\AutoHotkey64.exe" "%~dp0\src\InputTip.ahk"', "..\InputTip.bat", "`n UTF-8-Raw")
+        FileAppend('REM InputTip.bat' "`n" 'start "" /min "%~dp0\src\AutoHotkey\AutoHotkey64.exe" "%~dp0\src\InputTip.ahk"`n', "..\InputTip.bat", "`n UTF-8-Raw")
     }
 
     ; 丢失的文件列表
@@ -366,6 +366,9 @@ checkIni() {
             }
             g.OnEvent("Close", e_exit)
             e_exit(*) {
+                try {
+                    IniDelete("InputTip.ini", "InputMethod", "mode")
+                }
                 ExitApp()
             }
             return g

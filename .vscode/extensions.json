@@ -1,3 +1,6 @@
 {
-  "recommendations": ["thqby.vscode-autohotkey2-lsp"]
+  "recommendations": [
+    "thqby.vscode-autohotkey2-lsp",
+    "zero-plusplus.vscode-autohotkey-debug"
+  ]
 }

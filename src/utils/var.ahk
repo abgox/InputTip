@@ -1,6 +1,6 @@
 ; InputTip
 
-; 更新检查时间间隔
+; 更新检查时间间隔，默认是 1440 分钟，即 24 小时
 checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 
 ; g.SetFont(fontOpt*)
@@ -9,14 +9,18 @@ fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
 
+; 光标获取模式
 modeList := {}
 
-; 以哪一种状态作为判断依据
+; 默认输入法状态(1: 中文, 0: 英文)
+; 在自定义模式下，如果所有规则都不匹配，则返回此状态
 baseStatus := readIni("baseStatus", 0, "InputMethod")
 
+; 自定义模式下定义的模式规则
 modeRule := readIni("modeRule", "", "InputMethod")
 modeRules := StrSplit(modeRule, ":")
 
+; 获取输入法状态的超时时间
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
 ; 是否使用 Shift 键切换输入法状态
@@ -35,12 +39,16 @@ changeCursor := readIni("changeCursor", 0)
     3: 文本符号
 */
 symbolType := readIni("symbolType", 1)
-symbolPos := readIni("symbolType", 1)
+; 符号的垂直偏移量的参考原点
 symbolOffsetBase := readIni("symbolOffsetBase", 0)
 
+; 是否在任意窗口中，符号都显示在鼠标附近
 showCursorPos := readIni("showCursorPos", 0)
+; 需要将符号显示在鼠标附近的窗口列表
 showCursorPosList := ":" readIni("showCursorPosList", "wps.exe") ":"
+; 符号显示在鼠标附近时的特殊偏移量 x
 showCursorPos_x := readIni("showCursorPos_x", 0)
+; 符号显示在鼠标附近时的特殊偏移量 y
 showCursorPos_y := readIni("showCursorPos_y", -20)
 
 ; 当鼠标悬浮在符号上时，符号是否需要隐藏
@@ -58,7 +66,6 @@ isStartUp := readIni("isStartUp", 0)
 ; 启用 JAB/JetBrains 支持
 enableJABSupport := readIni("enableJABSupport", 0)
 
-; XXX: 快捷键修改后，必须重启再生效，不重启动态修改 Hotkey 会存在问题
 ; 中文快捷键
 hotkey_CN := readIni('hotkey_CN', '')
 ; 英文快捷键
@@ -239,9 +246,9 @@ updateSymbol(init := 0) {
     }
     symbolConfig := {
         ; 启用独立配置
-        enableIsolateConfigPic: readIni("enableIsolateConfigPic", "0"),
-        enableIsolateConfigBlock: readIni("enableIsolateConfigBlock", "0"),
-        enableIsolateConfigText: readIni("enableIsolateConfigText", "0"),
+        enableIsolateConfigPic: readIni("enableIsolateConfigPic", 0),
+        enableIsolateConfigBlock: readIni("enableIsolateConfigBlock", 0),
+        enableIsolateConfigText: readIni("enableIsolateConfigText", 0),
     }
 
     infoCN := {
@@ -562,7 +569,7 @@ restartJAB() {
         SetTimer(restartAppTimer, -1)
         restartAppTimer() {
             done := 0
-            killJAB(1, 0)
+            killJAB(1)
             if (A_IsAdmin) {
                 try {
                     Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")

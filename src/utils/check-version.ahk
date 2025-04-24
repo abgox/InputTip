@@ -4,7 +4,7 @@
  * 比对版本号
  * @param new 新版本号
  * @param old 旧版本号
- * @returns {Number}
+ * @returns {1 | -1 | 0}
  * - new > old : 1
  * - new < old : -1
  * - new = old : 0
@@ -146,7 +146,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
 
                         if (done) {
                             if (enableJABSupport) {
-                                killJAB(1, A_IsCompiled)
+                                killJAB(1)
                             }
                             try {
                                 FileInstall("utils/app-update/target/release/app-update.exe", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version.exe", 1)
@@ -552,7 +552,7 @@ checkUpdateDone() {
                     writeIni("mode", 1, "InputMethod")
                 case 3:
                     ; 讯飞输入法
-                    writeIni("evenStatusMode", "0", "InputMethod")
+                    writeIni("evenStatusMode", 0, "InputMethod")
                     writeIni("mode", 0, "InputMethod")
                 case 4:
                     ; 手心输入法

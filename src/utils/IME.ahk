@@ -2,7 +2,7 @@
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/IME.ahk
- * @Tip 有所修改，外部必须提供变量 checkTimeout,modeRule,defaultStatus
+ * @Tip 有所修改，外部必须提供变量 checkTimeout,modeRule,baseStatus
  * @example
  * checkTimeout := 1000 ; 超时时间(单位：毫秒)
  * modeRules := [] ; 状态规则
@@ -11,17 +11,21 @@
  * IME.SetInputMode(!IME.GetInputMode()) ; 切换当前输入法输入模式
  */
 class IME {
+    /**
+     * 获取当前输入法输入模式
+     * @param hwnd
+     * @returns {1 | 0} 1:中文，0:英文
+     */
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
         if (mode = 1) {
             if (!this.GetOpenStatus(hwnd)) {
                 return 0
             }
-
-            v := this.GetConversionMode(hwnd)
-            return v & 1
+            return this.GetConversionMode(hwnd) & 1
         }
 
-        defaultStatus := baseStatus
+        ; 存储默认状态，如果都不匹配，就返回预先指定的默认状态
+        status := baseStatus
 
         ; 系统返回的状态码
         statusMode := this.GetOpenStatus(hwnd)
@@ -31,54 +35,51 @@ class IME {
         for v in modeRules {
             r := StrSplit(v, "*")
 
-            ; 状态码
+            ; 状态码规则
             sm := r[1]
-            ; 切换码
+            ; 切换码规则
             cm := r[2]
-            ; 状态
-            status := r[3]
-
-            ; 是否匹配
-            isMatch := true
+            ; 匹配状态
+            s := r[3]
 
             if (matchRule(statusMode, sm) && matchRule(conversionMode, cm)) {
                 ; 匹配成功
-                defaultStatus := status
+                status := s
                 break
             }
         }
 
         /**
          * 匹配规则
-         * @param value 实际的值
-         * @param ruleValue 规则的值
-         * @returns
+         * @param value 系统返回的状态值
+         * @param ruleValue 规则定义的状态值
+         * @returns {1 | 0} 是否匹配成功
          */
         matchRule(value, ruleValue) {
             ; 规则为空，默认匹配成功
             if (ruleValue == "") {
                 return 1
-            } else {
-                ; 是否是奇数
-                isOdd := value & 1
-
-                if (ruleValue == "evenNum") {
-                    ; 如果状态码规则是偶数
-                    isMatch := !isOdd
-                } else if (ruleValue == "oddNum") {
-                    ; 如果状态码规则是奇数
-                    isMatch := isOdd
-                } else {
-                    str := "/" value "/"
-                    isMatch := InStr(str, "/" ruleValue "/")
-                }
-                return isMatch
             }
+
+            if (ruleValue == "evenNum") { ; 如果值是偶数
+                isMatch := !(value & 1)
+            } else if (ruleValue == "oddNum") { ; 如果值是奇数
+                isMatch := value & 1
+            } else {
+                str := "/" value "/"
+                isMatch := InStr(str, "/" ruleValue "/")
+            }
+            return isMatch
         }
 
-        return defaultStatus
+        return status
     }
 
+    /**
+     * 系统返回的状态码和切换码
+     * @param hwnd
+     * @returns {Object} 系统返回的状态码和切换码
+     */
     static CheckInputMode(hwnd := this.GetFocusedWindow()) {
         return {
             statusMode: this.GetOpenStatus(hwnd),
@@ -86,6 +87,11 @@ class IME {
         }
     }
 
+    /**
+     * 切换到指定的输入法状态
+     * @param mode 要切换的指定输入法状态(1:中文，0:英文)
+     * @param hwnd
+     */
     static SetInputMode(mode, hwnd := this.GetFocusedWindow()) {
         if mode {
             this.SetOpenStatus(true, hwnd)
@@ -178,7 +184,7 @@ class IME {
 
 /**
  * 判断当前输入法状态是否为中文
- * @returns {Boolean} 输入法是否为中文
+ * @returns {1 | 0} 输入法是否为中文
  * @example
  * DetectHiddenWindows 1 ; 前置条件(不为1，可能判断有误)
  * ;...

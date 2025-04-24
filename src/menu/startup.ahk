@@ -97,9 +97,9 @@ fn_startup(item, *) {
             btn.OnEvent("Click", e_useTask)
             e_useTask(*) {
                 if (A_IsCompiled) {
-                    flag := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0, 1], , , 1)
+                    flag := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0], , , 1)
                 } else {
-                    flag := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0, 1], , , 1)
+                    flag := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0], , , 1)
                 }
 
                 if (flag) {
@@ -164,16 +164,15 @@ fn_startup(item, *) {
     }
 }
 
-
 /**
  * 创建/更新任务计划程序
- * @param path 要执行的应用程序
- * @param taskName 任务计划名称
+ * @param {String} path 要执行的应用程序
+ * @param {String} taskName 任务计划名称
  * @param {Array} args 运行参数
  * @param {Highest | Limited} runLevel 运行级别
- * @param {Boolean} isWait 是否等待完成
- * @param {Boolean} needStartUp 是否需要开机启动
- * @returns {Integer} 是否创建成功
+ * @param {1 | 0} isWait 是否等待完成
+ * @param {1 | 0} needStartUp 是否需要开机启动
+ * @returns {1 | 0} 是否创建成功
  */
 createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 0, needStartUp := 0, *) {
     if (A_IsAdmin) {

@@ -639,16 +639,18 @@ end:
 
 
 ; 强制显示托盘菜单图标
-SetTimer(showIconTimer, 30000)
+SetTimer(showIconTimer, 10000)
 showIconTimer() {
     static n := 0
-    if (n >= 10) {
+    if (n > 30) {
         SetTimer(, 0)
     }
-    A_IconHidden := 0 ; 强制显示托盘菜单图标
     n++
+
+    ; 强制显示托盘菜单图标
+    A_IconHidden := 0
 }
 
 ; 如果有修改代码的需求，你应该写在此行之前
-; 此行之后的普通代码，都会因为死循环而无效
+; 此行之后的逻辑代码，都会因为 show.ahk 中的死循环而无效
 #Include ./utils/show.ahk

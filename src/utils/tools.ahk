@@ -1,5 +1,11 @@
 ; InputTip
 
+/**
+ * 将数组转换成字符串，并用指定分隔符连接
+ * @param {Array} arr 数组
+ * @param {String} separator 分隔符
+ * @returns {String} 连接后的字符串
+ */
 arrJoin(arr, separator := ",") {
     res := ""
     for i, v in arr {
@@ -8,12 +14,22 @@ arrJoin(arr, separator := ",") {
     return res
 }
 
+/**
+ * 检查是否存在子目录
+ * @param {String} path 目录路径
+ * @returns 是否存在子目录
+ */
 hasChildDir(path) {
     Loop Files path "\*", "D" {
         return A_Index
     }
 }
 
+/**
+ * 鼠标是否悬浮在指定窗口上
+ * @param WinTitle  窗口标题
+ * @returns 是否悬浮在窗口上
+ */
 isMouseOver(WinTitle) {
     try {
         MouseGetPos(, , &Win)
@@ -22,6 +38,11 @@ isMouseOver(WinTitle) {
     return 0
 }
 
+/**
+ * 替换环境变量中的变量
+ * @param {String} str 环境变量
+ * @returns {String} 替换后的字符串
+ */
 replaceEnvVariables(str) {
     while RegExMatch(str, "%\w+%", &match) {
         env := match[]

@@ -84,5 +84,5 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
 }
 
 ; 如果有修改代码的需求，你应该写在此行之前
-; 此行之后的普通代码，都会因为死循环而无效
+; 此行之后的逻辑代码，都会因为 show.ahk 中的死循环而无效
 #Include ./utils/show.ahk

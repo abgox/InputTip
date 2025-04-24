@@ -639,7 +639,7 @@ getFontList() {
 
 /**
  * 启动 JAB 进程
- * @returns {1|0} 1/0: 是否存在错误
+ * @returns {1 | 0} 1/0: 是否存在错误
  */
 runJAB() {
     if (A_IsCompiled) {
@@ -673,8 +673,8 @@ runJAB() {
 }
 /**
  * 停止 JAB 进程
- * @param {1|0} wait 等待停止进程
- * @param {0|1} delete 停止进程后，是否需要删除进程文件
+ * @param {1 | 0} wait 等待停止进程
+ * @param {1 | 0} delete 停止进程后，是否需要删除相关任务计划程序
  */
 killJAB(wait := 1, delete := 0) {
     if (A_IsAdmin) {
@@ -683,11 +683,6 @@ killJAB(wait := 1, delete := 0) {
             wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
         }
         if (delete) {
-            if (A_IsCompiled) {
-                try {
-                    FileDelete("InputTip.JAB.JetBrains.exe")
-                }
-            }
             try {
                 Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
             }

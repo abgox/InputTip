@@ -96,6 +96,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
             _checkUpdate()
         }
         _checkUpdate() {
+            static needSilentTip := 1
             if (A_IsCompiled) {
                 checkVersion(currentVersion, updateConfirm)
                 updateConfirm(newVersion, url) {
@@ -161,17 +162,20 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                     }
 
                     if (silent) {
-                        A_TrayMenu.Insert("开机自启动", "准备静默更新......", _do)
-                        A_TrayMenu.Insert("开机自启动", "正在等待电脑空闲......", _do)
-                        _do(*) {
-                        }
-                        A_TrayMenu.Insert("开机自启动")
-                        SetTimer(updateNewVersionTimer, 10000)
-                        updateNewVersionTimer() {
-                            ; 3 分钟内没有鼠标和键盘操作，视为电脑休闲时间，则自动更新
-                            if (A_TimeIdle > 1000 * 60 * 3) {
-                                updateNewVersion()
-                                SetTimer(, 0)
+                        if (needSilentTip) {
+                            needSilentTip := 0
+                            A_TrayMenu.Insert("开机自启动", "准备静默更新......", _do)
+                            A_TrayMenu.Insert("开机自启动", "正在等待电脑空闲......", _do)
+                            _do(*) {
+                            }
+                            A_TrayMenu.Insert("开机自启动")
+                            SetTimer(updateNewVersionTimer, 10000)
+                            updateNewVersionTimer() {
+                                ; 3 分钟内没有鼠标和键盘操作，视为电脑休闲时间，则自动更新
+                                if (A_TimeIdle > 1000 * 60 * 3) {
+                                    updateNewVersion()
+                                    SetTimer(, 0)
+                                }
                             }
                         }
                         return

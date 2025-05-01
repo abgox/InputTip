@@ -604,15 +604,13 @@ getCursorDir() {
  * 解析图片符号文件夹目录，并生成路径列表
  * @returns {Array} 路径列表
  */
-getPicDir() {
+getPicList() {
     picList := ":"
     defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
     disableList := ":InputTipSymbol\default\offer.png:InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:"
     Loop Files "InputTipSymbol\*", "R" {
-        if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":")) {
-            if (!InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
-                picList .= A_LoopFilePath ":"
-            }
+        if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":") && !InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
+            picList .= A_LoopFilePath ":"
         }
     }
 

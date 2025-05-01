@@ -66,12 +66,10 @@ class IME {
             } else if (ruleValue == "oddNum") { ; 如果值是奇数
                 isMatch := value & 1
             } else {
-                str := "/" value "/"
-                isMatch := InStr(str, "/" ruleValue "/")
+                isMatch := InStr("/" ruleValue "/", "/" value "/")
             }
             return isMatch
         }
-
         return status
     }
 

@@ -354,9 +354,9 @@ fn_config(*) {
         g.AddText("xs", line)
         g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的「刷新路径列表」`n如果选择第 1 个空白路径，则不会显示对应状态的图片符号")
         g.AddText(, "选择图片符号的文件路径: ")
-        dirList := StrSplit(picDir, ":")
-        if (dirList.Length = 0) {
-            dirList := getPicDir()
+        picList := StrSplit(picDir, ":")
+        if (picList.Length = 0) {
+            picList := getPicList()
         }
         for i, v in ["CN", "EN", "Caps"] {
             __ := g.AddText("xs", i ".")
@@ -370,7 +370,7 @@ fn_config(*) {
                 gc._focusSymbolPic.OnEvent("LoseFocus", fn_clear)
             }
 
-            _ := g.AddDropDownList("xs r9 w" bw, dirList)
+            _ := g.AddDropDownList("xs r9 w" bw, picList)
             _._config := v "_pic"
             _.OnEvent("Change", e_pic_path)
             e_pic_path(item, *) {

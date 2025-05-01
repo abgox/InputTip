@@ -184,7 +184,7 @@ cursorDir := readIni("cursorDir", "")
 
 SetTimer(getDirTimer, -1)
 getDirTimer() {
-    _picDir := arrJoin(getPicDir(), ":")
+    _picDir := arrJoin(getPicList(), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
     if (picDir != _picDir) {
         global picDir := _picDir

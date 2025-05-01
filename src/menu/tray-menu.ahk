@@ -56,8 +56,11 @@ makeTrayMenu() {
         if (isStartUp = 1) {
             FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
         } else {
-            target := A_IsCompiled ? A_ScriptFullPath : A_ScriptDir "\..\InputTip.bat"
-            FileCreateShortcut(target, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+            if (A_IsCompiled) {
+                FileCreateShortcut(A_ScriptFullPath, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+            } else {
+                FileCreateShortcut(A_AhkPath, A_Desktop "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
+            }
         }
     }
 
@@ -601,15 +604,13 @@ getCursorDir() {
  * 解析图片符号文件夹目录，并生成路径列表
  * @returns {Array} 路径列表
  */
-getPicDir() {
+getPicList() {
     picList := ":"
     defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
     disableList := ":InputTipSymbol\default\offer.png:InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:"
     Loop Files "InputTipSymbol\*", "R" {
-        if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":")) {
-            if (!InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
-                picList .= A_LoopFilePath ":"
-            }
+        if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":") && !InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
+            picList .= A_LoopFilePath ":"
         }
     }
 

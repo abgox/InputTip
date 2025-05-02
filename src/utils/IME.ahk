@@ -210,13 +210,13 @@ switch_CN(pressKey := "", *) {
         SendInput("{CapsLock}")
     }
     Sleep(50)
-    if (useShift) {
+    if (useShift = 1) {
         if (!isCN()) {
             SendInput("{LShift}")
-            Sleep(50)
-            if (!isCN()) {
-                SendInput("{RShift}")
-            }
+        }
+    } else if (useShift = 2) {
+        if (!isCN()) {
+            SendInput("{RShift}")
         }
     } else {
         IME.SetInputMode(1)
@@ -240,13 +240,13 @@ switch_EN(pressKey := "", *) {
         SendInput("{CapsLock}")
     }
     Sleep(50)
-    if (useShift) {
+    if (useShift = 1) {
         if (isCN()) {
             SendInput("{LShift}")
-            Sleep(50)
-            if (isCN()) {
-                SendInput("{RShift}")
-            }
+        }
+    } else if (useShift = 2) {
+        if (isCN()) {
+            SendInput("{RShift}")
         }
     } else {
         IME.SetInputMode(0)

@@ -19,7 +19,7 @@ fn_input_mode(*) {
 
         g := createGuiOpt("InputTip - 设置输入法模式")
         gc.modeList := ["【自定义】", "【通用】"]
-        tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义"])
+        tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义", "关于切换输入法状态"])
         tab.UseTab(1)
         g.AddText("Section cRed", "如果【通用】模式不可用，需要点击上方的「自定义」标签页去配置【自定义】模式")
 
@@ -47,53 +47,17 @@ fn_input_mode(*) {
             restartJAB()
         }
         timeout.Value := checkTimeout
-        g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接显示英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
-        g.AddText("xs", "3. Shift 键是否可以正常切换输入法状态: ")
-        gc.useShift := g.AddDropDownList("yp Choose" useShift + 1, ["【否】(慎重选择)", "【是】"])
+        g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
+        g.AddText("xs", "3. 指定内部实现切换输入法状态的方式: ")
+        gc.useShift := g.AddDropDownList("yp Choose" useShift + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift"])
         gc.useShift.OnEvent("Change", e_useShift)
         e_useShift(item, *) {
-            if (useShift = item.value) {
-                if (gc.w.shiftSwitchGui) {
-                    gc.w.shiftSwitchGui.Destroy()
-                    gc.w.shiftSwitchGui := ""
-                }
-                createGui(warningGui).Show()
-                warningGui(info) {
-                    gc.useShift.Value := useShift + 1
-
-                    g := createGuiOpt("InputTip - 警告")
-                    g.AddText(, "确定要使用【否】吗？")
-                    g.AddText("cRed", "除非你的输入法自定义了切换状态的按键，且禁用了 Shift 切换，才需要选择【否】`n如果选择【否】，在美式键盘(ENG)或部分特殊输入法中，可能会导致状态提示间歇性错误")
-                    g.AddText("cRed", "建议不要使用【否】，而是启用 Shift 切换状态，这也是几乎所有输入法的默认设置")
-
-                    if (info.i) {
-                        return g
-                    }
-                    w := info.w
-                    bw := w - g.MarginX * 2
-
-                    g.AddButton("w" bw, "我确定要使用【否】").OnEvent("Click", e_yes)
-                    g.AddButton("w" bw, "我只是不小心点错了").OnEvent("Click", e_no)
-                    e_yes(*) {
-                        g.Destroy()
-                        gc.useShift.Value := 1
-                        writeIni("useShift", 0)
-                        global useShift := 0
-                    }
-                    e_no(*) {
-                        g.Destroy()
-                    }
-                    gc.w.shiftSwitchGui := g
-                    return g
-                }
-            } else {
-                value := item.value - 1
-                writeIni("useShift", value)
-                global useShift := value
-                restartJAB()
-            }
+            value := item.value - 1
+            writeIni("useShift", value)
+            global useShift := value
+            restartJAB()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" w, "除非你的输入法自定义了切换状态的按键，且禁用了 Shift 切换，才需要选择【否】`n如果选择【否】，在美式键盘(ENG)或部分特殊输入法中，可能会导致状态提示间歇性错误")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" w, "如果想修改这个配置，需要先通过上方的「关于切换输入法状态」标签页了解详情")
         tab.UseTab(2)
 
         g.AddText("Section ReadOnly cRed -VScroll w" w, "首先需要点击上方的「关于自定义」标签页，查看帮助说明，了解如何设置")
@@ -107,7 +71,7 @@ fn_input_mode(*) {
             global baseStatus := value
         }
 
-        gc.input_mode_LV := _ := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Grid w" w, ["匹配的顺序", "状态码规则", "切换码规则", "输入法状态"])
+        gc.input_mode_LV := _ := g.AddListView("xs -LV0x10 -Multi r4 NoSortHdr Grid w" w, ["匹配的顺序", "状态码规则", "切换码规则", "输入法状态"])
         fn_reloading_LV(_)
 
         _.OnEvent("DoubleClick", e_edit)
@@ -361,6 +325,10 @@ fn_input_mode(*) {
         g.AddText("cRed", "使用【自定义】模式之前，务必仔细阅读下方的帮助说明，查看相关链接")
         g.AddEdit("Section r12 ReadOnly w" w, "1. 为什么需要【自定义】模式`n   - InputTip 是通过系统返回的状态码和切换码来判断当前的输入法状态的`n   - 对于多数常用的输入法来说【通用】模式是可以正常识别的`n   - 但是部分输入法会使系统返回的状态码和切换码很特殊，无法统一处理`n   - 在这种情况下，就需要用户通过规则来告诉 InputTip 当前的输入法状态`n`n2. 【自定义】模式的工作机制`n   - InputTip 会从系统获取到当前的状态码和切换码，通过定义的规则列表进行顺序匹配`n   - 每一条规则对应一种输入法状态，如果匹配成功，则判断为此状态`n   - 因此，如果你同时使用多个输入法，可以尝试通过【自定义】模式实现兼容`n`n3. 默认状态`n   -「如果所有规则都不匹配，应该判断为」这个配置项会指定一个默认状态`n   - 如果规则列表中的所有规则都没有匹配成功，就会使用这个默认状态`n`n4. 规则列表`n   - 规则列表就是上方的「自定义」标签页中的表格`n   - 添加规则: 点击「添加规则」按钮，在弹窗中进行规则设置`n   - 修改规则: 双击规则列表中已经存在的任意一条规则，在弹窗中进行规则修改`n   - 删除规则: 双击规则列表中已经存在的任意一条规则，在弹窗中点击「删除此条规则」`n`n5. 规则设置`n   - 点击「显示实时的状态码和切换码」，通过切换输入法状态，查看不同状态下的区别`n   - 当点击「添加规则」按钮后，会出现一个规则设置弹窗`n   - 弹窗中包含 4 个设置: 匹配的顺序、输入法状态、状态码规则、切换码规则`n      - 匹配的顺序：用来指定这一条规则在规则列表中的顺序`n      - 其余 3 个设置会在下方逐个解释`n`n6. 规则设置 —— 输入法状态`n   - 它用来指定这一条规则对应的输入法状态`n   - 当这一条规则匹配成功后，InputTip 就会认为当前输入法状态为这一状态`n`n7. 规则设置 —— 状态码规则、切换码规则`n   - 有两种形式可以选择: 指定数字或指定规律`n   - 这两种形式只能选择其中一种，它们会在下方进行详细解释`n   - 需要注意的是，你可以同时设置状态码规则和切换码规则`n   - 如果同时设置，则表示此条规则需要状态码规则和切换码规则都匹配`n`n8. 规则设置 —— 指定数字`n   - 你可以填入一个或多个数字，只要其中有一个数字匹配成功即可`n   - 如果是多个数字，需要使用 / 连接 (如: 1/3/5)`n   - 如: 你希望当状态码为 1 时匹配到这条规则，在「状态码规则」中填入 1 即可`n   - 如: 你希望当切换码为 1 或 3 时匹配到这条规则，在「切换码规则」中填入 1/3 即可`n`n9. 规则设置 —— 指定规律`n   - 由于部分输入法会使系统返回的状态码和切换码很特殊，呈现某种规律`n   - 比如随机奇数，这种情况无法通过指定数字来表示，因为不可能填入所有的奇数`n   - 对于这种情况，就可以通过指定规律来实现，在下拉列表中选择对应规律即可`n   - 如: 你希望当状态码为随机奇数时匹配到这条规则，选择「使用奇数」即可")
         g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/custom-input-mode">自定义模式</a>   <a href="https://inputtip.abgox.com/v2/#输入法兼容情况">输入法兼容情况</a>')
+
+        tab.UseTab(4)
+        g.AddEdit("Section r13 ReadOnly w" w, "1. 「指定内部实现切换输入法状态的方式」`n   - InputTip 中的以下功能需要 InputTip 来切换输入法状态`n      -「设置状态切换快捷键」`n      -「指定窗口自动切换状态」`n   - 比如通过「设置状态切换快捷键」设置了 LShift 来切换英文状态`n      - LShift 就是键盘左侧的 Shift 键，以此类推`n      - 当按下 LShift 后，如果当前状态不是英文，就需要 InputTip 自动切换输入法状态`n   - 配置项有 3 个可选值，你需要根据实际情况，选择合适的方式`n      - 模拟输入 LShift`n      - 模拟输入 RShift`n      - 内部调用 DLL`n`n2. 可选值 —— 模拟输入 LShift`n   - 当需要切换输入法状态时，InputTip 会模拟输入一个 LShift 键`n   - 这相当于 InputTip 帮你按了一次键盘左侧的 Shift 键`n   - 只要使用的输入法可以通过左侧的 Shift 键切换输入法状态，就应该使用它`n`n3. 可选值 —— 模拟输入 RShift`n   - 当需要切换输入法状态时，InputTip 会模拟输入一个 RShift 键`n   - 这相当于 InputTip 帮你按了一次键盘右侧的 Shift 键`n   - 只要使用的输入法可以通过右侧的 Shift 键切换输入法状态，就应该使用它`n`n4. 可选值 —— 内部调用 DLL`n   - 当需要切换输入法状态时，InputTip 会直接调用 DLL 接口去设置输入法状态`n   - 这种方式是一种强行设置行为，可能会导致以下问题，不建议使用`n      - 对于部分输入法可能无效`n      - 当需要设置为中文状态时，没有中文状态的键盘(如: 美式键盘)，也会被强行设置`n      - 这会导致基于此的鼠标样式和符号出现暂时的显示错误")
+        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/v2/#输入法兼容情况">输入法兼容情况</a>')
         g.OnEvent("Close", e_close)
         e_close(*) {
             g.Destroy()

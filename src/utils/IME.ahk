@@ -209,18 +209,17 @@ switch_CN(pressKey := "", *) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
-    if (!useShift) {
-        if (isCN()) {
-            IME.SetInputMode(1)
-        }
-    }
     Sleep(50)
-    if (!isCN()) {
-        SendInput("{LShift}")
-        Sleep(50)
+    if (useShift) {
         if (!isCN()) {
-            SendInput("{RShift}")
+            SendInput("{LShift}")
+            Sleep(50)
+            if (!isCN()) {
+                SendInput("{RShift}")
+            }
         }
+    } else {
+        IME.SetInputMode(1)
     }
 }
 /**
@@ -240,18 +239,17 @@ switch_EN(pressKey := "", *) {
     if (GetKeyState("CapsLock", "T")) {
         SendInput("{CapsLock}")
     }
-    if (!useShift) {
-        if (isCN()) {
-            IME.SetInputMode(0)
-        }
-    }
     Sleep(50)
-    if (isCN()) {
-        SendInput("{LShift}")
-        Sleep(50)
+    if (useShift) {
         if (isCN()) {
-            SendInput("{RShift}")
+            SendInput("{LShift}")
+            Sleep(50)
+            if (isCN()) {
+                SendInput("{RShift}")
+            }
         }
+    } else {
+        IME.SetInputMode(0)
     }
 }
 /**

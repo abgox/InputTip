@@ -40,7 +40,7 @@ fn_JAB(item, *) {
         SetTimer(killAppTimer, -1)
         killAppTimer() {
             try {
-                killJAB(1, A_IsCompiled | A_IsAdmin)
+                killJAB(1, A_IsCompiled || A_IsAdmin)
             }
         }
     }

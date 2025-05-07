@@ -53,6 +53,8 @@ gc := {
         updateUserGui: "",
         ; 设置输入法模式
         inputModeGui: "",
+        ; 显示实时的状态码和切换码的快捷键
+        showCodeHotkeyGui: "",
         ; 设置光标获取模式
         cursorModeGui: "",
         ; 设置符号显示位置
@@ -102,6 +104,11 @@ if (A_IsCompiled) {
     if (runCodeWithAdmin && !A_IsAdmin) {
         try {
             Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
+        } catch {
+            createTipGui([{
+                opt: "cRed",
+                text: "以管理员权限启动 InputTip 失败",
+            }], "InputTip - 错误").Show()
         }
     }
 }
@@ -133,6 +140,11 @@ if (hotkey_Caps) {
 if (hotkey_Pause) {
     try {
         Hotkey(hotkey_Pause, pauseApp)
+    }
+}
+if (hotkey_ShowCode) {
+    try {
+        Hotkey(hotkey_ShowCode, showCode)
     }
 }
 

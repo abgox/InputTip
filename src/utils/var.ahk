@@ -66,14 +66,16 @@ isStartUp := readIni("isStartUp", 0)
 ; 启用 JAB/JetBrains 支持
 enableJABSupport := readIni("enableJABSupport", 0)
 
-; 中文快捷键
+; 快捷键: 切换到中文
 hotkey_CN := readIni('hotkey_CN', '')
-; 英文快捷键
+; 快捷键: 切换到英文
 hotkey_EN := readIni('hotkey_EN', '')
-; 大写锁定快捷键
+; 快捷键: 切换到大写锁定
 hotkey_Caps := readIni('hotkey_Caps', '')
-; 软件启停快捷键
+; 快捷键: 软件启停
 hotkey_Pause := readIni('hotkey_Pause', '')
+; 快捷键: 实时显示状态码和切换码
+hotkey_ShowCode := readIni('hotkey_ShowCode', '')
 
 stateMap := {
     CN: "中文状态",
@@ -667,5 +669,33 @@ updateCursorMode(init := 0) {
     }
     for item in modeNameList {
         modeList.%item% .= %item% ":"
+    }
+}
+
+; 显示实时的状态码和切换码
+showCode(*) {
+    if (gc.timer) {
+        gc.timer := 0
+        try {
+            gc.status_btn.Text := "显示实时的状态码和切换码(双击设置快捷键)"
+        }
+        return
+    }
+
+    gc.timer := 1
+    try {
+        gc.status_btn.Text := "停止显示实时的状态码和切换码(双击设置快捷键)"
+    }
+
+    SetTimer(statusTimer, 25)
+    statusTimer() {
+        if (!gc.timer) {
+            ToolTip()
+            SetTimer(, 0)
+            return
+        }
+
+        info := IME.CheckInputMode()
+        ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
     }
 }

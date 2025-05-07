@@ -297,30 +297,110 @@ fn_input_mode(*) {
             return colList
         }
 
-        gc.status_btn := g.AddButton("xs w" w, "显示实时的状态码和切换码")
-        gc.status_btn.OnEvent("Click", e_showStatus)
-        e_showStatus(*) {
-            if (gc.timer) {
-                gc.timer := 0
-                gc.status_btn.Text := "显示实时的状态码和切换码"
-                return
+        gc.status_btn := g.AddButton("xs w" w, "显示实时的状态码和切换码(双击设置快捷键)")
+        gc.status_btn.OnEvent("Click", showCode)
+        gc.status_btn.OnEvent("DoubleClick", showCodeHotkey)
+        showCodeHotkey(*) {
+            gc.status_btn.Text := "显示实时的状态码和切换码(双击设置快捷键)"
+            gc.timer := 0
+
+            if (gc.w.showCodeHotkeyGui) {
+                gc.w.showCodeHotkeyGui.Destroy()
+                gc.w.showCodeHotkeyGui := ""
             }
+            line := "------------------------------------------------------------------------------------"
+            createGui(pauseKeyGui).Show()
+            pauseKeyGui(info) {
+                g := createGuiOpt("InputTip - 设置显示实时的状态码和切换码的快捷键")
+                tab := g.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
+                tab.UseTab(1)
+                g.AddText("Section", "1.")
+                g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
+                g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
+                g.AddText("xs", "3.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
 
-            gc.timer := 1
-            gc.status_btn.Text := "停止显示实时的状态码和切换码"
+                if (info.i) {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
 
-            SetTimer(statusTimer, 25)
-            statusTimer() {
-                if (!gc.timer) {
-                    ToolTip()
-                    SetTimer(, 0)
-                    return
+                g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
+                g.AddText("xs cRed", "显示实时的状态码和切换码")
+                g.AddText("yp", "的快捷键: ")
+
+                value := readIni('hotkey_ShowCode', '')
+                gc.hotkey_ShowCode := g.AddHotkey("yp", StrReplace(value, "#", ""))
+                gc.hotkey_ShowCode.OnEvent("Change", e_change_hotkey)
+                e_change_hotkey(item, *) {
+                    ; 同步修改到「手动输入快捷键」
+                    v := item.value
+                    if (gc.win.Value) {
+                        v := "#" v
+                    }
+                    gc.hotkey_ShowCode2.Value := v
+                }
+                gc.win := g.AddCheckbox("yp", "Win 键")
+                gc.win.OnEvent("Click", e_win_key)
+                e_win_key(item, *) {
+                    ; 同步修改到「手动输入快捷键」
+                    v := gc.hotkey_ShowCode.Value
+                    if (item.value) {
+                        gc.hotkey_ShowCode2.Value := "#" v
+                    } else {
+                        gc.hotkey_ShowCode2.Value := v
+                    }
+                }
+                gc.win.Value := InStr(value, "#") ? 1 : 0
+
+                tab.UseTab(2)
+                g.AddText("Section", "1.")
+                g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
+                g.AddText("xs", "2.")
+                g.AddText("yp cRed", "优先使用「设置组合快捷键」进行设置，除非因为快捷键占用无法设置")
+                g.AddText("xs", '3.  这里会回显它的设置，建议先使用它，然后回到此处适当修改')
+                g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
+
+                g.AddText("xs cRed", "显示实时的状态码和切换码")
+                g.AddText("yp", "的快捷键: ")
+                value := readIni('hotkey_ShowCode', '')
+
+                gc.hotkey_ShowCode2 := g.AddEdit("yp")
+                gc.hotkey_ShowCode2.Value := readIni("hotkey_ShowCode", '')
+                gc.hotkey_ShowCode2.OnEvent("Change", e_change_hotkey2)
+                e_change_hotkey2(item, *) {
+                    gc.win.Value := InStr(item.value, "#") ? 1 : 0
+                    if (item.value ~= "^~\w+\sUp$") {
+                        gc.hotkey_ShowCode.Value := ""
+                    } else {
+                        ; 当输入的快捷键符合组合快捷键时，同步修改
+                        try {
+                            gc.hotkey_ShowCode.Value := StrReplace(item.value, "#", "")
+                        } catch {
+                            gc.hotkey_ShowCode.Value := ""
+                        }
+                    }
+                }
+                tab.UseTab(0)
+                g.AddButton("Section w" bw, "确定").OnEvent("Click", e_yes)
+                e_yes(*) {
+                    value := gc.hotkey_ShowCode.value
+                    if (gc.win.Value) {
+                        key := "#" value
+                    } else {
+                        key := value
+                    }
+                    writeIni("hotkey_ShowCode", key)
+                    fn_restart()
                 }
 
-                info := IME.CheckInputMode()
-                ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
+                g.AddText("cGray", "此快捷键用于当出现基于状态错误的问题时快速显示实时的状态码和切换码以排查问题")
+
+                gc.w.showCodeHotkeyGui := g
+                return g
             }
         }
+
         tab.UseTab(3)
         g.AddText("cRed", "使用【自定义】模式之前，务必仔细阅读下方的帮助说明，查看相关链接")
         g.AddEdit("Section r12 ReadOnly w" w, "1. 为什么需要【自定义】模式`n   - InputTip 是通过系统返回的状态码和切换码来判断当前的输入法状态的`n   - 对于多数常用的输入法来说【通用】模式是可以正常识别的`n   - 但是部分输入法会使系统返回的状态码和切换码很特殊，无法统一处理`n   - 在这种情况下，就需要用户通过规则来告诉 InputTip 当前的输入法状态`n`n2. 【自定义】模式的工作机制`n   - InputTip 会从系统获取到当前的状态码和切换码，通过定义的规则列表进行顺序匹配`n   - 每一条规则对应一种输入法状态，如果匹配成功，则判断为此状态`n   - 因此，如果你同时使用多个输入法，可以尝试通过【自定义】模式实现兼容`n`n3. 默认状态`n   -「如果所有规则都不匹配，应该判断为」这个配置项会指定一个默认状态`n   - 如果规则列表中的所有规则都没有匹配成功，就会使用这个默认状态`n`n4. 规则列表`n   - 规则列表就是上方的「自定义」标签页中的表格`n   - 添加规则: 点击「添加规则」按钮，在弹窗中进行规则设置`n   - 修改规则: 双击规则列表中已经存在的任意一条规则，在弹窗中进行规则修改`n   - 删除规则: 双击规则列表中已经存在的任意一条规则，在弹窗中点击「删除此条规则」`n`n5. 规则设置`n   - 点击「显示实时的状态码和切换码」，通过切换输入法状态，查看不同状态下的区别`n   - 当点击「添加规则」按钮后，会出现一个规则设置弹窗`n   - 弹窗中包含 4 个设置: 匹配的顺序、输入法状态、状态码规则、切换码规则`n      - 匹配的顺序：用来指定这一条规则在规则列表中的顺序`n      - 其余 3 个设置会在下方逐个解释`n`n6. 规则设置 —— 输入法状态`n   - 它用来指定这一条规则对应的输入法状态`n   - 当这一条规则匹配成功后，InputTip 就会认为当前输入法状态为这一状态`n`n7. 规则设置 —— 状态码规则、切换码规则`n   - 有两种形式可以选择: 指定数字或指定规律`n   - 这两种形式只能选择其中一种，它们会在下方进行详细解释`n   - 需要注意的是，你可以同时设置状态码规则和切换码规则`n   - 如果同时设置，则表示此条规则需要状态码规则和切换码规则都匹配`n`n8. 规则设置 —— 指定数字`n   - 你可以填入一个或多个数字，只要其中有一个数字匹配成功即可`n   - 如果是多个数字，需要使用 / 连接 (如: 1/3/5)`n   - 如: 你希望当状态码为 1 时匹配到这条规则，在「状态码规则」中填入 1 即可`n   - 如: 你希望当切换码为 1 或 3 时匹配到这条规则，在「切换码规则」中填入 1/3 即可`n`n9. 规则设置 —— 指定规律`n   - 由于部分输入法会使系统返回的状态码和切换码很特殊，呈现某种规律`n   - 比如随机奇数，这种情况无法通过指定数字来表示，因为不可能填入所有的奇数`n   - 对于这种情况，就可以通过指定规律来实现，在下拉列表中选择对应规律即可`n   - 如: 你希望当状态码为随机奇数时匹配到这条规则，选择「使用奇数」即可")

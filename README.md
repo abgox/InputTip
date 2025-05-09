@@ -31,6 +31,7 @@
 >
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被错误判断为病毒程序或游戏外挂](https://inputtip.abgox.com/FAQ/about-virus)
+>   - [推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 > - InputTip 只适用于 **Windows** 系统(**Win10** 以上可用，以下未知)
 > - `托盘菜单` 指的是在底部任务栏右边的 InputTip 软件托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
@@ -39,20 +40,16 @@
 
 - 一个实时的输入法状态提示工具
 
-  - 根据输入法状态同步修改鼠标样式
-    - [自定义鼠标样式](#自定义鼠标样式)
-    - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
-      - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
-      - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
-  - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-    - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
+  - [多种状态提示方案](#关于状态提示方案)
+    - 使用多套鼠标样式，根据输入法状态加载不同的鼠标样式
+    - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
   - 切换不同应用窗口时，自动切换到指定的输入法状态
   - 指定按键强制切换输入法状态
   - 详细便捷的配置菜单
     - 所有的配置变动，都只应该在 `托盘菜单` 中进行
     - 不要手动修改 `InputTip.ini` 文件
 
-[**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**](#stars)
+[**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star**](#stars)
 
 ### 新的变化
 
@@ -211,10 +208,40 @@
    - 如果未完全恢复，请根据弹窗提示信息进行操作
 3. 删除以上所有文件或目录
 
+### 关于状态提示方案
+
+1. `鼠标样式方案`
+
+   - 使用多套鼠标样式，根据输入法状态加载不同的鼠标样式
+   - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
+     - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
+     - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
+   - [自定义鼠标样式](#自定义鼠标样式)
+
+2. `符号显示方案`
+
+   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
+   - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
+   - 需要注意:
+     - 此方案涉及到获取应用窗口中的输入光标位置信息
+     - InputTip 将通过指定的光标获取模式尝试获取到输入光标位置信息
+     - 你可以通过 `设置光标获取模式` 显示指定应用使用哪种模式
+       - 如果获取不到:
+         - 符号无法显示
+         - 这就只能使用 `鼠标样式方案` 或者 `设置符号显示位置`
+       - 获取到了，但符号位置有偏差(此应用中，所有窗口的偏差相同):
+         - 符号会显示，但符号显示的位置有偏差
+         - 由于偏差相同，可以通过 `偏移量`、`设置特殊偏移量` 解决
+       - 获取到了，但符号位置有偏差(此应用中，有窗口的偏差不同):
+         - 符号会显示，但符号显示的位置有偏差
+         - 由于偏差不同，无论如何设置，都会有窗口出现位置错误，目前无解
+         - 参考示例: [vscode v1.100 版本中编辑界面和终端界面符号位置有偏差](https://github.com/abgox/InputTip/issues/172)
+
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
 
 > [!Tip]
 >
+> - 如果只使用 `鼠标样式方案`，不需要进行以下步骤
 > - https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains
 > - [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 > - 如果有其他 JAB 程序，也可以按照此步骤进行设置
@@ -428,7 +455,7 @@
 
 ### Stars
 
-**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star ⭐**
+**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star**
 
 <a href="https://github.com/abgox/InputTip">
   <picture>

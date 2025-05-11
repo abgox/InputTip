@@ -304,101 +304,10 @@ fn_input_mode(*) {
             gc.status_btn.Text := "显示实时的状态码和切换码(双击设置快捷键)"
             gc.timer := 0
 
-            if (gc.w.showCodeHotkeyGui) {
-                gc.w.showCodeHotkeyGui.Destroy()
-                gc.w.showCodeHotkeyGui := ""
-            }
-            line := "------------------------------------------------------------------------------------"
-            createGui(pauseKeyGui).Show()
-            pauseKeyGui(info) {
-                g := createGuiOpt("InputTip - 设置显示实时的状态码和切换码的快捷键")
-                tab := g.AddTab3("-Wrap", ["设置组合快捷键", "手动输入快捷键"])
-                tab.UseTab(1)
-                g.AddText("Section", "1.")
-                g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
-                g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
-                g.AddText("xs", "3.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
-
-                if (info.i) {
-                    return g
-                }
-                w := info.w
-                bw := w - g.MarginX * 2
-
-                g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
-                g.AddText("xs cRed", "显示实时的状态码和切换码")
-                g.AddText("yp", "的快捷键: ")
-
-                value := readIni('hotkey_ShowCode', '')
-                gc.hotkey_ShowCode := g.AddHotkey("yp", StrReplace(value, "#", ""))
-                gc.hotkey_ShowCode.OnEvent("Change", e_change_hotkey)
-                e_change_hotkey(item, *) {
-                    ; 同步修改到「手动输入快捷键」
-                    v := item.value
-                    if (gc.win.Value) {
-                        v := "#" v
-                    }
-                    gc.hotkey_ShowCode2.Value := v
-                }
-                gc.win := g.AddCheckbox("yp", "Win 键")
-                gc.win.OnEvent("Click", e_win_key)
-                e_win_key(item, *) {
-                    ; 同步修改到「手动输入快捷键」
-                    v := gc.hotkey_ShowCode.Value
-                    if (item.value) {
-                        gc.hotkey_ShowCode2.Value := "#" v
-                    } else {
-                        gc.hotkey_ShowCode2.Value := v
-                    }
-                }
-                gc.win.Value := InStr(value, "#") ? 1 : 0
-
-                tab.UseTab(2)
-                g.AddText("Section", "1.")
-                g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
-                g.AddText("xs", "2.")
-                g.AddText("yp cRed", "优先使用「设置组合快捷键」进行设置，除非因为快捷键占用无法设置")
-                g.AddText("xs", '3.  这里会回显它的设置，建议先使用它，然后回到此处适当修改')
-                g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
-
-                g.AddText("xs cRed", "显示实时的状态码和切换码")
-                g.AddText("yp", "的快捷键: ")
-                value := readIni('hotkey_ShowCode', '')
-
-                gc.hotkey_ShowCode2 := g.AddEdit("yp")
-                gc.hotkey_ShowCode2.Value := readIni("hotkey_ShowCode", '')
-                gc.hotkey_ShowCode2.OnEvent("Change", e_change_hotkey2)
-                e_change_hotkey2(item, *) {
-                    gc.win.Value := InStr(item.value, "#") ? 1 : 0
-                    if (item.value ~= "^~\w+\sUp$") {
-                        gc.hotkey_ShowCode.Value := ""
-                    } else {
-                        ; 当输入的快捷键符合组合快捷键时，同步修改
-                        try {
-                            gc.hotkey_ShowCode.Value := StrReplace(item.value, "#", "")
-                        } catch {
-                            gc.hotkey_ShowCode.Value := ""
-                        }
-                    }
-                }
-                tab.UseTab(0)
-                g.AddButton("Section w" bw, "确定").OnEvent("Click", e_yes)
-                e_yes(*) {
-                    value := gc.hotkey_ShowCode.value
-                    if (gc.win.Value) {
-                        key := "#" value
-                    } else {
-                        key := value
-                    }
-                    writeIni("hotkey_ShowCode", key)
-                    fn_restart()
-                }
-
-                g.AddText("cGray", "此快捷键用于当出现基于状态错误的问题时快速显示实时的状态码和切换码以排查问题")
-
-                gc.w.showCodeHotkeyGui := g
-                return g
-            }
+            setHotKeyGui([{
+                config: "hotkey_ShowCode",
+                tip: "显示实时的状态码和切换码"
+            }], "显示实时的状态码和切换码")
         }
 
         tab.UseTab(3)

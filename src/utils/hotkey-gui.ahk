@@ -1,14 +1,25 @@
 ; InputTip
 
-fn_switch_key(*) {
-    if (gc.w.switchKeyGui) {
-        gc.w.switchKeyGui.Destroy()
-        gc.w.switchKeyGui := ""
+/**
+ * 设置快捷键
+ * @param keyConfigList 配置项
+ * @param label 窗口标题
+ * @example
+ * setHotKeyGui([{
+ * config: "hotkey_Pause", ; 要写入的配置项
+ * preTip: "设置快捷键", ; 快捷键功能描述前缀，可省略
+ * tip: "暂停/运行" ; 快捷键功能描述
+ * }], "软件暂停/运行")
+ */
+setHotKeyGui(keyConfigList, label := "") {
+    if (gc.w.hotKeyGui) {
+        gc.w.hotKeyGui.Destroy()
+        gc.w.hotKeyGui := ""
     }
-    line := "--------------------------------------------------------------------------------------------"
-    createGui(keyGui).Show()
-    keyGui(info) {
-        g := createGuiOpt("InputTip - 设置强制切换输入法状态的快捷键")
+    line := "------------------------------------------------------------------------------------"
+    createGui(hotKeyGui).Show()
+    hotKeyGui(info) {
+        g := createGuiOpt("InputTip - 设置快捷键" (label ? " —— " label : ""))
         tab := g.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
         tab.UseTab(1)
         g.AddText("Section", "1.")
@@ -24,20 +35,6 @@ fn_switch_key(*) {
 
         g.AddLink("xs", "4.  如果要移除快捷键，请选择「无」")
         g.AddLink("xs", '5.  <a href="https://inputtip.abgox.com/FAQ/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
-        keyConfigList := [{
-            config: "hotkey_CN",
-            tip: "中文状态",
-            with: "win_CN",
-        }, {
-            config: "hotkey_EN",
-            tip: "英文状态",
-            with: "win_EN",
-        }, {
-            config: "hotkey_Caps",
-            tip: "大写锁定",
-            with: "win_Caps",
-        }]
-
 
         keyList := []
         keyList.Push(["无", "Esc", "Shift", "LShift", "RShift", "Ctrl", "LCtrl", "RCtrl", "Alt", "LAlt", "RAlt"]*)
@@ -58,13 +55,18 @@ fn_switch_key(*) {
         }
 
         for v in keyConfigList {
-            g.AddText("xs", "强制切换到")
-            g.AddText("yp cRed", v.tip)
+            try {
+                g.AddText("xs", v.preTip)
+                g.AddText("yp cRed", v.tip)
+            } catch {
+                g.AddText("xs cRed", v.tip)
+            }
+
             g.AddText("yp", ":")
 
             _ := gc.%v.config% := g.AddDropDownList("yp r9", keyList)
             _._config := v.config
-            _._with := v.with
+            _._with := v.config "_win"
             _.OnEvent("Change", e_change_hotkey)
 
             config := readIni(v.config, "")
@@ -106,18 +108,22 @@ fn_switch_key(*) {
         g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
         for v in keyConfigList {
-            g.AddText("xs", "强制切换到")
-            g.AddText("yp cRed", v.tip)
+            try {
+                g.AddText("xs", v.preTip)
+                g.AddText("yp cRed", v.tip)
+            } catch {
+                g.AddText("xs cRed", v.tip)
+            }
             g.AddText("yp", ":")
             value := readIni(v.config, '')
             _ := gc.%v.config "2"% := g.AddHotkey("yp", StrReplace(value, "#", ""))
             _._config := v.config
-            _._with := v.with
+            _._with := v.config "_win"
             _.OnEvent("Change", e_change_hotkey1)
-            gc.%v.with% := g.AddCheckbox("yp", "Win 键")
-            gc.%v.with%._config := v.config
-            gc.%v.with%.OnEvent("Click", e_win_key)
-            gc.%v.with%.Value := InStr(value, "#") ? 1 : 0
+            gc.%_._with% := g.AddCheckbox("yp", "Win 键")
+            gc.%_._with%._config := v.config
+            gc.%_._with%.OnEvent("Click", e_win_key)
+            gc.%_._with%.Value := InStr(value, "#") ? 1 : 0
         }
         e_change_hotkey1(item, *) {
             ; 同步修改到「设置单键」和「手动输入快捷键」
@@ -142,12 +148,16 @@ fn_switch_key(*) {
         g.AddText("xs", '3.  这里会回显它们的设置，建议先使用它们，然后回到此处适当修改')
         g.AddLink("xs", '3.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
         for v in keyConfigList {
-            g.AddText("xs", "强制切换到")
-            g.AddText("yp cRed", v.tip)
+            try {
+                g.AddText("xs", v.preTip)
+                g.AddText("yp cRed", v.tip)
+            } catch {
+                g.AddText("xs cRed", v.tip)
+            }
             g.AddText("yp", ":")
             _ := gc.%v.config "3"% := g.AddEdit("yp")
             _._config := v.config
-            _._with := v.with
+            _._with := v.config "_win"
             _.Value := readIni(v.config, '')
             _.OnEvent("Change", e_change_hotkey2)
         }
@@ -172,7 +182,7 @@ fn_switch_key(*) {
             }
         }
         tab.UseTab(0)
-        g.AddButton("Section w" w, "确定").OnEvent("Click", e_yes)
+        g.AddButton("Section w" bw, "确定").OnEvent("Click", e_yes)
         e_yes(*) {
             for v in keyConfigList {
                 key := gc.%v.config "3"%.Value
@@ -184,7 +194,7 @@ fn_switch_key(*) {
         e_close(*) {
             g.Destroy()
         }
-        gc.w.switchKeyGui := g
+        gc.w.hotKeyGui := g
         return g
     }
 }

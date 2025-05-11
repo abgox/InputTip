@@ -5,11 +5,9 @@
 #Include input-mode.ahk
 #Include cursor-mode.ahk
 #Include bw-list.ahk
-#Include pause-key.ahk
 #Include config.ahk
 #Include symbol-pos.ahk
 #Include app-offset.ahk
-#Include switch-key.ahk
 #Include switch-window.ahk
 #Include JAB.ahk
 #Include about.ahk
@@ -67,6 +65,13 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("暂停/运行", pauseApp)
     A_TrayMenu.Add("暂停/运行快捷键", fn_pause_key)
+    fn_pause_key(*) {
+        setHotKeyGui([{
+            config: "hotkey_Pause",
+            preTip: "设置快捷键",
+            tip: "暂停/运行"
+        }], "软件暂停/运行")
+    }
     A_TrayMenu.Add("打开软件所在目录", fn_open_dir)
     fn_open_dir(*) {
         Run("explorer.exe /select," A_ScriptFullPath)
@@ -77,6 +82,21 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置状态切换快捷键", fn_switch_key)
+    fn_switch_key(*) {
+        setHotKeyGui([{
+            config: "hotkey_CN",
+            preTip: "强制切换到",
+            tip: "中文状态"
+        }, {
+            config: "hotkey_EN",
+            preTip: "强制切换到",
+            tip: "英文状态"
+        }, {
+            config: "hotkey_Caps",
+            preTip: "强制切换到",
+            tip: "大写锁定"
+        }], "输入法状态切换")
+    }
     A_TrayMenu.Add("指定窗口自动切换状态", fn_switch_window)
 
     A_TrayMenu.Add()

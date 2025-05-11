@@ -23,6 +23,7 @@ if (FileExist(favicon_png)) {
 
 #Include ./utils/verify-file.ahk
 #Include ./utils/create-gui.ahk
+#Include ./utils/hotkey-gui.ahk
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
@@ -44,6 +45,8 @@ gc := {
     tab: 0,
     ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
     w: {
+        ; 快捷键
+        hotKeyGui: "",
         ; 开机自启动
         startupGui: "",
         ; 设置更新检查
@@ -62,12 +65,8 @@ gc := {
         setShowPosGui: "",
         ; 符号显示黑/白名单
         bwListGui: "",
-        ; 暂停/运行快捷键
-        pauseHotkeyGui: "",
         ; 更改配置
         configGui: "",
-        ; 设置状态切换快捷键
-        switchKeyGui: "",
         ; 指定窗口自动切换状态
         windowToggleGui: "",
         ; 设置特殊偏移量

@@ -525,7 +525,7 @@ getRepoCode(newVersion, silent := silentUpdate) {
 
 
 /**
- * 当更新完成时弹出提示框
+ * 当更新完成时弹出提示框，并进行配置更新
  */
 checkUpdateDone() {
     oldVersion := readIni("version", currentVersion, "UserInfo")
@@ -608,10 +608,11 @@ checkUpdateDone() {
             writeIni("textSymbol_border_type", readIni('border_type', 1))
         }
 
-        ; 配置项更名
+        ; 配置项更名(old => new)
         replaceConfig := [
             ["JetBrains_list", "cursor_mode_JAB"],
             ["enableJetBrainsSupport", "enableJABSupport"],
+            ["useShift", "switchStatus"]
         ]
         for v in replaceConfig {
             try {
@@ -620,6 +621,8 @@ checkUpdateDone() {
                 IniDelete("InputTip.ini", "Config-v2", v[1])
             }
         }
+
+        global switchStatus := readIni("switchStatus", 1)
 
         if (silentUpdate && !readIni("clickUpdate", 0)) {
             SetTimer(handlePostUpdate, -500)
@@ -659,6 +662,7 @@ checkUpdateDone() {
             yes(*) {
                 g.Destroy()
                 handlePostUpdate()
+                fn_restart()
             }
             return g
         }

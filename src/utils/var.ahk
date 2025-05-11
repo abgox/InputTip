@@ -23,8 +23,9 @@ modeRules := StrSplit(modeRule, ":")
 ; 获取输入法状态的超时时间
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
-; 是否使用 Shift 键切换输入法状态
-useShift := readIni("useShift", 1)
+; 指定内部实现切换输入法状态的方式
+switchStatus := readIni("switchStatus", 1)
+switchStatusList := ["{LShift}", "{RShift}", "^{Space}"]
 
 ; 是否使用白名单机制
 useWhiteList := readIni("useWhiteList", 0)

@@ -49,12 +49,12 @@ fn_input_mode(*) {
         timeout.Value := checkTimeout
         g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
         g.AddText("xs", "3. 指定内部实现切换输入法状态的方式: ")
-        gc.useShift := g.AddDropDownList("yp Choose" useShift + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift"])
-        gc.useShift.OnEvent("Change", e_useShift)
-        e_useShift(item, *) {
+        gc.switchStatus := g.AddDropDownList("yp Choose" switchStatus + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift", "模拟输入 Ctrl+Space"])
+        gc.switchStatus.OnEvent("Change", e_switchStatus)
+        e_switchStatus(item, *) {
             value := item.value - 1
-            writeIni("useShift", value)
-            global useShift := value
+            writeIni("switchStatus", value)
+            global switchStatus := value
             restartJAB()
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" w, "如果想修改这个配置，需要先通过上方的「关于切换输入法状态」标签页了解详情")

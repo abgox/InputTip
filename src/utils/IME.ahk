@@ -195,7 +195,6 @@ isCN() {
 /**
  * 将输入法状态切换为中文
  * @param pressKey 触发此函数的按键，如果非按键触发，则为空
- * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
  * @example
  * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
  * ; ...
@@ -210,13 +209,9 @@ switch_CN(pressKey := "", *) {
         SendInput("{CapsLock}")
     }
     Sleep(50)
-    if (useShift = 1) {
+    if (switchStatus) {
         if (!isCN()) {
-            SendInput("{LShift}")
-        }
-    } else if (useShift = 2) {
-        if (!isCN()) {
-            SendInput("{RShift}")
+            SendInput(switchStatusList[switchStatus])
         }
     } else {
         IME.SetInputMode(1)
@@ -225,7 +220,6 @@ switch_CN(pressKey := "", *) {
 /**
  * 将输入法状态切换为英文
  * @param pressKey 触发此函数的按键，如果非按键触发，则为空
- * @Tip 外部必须提供变量 useShift(是否使用 Shift 切换输入法状态)
  * @example
  * SetStoreCapsLockMode 0 ; 前置条件，确保大写锁定可切换
  * ; ...
@@ -240,13 +234,9 @@ switch_EN(pressKey := "", *) {
         SendInput("{CapsLock}")
     }
     Sleep(50)
-    if (useShift = 1) {
+    if (switchStatus) {
         if (isCN()) {
-            SendInput("{LShift}")
-        }
-    } else if (useShift = 2) {
-        if (isCN()) {
-            SendInput("{RShift}")
+            SendInput(switchStatusList[switchStatus])
         }
     } else {
         IME.SetInputMode(0)

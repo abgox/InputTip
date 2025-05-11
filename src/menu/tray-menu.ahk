@@ -65,12 +65,6 @@ makeTrayMenu() {
     }
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add("设置输入法模式", fn_input_mode)
-    A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
-    A_TrayMenu.Add("设置符号显示位置", fn_symbol_pos)
-    A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)
-
-    A_TrayMenu.Add()
     A_TrayMenu.Add("暂停/运行", pauseApp)
     A_TrayMenu.Add("暂停/运行快捷键", fn_pause_key)
     A_TrayMenu.Add("打开软件所在目录", fn_open_dir)
@@ -81,9 +75,15 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("更改配置", fn_config)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("设置特殊偏移量", fn_app_offset)
+    A_TrayMenu.Add("设置输入法模式", fn_input_mode)
     A_TrayMenu.Add("设置状态切换快捷键", fn_switch_key)
     A_TrayMenu.Add("指定窗口自动切换状态", fn_switch_window)
+
+    A_TrayMenu.Add()
+    A_TrayMenu.Add("设置特殊偏移量", fn_app_offset)
+    A_TrayMenu.Add("设置光标获取模式", fn_cursor_mode)
+    A_TrayMenu.Add("设置符号显示位置", fn_symbol_pos)
+    A_TrayMenu.Add("符号显示黑/白名单", fn_bw_list)
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("启用 JAB/JetBrains IDE 支持", fn_JAB)

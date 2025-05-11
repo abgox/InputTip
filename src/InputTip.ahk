@@ -23,6 +23,7 @@ if (FileExist(favicon_png)) {
 
 #Include ./utils/verify-file.ahk
 #Include ./utils/create-gui.ahk
+#Include ./utils/hotkey-gui.ahk
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
@@ -44,6 +45,8 @@ gc := {
     tab: 0,
     ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
     w: {
+        ; 快捷键
+        hotKeyGui: "",
         ; 开机自启动
         startupGui: "",
         ; 设置更新检查
@@ -53,6 +56,8 @@ gc := {
         updateUserGui: "",
         ; 设置输入法模式
         inputModeGui: "",
+        ; 显示实时的状态码和切换码的快捷键
+        showCodeHotkeyGui: "",
         ; 设置光标获取模式
         cursorModeGui: "",
         ; 设置符号显示位置
@@ -60,12 +65,8 @@ gc := {
         setShowPosGui: "",
         ; 符号显示黑/白名单
         bwListGui: "",
-        ; 暂停/运行快捷键
-        pauseHotkeyGui: "",
         ; 更改配置
         configGui: "",
-        ; 设置状态切换快捷键
-        switchKeyGui: "",
         ; 指定窗口自动切换状态
         windowToggleGui: "",
         ; 设置特殊偏移量
@@ -102,6 +103,11 @@ if (A_IsCompiled) {
     if (runCodeWithAdmin && !A_IsAdmin) {
         try {
             Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
+        } catch {
+            createTipGui([{
+                opt: "cRed",
+                text: "以管理员权限启动 InputTip 失败",
+            }], "InputTip - 错误").Show()
         }
     }
 }
@@ -133,6 +139,11 @@ if (hotkey_Caps) {
 if (hotkey_Pause) {
     try {
         Hotkey(hotkey_Pause, pauseApp)
+    }
+}
+if (hotkey_ShowCode) {
+    try {
+        Hotkey(hotkey_ShowCode, showCode)
     }
 }
 

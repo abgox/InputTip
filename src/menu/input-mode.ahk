@@ -49,12 +49,12 @@ fn_input_mode(*) {
         timeout.Value := checkTimeout
         g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
         g.AddText("xs", "3. 指定内部实现切换输入法状态的方式: ")
-        gc.useShift := g.AddDropDownList("yp Choose" useShift + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift"])
-        gc.useShift.OnEvent("Change", e_useShift)
-        e_useShift(item, *) {
+        gc.switchStatus := g.AddDropDownList("yp Choose" switchStatus + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift", "模拟输入 Ctrl+Space"])
+        gc.switchStatus.OnEvent("Change", e_switchStatus)
+        e_switchStatus(item, *) {
             value := item.value - 1
-            writeIni("useShift", value)
-            global useShift := value
+            writeIni("switchStatus", value)
+            global switchStatus := value
             restartJAB()
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" w, "如果想修改这个配置，需要先通过上方的「关于切换输入法状态」标签页了解详情")
@@ -297,30 +297,19 @@ fn_input_mode(*) {
             return colList
         }
 
-        gc.status_btn := g.AddButton("xs w" w, "显示实时的状态码和切换码")
-        gc.status_btn.OnEvent("Click", e_showStatus)
-        e_showStatus(*) {
-            if (gc.timer) {
-                gc.timer := 0
-                gc.status_btn.Text := "显示实时的状态码和切换码"
-                return
-            }
+        gc.status_btn := g.AddButton("xs w" w, "显示实时的状态码和切换码(双击设置快捷键)")
+        gc.status_btn.OnEvent("Click", showCode)
+        gc.status_btn.OnEvent("DoubleClick", showCodeHotkey)
+        showCodeHotkey(*) {
+            gc.status_btn.Text := "显示实时的状态码和切换码(双击设置快捷键)"
+            gc.timer := 0
 
-            gc.timer := 1
-            gc.status_btn.Text := "停止显示实时的状态码和切换码"
-
-            SetTimer(statusTimer, 25)
-            statusTimer() {
-                if (!gc.timer) {
-                    ToolTip()
-                    SetTimer(, 0)
-                    return
-                }
-
-                info := IME.CheckInputMode()
-                ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
-            }
+            setHotKeyGui([{
+                config: "hotkey_ShowCode",
+                tip: "显示实时的状态码和切换码"
+            }], "显示实时的状态码和切换码")
         }
+
         tab.UseTab(3)
         g.AddText("cRed", "使用【自定义】模式之前，务必仔细阅读下方的帮助说明，查看相关链接")
         g.AddEdit("Section r12 ReadOnly w" w, "1. 为什么需要【自定义】模式`n   - InputTip 是通过系统返回的状态码和切换码来判断当前的输入法状态的`n   - 对于多数常用的输入法来说【通用】模式是可以正常识别的`n   - 但是部分输入法会使系统返回的状态码和切换码很特殊，无法统一处理`n   - 在这种情况下，就需要用户通过规则来告诉 InputTip 当前的输入法状态`n`n2. 【自定义】模式的工作机制`n   - InputTip 会从系统获取到当前的状态码和切换码，通过定义的规则列表进行顺序匹配`n   - 每一条规则对应一种输入法状态，如果匹配成功，则判断为此状态`n   - 因此，如果你同时使用多个输入法，可以尝试通过【自定义】模式实现兼容`n`n3. 默认状态`n   -「如果所有规则都不匹配，应该判断为」这个配置项会指定一个默认状态`n   - 如果规则列表中的所有规则都没有匹配成功，就会使用这个默认状态`n`n4. 规则列表`n   - 规则列表就是上方的「自定义」标签页中的表格`n   - 添加规则: 点击「添加规则」按钮，在弹窗中进行规则设置`n   - 修改规则: 双击规则列表中已经存在的任意一条规则，在弹窗中进行规则修改`n   - 删除规则: 双击规则列表中已经存在的任意一条规则，在弹窗中点击「删除此条规则」`n`n5. 规则设置`n   - 点击「显示实时的状态码和切换码」，通过切换输入法状态，查看不同状态下的区别`n   - 当点击「添加规则」按钮后，会出现一个规则设置弹窗`n   - 弹窗中包含 4 个设置: 匹配的顺序、输入法状态、状态码规则、切换码规则`n      - 匹配的顺序：用来指定这一条规则在规则列表中的顺序`n      - 其余 3 个设置会在下方逐个解释`n`n6. 规则设置 —— 输入法状态`n   - 它用来指定这一条规则对应的输入法状态`n   - 当这一条规则匹配成功后，InputTip 就会认为当前输入法状态为这一状态`n`n7. 规则设置 —— 状态码规则、切换码规则`n   - 有两种形式可以选择: 指定数字或指定规律`n   - 这两种形式只能选择其中一种，它们会在下方进行详细解释`n   - 需要注意的是，你可以同时设置状态码规则和切换码规则`n   - 如果同时设置，则表示此条规则需要状态码规则和切换码规则都匹配`n`n8. 规则设置 —— 指定数字`n   - 你可以填入一个或多个数字，只要其中有一个数字匹配成功即可`n   - 如果是多个数字，需要使用 / 连接 (如: 1/3/5)`n   - 如: 你希望当状态码为 1 时匹配到这条规则，在「状态码规则」中填入 1 即可`n   - 如: 你希望当切换码为 1 或 3 时匹配到这条规则，在「切换码规则」中填入 1/3 即可`n`n9. 规则设置 —— 指定规律`n   - 由于部分输入法会使系统返回的状态码和切换码很特殊，呈现某种规律`n   - 比如随机奇数，这种情况无法通过指定数字来表示，因为不可能填入所有的奇数`n   - 对于这种情况，就可以通过指定规律来实现，在下拉列表中选择对应规律即可`n   - 如: 你希望当状态码为随机奇数时匹配到这条规则，选择「使用奇数」即可")

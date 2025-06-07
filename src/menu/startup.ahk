@@ -155,7 +155,7 @@ fn_startup(item, *) {
             }
             tab.UseTab(2)
             g.AddText("cRed", "这里有多种方式设置开机自启动，请选择有效的方式")
-            g.AddEdit("ReadOnly r9 w" bw, "1. 关于「任务计划程序」`n   - 会创建一个任务计划程序 abgox.InputTip.noUAC`n   - 系统启动后，会通过它自动运行 InputTip`n   - 它可以直接避免每次启动都弹出管理员授权(UAC)窗口`n`n2. 关于「注册表」`n   - 会将程序路径写入注册表`n   - 系统启动后，会通过它自动运行 InputTip`n`n3. 关于「应用快捷方式」`n   - 它会在 shell:startup 目录下创建一个普通的快捷方式`n   - 系统启动后，会通过它自动运行 InputTip`n   - 注意: 由于权限或系统电源计划限制等因素，它可能无效`n`n4. 关于管理员授权(UAC)窗口`n   - 注意: 只有「任务计划程序」能直接避免此窗口弹出`n   - 「注册表」或「应用快捷方式」需要修改系统设置`n      - 系统设置 =>「更改用户账户控制设置」=>「从不通知」")
+            g.AddEdit("ReadOnly r9 w" bw, "1. 关于「任务计划程序」`n   - 会创建一个任务计划程序 abgox.InputTip.noUAC`n   - 系统启动后，会通过它自动运行 InputTip`n   - 它可以直接避免每次启动都弹出管理员授权(UAC)窗口`n`n2. 关于「注册表」`n   - 会将程序路径写入注册表`n   - 系统启动后，会通过它自动运行 InputTip`n`n3. 关于「应用快捷方式」`n   - 它会在 shell:startup 目录下创建一个普通的快捷方式`n   - 系统启动后，会通过它自动运行 InputTip`n   - 注意: 由于权限或系统电源计划限制等因素，它可能无效`n`n4. 关于管理员授权(UAC)窗口`n   - 注意: 只有「任务计划程序」能直接避免此窗口弹出`n   - 使用「注册表」或「应用快捷方式」需要修改系统设置`n      - 系统设置 =>「更改用户账户控制设置」=>「从不通知」")
             g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/startup">关于开机自启动</a>   <a href="https://support.microsoft.com/zh-cn/windows/用户帐户控制设置-d5b2046b-dcb8-54eb-f732-059f321afe18">用户账户控制设置(微软帮助)</a>')
 
             gc.w.startupGui := g

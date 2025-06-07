@@ -9,7 +9,11 @@ fn_about(*) {
     aboutGui(info) {
         g := createGuiOpt("InputTip - " (A_IsCompiled ? "exe 版本" : "zip 版本") " - " (A_IsAdmin ? "以管理员权限启动" : "以当前用户权限启动"))
 
-        g.AddText("Center w" info.w, "InputTip - 一个输入法状态实时提示工具")
+        g.AddText("Center w" info.w, "InputTip - 一个输入法状态管理工具")
+        g.SetFont("s" readIni("gui_font_size", "12") / 1.2)
+        g.AddText("Center w" info.w, "实时提示(鼠标样式、符号显示) + 窗口自动切换状态 + 快捷键切换状态")
+        g.SetFont(fontOpt*)
+
         tab := g.AddTab3("-Wrap", ["关于项目", "赞赏支持", "参考项目", "其他项目"])
         tab.UseTab(1)
         g.AddText("Section", '版本号: ')
@@ -51,9 +55,13 @@ fn_about(*) {
         g.AddText("xs", '- 因为实现很简单，就是去掉 v1 中方块符号的文字，加上不同的背景颜色')
 
         tab.UseTab(4)
-        g.AddLink("Section cRed w" bw, '关于我的其他项目，可以通过访问 <a href="https://me.abgox.com/">我的主页</a>、<a href="https://github.com/abgox">Github</a>、<a href="https://gitee.com/abgox">Gitee</a> 等方式去了解')
-        g.AddLink("Section w" bw, '1. <a href="https://pscompletions.abgox.com/">PSCompletions</a> : 一个 PowerShell 补全模块，它能让你在 PowerShell 中更简单、更方便地使用命令补全。')
-        g.AddLink("Section w" bw, '2. ...')
+        g.AddLink("Section cRed w" bw, '关于我的其他项目，可以通过访问 <a href="https://me.abgox.com/">我的主页</a>、<a href="https://github.com/abgox">Github</a>、<a href="https://gitee.com/abgox">Gitee</a> 等方式了解')
+        g.SetFont("s" readIni("gui_font_size", "12") / 1.1)
+        g.AddLink("Section w" bw, '1. <a href="https://pscompletions.abgox.com/">PSCompletions</a> (<a href="https://github.com/abgox/PSCompletions">Github</a> | <a href="https://gitee.com/abgox/PSCompletions">Gitee</a>) : 一个 PowerShell 补全模块，它能让你在 PowerShell 中更简单、更方便地使用命令补全。')
+        g.AddLink("Section w" bw, '2. filename-lint (<a href="https://github.com/abgox/filename-lint">Github</a> | <a href="https://gitee.com/abgox/filename-lint">Gitee</a>) : 一个 vscode 扩展插件，用于统一文件及文件夹的命名规范。')
+        g.AddLink("Section w" bw, '3. abyss (<a href="https://github.com/abgox/abyss">Github</a> | <a href="https://gitee.com/abgox/abyss">Gitee</a>) : 一个 scoop bucket 软件仓库，它具备更完善的 persist，优化的 Link 方案、进程终止功能和本地化输出(中文/英文)。')
+        g.AddLink("Section w" bw, '4. scoop-install (<a href="https://github.com/abgox/scoop-install">Github</a> | <a href="https://gitee.com/abgox/scoop-install">Gitee</a>) : 一个 PowerShell 脚本，它允许你添加 Scoop 配置，在 Scoop 安装应用时使用替换后的 url 而不是原始的 url。')
+        g.AddLink("Section w" bw, '5. ...')
 
         tab.UseTab(0)
         btn := g.AddButton("Section w" w, "关闭")

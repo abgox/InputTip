@@ -5,7 +5,7 @@
 #NoTrayIcon
 ;@AHK2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
-;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态提示工具
+;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态管理工具
 
 #Include ./utils/IME.ahk
 #Include ./utils/ini.ahk

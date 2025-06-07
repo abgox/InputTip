@@ -71,7 +71,7 @@ fn_check_update(*) {
             lineN := "13"
         }
         tab.UseTab(2)
-        g.AddEdit("ReadOnly w" bw " r" lineN, aboutText)
+        g.AddEdit("ReadOnly w" w " r" lineN, aboutText)
         g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/check-update">关于更新检查</a>')
         tab.UseTab(0)
         g.OnEvent("Close", e_close)

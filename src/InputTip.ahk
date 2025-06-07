@@ -5,7 +5,7 @@
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-SetOrigFilename InputTip.ahk
 ;@Ahk2Exe-UpdateManifest 1
-;@AHK2Exe-SetDescription InputTip - 一个输入法状态提示工具
+;@AHK2Exe-SetDescription InputTip - 一个输入法状态管理工具
 
 #Include ./utils/ini.ahk
 #Include ./utils/IME.ahk
@@ -27,7 +27,7 @@ if (FileExist(favicon_png)) {
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
-fileDesc := "InputTip - 一个输入法状态提示工具"
+fileDesc := "InputTip - 一个输入法状态管理工具"
 JAB_PID := ""
 
 try {

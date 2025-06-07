@@ -1,0 +1,51 @@
+name: Publish winget-pkgs on release
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  create-pr-branch:
+    runs-on: windows-latest
+    steps:
+      - name: Setup SSH
+        shell: pwsh
+        env:
+          SSH_CONFIG: ${{ secrets.SSH_CONFIG }}
+          SSH_ID_RSA_GITHUB: ${{ secrets.SSH_ID_RSA_GITHUB }}
+        run: |
+          # Create secure directory
+          $sshDir = "$HOME\.ssh"
+          New-Item -Path $sshDir -ItemType Directory -Force
+          attrib +h $sshDir
+
+          # Write key files
+          $env:SSH_CONFIG | Out-File "$sshDir\config" -Encoding utf8
+          $env:SSH_ID_RSA_GITHUB | Out-File "$sshDir\id_rsa_github" -Encoding utf8
+
+          # Set strict permissions
+          icacls "$sshDir\id_rsa_github" /reset /grant:r "$env:USERNAME`:F" /inheritance:r
+
+          # Add host fingerprints to known_hosts
+          ssh-keyscan github.com >> "$sshDir\known_hosts"
+
+      - name: Clone from GitHub and Create PR branch
+        shell: pwsh
+        run: |
+          $temp_dir = "temp_$(Get-Date -Format 'yyyyMMddHHmmss')"
+          git clone --depth 1 "git@github.com:abgox/InputTip.git"
+          git clone --depth 1 "git@github.com:abgox/winget-pkgs.git" $temp_dir
+          cd $temp_dir
+          $info = ..\InputTip\scripts\create-winget-manifest.ps1 "manifests\a\abgox\InputTip"
+          $new_branch = $info.new_branch
+          git checkout -b $new_branch
+          git add .
+          git commit -m $info.commit_msg
+          git push origin $new_branch
+
+      - name: Cleanup SSH
+        if: always()
+        shell: pwsh
+        run: |
+          Remove-Item "$HOME\.ssh" -Recurse -Force -ErrorAction SilentlyContinue

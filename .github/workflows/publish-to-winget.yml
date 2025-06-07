@@ -30,6 +30,12 @@ jobs:
           # Add host fingerprints to known_hosts
           ssh-keyscan github.com >> "$sshDir\known_hosts"
 
+      - name: Configure Git
+        shell: pwsh
+        run: |
+          git config --global user.name "abgox"
+          git config --global user.email "abgohxf@outlook.com"
+
       - name: Clone from GitHub and Create PR branch
         shell: pwsh
         run: |

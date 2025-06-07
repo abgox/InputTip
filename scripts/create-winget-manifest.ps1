@@ -17,18 +17,17 @@ PackageIdentifier: abgox.InputTip
 PackageVersion: {{ version }}
 UpgradeBehavior: uninstallPrevious
 ReleaseDate: {{ release_date }}
+InstallerType: portable
 Installers:
   # From GitHub repository
   - Architecture: x64
-    InstallerType: portable
     InstallerUrl: https://github.com/abgox/InputTip/releases/download/v{{ version }}/InputTip.exe
     InstallerSha256: {{ sha256 }}
   # From Gitee repository
   - Architecture: x64
-    InstallerLocale: zh-CN
-    InstallerType: portable
     InstallerUrl: https://gitee.com/abgox/InputTip/releases/download/v{{ version }}/InputTip.exe
     InstallerSha256: {{ sha256 }}
+    InstallerLocale: zh-CN
 ManifestType: installer
 ManifestVersion: 1.9.0
 '
@@ -48,14 +47,19 @@ License: MIT License
 LicenseUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
-ShortDescription: An input method status tip tool.
+ShortDescription: "An input method state manager tool: real-time tips(mouse style, symbol display) + auto-switch state per window + hotkey to switch state."
 Tags:
   - autohotkey
   - cursor
+  - mouse
+  - mouse pointer
   - ime
-  - input
   - inputmethod
+  - input
   - tip
+  - state
+  - switch
+  - hotkey
 ReleaseNotesUrl: https://github.com/abgox/InputTip/releases/tag/v{{ version }}
 Documentations:
   - DocumentLabel: README (GitHub)
@@ -86,7 +90,7 @@ License: MIT License
 LicenseUrl: https://gitee.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://gitee.com/abgox/InputTip/blob/main/LICENSE
-ShortDescription: 一个输入法状态实时提示工具。
+ShortDescription: "一个输入法状态管理工具: 实时提示(鼠标样式、符号显示) + 窗口自动切换状态 + 快捷键切换状态。"
 Tags:
   - autohotkey
   - 光标
@@ -96,6 +100,8 @@ Tags:
   - 输入法
   - 状态
   - 提示
+  - 状态切换
+  - 快捷键
   - 实时
   - 工具
 ReleaseNotesUrl: https://gitee.com/abgox/InputTip/releases/tag/v{{ version }}
@@ -159,11 +165,11 @@ foreach ($item in $tempate) {
   $item.content | Out-File $filePath -Force -Encoding utf8
 }
 
-# $envList = @{
-#   new_branch = "abgox.InputTip-$version"
-#   commit_msg = "New version: abgox.InputTip version $version"
-#   pr_title   = "New version: abgox.InputTip version $version"
-#   pr_body    = "Pull Request created by the publish action of [InputTip](https://github.com/abgox/InputTip)."
-# }
+@{
+  new_branch = "abgox.InputTip-$version"
+  commit_msg = "New version: abgox.InputTip version $version"
+  pr_title   = "New version: abgox.InputTip version $version"
+  pr_body    = "Pull Request created by the publish action of [InputTip](https://github.com/abgox/InputTip)."
+}
 
 # $envList | ConvertTo-Json | Out-File "$PSScriptRoot\..\out-winget-env.json"

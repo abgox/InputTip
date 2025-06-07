@@ -32,24 +32,24 @@
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被错误判断为病毒程序或游戏外挂](https://inputtip.abgox.com/FAQ/about-virus)
 >   - [推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
-> - InputTip 只适用于 **Windows** 系统(**Win10** 以上可用，以下未知)
-> - `托盘菜单` 指的是在底部任务栏右边的 InputTip 软件托盘菜单
+> - InputTip 只适用于 **Windows** 系统: **Win10** 以上可用，以下未知
+> - `托盘菜单` 指的是在底部任务栏右边的 InputTip 应用托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
 
 ### 介绍
 
-- 一个实时的输入法状态提示工具
+- 一个输入法状态提示工具：实时提示(鼠标、符号) + 窗口自动切换 + 按键快捷切换
 
   - [多种状态提示方案](#关于状态提示方案)
-    - 使用多套鼠标样式，根据输入法状态加载不同的鼠标样式
+    - 使用多套鼠标光标样式，根据输入法状态加载不同的鼠标光标样式
     - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
   - 切换不同应用窗口时，自动切换到指定的输入法状态
-  - 指定按键强制切换输入法状态
+  - 设置按键强制切换到指定的输入法状态
   - 详细便捷的配置菜单
     - 所有的配置变动，都只应该在 `托盘菜单` 中进行
     - 不要手动修改 `InputTip.ini` 文件
 
-[**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star**](#stars)
+[**如果 InputTip 对你有所帮助，请考虑给它一个 Star**](#stars)
 
 ### 新的变化
 
@@ -66,7 +66,7 @@
   - [输入法和应用窗口兼容情况](#兼容情况)
   - [issues](https://github.com/abgox/InputTip/issues)
   - ...
-- 如果仍有问题，可以前往 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 或 [腾讯频道](https://pd.qq.com/s/gyers18g6?businessType=5) 交流反馈
+- 如果仍有问题，可以前往 [腾讯频道](https://pd.qq.com/s/gyers18g6?businessType=5) 或 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 交流反馈
 
 ### 演示
 
@@ -77,11 +77,9 @@
 > [!Tip]
 >
 > - [关于 zip 与 exe 版本的区别以及相关说明](https://inputtip.abgox.com/FAQ/zip-vs-exe)
-> - 配置文件所在位置
->   - zip 版本: 解压后的 `src` 目录下的 `InputTip.ini`
->   - exe 版本: `InputTip.exe` 同级目录下的 `InputTip.ini`
+> - 推荐使用 zip 版本
 
-- zip 版本
+- zip 版本 (推荐)
 
   - 下载仓库的最新代码压缩包 `InputTip-main.zip`
   - 在仓库的 Releases 中下载 `InputTip.zip`
@@ -89,16 +87,26 @@
   - 使用 [Scoop](https://scoop.sh/) 安装
 
     ```shell
-    scoop bucket add abgox-bucket https://github.com/abgox/abgox-bucket
+    scoop bucket add abyss https://github.com/abgox/abyss.git
     ```
 
     ```shell
-    scoop install abgox-bucket/InputTip-zip
+    scoop install abyss/InputTip-zip
     ```
 
 - exe 版本
 
   - 在仓库的 Releases 中下载 `InputTip.exe`
+
+  - 使用 [Scoop](https://scoop.sh/) 安装
+
+    ```shell
+    scoop bucket add abyss https://github.com/abgox/abyss.git
+    ```
+
+    ```shell
+    scoop install abyss/InputTip
+    ```
 
   - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装
 
@@ -106,22 +114,16 @@
     winget install abgox.InputTip
     ```
 
-  - 使用 [Scoop](https://scoop.sh/) 安装
-
-    ```shell
-    scoop bucket add abgox-bucket https://github.com/abgox/abgox-bucket
-    ```
-
-    ```shell
-    scoop install abgox-bucket/InputTip
-    ```
-
 ### 使用
 
 1. 完成 [安装](#安装) 后，运行对应文件即可
 
-   - zip 版本: 运行解压后的目录下的 `InputTip.bat`
-   - exe 版本: 运行 `InputTip.exe`
+   - 如果是使用包管理器安装的
+     - [Scoop](https://scoop.sh/): 运行安装后创建的 `InputTip` 快捷方式即可
+     - [WinGet](https://learn.microsoft.com/windows/package-manager/winget/): 运行 `InputTip` 命令即可
+   - 如果是手动下载的
+     - zip 版本: 运行解压后的目录下的 `InputTip.bat`
+     - exe 版本: 运行 `InputTip.exe`
 
 2. 设置开机自启动: `托盘菜单` => `开机自启动`
 
@@ -165,13 +167,13 @@
    - [Github](https://github.com/abgox/InputTip)
 
      ```shell
-     git clone --depth 1 https://github.com/abgox/InputTip.git
+     git clone https://github.com/abgox/InputTip.git
      ```
 
    - [Gitee](https://gitee.com/abgox/InputTip)
 
      ```shell
-     git clone --depth 1 https://gitee.com/abgox/InputTip.git
+     git clone https://gitee.com/abgox/InputTip.git
      ```
 
 2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
@@ -185,28 +187,45 @@
 
 ### 卸载
 
-- 所有相关的文件或目录
-
-  - zip 版本
-
-    - 解压后的整个 `InputTip-main` 目录
-      - 鼠标样式文件夹 `src\InputTipCursor`
-      - 图片符号文件夹 `src\InputTipSymbol`
-      - 配置文件 `src\InputTip.ini`
-
-  - exe 版本
-    - 软件本体 `InputTip.exe`
-    - 鼠标样式文件夹 `InputTipCursor`
-    - 图片符号文件夹 `InputTipSymbol`
-    - 配置文件 `InputTip.ini`
-
----
-
 1. 取消 `开机自启动`: `托盘菜单` => `设置` => `开机自启动`
 2. 退出: `托盘菜单` => `退出`
    - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为 `【否】`，会尝试进行恢复
    - 如果未完全恢复，请根据弹窗提示信息进行操作
-3. 删除以上所有文件或目录
+3. 删除应用目录即可
+
+### 应用数据
+
+- 所有相关的文件或目录
+
+  - zip 版本
+
+    - 解压后的 `InputTip-main` 目录
+      - 鼠标样式文件夹 `src\InputTipCursor`
+      - 图片符号文件夹 `src\InputTipSymbol`
+      - 配置文件 `src\InputTip.ini`
+      - 其他文件或目录
+
+  - exe 版本
+    - 应用本体 `InputTip.exe`
+    - 鼠标样式文件夹 `InputTipCursor`
+    - 图片符号文件夹 `InputTipSymbol`
+    - 配置文件 `InputTip.ini`
+    - 其他文件或目录
+
+---
+
+- 如果你需要备份 `InputTip` 的数据以后续使用，请备份以下文件
+
+  - `InputTip.ini` 核心的配置文件
+  - `InputTipCursor` 鼠标样式文件夹 (如果你没有修改过，可以忽略)
+  - `InputTipSymbol` 图片符号文件夹 (如果你没有修改过，可以忽略)
+
+- 如果使用 [Scoop](https://scoop.sh/) 安装 [abgox/abyss](https://github.com/abgox/abyss) 下的 `InputTip-zip` 或 `InputTip`
+  - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
+  - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们
+- 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)
+  - 这些数据文件或文件夹会保存在 `$env:LocalAppData\Microsoft\WinGet\Packages\abgox.InputTip_Microsoft.Winget.Source_8wekyb3d8bbwe` 中
+  - 可以正常通过 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 更新、卸载，不会删除这些数据文件和文件夹
 
 ### 关于状态提示方案
 
@@ -223,19 +242,19 @@
    - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
    - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
    - 需要注意:
-     - 此方案涉及到获取应用窗口中的输入光标位置信息
+     - 此方案涉及到调用系统 DLL 获取应用窗口中的输入光标位置信息
      - InputTip 将通过指定的光标获取模式尝试获取到输入光标位置信息
      - 你可以通过 `设置光标获取模式` 显示指定应用使用哪种模式
        - 如果获取不到:
          - 符号无法显示
          - 这就只能使用 `鼠标样式方案` 或者 `设置符号显示位置`
-       - 获取到了，但符号位置有偏差(此应用中，所有窗口的偏差相同):
+       - 获取到了，只是符号位置有偏差，但在此应用中，所有窗口的偏差相同:
          - 符号会显示，但符号显示的位置有偏差
          - 由于偏差相同，可以通过 `偏移量`、`设置特殊偏移量` 解决
-       - 获取到了，但符号位置有偏差(此应用中，有窗口的偏差不同):
+       - 获取到了，只是符号位置有偏差，且在此应用中，不同窗口的偏差不同:
          - 符号会显示，但符号显示的位置有偏差
          - 由于偏差不同，无论如何设置，都会有窗口出现位置错误，目前无解
-         - 参考示例: [vscode v1.100 版本中编辑界面和终端界面符号位置有偏差](https://github.com/abgox/InputTip/issues/172)
+         - 参考示例: [在 vscode v1.100 版本中，编辑界面和终端界面符号位置有不同偏差](https://github.com/abgox/InputTip/issues/172)
 
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
 
@@ -372,7 +391,11 @@
 
 ### 兼容情况
 
-#### [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list)
+#### 应用窗口兼容情况
+
+- InputTip 在部分应用窗口中无法正确获取到输入光标位置，导致使用 [符号显示方案](#关于状态提示方案) 可能存在问题
+- [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list) 会记录这些特别的应用窗口
+- 如果你不使用 [符号显示方案](#关于状态提示方案)，可以直接忽略
 
 #### 输入法兼容情况
 
@@ -448,9 +471,9 @@
 - [AutoHotkeyScripts - Tebayaki](https://github.com/Tebayaki/AutoHotkeyScripts)
 - [language-indicator - yakunins](https://github.com/yakunins/language-indicator)
 - [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot)
-  - [InputTip v1](../v1) 在鼠标附近显示带文字的方块符号，后来 [InputTip v2](./) 版本默认通过不同颜色的鼠标样式来区分
-  - 之后看到了 [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot) 和 [language-indicator - yakunins](https://github.com/yakunins/language-indicator) 的设计，通过不同颜色加上小符号来判断不同输入法状态
-  - InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](../v1) 中带文字的方块符号，去掉文字，加上不同的背景颜色
+- [InputTip v1](../v1) 在鼠标附近显示带文字的方块符号，后来 [InputTip v2](./) 版本默认通过不同颜色的鼠标样式来区分
+- 之后看到了 [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot) 和 [language-indicator - yakunins](https://github.com/yakunins/language-indicator) 的设计，通过不同颜色加上小符号来判断不同输入法状态
+- InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](../v1) 中带文字的方块符号，去掉文字，加上不同的背景颜色
 
 ### Stars
 
@@ -463,11 +486,11 @@
   </picture>
 </a>
 
-### 赞赏支持
+### [赞赏支持](https://support-me.abgox.com/)
 
 > [!Tip]
 >
-> 这里是 [赞赏名单](https://inputtip.abgox.com/sponsor)，非常感谢所有赞助者！
+> 这里是 [赞赏名单](https://inputtip.abgox.com/sponsor)，非常感谢各位!
 
 <a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://me.abgox.com/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 

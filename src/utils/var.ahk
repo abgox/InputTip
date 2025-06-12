@@ -3,9 +3,6 @@
 ; 更新检查时间间隔，默认是 1440 分钟，即 24 小时
 checkUpdateDelay := readIni("checkUpdateDelay", 1440)
 
-; g.SetFont(fontOpt*)
-fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
-
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
 

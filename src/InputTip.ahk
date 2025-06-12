@@ -43,7 +43,7 @@ gc := {
     init: 0,
     timer: 0,
     tab: 0,
-    ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
+    ; 记录窗口 Gui，同一个 Gui 只允许存在一个
     w: {
         updateGui: "",
         subGui: ""
@@ -55,6 +55,9 @@ setTrayIcon(favicon_png)
 checkIni() ; 检查配置文件
 
 userName := readIni("userName", A_UserName, "UserInfo")
+
+; g.SetFont(fontOpt*)
+fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath

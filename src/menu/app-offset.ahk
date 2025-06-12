@@ -42,7 +42,7 @@ fn_app_offset(*) {
             }
             createGui(addGui).Show()
             addGui(info) {
-                g := createGuiOpt("InputTip - 设置特殊偏移量")
+                g := createGuiOpt("InputTip - 设置特殊偏移量 - 手动添加")
                 text := "每次只能添加一个应用进程名称"
                 if (useWhiteList) {
                     text .= "`n如果它不在白名单中，则会同步添加到白名单中"
@@ -186,11 +186,7 @@ fn_app_offset(*) {
             }
         }
 
-        if (gc.w.offsetGui) {
-            gc.w.offsetGui.Destroy()
-            gc.w.offsetGui := ""
-        }
-        createGui(setOffsetGui).Show()
+        createUniqueGui(setOffsetGui).Show()
         setOffsetGui(info) {
             g := createGuiOpt("InputTip - 设置 " app " 的特殊偏移量")
             g.AddText(, "正在设置")
@@ -268,7 +264,7 @@ fn_app_offset(*) {
             _.OnEvent("Click", e_setAll)
             e_setAll(item, *) {
                 close()
-                createGui(setAllGui).Show()
+                createUniqueGui(setAllGui).Show()
                 setAllGui(info) {
                     offset := { x: 0, y: 0 }
                     g := createGuiOpt("InputTip - 批量设置 " item._exe_name " 在多个屏幕的特殊偏移量")
@@ -328,7 +324,6 @@ fn_app_offset(*) {
             close(*) {
                 g.Destroy()
             }
-            gc.w.offsetGui := g
             return g
         }
     }

@@ -1,11 +1,7 @@
 ; InputTip
 
 fn_bw_list(*) {
-    if (gc.w.bwListGui) {
-        gc.w.bwListGui.Destroy()
-        gc.w.bwListGui := ""
-    }
-    createGui(bwListGui).Show()
+    createUniqueGui(bwListGui).Show()
     bwListGui(info) {
         g := createGuiOpt("InputTip - 设置符号显示的黑/白名单")
         g.AddText("cRed", "白名单机制: 只有在「白」名单中的应用进程窗口会尝试显示符号`n黑名单机制: 不在「黑」名单中的应用进程窗口都会尝试显示符号")
@@ -22,11 +18,7 @@ fn_bw_list(*) {
         gc._bw_list.OnEvent("Change", e_change_list)
         e_change_list(item, *) {
             if (useWhiteList = item.value) {
-                if (gc.w.subGui) {
-                    gc.w.subGui.Destroy()
-                    gc.w.subGui := ""
-                }
-                createGui(warningGui).Show()
+                createUniqueGui(warningGui).Show()
                 warningGui(info) {
                     gc._bw_list.Value := useWhiteList + 1
                     _g := createGuiOpt("InputTip - 警告")
@@ -54,7 +46,6 @@ fn_bw_list(*) {
                     e_no(*) {
                         _g.Destroy()
                     }
-                    gc.w.subGui := _g
                     return _g
                 }
             } else {
@@ -98,7 +89,6 @@ fn_bw_list(*) {
                 restartJAB()
             }
         }
-        gc.w.bwListGui := g
         return g
     }
 }

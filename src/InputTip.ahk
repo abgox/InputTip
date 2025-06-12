@@ -45,45 +45,8 @@ gc := {
     tab: 0,
     ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
     w: {
-        ; 快捷键
-        hotKeyGui: "",
-        ; 开机自启动
-        startupGui: "",
-        ; 设置更新检查
-        checkUpdateGui: "",
         updateGui: "",
-        ; 更改用户信息
-        updateUserGui: "",
-        ; 设置输入法模式
-        inputModeGui: "",
-        ; 显示实时的状态码和切换码的快捷键
-        showCodeHotkeyGui: "",
-        ; 设置光标获取模式
-        cursorModeGui: "",
-        ; 设置符号显示位置
-        symbolPosGui: "",
-        setShowPosGui: "",
-        ; 符号显示黑/白名单
-        bwListGui: "",
-        ; 更改配置
-        configGui: "",
-        ; 指定窗口自动切换状态
-        windowToggleGui: "",
-        ; 设置特殊偏移量
-        appOffsetGui: "",
-        ; 设置指定应用的特殊偏移量
-        offsetGui: "",
-        ; 启用 JAB/JetBrains IDE 支持
-        enableJABGui: "",
-        ; 应用列表
-        blackListGui: "",
-        whiteListGui: "",
-        ; 关于
-        aboutGui: "",
-        ; 二级菜单
-        subGui: "",
-        customModeGui: "",
-        shiftSwitchGui: "",
+        subGui: ""
     }
 }
 

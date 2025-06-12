@@ -8,7 +8,7 @@ fn_JAB(item, *) {
         if (runJAB()) {
             return
         }
-        createGui(JABGui).Show()
+        createUniqueGui(JABGui).Show()
         JABGui(info) {
             g := createGuiOpt("InputTip - 启用 JAB/JetBrains IDE 支持")
             g.AddText(, "已经成功启用了 JAB/JetBrains IDE 支持，你还需要进行以下操作步骤:           ")
@@ -29,14 +29,9 @@ fn_JAB(item, *) {
             e_close(*) {
                 g.Destroy()
             }
-            gc.w.enableJABGui := g
             return g
         }
     } else {
-        if (gc.w.enableJABGui) {
-            gc.w.enableJABGui.Destroy()
-            gc.w.enableJABGui := ""
-        }
         SetTimer(killAppTimer, -1)
         killAppTimer() {
             try {

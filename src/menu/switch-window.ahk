@@ -3,15 +3,7 @@
 fn_switch_window(*) {
     showGui()
     showGui(deep := "") {
-        if (gc.w.windowToggleGui) {
-            gc.w.windowToggleGui.Destroy()
-            gc.w.windowToggleGui := ""
-            try {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-        }
-        createGui(switchWindowGui).Show()
+        createUniqueGui(switchWindowGui).Show()
         switchWindowGui(info) {
             g := createGuiOpt("InputTip - 设置指定窗口状态自动切换")
             tab := g.AddTab3("-Wrap", ["设置状态自动切换", "关于"])
@@ -401,7 +393,6 @@ fn_switch_window(*) {
                     gc.w.subGui := ""
                 }
             }
-            gc.w.windowToggleGui := g
             return g
         }
     }

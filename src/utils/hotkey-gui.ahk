@@ -12,12 +12,8 @@
  * }], "软件暂停/运行")
  */
 setHotKeyGui(keyConfigList, label := "") {
-    if (gc.w.hotKeyGui) {
-        gc.w.hotKeyGui.Destroy()
-        gc.w.hotKeyGui := ""
-    }
     line := "------------------------------------------------------------------------------------"
-    createGui(hotKeyGui).Show()
+    createUniqueGui(hotKeyGui).Show()
     hotKeyGui(info) {
         g := createGuiOpt("InputTip - 设置快捷键" (label ? " —— " label : ""))
         tab := g.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
@@ -194,7 +190,6 @@ setHotKeyGui(keyConfigList, label := "") {
         e_close(*) {
             g.Destroy()
         }
-        gc.w.hotKeyGui := g
         return g
     }
 }

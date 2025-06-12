@@ -1,21 +1,13 @@
 ; InputTip
 
 fn_config(*) {
-    if (gc.w.configGui) {
-        gc.w.configGui.Destroy()
-        gc.w.configGui := ""
-        try {
-            gc.w.subGui.Destroy()
-            gc.w.subGui := ""
-        }
-    }
     if (gc.tab) {
         getDirTimer()
     } else {
         SetTimer(getDirTimer, -1)
     }
     line := "------------------------------------------------------------------------------------------------------------------"
-    createGui(changeConfigGui).Show()
+    createUniqueGui(changeConfigGui).Show()
     changeConfigGui(info) {
         g := createGuiOpt("InputTip - 更改核心配置(包括鼠标样式、符号显示及样式自定义等)")
         ; tab := g.AddTab3("-Wrap 0x100", ["显示形式", "鼠标样式", "图片符号", "方块符号", "文本符号"])
@@ -940,7 +932,6 @@ fn_config(*) {
                 gc.w.subGui := ""
             }
         }
-        gc.w.configGui := g
         return g
     }
 }

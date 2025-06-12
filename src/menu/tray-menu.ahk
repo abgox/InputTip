@@ -122,11 +122,7 @@ makeTrayMenu() {
 
 fn_update_user(uname, *) {
     global userName := uname
-    if (gc.w.updateUserGui) {
-        gc.w.updateUserGui.Destroy()
-        gc.w.updateUserGui := ""
-    }
-    createGui(updateUserGui).Show()
+    createUniqueGui(updateUserGui).Show()
     updateUserGui(info) {
         g := createGuiOpt("InputTip - 更改用户信息")
         g.AddText("cRed", "- 如果是普通用户，确保用户名正确即可`n- 如果是域用户，在用户名中需要添加域`n   - 如: xxx\abgox")
@@ -166,7 +162,6 @@ fn_update_user(uname, *) {
                 }
             }
         }
-        gc.w.updateUserGui := g
         return g
     }
 }
@@ -191,15 +186,7 @@ fn_restart(*) {
 fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
     showGui()
     showGui(deep := "") {
-        if (gc.w.%tipList.gui%) {
-            gc.w.%tipList.gui%.Destroy()
-            gc.w.%tipList.gui% := ""
-            try {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-        }
-        createGui(commonGui).Show()
+        createUniqueGui(commonGui).Show()
         commonGui(info) {
             g := createGuiOpt("InputTip - 配置")
             tab := g.AddTab3("-Wrap", tipList.tab)
@@ -559,7 +546,6 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     gc.w.subGui := ""
                 }
             }
-            gc.w.%tipList.gui% := g
             return g
         }
     }

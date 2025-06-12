@@ -1,11 +1,7 @@
 ; InputTip
 
 fn_symbol_pos(*) {
-    if (gc.w.symbolPosGui) {
-        gc.w.symbolPosGui.Destroy()
-        gc.w.symbolPosGui := ""
-    }
-    createGui(symbolPos).Show()
+    createUniqueGui(symbolPos).Show()
     symbolPos(info) {
         g := createGuiOpt("InputTip - 设置符号的显示位置")
         g.AddLink("cRed", '在 InputTip 的 v1 版本中，通过在鼠标附近显示符号，没有发现兼容性问题`n而 v2 中，部分窗口始终无法获取到光标位置，因此决定在 v2 中添加此特性`n详情请查看:   <a href="https://inputtip.abgox.com/FAQ/support-app-list">应用窗口兼容情况</a>')
@@ -70,7 +66,6 @@ fn_symbol_pos(*) {
                 restartJAB()
             }
         }
-        gc.w.symbolPosGui := g
         return g
     }
 }

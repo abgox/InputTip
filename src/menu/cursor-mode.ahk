@@ -3,15 +3,7 @@
 fn_cursor_mode(*) {
     showGui()
     showGui(deep := "") {
-        if (gc.w.cursorModeGui) {
-            gc.w.cursorModeGui.Destroy()
-            gc.w.cursorModeGui := ""
-            try {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-        }
-        createGui(modeGui).Show()
+        createUniqueGui(modeGui).Show()
         modeGui(info) {
             g := createGuiOpt("InputTip - 设置光标获取模式")
             tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
@@ -222,7 +214,7 @@ fn_cursor_mode(*) {
                     }
                     createGui(addGui).Show()
                     addGui(info) {
-                        g := createGuiOpt("InputTip - 设置光标获取模式")
+                        g := createGuiOpt("InputTip - 设置光标获取模式 - 手动添加")
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
                             text .= "`n如果它不在白名单中，则会同步添加到白名单中              "
@@ -353,7 +345,6 @@ fn_cursor_mode(*) {
                     gc.w.subGui := ""
                 }
             }
-            gc.w.cursorModeGui := g
             return g
         }
     }

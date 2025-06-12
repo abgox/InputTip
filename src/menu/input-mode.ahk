@@ -1,19 +1,7 @@
 ; InputTip
 
 fn_input_mode(*) {
-    if (gc.w.inputModeGui) {
-        gc.w.inputModeGui.Destroy()
-        gc.w.inputModeGui := ""
-        try {
-            gc.w.customModeGui.Destroy()
-            gc.w.customModeGui := ""
-        }
-        try {
-            gc.w.shiftSwitchGui.Destroy()
-            gc.w.shiftSwitchGui := ""
-        }
-    }
-    createGui(inputModeGui).Show()
+    createUniqueGui(inputModeGui).Show()
     inputModeGui(info) {
         global mode := readIni("mode", 1, "InputMethod")
 
@@ -107,7 +95,7 @@ fn_input_mode(*) {
                 typeText := "编辑"
             }
 
-            createGui(editRuleGui).Show()
+            createUniqueGui(editRuleGui).Show()
             editRuleGui(info) {
                 g := createGuiOpt("InputTip - " typeText "规则")
 
@@ -322,16 +310,7 @@ fn_input_mode(*) {
         e_close(*) {
             g.Destroy()
             gc.timer := 0
-            try {
-                gc.w.customModeGui.Destroy()
-                gc.w.customModeGui := ""
-            }
-            try {
-                gc.w.shiftSwitchGui.Destroy()
-                gc.w.shiftSwitchGui := ""
-            }
         }
-        gc.w.inputModeGui := g
         return g
     }
 }

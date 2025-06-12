@@ -1,13 +1,9 @@
 ; InputTip
 
 fn_check_update(*) {
-    if (gc.w.checkUpdateGui) {
-        gc.w.checkUpdateGui.Destroy()
-        gc.w.checkUpdateGui := ""
-    }
     gc.checkUpdateDelay := checkUpdateDelay
 
-    createGui(checkUpdateGui).Show()
+    createUniqueGui(checkUpdateGui).Show()
     checkUpdateGui(info) {
         g := createGuiOpt("InputTip - 设置更新检查")
         line := "--------------------------------------------------------------------------"
@@ -81,7 +77,6 @@ fn_check_update(*) {
                 checkUpdate(1, 1)
             }
         }
-        gc.w.checkUpdateGui := g
         return g
     }
 }

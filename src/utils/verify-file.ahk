@@ -316,7 +316,7 @@ checkIni() {
             g.SetFont(fz, "Microsoft YaHei")
             g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
             g.AddText("xs cRed", "InputTip 会根据不同输入法状态同步修改鼠标样式")
-            g.AddEdit("xs Disabled -VScroll", "更多详情，请点击「托盘菜单」中的「关于」，前往官网或项目中查看")
+            g.AddEdit("xs Disabled -VScroll", "更多详情，请点击【托盘菜单】中的【关于】，前往官网或项目中查看")
 
             if (info.i) {
                 return g
@@ -332,7 +332,7 @@ checkIni() {
                     g := Gui("AlwaysOnTop")
                     g.SetFont(fz, "Microsoft YaHei")
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
-                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击「托盘菜单」=>「更改配置」`n  2. 将「1. 是否同步修改鼠标样式」的值更改为【否】")
+                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】=>【更改配置】`n  2. 将【1. 是否同步修改鼠标样式】的值更改为【否】")
 
                     if (info.i) {
                         return g

@@ -153,18 +153,18 @@ updateTip(flag := "") {
     }
 }
 
-picDir := readIni("picDir", "")
+symbolPaths := readIni("symbolPaths", "")
 iconPaths := readIni("iconPaths", "")
 cursorDir := readIni("cursorDir", "")
 
 SetTimer(getDirTimer, -1)
 getDirTimer() {
-    _picPaths := arrJoin(getPicList(), ":")
+    _symbolPaths := arrJoin(getPicList(), ":")
     _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:", ":InputTipSymbol\default\offer.png:InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
-    if (picDir != _picPaths) {
-        global picDir := _picPaths
-        writeIni("picDir", _picPaths)
+    if (symbolPaths != _symbolPaths) {
+        global symbolPaths := _symbolPaths
+        writeIni("symbolPaths", _symbolPaths)
     }
     if (iconPaths != _iconPaths) {
         global iconPaths := _iconPaths

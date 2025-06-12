@@ -28,7 +28,7 @@ fn_config(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddText("xs cGray", "- 如果是第一次打开配置菜单，建议点击上方的「其他杂项」，把配置菜单的字体调整到合适的大小`n- 所有的配置修改会实时生效，可以立即看到最新效果，但是修改时速度不要太快`n- 特别是需要输入内容的配置，输入过快可能因为响应稍慢导致最新修改丢失，需要把输入速度放慢一点")
+        g.AddText("xs cGray", "- 如果是第一次打开配置菜单，建议点击上方的【其他杂项】，把配置菜单的字体调整到合适的大小`n- 所有的配置修改会实时生效，可以立即看到最新效果，但是修改时速度不要太快`n- 特别是需要输入内容的配置，输入过快可能因为响应稍慢导致最新修改丢失，需要把输入速度放慢一点")
         g.AddText("xs", line)
         g.AddText("xs", "1. 是否同步修改鼠标样式: ")
         _ := g.AddDropDownList("w" bw / 2 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
@@ -59,7 +59,7 @@ fn_config(*) {
                 doingGui(info) {
                     g := createGuiOpt("InputTip - 尝试恢复鼠标样式")
                     g.AddText(, "正在尝试恢复到启动 InputTip 之前的鼠标样式")
-                    g.AddText("cRed", "可能无法完全恢复，你需要进行以下额外步骤或者重启系统:`n1. 进入「系统设置」=>「蓝牙和其他设备」=>「鼠标」=>「其他鼠标设置」`n2. 先更改为另一个鼠标样式方案，再改回你之前使用的方案")
+                    g.AddText("cRed", "可能无法完全恢复，你需要进行以下额外步骤或者重启系统:`n1. 进入【系统设置】=>【蓝牙和其他设备】=>【鼠标】=>【其他鼠标设置】`n2. 先更改为另一个鼠标样式方案，再改回你之前使用的方案")
 
                     if (info.i) {
                         return g
@@ -108,7 +108,7 @@ fn_config(*) {
             global hoverHide := item.value
             writeIni("hoverHide", item.value)
         }
-        g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以通过「托盘菜单」中的「设置符号显示位置」，让它在鼠标附近显示")
+        g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以通过【托盘菜单】中的【设置符号显示位置】，让它在鼠标附近显示")
         g.AddText("xs", "3. 符号的垂直偏移量的参考原点: ")
         g.AddDropDownList("yp AltSubmit Choose" symbolOffsetBase + 1, [" 输入光标上方", " 输入光标下方"]).OnEvent("Change", e_offset_base)
         e_offset_base(item, *) {
@@ -168,10 +168,10 @@ fn_config(*) {
         g.AddText("yp cRed", "鼠标样式")
         g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/cursor-style">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
         g.AddText("xs cGray", "- 如果要自定义鼠标样式文件夹，请先查看相关链接，然后模仿默认的鼠标样式文件夹去尝试自定义")
-        g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的「下载鼠标样式扩展包」")
+        g.AddText("xs cGray", "- 更推荐去下载已经适配好的鼠标样式，通过点击右下角的【下载鼠标样式扩展包】")
         g.AddText("xs", line)
-        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击下方的「刷新路径列表」")
-        g.AddText("xs cGray", "如果「显示形式」页面中的第 1 个配置「是否同步修改鼠标样式」选择了【是】")
+        g.AddText("cRed", "如果下方的 3 个下拉列表中显示的鼠标样式文件夹路径不是最新的，请点击下方的【刷新路径列表】")
+        g.AddText("xs cGray", "如果【显示形式】页面中的第 1 个配置【是否同步修改鼠标样式】选择了【是】")
         g.AddText("xs cGray", "InputTip 就会使用下方选择的鼠标样式文件夹中的鼠标样式文件，根据不同输入法状态加载对应的鼠标样式")
         g.AddText("Section", "选择鼠标样式文件夹路径:")
         dirList := StrSplit(cursorDir, ":")
@@ -344,9 +344,9 @@ fn_config(*) {
             }
         }
         g.AddText("xs", line)
-        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的「刷新路径列表」`n如果选择第 1 个空白路径，则不会显示对应状态的图片符号")
+        g.AddText("xs Section cRed", "如果下方的 3 个下拉列表中显示的图片符号路径不是最新的，请点击下方的【刷新路径列表】`n如果选择第 1 个空白路径，则不会显示对应状态的图片符号")
         g.AddText(, "选择图片符号的文件路径: ")
-        picList := StrSplit(picDir, ":")
+        picList := StrSplit(symbolPaths, ":")
         if (picList.Length = 0) {
             picList := getPicList()
         }
@@ -831,7 +831,7 @@ fn_config(*) {
             global fontOpt := ["s" value, "Microsoft YaHei"]
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "取值范围: 5-30，建议 12-20 之间，超出范围则使用最近的有效值。更改后，重新打开配置菜单即可")
-        g.AddText("Section xs", "2. 设置鼠标悬浮在「托盘菜单」上时的文字模板")
+        g.AddText("Section xs", "2. 设置鼠标悬浮在【托盘菜单】上时的文字模板")
         _ := g.AddEdit("w" bw)
         _.Value := trayTipTemplate
         _.OnEvent("Change", e_trayTemplate)
@@ -853,7 +853,7 @@ fn_config(*) {
             writeIni("enableKeyCount", value)
             updateTip()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计相关文本`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，鼠标悬浮在【托盘菜单】上时，会额外显示按键次数统计相关文本`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
         g.AddText("Section xs", "4. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)
         _.Value := keyCountTemplate

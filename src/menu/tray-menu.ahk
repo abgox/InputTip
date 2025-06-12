@@ -433,7 +433,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 fn_close()
                 showGui(deep)
             }
-            g.AddButton("xs w" w / 2, "通过输入进程名称手动添加").OnEvent("Click", e_add_by_hand)
+            g.AddButton("xs w" w / 2, "手动添加").OnEvent("Click", e_add_by_hand)
             e_add_by_hand(*) {
                 if (addFn) {
                     addFn(tipList)
@@ -548,7 +548,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     }
                 }
             }
-            g.AddButton("xs w" w / 2, "一键清空「" tipList.list "」").OnEvent("Click", e_clear)
+            g.AddButton("xs w" w / 2, "一键清空【" tipList.list "】").OnEvent("Click", e_clear)
             e_clear(*) {
                 count := gc.%tipList.gui "_LV_rm"%.GetCount()
                 if (gc.w.subGui) {
@@ -558,7 +558,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                 createGui(clearGui).Show()
                 clearGui(info) {
                     g := createGuiOpt("InputTip - 警告")
-                    g.AddText(, "确定要清空「" tipList.list "」吗？")
+                    g.AddText(, "确定要清空【" tipList.list "】吗？")
                     g.AddText("cRed", "请谨慎选择，它会移除其中的 " count " 个应用进程`n一旦清空，无法恢复，只能重新一个一个添加")
 
                     if (info.i) {
@@ -624,17 +624,17 @@ fn_white_list(*) {
         gui: "whiteListGui",
         config: "app_show_state",
         tab: ["设置白名单", "关于"],
-        tip: "你首先应该点击上方的「关于」查看具体的操作说明                                    ",
+        tip: "你首先应该点击上方的【关于】查看具体的操作说明                                    ",
         list: "符号显示白名单",
         color: "cRed",
-        about: '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到「符号显示白名单」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「符号显示白名单」应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 白名单机制: 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
+        about: '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 双击列表中任意应用进程，就可以将其添加到【符号显示白名单】中`n   - 如果需要更多的进程，请点击右下角的【显示更多进程】以显示后台和隐藏进程`n   - 也可以点击右下角的【手动添加】直接添加进程名称`n`n   - 下方是【符号显示白名单】应用进程列表，如果使用白名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 白名单机制: 只有在白名单中的应用进程窗口才会显示符号`n   - 建议使用白名单机制，这样可以精确控制哪些应用进程窗口需要显示符号`n   - 使用白名单机制，只需要添加常用的窗口，可以减少一些特殊窗口的兼容性问题`n   - 如果选择了白名单机制，请及时添加你需要使用的应用进程到白名单中`n`n2. 如何快速添加应用进程？`n`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
         link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a>',
         addConfirm: "是否要将",
-        addConfirm2: "添加到「符号显示白名单」中？",
+        addConfirm2: "添加到【符号显示白名单】中？",
         addConfirm3: "添加后，白名单机制下，在此应用窗口中时，会显示符号",
         addConfirm4: "",
         rmConfirm: "是否要将",
-        rmConfirm2: "从「符号显示白名单」中移除？",
+        rmConfirm2: "从【符号显示白名单】中移除？",
         rmConfirm3: "移除后，白名单机制下，在此应用窗口中时，不会显示符号",
     },
         fn

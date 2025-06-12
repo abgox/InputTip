@@ -98,6 +98,74 @@ makeTrayMenu() {
         }], "输入法状态切换")
     }
     A_TrayMenu.Add("指定窗口自动切换状态", fn_switch_window)
+    A_TrayMenu.Add("获取当前窗口相关进程信息", fn_process_info)
+    fn_process_info(*) {
+        createUniqueGui(processInfoGui).Show()
+        processInfoGui(info) {
+            g := createGuiOpt("InputTip - 实时获取当前激活的窗口进程信息")
+            g.AddText("cRed", "获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)")
+            if (info.i) {
+                return g
+            }
+            w := info.w
+            bw := w - g.MarginX * 2
+
+            createGuiOpt().AddText(, " ").GetPos(, , &__w)
+            gc._window_info := g.AddButton("xs w" bw, "点击获取")
+            gc._window_info.OnEvent("Click", e_window_info)
+            g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
+            _width := bw - _w - g.MarginX + __w
+            gc.app_name := g.AddEdit("yp ReadOnly -VScroll w" _width)
+            g.AddText("xs cRed", "标题: ").GetPos(, , &_w)
+            gc.app_title := g.AddEdit("yp ReadOnly -VScroll w" _width)
+            g.AddText("xs cRed", "路径: ").GetPos(, , &_w)
+            gc.app_path := g.AddEdit("yp ReadOnly -VScroll w" _width)
+            e_window_info(*) {
+                if (gc.timer) {
+                    gc.timer := 0
+                    gc._window_info.Text := "点击获取"
+                    return
+                }
+                gc.timer := 1
+                gc._window_info.Text := "停止获取"
+                SetTimer(statusTimer, 25)
+                statusTimer() {
+                    static first := "", last := ""
+
+                    if (!gc.timer) {
+                        SetTimer(, 0)
+                        first := ""
+                        last := ""
+                        return
+                    }
+                    try {
+                        if (!first) {
+                            name := WinGetProcessName("A")
+                            title := WinGetTitle("A")
+                            path := WinGetProcessPath("A")
+                            gc.app_name.Value := name
+                            gc.app_title.Value := title
+                            gc.app_path.Value := path
+                            first := name title path
+                        }
+
+                        name := WinGetProcessName("A")
+                        title := WinGetTitle("A")
+                        path := WinGetProcessPath("A")
+                        info := name title path
+                        if (info = last || info = first) {
+                            return
+                        }
+                        gc.app_name.Value := name
+                        gc.app_title.Value := title
+                        gc.app_path.Value := path
+                        last := info
+                    }
+                }
+            }
+            return g
+        }
+    }
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("设置特殊偏移量", fn_app_offset)

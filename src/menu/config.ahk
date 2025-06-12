@@ -865,63 +865,6 @@ fn_config(*) {
             updateTip(A_IsPaused)
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %\n% 表示换行，%keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态')
-
-        createGuiOpt().AddText(, " ").GetPos(, , &__w)
-        gc._window_info := g.AddButton("xs w" bw, "实时获取当前激活的窗口进程信息")
-        gc._window_info.OnEvent("Click", e_window_info)
-        g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
-        _width := bw - _w - g.MarginX + __w
-        gc.app_name := g.AddEdit("yp ReadOnly -VScroll w" _width)
-        g.AddText("xs cRed", "标题: ").GetPos(, , &_w)
-        gc.app_title := g.AddEdit("yp ReadOnly -VScroll w" _width)
-        g.AddText("xs cRed", "路径: ").GetPos(, , &_w)
-        gc.app_path := g.AddEdit("yp ReadOnly -VScroll w" _width)
-        e_window_info(*) {
-            if (gc.timer) {
-                gc.timer := 0
-                gc._window_info.Text := "实时获取当前激活的窗口进程信息"
-                return
-            }
-
-            gc.timer := 1
-            gc._window_info.Text := "停止获取当前激活的窗口进程信息"
-
-            SetTimer(statusTimer, 25)
-            statusTimer() {
-                static first := "", last := ""
-
-                if (!gc.timer) {
-                    SetTimer(, 0)
-                    first := ""
-                    last := ""
-                    return
-                }
-
-                try {
-                    if (!first) {
-                        name := WinGetProcessName("A")
-                        title := WinGetTitle("A")
-                        path := WinGetProcessPath("A")
-                        gc.app_name.Value := name
-                        gc.app_title.Value := title
-                        gc.app_path.Value := path
-                        first := name title path
-                    }
-
-                    name := WinGetProcessName("A")
-                    title := WinGetTitle("A")
-                    path := WinGetProcessPath("A")
-                    info := name title path
-                    if (info = last || info = first) {
-                        return
-                    }
-                    gc.app_name.Value := name
-                    gc.app_title.Value := title
-                    gc.app_path.Value := path
-                    last := info
-                }
-            }
-        }
         g.OnEvent("Close", e_close)
         e_close(*) {
             g.Destroy()

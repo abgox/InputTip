@@ -15,10 +15,10 @@
 #Include ./utils/app-list.ahk
 
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
-favicon_png := A_ScriptDir "\InputTipSymbol\default\favicon.png"
+favicon_png := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
 
 if (FileExist(favicon_png)) {
-    TraySetIcon(favicon_png, , 1)
+    setTrayIcon(favicon_png)
 }
 
 #Include ./utils/verify-file.ahk
@@ -45,49 +45,12 @@ gc := {
     tab: 0,
     ; 记录所有的窗口 Gui，同一个 Gui 只允许存在一个
     w: {
-        ; 快捷键
-        hotKeyGui: "",
-        ; 开机自启动
-        startupGui: "",
-        ; 设置更新检查
-        checkUpdateGui: "",
         updateGui: "",
-        ; 更改用户信息
-        updateUserGui: "",
-        ; 设置输入法模式
-        inputModeGui: "",
-        ; 显示实时的状态码和切换码的快捷键
-        showCodeHotkeyGui: "",
-        ; 设置光标获取模式
-        cursorModeGui: "",
-        ; 设置符号显示位置
-        symbolPosGui: "",
-        setShowPosGui: "",
-        ; 符号显示黑/白名单
-        bwListGui: "",
-        ; 更改配置
-        configGui: "",
-        ; 指定窗口自动切换状态
-        windowToggleGui: "",
-        ; 设置特殊偏移量
-        appOffsetGui: "",
-        ; 设置指定应用的特殊偏移量
-        offsetGui: "",
-        ; 启用 JAB/JetBrains IDE 支持
-        enableJABGui: "",
-        ; 应用列表
-        blackListGui: "",
-        whiteListGui: "",
-        ; 关于
-        aboutGui: "",
-        ; 二级菜单
-        subGui: "",
-        customModeGui: "",
-        shiftSwitchGui: "",
+        subGui: ""
     }
 }
 
-TraySetIcon(favicon_png, , 1)
+setTrayIcon(favicon_png)
 
 checkIni() ; 检查配置文件
 
@@ -190,16 +153,22 @@ updateTip(flag := "") {
     }
 }
 
-picDir := readIni("picDir", "")
+symbolPaths := readIni("symbolPaths", "")
+iconPaths := readIni("iconPaths", "")
 cursorDir := readIni("cursorDir", "")
 
 SetTimer(getDirTimer, -1)
 getDirTimer() {
-    _picDir := arrJoin(getPicList(), ":")
+    _symbolPaths := arrJoin(getPicList(), ":")
+    _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:", ":InputTipSymbol\default\offer.png:InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
-    if (picDir != _picDir) {
-        global picDir := _picDir
-        writeIni("picDir", _picDir)
+    if (symbolPaths != _symbolPaths) {
+        global symbolPaths := _symbolPaths
+        writeIni("symbolPaths", _symbolPaths)
+    }
+    if (iconPaths != _iconPaths) {
+        global iconPaths := _iconPaths
+        writeIni("iconPaths", _iconPaths)
     }
     if (cursorDir != _cursorDir) {
         global cursorDir := _cursorDir

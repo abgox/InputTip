@@ -34,6 +34,43 @@ createGui(callback) {
 }
 
 /**
+ * 创建一个唯一的 Gui
+ * @param {Func} callback
+ * - 回调函数接受形参 `info`
+ *    - `info.x`,`info.y`,`info.w`,`info.h`: 最终计算得到的窗口坐标和宽高。
+ *    - 当执行隐藏显示时，`info.i` 为 `1`，否则为 `0`
+ * @returns {Gui} 返回 Gui 对象
+ * @example
+ * createUniqueGui(helloGui).Show()
+ * helloGui(info) {
+ *     g := createGuiOpt()
+ *     g.AddText(, "xxxxxxxxxxxxxxxxxxx")
+ *     ; 第一次隐藏显示，可以通过它在合适的地方直接返回，减少多余的执行
+ *     if (info.i) {
+ *         return g
+ *     }
+ *     w := info.w
+ *     bw := w - g.MarginX * 2
+ *     ; 其他控件...
+ *     g.AddButton("w" bw, "确定")
+ *     return g
+ * }
+ */
+createUniqueGui(callback) {
+    static w := Map()
+    g := createGui(callback)
+    g.GetPos(, , &width, &height)
+    ; 基本确保唯一性
+    id := g.Title "_" width "_" height
+    if (w.Has(id)) {
+        w.Get(id).Destroy()
+        w.Delete(id)
+    }
+    w.Set(id, g)
+    return g
+}
+
+/**
  * @param title Gui 标题
  * @param {Array} fontOption 字体配置(如: ["s12", "Microsoft YaHei"])
  * - 这里为了方便 InputTip 使用，默认值使用了外部的 fontOpt 变量
@@ -55,10 +92,6 @@ createGuiOpt(title := fileDesc, fontOption := fontOpt, guiOption := "AlwaysOnTop
  * @returns {Gui} 返回 Gui 对象
  */
 createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
-    if (gc.w.subGui) {
-        gc.w.subGui.Destroy()
-        gc.w.subGui := ""
-    }
     tipGui(info) {
         g := createGuiOpt(title)
 
@@ -77,8 +110,7 @@ createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
         e_close(*) {
             g.Destroy()
         }
-        gc.w.subGui := g
         return g
     }
-    return createGui(tipGui)
+    return createUniqueGui(tipGui)
 }

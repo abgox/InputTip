@@ -3,20 +3,12 @@
 fn_cursor_mode(*) {
     showGui()
     showGui(deep := "") {
-        if (gc.w.cursorModeGui) {
-            gc.w.cursorModeGui.Destroy()
-            gc.w.cursorModeGui := ""
-            try {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-        }
-        createGui(modeGui).Show()
+        createUniqueGui(modeGui).Show()
         modeGui(info) {
             g := createGuiOpt("InputTip - 设置光标获取模式")
             tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
             tab.UseTab(1)
-            g.AddText("Section cRed", "你首先应该点击上方的「关于」查看具体的操作说明                                              ")
+            g.AddText("Section cRed", "你首先应该点击上方的【关于】查看具体的操作说明                                              ")
 
             if (info.i) {
                 return g
@@ -24,7 +16,7 @@ fn_cursor_mode(*) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            gc.LV_add := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["应用进程列表", "窗口标题", "应用进程文件所在位置"])
+            gc.LV_add := g.AddListView("-LV0x10 -Multi r8 NoSortHdr Sort Grid w" w, ["应用进程列表", "窗口标题", "应用进程文件所在位置"])
             gc.LV_add.OnEvent("DoubleClick", e_add)
             e_add(LV, RowNumber) {
                 handleClick(LV, RowNumber, "add")
@@ -212,7 +204,7 @@ fn_cursor_mode(*) {
                 showGui(deep)
             }
 
-            g.AddButton("yp w" w / 3, "通过输入进程名称手动添加").OnEvent("Click", e_add_by_hand)
+            g.AddButton("yp w" w / 3, "手动添加").OnEvent("Click", e_add_by_hand)
             e_add_by_hand(*) {
                 addApp("xxx.exe")
                 addApp(v) {
@@ -222,7 +214,7 @@ fn_cursor_mode(*) {
                     }
                     createGui(addGui).Show()
                     addGui(info) {
-                        g := createGuiOpt("InputTip - 设置光标获取模式")
+                        g := createGuiOpt("InputTip - 设置光标获取模式 - 手动添加")
                         text := "每次只能添加一个应用进程名称"
                         if (useWhiteList) {
                             text .= "`n如果它不在白名单中，则会同步添加到白名单中              "
@@ -343,7 +335,7 @@ fn_cursor_mode(*) {
             }
             autoHdrLV(gc.LV_add)
             tab.UseTab(2)
-            g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击下方的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n  - 此时，可以尝试使用「设置符号显示位置」这个配置菜单，让符号显示在鼠标附近`n`n3. JetBrains 系列 IDE`n`n   - JetBrains 系列 IDE 需要添加到「JAB」列表中`n   - 如果未生效，请检查是否完成「启用 JAB/JetBrains IDE 支持」中的所有操作步骤')
+            g.AddEdit("ReadOnly -VScroll w" w, '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到下方任意列表中`n   - 如果需要更多的进程，请点击下方的【显示更多进程】以显示后台和隐藏进程`n   - 也可以点击下方的【手动添加】直接添加进程名称`n`n   - 下方分别是 InputTip 的多种光标获取模式`n   - 不用在意这些模式是啥，只要记住，哪个能用，就用哪个即可`n      - 如果想了解相关内容，请查看下方相关链接`n   - 这几个模式列表中的应用进程会使用对应的模式尝试去获取光标位置`n   - 双击列表中任意应用进程，就可以将它移除或者添加到其他列表中`n   - 白名单机制下，选择添加且此应用不在白名单中，则会同步添加到白名单中`n`n2. 什么时候需要去添加？`n`n  - 当你发现一个应用窗口，无法获取到光标位置，或者有兼容性问题时`n  - 就可以尝试将其添加到下方的各个列表中，看哪个模式是可用的且无兼容性问题的`n  - 如果所有模式都不可用，则表示在此窗口中获取不到光标位置，暂时无法解决`n  - 如果已知都不可用，记得移除这个应用进程`n  - 此时，可以尝试使用【设置符号显示位置】这个配置菜单，让符号显示在鼠标附近`n`n3. JetBrains 系列 IDE`n`n   - JetBrains 系列 IDE 需要添加到【JAB】列表中`n   - 如果未生效，请检查是否完成【启用 JAB/JetBrains IDE 支持】中的所有操作步骤')
             g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/cursor-mode">关于光标获取模式</a>')
             g.OnEvent("Close", fn_close)
             fn_close(*) {
@@ -353,7 +345,6 @@ fn_cursor_mode(*) {
                     gc.w.subGui := ""
                 }
             }
-            gc.w.cursorModeGui := g
             return g
         }
     }

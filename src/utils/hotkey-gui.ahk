@@ -12,18 +12,14 @@
  * }], "软件暂停/运行")
  */
 setHotKeyGui(keyConfigList, label := "") {
-    if (gc.w.hotKeyGui) {
-        gc.w.hotKeyGui.Destroy()
-        gc.w.hotKeyGui := ""
-    }
     line := "------------------------------------------------------------------------------------"
-    createGui(hotKeyGui).Show()
+    createUniqueGui(hotKeyGui).Show()
     hotKeyGui(info) {
         g := createGuiOpt("InputTip - 设置快捷键" (label ? " —— " label : ""))
         tab := g.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
         tab.UseTab(1)
         g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
+        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
         g.AddText("xs", "2.  LShift 指的是左边的 Shift 键，RShift 指的是右边的 Shift 键，其他按键以此类推")
         g.AddText("xs", "3.  使用单键不会覆盖原本的按键功能，因为是在单键抬起时才会触发")
 
@@ -33,7 +29,7 @@ setHotKeyGui(keyConfigList, label := "") {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddLink("xs", "4.  如果要移除快捷键，请选择「无」")
+        g.AddLink("xs", "4.  如果要移除快捷键，请选择【无】")
         g.AddLink("xs", '5.  <a href="https://inputtip.abgox.com/FAQ/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
 
         keyList := []
@@ -90,7 +86,7 @@ setHotKeyGui(keyConfigList, label := "") {
             }
             last := item.value
 
-            ; 同步修改到「设置组合快捷键」和「手动输入快捷键」
+            ; 同步修改到【设置组合快捷键】和【手动输入快捷键】
             if (item.Text = "无") {
                 key := ""
             } else {
@@ -102,8 +98,8 @@ setHotKeyGui(keyConfigList, label := "") {
         }
         tab.UseTab(2)
         g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
-        g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用「手动输入快捷键」")
+        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
+        g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用【手动输入快捷键】")
         g.AddText("xs", "3.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
         g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
@@ -126,7 +122,7 @@ setHotKeyGui(keyConfigList, label := "") {
             gc.%_._with%.Value := InStr(value, "#") ? 1 : 0
         }
         e_change_hotkey1(item, *) {
-            ; 同步修改到「设置单键」和「手动输入快捷键」
+            ; 同步修改到【设置单键】和【手动输入快捷键】
             gc.%item._config%.Text := "无"
             v := item.value
             if (gc.%item._with%.Value) {
@@ -135,16 +131,16 @@ setHotKeyGui(keyConfigList, label := "") {
             gc.%item._config "3"%.Value := v
         }
         e_win_key(item, *) {
-            ; 同步修改到「设置单键」和「手动输入快捷键」
+            ; 同步修改到【设置单键】和【手动输入快捷键】
             gc.%item._config%.Text := "无"
             v := gc.%item._config "2"%.Value
             gc.%item._config "3"%.Value := item.value ? "#" v : v
         }
         tab.UseTab(3)
         g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的「确定」后生效")
+        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
         g.AddText("xs", "2.")
-        g.AddText("yp cRed", "优先使用「设置单键」或「设置组合快捷键」设置，除非因为快捷键占用无法设置")
+        g.AddText("yp cRed", "优先使用【设置单键】或【设置组合快捷键】设置，除非因为快捷键占用无法设置")
         g.AddText("xs", '3.  这里会回显它们的设置，建议先使用它们，然后回到此处适当修改')
         g.AddLink("xs", '3.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
         for v in keyConfigList {
@@ -194,7 +190,6 @@ setHotKeyGui(keyConfigList, label := "") {
         e_close(*) {
             g.Destroy()
         }
-        gc.w.hotKeyGui := g
         return g
     }
 }

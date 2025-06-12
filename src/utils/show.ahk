@@ -18,6 +18,7 @@ while 1 {
         }
         try {
             exe_name := ProcessGetName(WinGetPID("A"))
+            exe_title := WinGetTitle("A")
             exe_str := ":" exe_name ":"
         } catch {
             hideSymbol()
@@ -47,30 +48,32 @@ while 1 {
             hideSymbol()
             needShow := 0
         }
-        if (exe_name != lastWindow) {
+        if (lastWindow != exe_name ":" exe_title) {
             WinWaitActive("ahk_exe " exe_name)
             lastSymbol := ""
             lastCursor := ""
-            lastWindow := exe_name
-            if (InStr(app_CN, exe_str)) {
+
+            toState := switchState(exe_name, exe_title)
+            if (toState == "CN") {
                 switch_CN()
                 if (isCN()) {
                     loadCursor("CN", 1)
                     ShowSymbolEx("CN")
                 }
-            } else if (InStr(app_EN, exe_str)) {
+            } else if (toState == "EN") {
                 switch_EN()
                 if (!isCN()) {
                     loadCursor("EN", 1)
                     ShowSymbolEx("EN")
                 }
-            } else if (InStr(app_Caps, exe_str)) {
+            } else if (toState == "Caps") {
                 switch_Caps()
                 if (GetKeyState("CapsLock", "T")) {
                     loadCursor("Caps", 1)
                     ShowSymbolEx("Caps")
                 }
             }
+            lastWindow := exe_name ":" exe_title
         }
         if (GetKeyState("CapsLock", "T")) {
             loadCursor("Caps")
@@ -86,6 +89,55 @@ while 1 {
         loadCursor(v)
         ShowSymbolEx(v)
     }
+}
+
+/**
+ * 匹配指定的状态，并返回是否需要切换
+ * @param {String} exe_name 程序名
+ * @param {String} exe_title 程序标题
+ * @returns {"CN" | "EN" | "Caps" | 0} 需要切换到的状态或0
+ */
+switchState(exe_name, exe_title) {
+    all := false
+    for value in ["CN", "EN", "Caps"] {
+        app_state := %"app_" value%
+        for v in app_state {
+            kv := StrSplit(v, "=", , 2)
+            part := StrSplit(kv[2], ":", , 4)
+            if (part.Length >= 2) {
+                ; 进程名称
+                name := part[1]
+                ; 是否全局的，全局的只有当切换到此窗口时才会触发
+                isGlobal := part[2]
+
+                if (isGlobal) {
+                    if (exe_name == name && !InStr(lastWindow, name ":")) {
+                        all := value
+                    }
+                    continue
+                }
+            }
+
+            if (part.Length < 4) {
+                continue
+            }
+
+            ; 是否正则匹配
+            isRegex := part[3]
+            ; 标题
+            title := part[4]
+            if (name == exe_name) {
+                isMatch := isRegex ? RegExMatch(exe_title, title) : exe_title == title
+                if (isMatch) {
+                    return value
+                }
+            }
+        }
+    }
+    if (all) {
+        return all
+    }
+    return 0
 }
 
 ShowSymbolEx(state) {

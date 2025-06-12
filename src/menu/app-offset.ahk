@@ -5,10 +5,10 @@ fn_app_offset(*) {
         gui: "appOffsetGui",
         config: "app_offset",
         tab: ["设置特殊偏移量", "关于"],
-        tip: "你首先应该点击上方的「关于」查看具体的操作说明                                         ",
+        tip: "你首先应该点击上方的【关于】查看具体的操作说明                                         ",
         list: "特殊偏移量列表",
         color: "cRed",
-        about: '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到「特殊偏移量列表」中`n   - 如果需要更多的进程，请点击右下角的「显示更多进程」以显示后台和隐藏进程`n   - 也可以点击右下角的「通过输入进程名称手动添加」直接添加进程名称`n`n   - 下方是「特殊偏移量列表」，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它`n`n2. 如何设置偏移量？`n`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过坐标信息判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左边，副屏幕在右边`n      - 那么副屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
+        about: '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到【特殊偏移量列表】中`n   - 如果需要更多的进程，请点击右下角的【显示更多进程】以显示后台和隐藏进程`n   - 也可以点击右下角的【手动添加】直接添加进程名称`n`n   - 下方是【特殊偏移量列表】，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，或者点击窗口底部按钮移除它`n`n2. 如何设置偏移量？`n`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过坐标信息判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左边，副屏幕在右边`n      - 那么副屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
         link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/app-offset">关于特殊偏移量</a>',
         addConfirm: "",
         addConfirm2: "",
@@ -42,7 +42,7 @@ fn_app_offset(*) {
             }
             createGui(addGui).Show()
             addGui(info) {
-                g := createGuiOpt("InputTip - 设置特殊偏移量")
+                g := createGuiOpt("InputTip - 设置特殊偏移量 - 手动添加")
                 text := "每次只能添加一个应用进程名称"
                 if (useWhiteList) {
                     text .= "`n如果它不在白名单中，则会同步添加到白名单中"
@@ -186,11 +186,7 @@ fn_app_offset(*) {
             }
         }
 
-        if (gc.w.offsetGui) {
-            gc.w.offsetGui.Destroy()
-            gc.w.offsetGui := ""
-        }
-        createGui(setOffsetGui).Show()
+        createUniqueGui(setOffsetGui).Show()
         setOffsetGui(info) {
             g := createGuiOpt("InputTip - 设置 " app " 的特殊偏移量")
             g.AddText(, "正在设置")
@@ -268,7 +264,7 @@ fn_app_offset(*) {
             _.OnEvent("Click", e_setAll)
             e_setAll(item, *) {
                 close()
-                createGui(setAllGui).Show()
+                createUniqueGui(setAllGui).Show()
                 setAllGui(info) {
                     offset := { x: 0, y: 0 }
                     g := createGuiOpt("InputTip - 批量设置 " item._exe_name " 在多个屏幕的特殊偏移量")
@@ -328,7 +324,6 @@ fn_app_offset(*) {
             close(*) {
                 g.Destroy()
             }
-            gc.w.offsetGui := g
             return g
         }
     }

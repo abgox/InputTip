@@ -61,6 +61,10 @@ hideSymbolDelay := readIni("hideSymbolDelay", 0)
 ; 每多少毫秒后更新符号的显示位置和状态
 delay := readIni("delay", 20)
 
+; 托盘菜单图标
+iconRunning := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
+iconPaused := readIni("iconPaused", "InputTipSymbol\default\favicon-pause.png")
+
 ; 开机自启动
 isStartUp := readIni("isStartUp", 0)
 
@@ -84,6 +88,11 @@ stateMap := {
     EN: "英文状态",
     0: "英文状态",
     Caps: "大写锁定"
+}
+stateTextMap := {
+    中文状态: "CN",
+    英文状态: "EN",
+    大写锁定: "Caps"
 }
 
 left := 0, top := 0, right := 0, bottom := 0
@@ -542,7 +551,7 @@ pauseApp(*) {
     if (A_IsPaused) {
         updateTip(!A_IsPaused)
         A_TrayMenu.Uncheck("暂停/运行")
-        TraySetIcon("InputTipSymbol/default/favicon.png", , 1)
+        setTrayIcon(iconRunning)
         reloadSymbol()
         if (enableJABSupport) {
             runJAB()
@@ -550,7 +559,7 @@ pauseApp(*) {
     } else {
         updateTip(!A_IsPaused)
         A_TrayMenu.Check("暂停/运行")
-        TraySetIcon("InputTipSymbol/default/favicon-pause.png", , 1)
+        setTrayIcon(iconPaused)
         hideSymbol()
         if (enableJABSupport) {
             killJAB(0)
@@ -599,11 +608,11 @@ updateList(init := 0) {
     app_show_state := ":" readIni('app_show_state', '') ":"
 
     ; 应用列表: 自动切换到中文
-    app_CN := ":" readIni('app_CN', '') ":"
+    app_CN := StrSplit(readIniSection("App-CN"), "`n")
     ; 应用列表: 自动切换到英文
-    app_EN := ":" readIni('app_EN', '') ":"
+    app_EN := StrSplit(readIniSection("App-EN"), "`n")
     ; 应用列表: 自动切换到大写锁定
-    app_Caps := ":" readIni('app_Caps', '') ":"
+    app_Caps := StrSplit(readIniSection("App-Caps"), "`n")
 }
 updateWhiteList(app) {
     if (!useWhiteList) {

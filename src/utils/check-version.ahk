@@ -295,7 +295,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         g.AddText("yp cRed", "git pull")
                         g.AddText("yp", "更新")
                         g.AddLink("xs", '不用 <a href="https://git-scm.com/">git</a> :')
-                        g.AddLink("yp", '使用下方的「确认更新」按钮进行更新')
+                        g.AddLink("yp", '使用下方的【确认更新】按钮进行更新')
                         g.AddText("xs", "--------------------------------------------------------------------------")
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
@@ -353,9 +353,9 @@ ignoreUpdateTip() {
         g.AddText("yp cRed", "版本更新检查")
         g.AddText("yp", "已关闭")
         g.AddText("xs", "现在 InputTip 不会再检查版本更新，除非重新设置更新检查间隔")
-        g.AddText("xs", "设置方式:「托盘菜单」=>「设置更新检查」")
+        g.AddText("xs", "设置方式:【托盘菜单】=>【设置更新检查】")
 
-        g.AddText("cGray", "如果在使用过程中有任何问题，先检查当前是否为最新版本`n如果更新到最新版本，问题依然存在，可以进行反馈`n「托盘菜单」的「关于」中有代码仓库、腾讯频道等反馈渠道")
+        g.AddText("cGray", "如果在使用过程中有任何问题，先检查当前是否为最新版本`n如果更新到最新版本，问题依然存在，可以进行反馈`n【托盘菜单】的【关于】中有代码仓库、腾讯频道等反馈渠道")
 
         if (info.i) {
             return g
@@ -533,6 +533,18 @@ checkUpdateDone() {
     flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
     if (compareVersion(currentVersion, oldVersion) > 0 || FileExist(flagFile) || FileExist(flagFile2)) {
         try {
+            for v in ["CN", "EN", "Caps"] {
+                _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "app_" v), ":")
+                for value in _ {
+                    id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                    IniWrite(value ":1", "InputTip.ini", "App-" v, id)
+                    Sleep(5)
+                }
+                IniDelete("InputTip.ini", "Config-v2", "app_" v)
+            }
+        }
+
+        try {
             ignoreUpdate := IniRead("InputTip.ini", "Config-v2", "ignoreUpdate")
             _ := ignoreUpdate ? 0 : 1440
             writeIni("checkUpdateDelay", _)
@@ -612,7 +624,8 @@ checkUpdateDone() {
         replaceConfig := [
             ["JetBrains_list", "cursor_mode_JAB"],
             ["enableJetBrainsSupport", "enableJABSupport"],
-            ["useShift", "switchStatus"]
+            ["useShift", "switchStatus"],
+            ["picDir", "symbolPaths"]
         ]
         for v in replaceConfig {
             try {

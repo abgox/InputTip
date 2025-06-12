@@ -1,11 +1,7 @@
 ; InputTip
 
 fn_about(*) {
-    if (gc.w.aboutGui) {
-        gc.w.aboutGui.Destroy()
-        gc.w.aboutGui := ""
-    }
-    createGui(aboutGui).Show()
+    createUniqueGui(aboutGui).Show()
     aboutGui(info) {
         g := createGuiOpt("InputTip - " (A_IsCompiled ? "exe 版本" : "zip 版本") " - " (A_IsAdmin ? "以管理员权限启动" : "以当前用户权限启动"))
 
@@ -70,7 +66,6 @@ fn_about(*) {
         e_close(*) {
             g.Destroy()
         }
-        gc.w.aboutGui := g
         return g
     }
 }

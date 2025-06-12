@@ -15,10 +15,10 @@
 #Include ./utils/app-list.ahk
 
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
-favicon_png := A_ScriptDir "\InputTipSymbol\default\favicon.png"
+favicon_png := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
 
 if (FileExist(favicon_png)) {
-    TraySetIcon(favicon_png, , 1)
+    setTrayIcon(favicon_png)
 }
 
 #Include ./utils/verify-file.ahk
@@ -50,7 +50,7 @@ gc := {
     }
 }
 
-TraySetIcon(favicon_png, , 1)
+setTrayIcon(favicon_png)
 
 checkIni() ; 检查配置文件
 
@@ -154,15 +154,21 @@ updateTip(flag := "") {
 }
 
 picDir := readIni("picDir", "")
+iconPaths := readIni("iconPaths", "")
 cursorDir := readIni("cursorDir", "")
 
 SetTimer(getDirTimer, -1)
 getDirTimer() {
-    _picDir := arrJoin(getPicList(), ":")
+    _picPaths := arrJoin(getPicList(), ":")
+    _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:", ":InputTipSymbol\default\offer.png:InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
-    if (picDir != _picDir) {
-        global picDir := _picDir
-        writeIni("picDir", _picDir)
+    if (picDir != _picPaths) {
+        global picDir := _picPaths
+        writeIni("picDir", _picPaths)
+    }
+    if (iconPaths != _iconPaths) {
+        global iconPaths := _iconPaths
+        writeIni("iconPaths", _iconPaths)
     }
     if (cursorDir != _cursorDir) {
         global cursorDir := _cursorDir

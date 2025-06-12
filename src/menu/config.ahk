@@ -853,7 +853,7 @@ fn_config(*) {
             writeIni("enableKeyCount", value)
             updateTip()
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计相关文本。`n可通过下方的模板进行自定义。只有当上一次按键和当前按键不同时，才会记为一次有效按键")
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, "开启后，鼠标悬浮在「托盘菜单」上时，会额外显示按键次数统计相关文本`n只有当上一次按键和当前按键不同时，才会记为一次有效按键")
         g.AddText("Section xs", "4. 设置按键次数统计的文字模板")
         _ := g.AddEdit("w" bw)
         _.Value := keyCountTemplate
@@ -865,6 +865,39 @@ fn_config(*) {
             updateTip(A_IsPaused)
         }
         g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '模板变量: %\n% 表示换行，%keyCount% 会替换为按键次数，%appState% 会替换为软件运行状态')
+        g.AddText("Section xs", "5. 设置软件的托盘图标")
+        g.AddText("xs cGray", '注意: 托盘图标的图片文件需要放在 InputTipSymbol 目录下，它和图片符号共用同一个父目录')
+        iconList := StrSplit(iconPaths, ":")
+        iconList.RemoveAt(1)
+        g.AddText("xs cRed", "运行中: ").GetPos(, , &_w)
+        _ := g.AddDropDownList("yp r9 w" bw - _w, iconList)
+        _.Text := iconRunning
+        _.OnEvent("Change", e_iconRunning)
+        e_iconRunning(item, *) {
+            value := item.Text
+            global iconRunning := value
+            writeIni("iconRunning", value)
+            if (!A_IsPaused) {
+                setTrayIcon(value)
+            }
+        }
+        g.AddText("xs cRed", "暂停中: ")
+        _ := g.AddDropDownList("yp r9 w" bw - _w, iconList)
+        _.Text := iconPaused
+        _.OnEvent("Change", e_iconPaused)
+        e_iconPaused(item, *) {
+            value := item.Text
+            global iconPaused := value
+            writeIni("iconPaused", value)
+            if (A_IsPaused) {
+                setTrayIcon(value)
+            }
+        }
+        _ := g.AddButton("xs w" bw / 2, "打开图片文件目录")
+        _._config := "InputTipSymbol"
+        _.OnEvent("Click", fn_open_dir)
+        g.AddButton("yp w" bw / 2, "刷新路径列表").OnEvent("Click", fn_config)
+
         g.OnEvent("Close", e_close)
         e_close(*) {
             g.Destroy()

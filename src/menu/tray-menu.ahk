@@ -676,12 +676,18 @@ getCursorDir() {
 
 /**
  * 解析图片符号文件夹目录，并生成路径列表
+ * @param {String} defaultList 默认列表，会放在最前面
+ * @param {String} disableList 禁用列表，不会显示在列表中
  * @returns {Array} 路径列表
  */
-getPicList() {
+getPicList(defaultList := "", disableList := "") {
     picList := ":"
-    defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
-    disableList := ":InputTipSymbol\default\offer.png:InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:"
+    if (!defaultList) {
+        defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
+    }
+    if (!disableList) {
+        disableList := ":InputTipSymbol\default\offer.png:InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:"
+    }
     Loop Files "InputTipSymbol\*", "R" {
         if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":") && !InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
             picList .= A_LoopFilePath ":"

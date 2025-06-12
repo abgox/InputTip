@@ -113,3 +113,21 @@ returnNumber(value) {
     RegExMatch(value, "(-?\d+)", &numbers)
     return numbers[1]
 }
+
+; 设置托盘图标
+setTrayIcon(path) {
+    try {
+        TraySetIcon(path, , 1)
+    } catch {
+        if (A_IsPaused) {
+            path := "InputTipSymbol\default\favicon-pause.png"
+            global iconPaused := path
+            writeIni("iconPaused", path)
+        } else {
+            path := "InputTipSymbol\default\favicon.png"
+            global iconRunning := path
+            writeIni("iconRunning", path)
+        }
+        TraySetIcon(path, , 1)
+    }
+}

@@ -61,6 +61,10 @@ hideSymbolDelay := readIni("hideSymbolDelay", 0)
 ; 每多少毫秒后更新符号的显示位置和状态
 delay := readIni("delay", 20)
 
+; 托盘菜单图标
+iconRunning := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
+iconPaused := readIni("iconPaused", "InputTipSymbol\default\favicon-pause.png")
+
 ; 开机自启动
 isStartUp := readIni("isStartUp", 0)
 
@@ -542,7 +546,7 @@ pauseApp(*) {
     if (A_IsPaused) {
         updateTip(!A_IsPaused)
         A_TrayMenu.Uncheck("暂停/运行")
-        TraySetIcon("InputTipSymbol/default/favicon.png", , 1)
+        setTrayIcon(iconRunning)
         reloadSymbol()
         if (enableJABSupport) {
             runJAB()
@@ -550,7 +554,7 @@ pauseApp(*) {
     } else {
         updateTip(!A_IsPaused)
         A_TrayMenu.Check("暂停/运行")
-        TraySetIcon("InputTipSymbol/default/favicon-pause.png", , 1)
+        setTrayIcon(iconPaused)
         hideSymbol()
         if (enableJABSupport) {
             killJAB(0)

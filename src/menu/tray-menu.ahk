@@ -778,9 +778,11 @@ killJAB(wait := 1, delete := 0) {
  * @param LV
  */
 autoHdrLV(LV) {
-    col := LV.GetCount("Col")
-    while (col >= 1) {
-        LV.ModifyCol(col, "AutoHdr")
-        col--
+    try {
+        col := LV.GetCount("Col")
+        while (col >= 1) {
+            LV.ModifyCol(col, "AutoHdr")
+            col--
+        }
     }
 }

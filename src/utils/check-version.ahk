@@ -260,7 +260,11 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                     }
                 }
             } else {
-                checkVersion(currentVersion, updatePrompt)
+                checkVersion(currentVersion, updatePrompt, [
+                    "https://gitee.com/abgox/InputTip/raw/main/src/version-zip.txt",
+                    "https://inputtip.abgox.com/releases/v2/version-zip.txt",
+                    "https://github.com/abgox/InputTip/raw/main/src/version-zip.txt"
+                ])
                 updatePrompt(newVersion, url) {
                     if (gc.w.updateGui || compareVersion(newVersion, currentVersion) <= 0) {
                         return

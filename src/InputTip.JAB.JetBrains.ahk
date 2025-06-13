@@ -13,6 +13,9 @@
 #Include ./utils/var.ahk
 #Include ./utils/tools.ahk
 
+; g.SetFont(fontOpt*)
+fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
+
 /**
  * 跳过非 JAB/JetBrains IDE 程序，交由 InputTip 处理
  * @param exe_str 进程字符串，如 ":webstorm64.exe:"

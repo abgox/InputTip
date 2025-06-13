@@ -30,7 +30,7 @@
 > [!Tip]
 >
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
->   - [InputTip 可能被错误判断为病毒程序或游戏外挂](https://inputtip.abgox.com/FAQ/about-virus)
+>   - [InputTip 可能被误判为游戏外挂，exe 版本可能被误判为病毒程序](https://inputtip.abgox.com/FAQ/about-virus)
 >   - [推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 > - InputTip 只适用于 **Windows** 系统: **Win10** 以上可用，以下未知
 > - `托盘菜单` 指的是在底部任务栏右边的 InputTip 应用托盘菜单
@@ -43,7 +43,7 @@
   - [多种状态提示方案](#关于状态提示方案)
     - 使用多套鼠标光标样式，根据输入法状态加载不同的鼠标光标样式
     - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-  - 切换不同应用窗口时，自动切换到指定的输入法状态
+  - 切换不同窗口时，自动切换到指定的输入法状态
   - 设置按键强制切换到指定的输入法状态
   - 详细便捷的配置菜单
     - 所有的配置变动，都只应该在 `托盘菜单` 中进行
@@ -57,7 +57,7 @@
 
 ### 常见问题
 
-- 如果有使用问题，请先确认当前使用的 `InputTip` 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
+- 如果有使用问题，请先确认当前使用的 InputTip 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
   - 在 `托盘菜单` => `关于` 中查看当前版本号
   - 如果不是最新版本，你应该先更新到最新版本，检查问题是否仍然存在
 - 然后查看相关的文档
@@ -74,45 +74,50 @@
 
 ### 安装
 
+#### zip 版本
+
 > [!Tip]
 >
-> - [关于 zip 与 exe 版本的区别以及相关说明](https://inputtip.abgox.com/FAQ/zip-vs-exe)
-> - 推荐使用 zip 版本
+> - 推荐使用，它带有 [exe 版本](#exe-版本) 不具备的特性，且没有 [exe 版本](#exe-版本) 的一些缺陷
+> - 详情参考: [关于 zip 与 exe 版本的区别以及相关说明](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 
-- zip 版本 (推荐)
+- 下载仓库的最新代码压缩包 `InputTip-main.zip`
+- 在仓库的 Releases (发行版) 中下载 `InputTip.zip`
+- [前往官网下载 InputTip.zip](https://inputtip.abgox.com/download)
+- 使用 [Scoop](https://scoop.sh/)
 
-  - 下载仓库的最新代码压缩包 `InputTip-main.zip`
-  - 在仓库的 Releases 中下载 `InputTip.zip`
-  - [前往官网下载 InputTip.zip](https://inputtip.abgox.com/download)
-  - 使用 [Scoop](https://scoop.sh/) 安装
+  ```shell
+  scoop bucket add abyss https://github.com/abgox/abyss.git
+  ```
 
-    ```shell
-    scoop bucket add abyss https://github.com/abgox/abyss.git
-    ```
+  ```shell
+  scoop install abyss/InputTip-zip
+  ```
 
-    ```shell
-    scoop install abyss/InputTip-zip
-    ```
+#### exe 版本
 
-- exe 版本
+> [!Warning]
+>
+> - 不推荐使用，和 [zip 版本](#zip-版本) 相比，它缺少了一些特性，且有一些缺陷
+> - 详情参考: [关于 zip 与 exe 版本的区别以及相关说明](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 
-  - 在仓库的 Releases 中下载 `InputTip.exe`
+- 在仓库的 Releases (发行版) 中下载 `InputTip.exe`
 
-  - 使用 [Scoop](https://scoop.sh/) 安装
+- 使用 [Scoop](https://scoop.sh/)
 
-    ```shell
-    scoop bucket add abyss https://github.com/abgox/abyss.git
-    ```
+  ```shell
+  scoop bucket add abyss https://github.com/abgox/abyss.git
+  ```
 
-    ```shell
-    scoop install abyss/InputTip
-    ```
+  ```shell
+  scoop install abyss/InputTip
+  ```
 
-  - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装
+- 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/)
 
-    ```shell
-    winget install abgox.InputTip
-    ```
+  ```shell
+  winget install abgox.InputTip
+  ```
 
 ### 使用
 
@@ -127,12 +132,12 @@
 
 2. 设置开机自启动: `托盘菜单` => `开机自启动`
 
-   - 建议使用 `任务计划程序` 或 `注册表`
-   - `应用快捷方式` 可能会无效，详情请查看 [关于开机自启动](https://inputtip.abgox.com/FAQ/startup)
+   - 建议使用 `任务计划程序` 或 `注册表`，`应用快捷方式` 可能会无效
+   - 详情请查看 [关于开机自启动](https://inputtip.abgox.com/FAQ/startup)
 
 3. 设置 `所有配置菜单的字体大小`
 
-   - 你可以设置字体大小来解决屏幕过小导致菜单显示不完全或屏幕过大导致菜单显示过小的问题
+   - 你可以设置字体大小来优化配置菜单在不同屏幕上的显示效果
    - `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
 
 4. [设置鼠标样式](https://inputtip.abgox.com/FAQ/cursor-style)
@@ -155,7 +160,7 @@
 ### 编译
 
 > [!Tip]
-> 你可以自行查看源代码并编译 `InputTip`
+> 你可以自行查看源代码并编译 InputTip
 
 > [!Warning]
 >
@@ -163,7 +168,7 @@
 
 1. 克隆项目仓库到本地
 
-   - 完成项目克隆后，你也可以直接运行目录下的 `InputTip.bat` 来使用 `InputTip`
+   - 完成项目克隆后，你也可以直接运行目录下的 `InputTip.bat` 来使用 InputTip，它等同于 [zip 版本](#zip-版本)
    - [Github](https://github.com/abgox/InputTip)
 
      ```shell
@@ -191,7 +196,7 @@
 2. 退出: `托盘菜单` => `退出`
    - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为 `【否】`，会尝试进行恢复
    - 如果未完全恢复，请根据弹窗提示信息进行操作
-3. 删除应用目录即可
+3. 删除相关目录即可
 
 ### 应用数据
 
@@ -203,6 +208,7 @@
       - 鼠标样式文件夹 `src\InputTipCursor`
       - 图片符号文件夹 `src\InputTipSymbol`
       - 配置文件 `src\InputTip.ini`
+      - 启动脚本 `src\InputTip.bat`
       - 其他文件或目录
 
   - exe 版本
@@ -214,11 +220,11 @@
 
 ---
 
-- 如果你需要备份 `InputTip` 的数据以后续使用，请备份以下文件
+- 如果你需要备份 InputTip 的数据以后续使用，请备份以下文件
 
   - `InputTip.ini` 核心的配置文件
-  - `InputTipCursor` 鼠标样式文件夹 (如果你没有修改过，可以忽略)
-  - `InputTipSymbol` 图片符号文件夹 (如果你没有修改过，可以忽略)
+  - `InputTipCursor` 鼠标样式文件夹 (如果没有修改，可以忽略)
+  - `InputTipSymbol` 图片符号文件夹 (如果没有修改，可以忽略)
 
 - 如果使用 [Scoop](https://scoop.sh/) 安装 [abgox/abyss](https://github.com/abgox/abyss) 下的 `InputTip-zip` 或 `InputTip`
   - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
@@ -229,38 +235,40 @@
 
 ### 关于状态提示方案
 
-1. `鼠标样式方案`
+#### 鼠标样式方案
 
-   - 使用多套鼠标样式，根据输入法状态加载不同的鼠标样式
-   - 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
-     - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
-     - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
-   - [自定义鼠标样式](#自定义鼠标样式)
+- 使用多套鼠标样式，根据输入法状态加载不同的鼠标样式
+- 默认使用 [多彩水滴 Oreo 光标](https://zhutix.com/ico/oreo-cu)
+  - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
+  - 在 [更多已适配的鼠标样式](https://inputtip.abgox.com/download/extra) 中有提供它们的左手镜像版本
+- [自定义鼠标样式](#自定义鼠标样式)
 
-2. `符号显示方案`
+#### 符号显示方案
 
-   - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-   - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
-   - 需要注意:
-     - 此方案涉及到调用系统 DLL 获取应用窗口中的输入光标位置信息
-     - InputTip 将通过指定的光标获取模式尝试获取到输入光标位置信息
-     - 你可以通过 `设置光标获取模式` 显示指定应用使用哪种模式
-       - 如果获取不到:
-         - 符号无法显示
-         - 这就只能使用 `鼠标样式方案` 或者 `设置符号显示位置`
-       - 获取到了，只是符号位置有偏差，但在此应用中，所有窗口的偏差相同:
-         - 符号会显示，但符号显示的位置有偏差
-         - 由于偏差相同，可以通过 `偏移量`、`设置特殊偏移量` 解决
-       - 获取到了，只是符号位置有偏差，且在此应用中，不同窗口的偏差不同:
-         - 符号会显示，但符号显示的位置有偏差
-         - 由于偏差不同，无论如何设置，都会有窗口出现位置错误，目前无解
-         - 参考示例: [在 vscode v1.100 版本中，编辑界面和终端界面符号位置有不同偏差](https://github.com/abgox/InputTip/issues/172)
+- 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
+- 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
+- 需要注意:
+  - 此方案涉及到调用系统 DLL 获取应用窗口中的输入光标位置信息
+  - InputTip 将通过指定的光标获取模式尝试获取到输入光标位置信息
+  - 你可以通过 `设置光标获取模式` 显示指定应用使用哪种模式
+    - 如果获取不到:
+      - 符号无法显示
+      - 这就只能使用 [鼠标样式方案](#鼠标样式方案) 或者 `设置符号显示位置`
+    - 获取到了，只是符号位置有偏差，但在此应用中，所有窗口的偏差相同:
+      - 符号会显示，但符号显示的位置有偏差
+      - 由于偏差相同，可以通过 `偏移量`、`设置特殊偏移量` 解决
+    - 获取到了，只是符号位置有偏差，且在此应用中，不同窗口的偏差不同:
+      - 符号会显示，但符号显示的位置有偏差
+      - 由于偏差不同，无论如何设置，都会有窗口出现位置错误，目前无解
+      - 参考示例:
+        - [在 vscode v1.100 版本中，编辑界面和终端界面符号位置有不同偏差](https://github.com/abgox/InputTip/issues/172)
+        - 在 vscode v1.101 版本中已修复
 
 ### 如何在 JetBrains 系列 IDE 中使用 InputTip
 
 > [!Tip]
 >
-> - 如果只使用 `鼠标样式方案`，不需要进行以下步骤
+> - 如果只使用 [鼠标样式方案](#鼠标样式方案)，不需要进行以下步骤
 > - https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains
 > - [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 > - 如果有其他 JAB 程序，也可以按照此步骤进行设置
@@ -346,8 +354,6 @@
 > [!Tip]
 >
 > - 也可以直接下载 [已经适配的鼠标样式](https://inputtip.abgox.com/download/extra) 来使用
-> - `InputTip.exe` 启动后，会在同级目录下生成 `InputTipCursor` 目录，其中包括 `default` 文件夹
->   - `default` 用于存放中文/英文/大写锁定状态的 **默认** 鼠标样式
 
 1. 你需要在 `InputTipCursor` 目录下创建一个文件夹
 
@@ -393,9 +399,9 @@
 
 #### 应用窗口兼容情况
 
-- InputTip 在部分应用窗口中无法正确获取到输入光标位置，导致使用 [符号显示方案](#关于状态提示方案) 可能存在问题
+- InputTip 在部分应用窗口中无法正确获取到输入光标位置，导致使用 [符号显示方案](#符号显示方案) 可能存在问题
 - [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list) 会记录这些特别的应用窗口
-- 如果你不使用 [符号显示方案](#关于状态提示方案)，可以直接忽略
+- 如果你不使用 [符号显示方案](#符号显示方案)，可以直接忽略
 
 #### 输入法兼容情况
 
@@ -426,7 +432,7 @@
   - [华宇拼音输入法](https://pinyin.thunisoft.com/)
   - [影子输入法](https://gitee.com/orz707/Yzime)
     - 需要关闭影子输入法中的 `tsf`
-    - 在键盘布局中，选择一个能正常识别状态的输入法(建议选择微信输入法、搜狗输入法等)
+    - 在键盘布局中，选择一个能正常识别状态的输入法(建议选择[微信输入法](https://z.weixin.qq.com/)、[搜狗输入法](https://shurufa.sogou.com/)等)
     - 然后正常使用影子输入法即可
   - [可可五笔](https://suke.kim/)
   - 谷歌输入法

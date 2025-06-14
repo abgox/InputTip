@@ -42,7 +42,7 @@
 
   - [多种状态提示方案](#关于状态提示方案)
     - 使用多套鼠标光标样式，根据输入法状态加载不同的鼠标光标样式
-    - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
+    - 根据输入法状态在输入光标附近显示不同的 [符号](#符号显示方案)
   - 切换不同窗口时，自动切换到指定的输入法状态
   - 设置按键强制切换到指定的输入法状态
   - 详细便捷的配置菜单
@@ -168,7 +168,7 @@
 
 1. 克隆项目仓库到本地
 
-   - 完成项目克隆后，你也可以直接运行目录下的 `InputTip.bat` 来使用 InputTip，它等同于 [zip 版本](#zip-版本)
+   - 完成项目克隆后，你也可以直接运行 `InputTip.bat` 来使用 InputTip，它等同于 [zip 版本](#zip-版本)
    - [Github](https://github.com/abgox/InputTip)
 
      ```shell
@@ -196,39 +196,38 @@
 2. 退出: `托盘菜单` => `退出`
    - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为 `【否】`，会尝试进行恢复
    - 如果未完全恢复，请根据弹窗提示信息进行操作
-3. 删除相关目录即可
+3. 删除 [目录结构及数据](#目录结构及数据) 中展示的相关目录即可
 
-### 应用数据
+### 目录结构及数据
 
-- 所有相关的文件或目录
+- zip 版本
 
-  - zip 版本
+  - 解压后的 `InputTip-main` 目录
+    - 启动脚本 `src\InputTip.bat`
+    - 配置文件 `src\InputTip.ini`
+    - 鼠标样式文件夹 `src\InputTipCursor`
+    - 图片符号文件夹 `src\InputTipSymbol`
+    - 其他文件或文件夹
 
-    - 解压后的 `InputTip-main` 目录
-      - 鼠标样式文件夹 `src\InputTipCursor`
-      - 图片符号文件夹 `src\InputTipSymbol`
-      - 配置文件 `src\InputTip.ini`
-      - 启动脚本 `src\InputTip.bat`
-      - 其他文件或目录
-
-  - exe 版本
-    - 应用本体 `InputTip.exe`
+- exe 版本
+  - 没有根目录，建议新建一个目录，将 `InputTip.exe` 放入其中再运行
+    - 程序文件 `InputTip.exe`
+    - 配置文件 `InputTip.ini`
     - 鼠标样式文件夹 `InputTipCursor`
     - 图片符号文件夹 `InputTipSymbol`
-    - 配置文件 `InputTip.ini`
-    - 其他文件或目录
 
 ---
 
-- 如果你需要备份 InputTip 的数据以后续使用，请备份以下文件
+- 如果你需要备份 InputTip 的数据以便于后续使用，请备份它们
 
-  - `InputTip.ini` 核心的配置文件
+  - `InputTip.ini` 配置文件
   - `InputTipCursor` 鼠标样式文件夹 (如果没有修改，可以忽略)
   - `InputTipSymbol` 图片符号文件夹 (如果没有修改，可以忽略)
 
 - 如果使用 [Scoop](https://scoop.sh/) 安装 [abgox/abyss](https://github.com/abgox/abyss) 下的 `InputTip-zip` 或 `InputTip`
   - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
   - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们
+  - 注意: 如果卸载时携带 `-p` 或 `--purge` 参数，会删除它们
 - 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)
   - 这些数据文件或文件夹会保存在 `$env:LocalAppData\Microsoft\WinGet\Packages\abgox.InputTip_Microsoft.Winget.Source_8wekyb3d8bbwe` 中
   - 可以正常通过 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 更新、卸载，不会删除这些数据文件和文件夹
@@ -249,7 +248,7 @@
 - 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
 - 需要注意:
   - 此方案涉及到调用系统 DLL 获取应用窗口中的输入光标位置信息
-  - InputTip 将通过指定的光标获取模式尝试获取到输入光标位置信息
+  - InputTip 将通过 [指定的光标获取模式](https://inputtip.abgox.com/FAQ/cursor-mode) 尝试获取到输入光标位置信息
   - 你可以通过 `设置光标获取模式` 显示指定应用使用哪种模式
     - 如果获取不到:
       - 符号无法显示
@@ -264,18 +263,40 @@
         - [在 vscode v1.100 版本中，编辑界面和终端界面符号位置有不同偏差](https://github.com/abgox/InputTip/issues/172)
         - 在 vscode v1.101 版本中已修复
 
-### 如何在 JetBrains 系列 IDE 中使用 InputTip
+### [如何在 JetBrains 系列 IDE 中使用 InputTip](https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains)
+
+> [!Warning]
+>
+> 如果不使用 [符号显示方案](#符号显示方案)，不需要进行以下步骤
 
 > [!Tip]
 >
-> - 如果只使用 [鼠标样式方案](#鼠标样式方案)，不需要进行以下步骤
-> - https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains
-> - [通过 AutoHotkey 官方论坛中 Descolada 大佬给出的解决方案实现](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
-> - 如果有其他 JAB 程序，也可以按照此步骤进行设置
+> - [使用 AutoHotkey 官方论坛中的解决方案实现，方案由 Descolada 提出](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
+> - 建议使用 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
+> - 如果使用其他版本的 JDK 或 JRE，需要自行测试可用性
+> - 例如 [Adoptium Temurin](https://adoptium.net/zh-CN/temurin/releases/?os=windows&arch=any)，测试后发现: JDK 版本无效，JRE 版本有效
 
-1. 打开 Java Access Bridge (java 访问桥)
+1. 安装 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
 
-   - 如果以下命令不存在，请 [下载并安装 OpenJDK JRE](https://adoptium.net/temurin/releases/?os=windows&arch=x64&package=jre&version=8) 或其他 JDK
+   - 使用 [Scoop](https://scoop.sh/)
+
+     ```shell
+     scoop bucket add abyss https://github.com/abgox/abyss.git
+     ```
+
+     ```shell
+     scoop install abyss/OpenJDK-Microsoft-JDK-21
+     ```
+
+   - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/)
+
+     ```shell
+     winget install Microsoft.OpenJDK.21
+     ```
+
+2. 打开 `Java Access Bridge`
+
+   - 如果以下命令不存在，请检查 **步骤 1**
    - 如果以下命令不能正常运行，请检查环境变量是否配置正确
 
      ```shell
@@ -286,14 +307,13 @@
      jabswitch -enable
      ```
 
-2. `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
+3. `托盘菜单` => `启用 JAB/JetBrains IDE 支持`
 
-3. `托盘菜单` => `设置光标获取模式`，将 JetBrains IDE 应用添加到其中的 `JAB` 列表中
+4. `托盘菜单` => `设置光标获取模式`，将 JetBrains IDE 应用添加到其中的 `JAB` 列表中
 
-4. 如果未生效，请依次尝试以下操作并查看是否生效
-
+5. 如果未生效，请依次尝试以下操作并查看是否生效
+   - 重启 InputTip: `托盘菜单` => `重启`
    - 重启正在运行的 JetBrains IDE
-   - 重启 InputTip : `托盘菜单` => `重启`
    - 重启系统
 
 > [!Tip]
@@ -310,11 +330,7 @@
 >   - 使用 `设置符号显示位置`，根据窗口提示，将它添加到其中，即可实现在鼠标附近显示
 >   - 这是一个折中的处理方案，此前的 `v1` 版本就一直使用它，稳定性非常好
 
-#### 图片符号
-
-> [!Tip]
->
-> https://inputtip.abgox.com/FAQ/symbol-picture
+#### [图片符号](https://inputtip.abgox.com/FAQ/symbol-picture)
 
 - `InputTipSymbol\default` 文件夹中包含了默认的图片符号
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示图片符号` 时，会显示对应的图片符号
@@ -325,11 +341,7 @@
 - 设置方法: `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择图片路径
 - 如果选择第一个空白路径，则不会显示对应状态的图片符号
 
-#### 方块符号
-
-> [!Tip]
->
-> https://inputtip.abgox.com/FAQ/symbol-block
+#### [方块符号](https://inputtip.abgox.com/FAQ/symbol-block)
 
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
 - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
@@ -337,11 +349,7 @@
 - 当其中的方块符号的颜色设置修改为空时，则不会显示该状态的方块符号
   - 比如: 你只希望在中文状态下显示方块符号，那么就将 `英文状态时方块符号的颜色` 和 `大写锁定时方块符号的颜色` 的值都设置为空
 
-#### 文本符号
-
-> [!Tip]
->
-> https://inputtip.abgox.com/FAQ/symbol-text
+#### [文本符号](https://inputtip.abgox.com/FAQ/symbol-text)
 
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `2. 显示什么类型的符号`，选择 `显示文本符号` 时，会显示对应的文本符号
 - 默认中文状态为 `中`，英文状态为 `英`，大写锁定为 `大`

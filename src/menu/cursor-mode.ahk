@@ -2,7 +2,7 @@
 
 fn_cursor_mode(*) {
     showGui()
-    showGui(deep := "") {
+    showGui(deep := 0) {
         createUniqueGui(modeGui).Show()
         modeGui(info) {
             g := createGuiOpt("InputTip - 设置光标获取模式")

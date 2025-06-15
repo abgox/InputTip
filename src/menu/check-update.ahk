@@ -9,7 +9,7 @@ fn_check_update(*) {
         line := "--------------------------------------------------------------------------"
         tab := g.AddTab3("-Wrap", ["设置更新检查", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", "你首先应该点击上方的【关于】或官网查看相关的详细帮助说明")
+        g.AddText("Section cRed", gui_help_tip)
 
         if (info.i) {
             g.AddText("cGray", "点击后，如果没有更新弹窗且不是网络问题，则当前是最新版本")
@@ -67,7 +67,7 @@ fn_check_update(*) {
             lineN := "13"
         }
         tab.UseTab(2)
-        g.AddEdit("ReadOnly w" w " r" lineN, aboutText)
+        g.AddEdit("ReadOnly w" bw " r" lineN, aboutText)
         g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/check-update">关于更新检查</a>')
         tab.UseTab(0)
         g.OnEvent("Close", e_close)

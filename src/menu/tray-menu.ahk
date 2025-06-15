@@ -262,6 +262,7 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             g.AddLink("Section cRed", tipList.tip)
 
             if (info.i) {
+                g.AddText(, gui_width_line)
                 return g
             }
             w := info.w

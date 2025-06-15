@@ -2,7 +2,7 @@
 
 fn_switch_window(*) {
     showGui()
-    showGui(deep := "") {
+    showGui(deep := 0) {
         createUniqueGui(switchWindowGui).Show()
         switchWindowGui(info) {
             g := createGuiOpt("InputTip - 指定窗口自动切换输入法状态")

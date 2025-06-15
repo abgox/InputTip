@@ -15,5 +15,5 @@ InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.39.0
-currentVersion := "2.39.0"
+;@AHK2Exe-SetVersion 2.40.0
+currentVersion := "2.40.0"

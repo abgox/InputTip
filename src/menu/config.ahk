@@ -108,7 +108,7 @@ fn_config(*) {
             global hoverHide := item.value
             writeIni("hoverHide", item.value)
         }
-        g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以通过【托盘菜单】中的【设置符号显示位置】，让它在鼠标附近显示")
+        g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以通过【托盘菜单】中的【设置符号显示在鼠标附近】，让它在鼠标附近显示")
         g.AddText("xs", "3. 符号的垂直偏移量的参考原点: ")
         g.AddDropDownList("yp AltSubmit Choose" symbolOffsetBase + 1, [" 输入光标上方", " 输入光标下方"]).OnEvent("Change", e_offset_base)
         e_offset_base(item, *) {

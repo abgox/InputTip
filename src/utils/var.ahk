@@ -598,6 +598,7 @@ restartJAB() {
     }
 }
 
+; 更新符号显示黑白名单和自动切换列表
 updateList(init := 0) {
     global
 
@@ -610,6 +611,12 @@ updateList(init := 0) {
     ; 应用列表: 符号显示白名单
     app_show_state := ":" readIni('app_show_state', '') ":"
 
+    updateAutoSwitchList()
+}
+
+; 更新自动切换列表
+updateAutoSwitchList() {
+    global
     ; 应用列表: 自动切换到中文
     app_CN := StrSplit(readIniSection("App-CN"), "`n")
     ; 应用列表: 自动切换到英文
@@ -617,6 +624,11 @@ updateList(init := 0) {
     ; 应用列表: 自动切换到大写锁定
     app_Caps := StrSplit(readIniSection("App-Caps"), "`n")
 }
+
+/**
+ * 将进程添加到白名单中
+ * @param app 要添加的进程名称
+ */
 updateWhiteList(app) {
     if (!useWhiteList) {
         return

@@ -363,7 +363,7 @@ fn_common(args, cb_updateVar) {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                if (action != "edit" && useWhiteList) {
+                if (action != "edit" && itemValue.configName != "App-ShowSymbol") {
                     g.AddText("cRed", "是否自动添加到白名单中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
@@ -371,7 +371,7 @@ fn_common(args, cb_updateVar) {
                     e_change(item, *) {
                         needAddWhiteList := item.value - 1
                     }
-                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将自动添加")
+                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将以【进程级】自动添加")
                 }
 
                 scaleWidth := bw / 1.5

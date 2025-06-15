@@ -24,9 +24,6 @@ checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 switchStatus := readIni("switchStatus", 1)
 switchStatusList := ["{LShift}", "{RShift}", "^{Space}"]
 
-; 是否使用白名单机制
-useWhiteList := readIni("useWhiteList", 0)
-
 ; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)
 

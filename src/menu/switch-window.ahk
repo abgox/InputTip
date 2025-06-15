@@ -94,7 +94,7 @@ fn_switch_window(*) {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                if (action != "edit" && useWhiteList) {
+                if (action != "edit") {
                     g.AddText("cRed", "是否自动添加到白名单中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
@@ -102,7 +102,7 @@ fn_switch_window(*) {
                     e_change(item, *) {
                         needAddWhiteList := item.value - 1
                     }
-                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将自动添加")
+                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将以【进程级】自动添加")
                 }
 
                 scaleWidth := bw / 1.5
@@ -242,6 +242,7 @@ fn_switch_window(*) {
                 args := {
                     title: "添加一条自动切换规则",
                     state: state,
+                    configName: "",
                     LV: LV
                 }
                 createProcessListGui(args, addClick, e_add_manually)

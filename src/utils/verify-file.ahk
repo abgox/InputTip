@@ -306,9 +306,6 @@ checkIni() {
         ; 输入法模式
         mode := readIni("mode", 1, "InputMethod")
 
-        ; 是否使用白名单机制，如果是第一次使用，就直接使用白名单机制
-        useWhiteList := readIni("useWhiteList", 1)
-
         fz := "s14"
         createGui(confirmGui).Show()
         confirmGui(info) {

@@ -93,9 +93,10 @@ left := 0, top := 0, right := 0, bottom := 0
 lastWindow := "", lastSymbol := "", lastCursor := ""
 
 needHide := 0
-exe_name := ""
-exe_str := "::"
+
+exe_name := "explorer.exe"
 exe_title := ""
+exe_str := ":" exe_name ":"
 
 leaveDelay := delay + 500
 

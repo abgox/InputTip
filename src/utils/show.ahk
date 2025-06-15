@@ -37,13 +37,19 @@ while 1 {
                     continue
                 }
 
-                if (
-                    !showCursorPos
-                    && !WinActive("ahk_class AutoHotkeyGUI")
-                    && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))
-                ) {
-                    hideSymbol()
-                    needShow := 0
+                if (!showCursorPos && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
+                    try {
+                        path := WinGetProcessPath("A")
+                        ; 当前窗口是 InputTip 自身的配置菜单窗口
+                        self := A_AhkPath == path || (A_IsCompiled && A_ScriptFullPath == path)
+                    } catch {
+                        self := 0
+                    }
+
+                    if (!self) {
+                        hideSymbol()
+                        needShow := 0
+                    }
                 }
             }
 

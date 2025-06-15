@@ -312,8 +312,8 @@ checkIni() {
             g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
             g.SetFont(fz, "Microsoft YaHei")
             g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
-            g.AddText("xs cRed", "InputTip 会根据不同输入法状态同步修改鼠标样式")
-            g.AddEdit("xs Disabled -VScroll", "更多详情，请点击【托盘菜单】中的【关于】，前往官网或项目中查看")
+            g.AddText("xs cRed", "InputTip 会使用三套不同颜色的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
+            g.AddLink(, '详情参考鼠标样式方案:  <a href="https://inputtip.abgox.com/v2/#鼠标样式方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标样式方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标样式方案">Gitee</a>')
 
             if (info.i) {
                 return g
@@ -342,14 +342,14 @@ checkIni() {
                         g.Destroy()
                         writeIni("changeCursor", 1)
                         global changeCursor := 1
-                        initWhiteList()
+                        showSymbol()
                     }
                     g.AddButton("w" bw, "【否】不，我点错了").OnEvent("Click", e_no)
                     e_no(*) {
                         g.Destroy()
                         writeIni("changeCursor", 0)
                         global changeCursor := 0
-                        initWhiteList()
+                        showSymbol()
                     }
                     return g
                 }
@@ -359,7 +359,7 @@ checkIni() {
                 g.Destroy()
                 writeIni("changeCursor", 0)
                 global changeCursor := 0
-                initWhiteList()
+                showSymbol()
             }
             g.OnEvent("Close", e_exit)
             e_exit(*) {
@@ -370,14 +370,53 @@ checkIni() {
             }
             return g
         }
+        showSymbol() {
+            createGui(confirmGui).Show()
+            confirmGui(info) {
+                g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
+                g.SetFont(fz, "Microsoft YaHei")
+                g.AddText(, "你是否希望 InputTip 显示符号?")
+                g.AddText("xs cRed", "InputTip 会尝试获取输入光标位置，在其附近显示符号")
+                g.AddLink(, '详情参考符号显示方案:  <a href="https://inputtip.abgox.com/v2/#符号显示方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号显示方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号显示方案">Gitee</a>')
+
+                if (info.i) {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                g.AddButton("xs cRed w" bw, "【是】显示符号").OnEvent("Click", e_yes)
+                e_yes(*) {
+                    g.Destroy()
+                    writeIni("symbolType", 1)
+                    global symbolType := 1
+                    initWhiteList()
+                }
+                g.AddButton("w" bw, "【否】不显示符号").OnEvent("Click", e_no)
+                e_no(*) {
+                    g.Destroy()
+                    writeIni("symbolType", 0)
+                    global symbolType := 0
+                }
+                g.OnEvent("Close", e_exit)
+                e_exit(*) {
+                    try {
+                        IniDelete("InputTip.ini", "InputMethod", "mode")
+                    }
+                    ExitApp()
+                }
+                return g
+            }
+        }
+
         initWhiteList() {
             createGui(listTipGui).Show()
             listTipGui(info) {
                 g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
-                g.AddText("cRed", "对于符号显示，InputTip 现在默认使用白名单机制。")
-                g.AddLink("cRed", '<a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号。')
-                g.AddText(, "建议立即添加你常用的应用进程窗口到白名单中。")
+                g.AddText("cRed", "对于符号显示，InputTip 核心使用白名单机制")
+                g.AddLink("cRed", '<a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a> : 只有在白名单中的应用进程窗口会显示符号')
+                g.AddText(, "建议立即添加你常用的应用进程窗口到白名单中")
 
                 if (info.i) {
                     return g

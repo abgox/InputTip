@@ -28,7 +28,7 @@ fn_bw_list(*) {
                 title: "设置符号显示黑名单应用",
                 tab: "符号显示黑名单",
                 config: "App-HideSymbol",
-                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">为什么建议使用白名单机制</a>'
+                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">符号显示方案的白名单机制</a>'
             }, fn)
             fn() {
                 global app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")

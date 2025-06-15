@@ -786,3 +786,112 @@ autoHdrLV(LV) {
         }
     }
 }
+
+/**
+ * 创建一个包含当前正在运行的进程列表的窗口，用于提取信息，便于进行后续操作
+ * @param {Object} args 传入的参数，格式为 {title: "窗口标题", ...}
+ * @param {String} args.title - 窗口标题
+ * @param {Func} cb_addClick 点击添加按钮的回调函数
+ * @param {Func} cb_addManual 手动添加应用进程的回调函数
+ */
+createProcessListGui(args, cb_addClick, cb_addManual) {
+    showGui()
+    showGui(deep := 0) {
+        createUniqueGui(processListGui).Show()
+        processListGui(info) {
+            showGui(deep := 0) {
+                g := createGuiOpt("InputTip - " args.title)
+                tab := g.AddTab3("-Wrap", ["应用进程列表", "关于"])
+                tab.UseTab(1)
+
+                if (info.i) {
+                    g.AddText(, gui_width_line)
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                g.AddText("Section cRed", gui_help_tip)
+
+                gc.LV_processList := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "来源", "窗口标题", "文件路径"])
+
+                gc.LV_processList.OnEvent("DoubleClick", e_click_add)
+                e_click_add(LV, RowNumber, *) {
+                    windowInfo := {
+                        exe_name: LV.GetText(RowNumber, 1),
+                        title: LV.GetText(RowNumber, 3),
+                        id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                    }
+                    cb_addClick({
+                        windowInfo: windowInfo,
+                        LV: LV,
+                        RowNumber: RowNumber,
+                        parentArgs: args
+                    })
+                }
+
+                gc.LV_processList._type := "add"
+
+                res := ":"
+                DetectHiddenWindows deep
+                gc.LV_processList.Opt("-Redraw")
+                for v in WinGetList() {
+                    try {
+                        exe_name := ProcessGetName(WinGetPID("ahk_id " v))
+                        if (!InStr(res, ":" exe_name ":")) {
+                            res .= exe_name ":"
+                            gc.LV_processList.Add(, exe_name, "系统", WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
+                        }
+                    }
+                }
+
+                for v in StrSplit(readIni("app_show_state", ''), ":") {
+                    if (!InStr(res, ":" v ":") && Trim(v)) {
+                        res .= exe_name ":"
+                        gc.LV_processList.Add(, v, "白名单")
+                    }
+                }
+                gc.LV_processList.Opt("+Redraw")
+                DetectHiddenWindows 1
+                autoHdrLV(gc.LV_processList)
+                g.AddButton("Section w" bw / 3, "刷新此界面").OnEvent("Click", e_fresh)
+                e_fresh(*) {
+                    g.Destroy()
+                    showGui(deep).Show()
+                }
+
+                g.AddButton("yp w" bw / 3, "手动添加").OnEvent("Click", e_add_manually)
+
+                e_add_manually(*) {
+                    windowInfo := {
+                        exe_name: "",
+                        title: "",
+                        id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                    }
+                    cb_addManual({
+                        windowInfo: windowInfo,
+                        parentArgs: args
+                    })
+                }
+
+                if (deep) {
+                    g.AddButton("yp w" bw / 3, "显示更少进程").OnEvent("Click", e_less_window)
+                    e_less_window(*) {
+                        g.Destroy()
+                        showGui(0).Show()
+                    }
+                } else {
+                    g.AddButton("yp w" bw / 3, "显示更多进程").OnEvent("Click", e_more_window)
+                    e_more_window(*) {
+                        g.Destroy()
+                        showGui(1).Show()
+                    }
+                }
+                tab.UseTab(2)
+                g.AddEdit("ReadOnly VScroll r12 w" w, "1. 简要说明`n   - 这个菜单中显示的是所有正在运行的【应用进程列表】`n   - 整个列表根据【进程名称】的首字母进行排序`n   - 如果你需要添加其中一个进程，你只需要鼠标双击它即可`n   - 注意: 为了便于操作，白名单中的应用进程也会添加到列表中`n`n2. 应用进程列表 —— 进程名称`n   - 应用实际运行的进程名称`n   - 如果不清楚是哪个应用的进程，可能需要通过【窗口标题】、【文件路径】来判断`n`n3. 应用进程列表 —— 来源`n   - 它可能是【系统】或【白名单】`n   - 【白名单】表明这个进程是从系统中获取的，它正在运行`n   - 【系统】表明这个进程是存在于白名单中的，为了方便操作，被添加到列表中`n`n4. 应用进程列表 —— 窗口标题`n   - 这个应用进程所显示的窗口的标题`n   - 你可能需要通过它来判断这是哪一个应用的进程`n`n5. 应用进程列表 —— 文件路径`n   - 这个应用进程的可执行文件的所在路径`n   - 你可能需要通过它来判断这是哪一个应用的进程`n`n6. 技巧 —— 获取当前窗口的实时的相关进程信息`n   - 你可以使用【托盘菜单】中的【获取当前窗口相关进程信息】`n   - 它会实时获取当前激活的窗口的【进程名称】【窗口标题】【文件路径】`n`n7. 按钮 —— 刷新此界面`n   - 因为列表中显示的是当前正在运行的应用进程`n   - 如果你是先打开这个配置菜单，再打开对应的应用，它不会显示在这里`n   - 你需要重新打开这个配置菜单，或者点击这个按钮进行刷新`n`n8. 按钮 —— 手动添加`n   - 在【应用进程列表】中，可能没有你想要添加的进程，你需要点击这个按钮手动添加`n   - 可以配合第 6 点的技巧，让手动添加更方便`n`n9. 按钮 —— 显示更多进程`n   - 默认情况下，【应用进程列表】中显示的是前台应用进程，就是有窗口的应用进程`n   - 你可以点击它来显示更多的进程，比如后台进程`n`n10. 按钮 —— 显示更少进程`n   - 当你点击【显示更多进程】按钮后，会出现这个按钮`n   - 点击它又会重新显示前台应用进程")
+                return g
+            }
+            return showGui()
+        }
+    }
+}

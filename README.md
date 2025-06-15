@@ -31,7 +31,7 @@
 >
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被误判为游戏外挂，exe 版本可能被误判为病毒程序](https://inputtip.abgox.com/FAQ/about-virus)
->   - [推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
+>   - [只推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 > - InputTip 只适用于 **Windows** 系统: **Win10** 以上可用，以下未知
 > - `托盘菜单` 指的是在底部任务栏右边的 InputTip 应用托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
@@ -245,7 +245,7 @@
 #### 符号显示方案
 
 - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-- 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
+- 需要搭配 [符号的白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 使用
 - 需要注意:
   - 此方案涉及到调用系统 DLL 获取应用窗口中的输入光标位置信息
   - InputTip 将通过 [指定的光标获取模式](https://inputtip.abgox.com/FAQ/cursor-mode) 尝试获取到输入光标位置信息
@@ -267,7 +267,8 @@
 
 > [!Warning]
 >
-> 如果不使用 [符号显示方案](#符号显示方案)，不需要进行以下步骤
+> - 如果不使用 [符号显示方案](#符号显示方案)，不需要进行步骤 1 和 2
+> - 直接从步骤 3 开始，让 InputTip 能在 IDE 中正常识别和切换输入法状态即可
 
 > [!Tip]
 >
@@ -294,7 +295,7 @@
      winget install Microsoft.OpenJDK.21
      ```
 
-2. 打开 `Java Access Bridge`
+2. 启用 `Java Access Bridge`
 
    - 如果以下命令不存在，请检查 **步骤 1**
    - 如果以下命令不能正常运行，请检查环境变量是否配置正确

@@ -43,26 +43,13 @@ fn_symbol_pos(*) {
         set_app_list(*) {
             g.Destroy()
             fn_common({
-                gui: "setShowPosGui",
-                config: "showCursorPosList",
-                tab: ["设置符号显示在鼠标附近的应用", "关于"],
-                tip: gui_help_tip,
-                list: "符号显示在鼠标附近的应用列表",
-                color: "cRed",
-                about: '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到【符号显示在鼠标附近的应用列表】中`n   - 如果需要更多的进程，请点击右下角的【显示更多进程】以显示后台和隐藏进程`n   - 也可以点击右下角的【手动添加】直接添加进程名称`n`n   - 下方是【符号显示在鼠标附近的应用列表】`n   - 双击列表中任意应用进程，就可以将它移除`n`n2. 为什么要添加这个列表？`n   - 因为在少数应用中始终无法获取到输入光标位置，从而无法实现在输入光标附近显示符号`n   - 而 v1 版本中，在鼠标附近显示符号的方案，在这种情况下也算是一种折中的解决方案`n`n3. 如何快速添加应用进程？`n`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
-                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/symbol-show-pos">关于符号显示位置</a>',
-                addConfirm: "是否要将",
-                addConfirm2: "添加到【符号显示在鼠标附近的应用列表】中？",
-                addConfirm3: "添加后，在此应用窗口中时，符号会显示在鼠标附近",
-                rmConfirm: "是否要将",
-                rmConfirm2: "从【符号显示在鼠标附近的应用列表】中移除？",
-                rmConfirm3: "移除后，在此应用窗口中时，符号会显示在输入光标附近",
-            },
-                fn
-            )
-            fn(value) {
-                global showCursorPosList := ":" value ":"
-                gc.setShowPosGui_LV_rm_title.Text := "符号显示在鼠标附近的应用列表 ( " gc.setShowPosGui_LV_rm.GetCount() " 个 )"
+                title: "设置符号显示在鼠标附近的应用",
+                tab: "设置符号显示在鼠标附近",
+                config: "ShowNearCursor",
+                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/symbol-show-pos">关于符号显示位置</a>'
+            }, fn)
+            fn() {
+                global ShowNearCursor := StrSplit(readIniSection("ShowNearCursor"), "`n")
                 restartJAB()
             }
         }

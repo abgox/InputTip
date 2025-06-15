@@ -43,7 +43,7 @@ symbolOffsetBase := readIni("symbolOffsetBase", 0)
 ; 是否在任意窗口中，符号都显示在鼠标附近
 showCursorPos := readIni("showCursorPos", 0)
 ; 需要将符号显示在鼠标附近的窗口列表
-showCursorPosList := ":" readIni("showCursorPosList", "wps.exe") ":"
+ShowNearCursor := StrSplit(readIniSection("ShowNearCursor"), "`n")
 ; 符号显示在鼠标附近时的特殊偏移量 x
 showCursorPos_x := readIni("showCursorPos_x", 0)
 ; 符号显示在鼠标附近时的特殊偏移量 y

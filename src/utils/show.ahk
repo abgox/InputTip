@@ -140,10 +140,65 @@ switchState(exe_name, exe_title) {
     return 0
 }
 
+/**
+ * 是否需要显示在鼠标附近
+ * @param {String} exe_name 程序名
+ * @param {String} exe_title 程序标题
+ * @returns {1 | 0}
+ */
+showBesideCursor(exe_name, exe_title) {
+    if (showCursorPos) {
+        return 1
+    }
+    return validateMatch(exe_name, exe_title, ShowNearCursor)
+}
+
+/**
+ * 验证匹配是否成功(通用)
+ * @param {String} exe_name 程序名
+ * @param {String} exe_title 程序标题
+ * @returns {1 | 0}
+ */
+validateMatch(exe_name, exe_title, configValue) {
+    for v in configValue {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 4)
+        if (part.Length >= 2) {
+            ; 进程名称
+            name := part[1]
+            if (exe_name == name) {
+                ; 如果是进程级
+                if (part[2]) {
+                    return 1
+                }
+            } else {
+                continue
+            }
+        }
+
+        if (part.Length < 4) {
+            continue
+        }
+
+        if (name == exe_name) {
+            ; 是否正则匹配
+            isRegex := part[3]
+            ; 标题
+            title := part[4]
+
+            isMatch := isRegex ? RegExMatch(exe_title, title) : exe_title == title
+            if (isMatch) {
+                return 1
+            }
+        }
+    }
+    return 0
+}
+
 ShowSymbolEx(state) {
     global canShowSymbol
     if (needShow) {
-        if (showCursorPos || InStr(showCursorPosList, exe_str)) {
+        if (showCursorPos || showBesideCursor(exe_name, exe_title)) {
             try {
                 MouseGetPos(&left, &top)
                 canShowSymbol := 1

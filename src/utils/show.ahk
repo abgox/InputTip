@@ -33,12 +33,12 @@ while 1 {
                 continue
             }
             if (useWhiteList) {
-                if (!showCursorPos && !InStr(app_show_state, exe_str) && !WinActive("ahk_class AutoHotkeyGUI")) {
+                if (!showCursorPos && !validateMatch(exe_name, exe_title, app_ShowSymbol) && !WinActive("ahk_class AutoHotkeyGUI")) {
                     hideSymbol()
                     needShow := 0
                 }
             } else {
-                if (InStr(app_hide_state, exe_str)) {
+                if (validateMatch(exe_name, exe_title, app_HideSymbol)) {
                     hideSymbol()
                     needShow := 0
                 }

@@ -548,13 +548,19 @@ checkUpdateDone() {
             }
         }
 
-        try {
-            list := [{
-                old: "showCursorPosList",
-                new: "ShowNearCursor"
-            }]
+        list := [{
+            old: "showCursorPosList",
+            new: "ShowNearCursor"
+        }, {
+            old: "app_hide_state",
+            new: "App-HideSymbol"
+        }, {
+            old: "app_show_state",
+            new: "App-ShowSymbol"
+        }]
 
-            for v in list {
+        for v in list {
+            try {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", v.old), ":")
                 for value in _ {
                     id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec

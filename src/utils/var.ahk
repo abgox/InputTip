@@ -606,10 +606,10 @@ updateList(init := 0) {
         restartJAB()
     }
     ; 应用列表: 符号显示黑名单
-    app_hide_state := ":" readIni('app_hide_state', '') ":"
+    app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
 
     ; 应用列表: 符号显示白名单
-    app_show_state := ":" readIni('app_show_state', '') ":"
+    app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
 
     updateAutoSwitchList()
 }
@@ -626,23 +626,32 @@ updateAutoSwitchList() {
 }
 
 /**
- * 将进程添加到白名单中
+ * 将进程以【进程级】添加到白名单中
  * @param app 要添加的进程名称
  */
 updateWhiteList(app) {
-    if (!useWhiteList) {
-        return
-    }
-    global app_show_state
-    _app_show_state := readIni("app_show_state", "")
-    if (!InStr(app_show_state, ":" app ":")) {
-        if (_app_show_state) {
-            _app_show_state .= ":" app
-        } else {
-            _app_show_state := app
+    exist := 0
+
+    for v in StrSplit(readIniSection("App-ShowSymbol"), "`n") {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 3)
+        try {
+            if (part[1] == app) {
+                isGlobal := part[2]
+                if (isGlobal) {
+                    exist := 1
+                    return
+                } else {
+                    continue
+                }
+            }
         }
-        app_show_state := ":" _app_show_state ":"
-        writeIni("app_show_state", _app_show_state)
+    }
+    if (!exist) {
+        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+        writeIni(id, app ":1", "App-ShowSymbol")
+
+        global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
     }
 }
 updateAppOffset(init := 0) {

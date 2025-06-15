@@ -66,26 +66,13 @@ fn_bw_list(*) {
         set_black_list(*) {
             g.Destroy()
             fn_common({
-                gui: "blackListGui",
-                config: "app_hide_state",
-                tab: ["设置黑名单", "关于"],
-                tip: "你首先应该点击上方的【关于】查看具体的操作说明                                    ",
-                list: "符号显示黑名单",
-                color: "cRed",
-                about: '1. 如何使用这个配置菜单？`n`n   - 上方的列表页显示的是当前系统正在运行的应用进程(仅前台窗口)`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意应用进程，就可以将其添加到【符号显示黑名单】中`n   - 如果需要更多的进程，请点击右下角的【显示更多进程】以显示后台和隐藏进程`n   - 也可以点击右下角的【手动添加】直接添加进程名称`n`n   - 下方是【符号显示黑名单】应用进程列表，如果使用黑名单机制，它将生效`n   - 双击列表中任意应用进程，就可以将它移除`n`n   - 黑名单机制: 只有不在黑名单中的应用进程窗口才会显示符号`n   - 使用黑名单，可能会有一些特殊窗口的兼容性问题`n   - 建议使用白名单机制，最好少用黑名单机制`n`n2. 如何快速添加应用进程？`n`n   - 每次双击应用进程后，会弹出操作窗口，需要选择添加/移除或取消`n   - 如果你确定当前操作不需要取消，可以在操作窗口弹出后，按下空格键快速确认',
-                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">白名单机制</a>',
-                addConfirm: "是否要将",
-                addConfirm2: "添加到【符号显示黑名单】中？",
-                addConfirm3: "添加后，黑名单机制下，在此应用窗口中时，不会显示符号",
-                rmConfirm: "是否要将",
-                rmConfirm2: "从【符号显示黑名单】中移除？",
-                rmConfirm3: "移除后，黑名单机制下，在此应用窗口中时，会显示符号",
-            },
-                fn
-            )
-            fn(value) {
-                global app_hide_state := ":" value ":"
-                gc.blackListGui_LV_rm_title.Text := "符号显示黑名单 ( " gc.blackListGui_LV_rm.GetCount() " 个 )"
+                title: "设置符号显示黑名单应用",
+                tab: "符号显示黑名单",
+                config: "App-HideSymbol",
+                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">为什么建议使用白名单机制</a>'
+            }, fn)
+            fn() {
+                global app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
                 restartJAB()
             }
         }

@@ -251,15 +251,24 @@ fn_restart(*) {
     ExitApp()
 }
 
-fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
+
+/**
+ * 通用的 窗口级、标题级匹配菜单
+ * @param {Object} args 传入的参数，格式为 {title: "窗口标题", ...}
+ * @param {String} args.title - 窗口标题
+ * @param {String} args.tab - 标签页名称
+ * @param {String} args.config - 配置项名称
+ * @param {Func} cb_updateVar 更新变量的回调函数
+ */
+fn_common(args, cb_updateVar) {
     showGui()
-    showGui(deep := "") {
+    showGui(deep := 0) {
         createUniqueGui(commonGui).Show()
         commonGui(info) {
-            g := createGuiOpt("InputTip - 配置")
-            tab := g.AddTab3("-Wrap", tipList.tab)
+            g := createGuiOpt("InputTip - " args.title)
+            tab := g.AddTab3("-Wrap", [args.tab, "关于"])
             tab.UseTab(1)
-            g.AddLink("Section cRed", tipList.tip)
+            g.AddLink("Section cRed", gui_help_tip)
 
             if (info.i) {
                 g.AddText(, gui_width_line)
@@ -268,84 +277,48 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
             w := info.w
             bw := w - g.MarginX * 2
 
-            tabs := ["应用进程列表", "窗口标题", "应用进程文件所在位置"]
-            _gui := tipList.gui
+            LV := "LV_" A_Now
 
-            LV_add := gc.%_gui "_LV_add"% := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, tabs)
-            LV_add.OnEvent("DoubleClick", e_add_dbClick)
-            e_add_dbClick(LV, RowNumber) {
-                if (addClickFn) {
-                    addClickFn(LV, RowNumber, tipList)
-                } else {
-                    handleClick(LV, RowNumber, "add", tipList)
-                }
-            }
-            if (tipList.config = "app_offset") {
-                res := ":"
-                for v in app_offset.OwnProps() {
-                    res .= v ":"
-                }
-            } else {
-                res := ":" readIni(tipList.config, "") ":"
-            }
-            temp := ":"
-            DetectHiddenWindows deep
-            LV_add.Opt("-Redraw")
-            for v in WinGetList() {
-                try {
-                    exe_name := ProcessGetName(WinGetPID("ahk_id " v))
-                    exe_str := ":" exe_name ":"
-                    if (!InStr(temp, exe_str) && !InStr(res, exe_str)) {
-                        temp .= exe_name ":"
-                        LV_add.Add(, exe_name, WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
-                    }
-                }
-            }
-            if (tipList.config != "app_show_state") {
-                for v in StrSplit(readIni("app_show_state", ''), ":") {
-                    if (!InStr(temp, ":" v ":") && !InStr(res, ":" v ":")) {
-                        temp .= v ":"
-                        try {
-                            LV_add.Add(, v, WinGetTitle("ahk_exe " v), WinGetProcessPath("ahk_exe " v))
-                        } catch {
-                            LV_add.Add(, v)
-                        }
-                    }
-                }
-            }
+            gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
 
-            LV_add.Opt("+Redraw")
-            DetectHiddenWindows 1
-            autoHdrLV(LV_add)
-
-            gc.%_gui "_LV_rm_title"% := g.AddText("w" w, tipList.list)
-            LV_rm := gc.%_gui "_LV_rm"% := g.AddListView("xs -Hdr -LV0x10 -Multi r8 NoSortHdr Sort Grid w" w / 2 " " tipList.color, [tipList.list])
-            valueArr := StrSplit(readIni(tipList.config, ""), ":")
-            temp := ":"
-            LV_rm.Opt("-Redraw")
+            gc.%LV%.Opt("-Redraw")
+            valueArr := StrSplit(readIniSection(args.config), "`n")
             for v in valueArr {
-                if (Trim(v) && !InStr(temp, ":" v ":")) {
-                    if (tipList.config = "app_offset") {
-                        LV_rm.Add(, StrSplit(v, "|")[1])
-                    } else {
-                        LV_rm.Add(, v)
+                kv := StrSplit(v, "=", , 2)
+                part := StrSplit(kv[2], ":", , 4)
+                if (part.Length >= 2) {
+                    name := part[1]
+                    isGlobal := part[2]
+                    isRegex := ""
+                    title := ""
+                    if (part.Length == 4) {
+                        isRegex := part[3]
+                        title := part[4]
                     }
-                    temp .= v ":"
-                }
-            }
-            LV_rm.Opt("+Redraw")
-            gc.%_gui "_LV_rm_title"%.Text := tipList.list " ( " LV_rm.GetCount() " 个 )"
 
-            autoHdrLV(LV_rm)
-            LV_rm.OnEvent("DoubleClick", e_rm_dbClick)
-            e_rm_dbClick(LV, RowNumber) {
-                if (rmClickFn) {
-                    rmClickFn(LV, RowNumber, tipList)
+                    tipGlobal := isGlobal ? "窗口级" : "标题级"
+
+                    tipRegex := isRegex ? "正则" : "相等"
+                    gc.%LV%.Add(, name, tipGlobal, tipRegex, title, kv[1])
                 } else {
-                    handleClick(LV, RowNumber, "rm", tipList)
+                    IniDelete("InputTip.ini", args.config, kv[1])
                 }
             }
-            handleClick(LV, RowNumber, from, tipList) {
+            gc.%LV%.Opt("+Redraw")
+            autoHdrLV(gc.%LV%)
+
+            gc.%LV%.OnEvent("DoubleClick", handleClick)
+            gc.%LV%._LV := LV
+            gc.%LV%._config := args.config
+            _ := g.AddButton("xs w" w, "添加规则")
+            _.OnEvent("Click", e_add)
+            _._LV := LV
+            _._config := args.config
+            e_add(item, *) {
+                fn_add(item._LV, item._config)
+            }
+
+            handleClick(LV, RowNumber) {
                 if (!RowNumber) {
                     return
                 }
@@ -354,271 +327,181 @@ fn_common(tipList, handleFn, addClickFn := "", rmClickFn := "", addFn := "") {
                     gc.w.subGui.Destroy()
                     gc.w.subGui := ""
                 }
-                createGui(addGui).Show()
-                addGui(info) {
-                    g := createGuiOpt("InputTip - 配置")
-                    g.AddLink(, tipList.%from "Confirm"%)
-                    g.AddLink("yp cRed", exe_name)
-                    g.AddLink("yp", tipList.%from "Confirm2"%)
-                    g.AddLink("xs", tipList.%from "Confirm3"%)
 
-                    if (info.i) {
-                        return g
+                itemValue := {
+                    exe_name: LV.GetText(RowNumber, 1),
+                    isGlobal: LV.GetText(RowNumber, 2),
+                    isRegex: LV.GetText(RowNumber, 3),
+                    title: LV.GetText(RowNumber, 4),
+                    id: LV.GetText(RowNumber, 5),
+                    configName: LV._config
+                }
+                createGui(editGui).Show()
+                editGui(info) {
+                    return fn_edit(gc.%LV._LV%, RowNumber, "edit", itemValue)
+                }
+            }
+
+            fn_edit(LV, RowNumber, action, itemValue) {
+                ; 是否自动添加到白名单中
+                needAddWhiteList := 1
+
+                if (action == "edit") {
+                    actionText := "编辑"
+                } else {
+                    actionText := "添加"
+                }
+
+                label := "正在" actionText "规则"
+
+                g := createGuiOpt("InputTip - " label)
+
+                if (info.i) {
+                    g.AddText(, gui_width_line)
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                if (action != "edit" && useWhiteList) {
+                    g.AddText("cRed", "是否自动添加到白名单中: ")
+                    _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
+                    _.Value := needAddWhiteList + 1
+                    _.OnEvent("Change", e_change)
+                    e_change(item, *) {
+                        needAddWhiteList := item.value - 1
                     }
-                    w := info.w
-                    bw := w - g.MarginX * 2
+                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将自动添加")
+                }
 
-                    if (from = "add") {
-                        if (useWhiteList && tipList.config = "showCursorPosList") {
-                            g.AddText("xs cRed", "如果它不在白名单中，则会同步添加到白名单中")
-                        }
-                        _ := g.AddButton("xs w" bw, "添加")
-                        _.Focus()
-                        _.OnEvent("Click", fn_add)
-                        fn_add(*) {
-                            g.Destroy()
-                            if (useWhiteList && tipList.config = "showCursorPosList") {
-                                updateWhiteList(exe_name)
-                            }
-                            gc.%_gui "_LV_add"%.Delete(RowNumber)
-                            autoHdrLV(gc.%_gui "_LV_add"%)
-                            gc.%_gui "_LV_rm"%.Add(, exe_name)
-                            autoHdrLV(gc.%_gui "_LV_rm"%)
-                            config := tipList.config
-                            value := readIni(config, "")
-                            if (value) {
-                                result := value ":" exe_name
-                                writeIni(config, value ":" exe_name)
-                            } else {
-                                result := exe_name
-                                writeIni(config, exe_name)
-                            }
-                            handleFn(result)
-                        }
+                scaleWidth := bw / 1.5
+
+                g.AddText(, "1. 进程名称: ")
+                _ := g.AddEdit("yp w" scaleWidth, "")
+                _.Text := itemValue.exe_name
+                _.OnEvent("Change", e_changeName)
+                e_changeName(item, *) {
+                    v := item.Text
+                    itemValue.exe_name := v
+                }
+
+                g.AddText("xs", "2. 匹配范围: ")
+                _ := g.AddDropDownList("yp w" scaleWidth, ["窗口级", "标题级"])
+                _.Text := itemValue.isGlobal
+                _.OnEvent("Change", e_changeLevel)
+                e_changeLevel(item, *) {
+                    v := item.Text
+                    itemValue.isGlobal := v
+                }
+
+                g.AddText("xs cGray", "【匹配模式】和【匹配标题】仅在【匹配范围】为【标题级】时有效")
+                g.AddText("xs", "3. 匹配模式: ")
+                _ := g.AddDropDownList("yp w" scaleWidth, ["相等", "正则"])
+                _.Text := itemValue.isRegex
+                _.OnEvent("Change", e_changeMatch)
+                e_changeMatch(item, *) {
+                    v := item.Text
+                    itemValue.isRegex := v
+                }
+
+                g.AddText("xs", "4. 匹配标题: ")
+                _ := g.AddEdit("yp w" scaleWidth)
+                _.Text := itemValue.title
+                _.OnEvent("Change", e_changeTitle)
+                e_changeTitle(item, *) {
+                    v := item.Text
+                    itemValue.title := v
+                }
+
+                g.AddButton("xs w" bw / 1.2, "完成" actionText).OnEvent("Click", e_set)
+                e_set(*) {
+                    fn_set(action, 0)
+                }
+                if (action == "edit") {
+                    g.AddButton("xs w" bw / 1.2, "删除它").OnEvent("Click", e_delete)
+                    e_delete(*) {
+                        fn_set(action, 1)
+                    }
+                }
+
+                fn_set(action, delete) {
+                    g.Destroy()
+
+                    try {
+                        IniDelete("InputTip.ini", itemValue.configName, itemValue.id)
+                    }
+
+                    if (delete) {
+                        LV.Delete(RowNumber)
                     } else {
-                        _ := g.AddButton("xs w" bw, "移除")
-                        _.Focus()
-                        _.OnEvent("Click", e_rm)
-                        e_rm(*) {
-                            g.Destroy()
-                            LV.Delete(RowNumber)
-                            autoHdrLV(LV)
-                            gc.%_gui "_LV_rm_title"%.Text := tipList.list " ( " gc.%_gui "_LV_rm"%.GetCount() " 个 )"
-                            try {
-                                gc.%_gui "_LV_add"%.Add(, exe_name, WinGetTitle("ahk_exe " exe_name))
-                                autoHdrLV(gc.%_gui "_LV_add"%)
-                            }
-                            config := tipList.config
-                            value := readIni(config, "")
-                            result := ""
-                            for v in StrSplit(value, ":") {
-                                if (Trim(v) && v != exe_name) {
-                                    result .= ":" v
-                                }
-                            }
-                            result := SubStr(result, 2)
-                            writeIni(config, result)
-                            handleFn(result)
+                        isGlobal := itemValue.isGlobal == "窗口级" ? 1 : 0
+                        isRegex := itemValue.isRegex == "正则" ? 1 : 0
+                        value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
+                        ; 没有进行移动
+                        writeIni(itemValue.id, value, itemValue.configName, "InputTip.ini")
+                        if (action == "edit") {
+                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                        } else {
+                            LV.Insert(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                        }
+
+                        if (needAddWhiteList) {
+                            updateWhiteList(itemValue.exe_name)
                         }
                     }
-                    g.AddButton("xs w" bw, "取消").OnEvent("Click", no)
-                    no(*) {
-                        g.Destroy()
+
+                    autoHdrLV(LV)
+
+                    cb_updateVar()
+                }
+                return g
+            }
+
+            fn_add(parentLV, configName) {
+                args := {
+                    title: "添加规则",
+                    configName: configName,
+                    LV: parentLV,
+                }
+                createProcessListGui(args, addClick, e_add_manually)
+
+                addClick(args) {
+                    windowInfo := args.windowInfo
+                    RowNumber := args.RowNumber
+
+                    itemValue := {
+                        exe_name: windowInfo.exe_name,
+                        isGlobal: "窗口级",
+                        isRegex: "相等",
+                        title: windowInfo.title,
+                        id: windowInfo.id,
+                        configName: args.parentArgs.configName
                     }
-                    gc.w.subGui := g
-                    return g
+                    fn_edit(gc.%args.parentArgs.LV%, RowNumber, "add", itemValue).Show()
+                }
+
+                e_add_manually(args) {
+                    windowInfo := args.windowInfo
+
+                    itemValue := {
+                        exe_name: windowInfo.exe_name,
+                        isGlobal: "窗口级",
+                        isRegex: "相等",
+                        title: windowInfo.title,
+                        id: windowInfo.id,
+                        configName: args.parentArgs.configName
+                    }
+                    fn_edit(gc.%args.parentArgs.LV%, 1, "add", itemValue).Show()
                 }
             }
-            g.AddButton("Section yp w" w / 2, "刷新此界面").OnEvent("Click", e_refresh)
-            e_refresh(*) {
-                fn_close()
-                showGui(deep)
-            }
-            g.AddButton("xs w" w / 2, "手动添加").OnEvent("Click", e_add_by_hand)
-            e_add_by_hand(*) {
-                if (addFn) {
-                    addFn(tipList)
-                    return
-                }
-                addApp("xxx.exe")
-                addApp(v) {
-                    if (gc.w.subGui) {
-                        gc.w.subGui.Destroy()
-                        gc.w.subGui := ""
-                    }
-                    createGui(addGui).Show()
-                    addGui(info) {
-                        g := createGuiOpt("InputTip - " tipList.tab[1])
-                        text := "每次只能添加一个应用进程名称"
-                        if (useWhiteList) {
-                            text .= "`n如果它不在白名单中，则会同步添加到白名单中"
-                        }
-                        g.AddText("cRed", text)
-                        g.AddText("xs", "应用进程名称: ")
-
-                        if (info.i) {
-                            return g
-                        }
-                        w := info.w
-                        bw := w - g.MarginX * 2
-
-                        gc._exe_name := g.AddEdit("yp")
-                        gc._exe_name.Value := v
-                        g.AddButton("xs w" bw, "添加").OnEvent("Click", e_yes)
-                        e_yes(*) {
-                            exe_name := gc._exe_name.value
-                            g.Destroy()
-                            if (!RegExMatch(exe_name, "^.*\.\w{3}$") || RegExMatch(exe_name, '[\\/:*?\"<>|]')) {
-                                if (gc.w.subGui) {
-                                    gc.w.subGui.Destroy()
-                                    gc.w.subGui := ""
-                                }
-                                createGui(errGui).Show()
-                                errGui(info) {
-                                    g := createGuiOpt("InputTip - 警告")
-                                    g.AddText("cRed", exe_name)
-                                    g.AddText("yp", "是一个错误的应用进程名称")
-                                    g.AddText("xs cRed", '正确的应用进程名称是 xxx.exe 这样的格式`n同时文件名中不能包含这些英文符号 \ / : * ? " < >|')
-
-                                    if (info.i) {
-                                        return g
-                                    }
-                                    w := info.w
-                                    bw := w - g.MarginX * 2
-
-                                    y := g.AddButton("xs w" bw, "重新输入")
-                                    y.Focus()
-                                    y.OnEvent("click", e_close)
-                                    e_close(*) {
-                                        g.Destroy()
-                                        addApp(exe_name)
-                                    }
-                                    gc.w.subGui := g
-                                    return g
-                                }
-                                return
-                            }
-                            value := readIni(tipList.config, "")
-                            valueArr := StrSplit(value, ":")
-                            res := ""
-                            isExist := 0
-                            for v in valueArr {
-                                if (v = exe_name) {
-                                    isExist := 1
-                                }
-                                if (Trim(v)) {
-                                    res .= v ":"
-                                }
-                            }
-                            if (isExist) {
-                                if (gc.w.subGui) {
-                                    gc.w.subGui.Destroy()
-                                    gc.w.subGui := ""
-                                }
-                                createGui(existGui).Show()
-                                existGui(info) {
-                                    g := createGuiOpt("InputTip - 警告")
-                                    g.AddText("cRed", exe_name)
-                                    g.AddText("yp", "这个应用进程已经存在了")
-
-                                    if (info.i) {
-                                        return g
-                                    }
-                                    w := info.w
-                                    bw := w - g.MarginX * 2
-
-                                    g.AddButton("xs w" bw, "重新输入").OnEvent("click", e_close)
-                                    e_close(*) {
-                                        g.Destroy()
-                                        addApp(exe_name)
-                                    }
-                                    gc.w.subGui := g
-                                    return g
-                                }
-                            } else {
-                                updateWhiteList(exe_name)
-                                gc.%_gui "_LV_rm"%.Add(, exe_name)
-                                autoHdrLV(gc.%_gui "_LV_rm"%)
-                                result := res exe_name
-                                writeIni(tipList.config, result)
-                                handleFn(result)
-                            }
-                        }
-                        gc.w.subGui := g
-                        return g
-                    }
-                }
-            }
-            g.AddButton("xs w" w / 2, "一键清空【" tipList.list "】").OnEvent("Click", e_clear)
-            e_clear(*) {
-                count := gc.%tipList.gui "_LV_rm"%.GetCount()
-                if (gc.w.subGui) {
-                    gc.w.subGui.Destroy()
-                    gc.w.subGui := ""
-                }
-                createGui(clearGui).Show()
-                clearGui(info) {
-                    g := createGuiOpt("InputTip - 警告")
-                    g.AddText(, "确定要清空【" tipList.list "】吗？")
-                    g.AddText("cRed", "请谨慎选择，它会移除其中的 " count " 个应用进程`n一旦清空，无法恢复，只能重新一个一个添加")
-
-                    if (info.i) {
-                        return g
-                    }
-                    w := info.w
-                    bw := w - g.MarginX * 2
-
-                    g.AddButton("xs w" bw, "【是】我确定要清空").OnEvent("Click", yes)
-                    _ := g.AddButton("xs w" bw, "【否】不，我点错了")
-                    _.Focus()
-                    _.OnEvent("Click", no)
-                    yes(*) {
-                        g.Destroy()
-                        gc.%_gui "_LV_rm"%.Delete()
-                        autoHdrLV(gc.%_gui "_LV_rm"%)
-                        writeIni(tipList.config, "")
-                        handleFn("")
-                        fn_close()
-                        showGui(deep)
-                    }
-                    no(*) {
-                        g.Destroy()
-                    }
-                    gc.w.subGui := g
-                    return g
-                }
-            }
-            if (deep) {
-                g.AddButton("xs w" w / 2, "显示更少进程(前台窗口)").OnEvent("Click", e_less_window)
-                e_less_window(*) {
-                    fn_close()
-                    showGui("")
-                }
-            } else {
-                g.AddButton("xs w" w / 2, "显示更多进程(后台窗口)").OnEvent("Click", e_more_window)
-                e_more_window(*) {
-                    fn_close()
-                    showGui(1)
-                }
-            }
-            autoHdrLV(LV_add)
             tab.UseTab(2)
-            g.AddEdit("ReadOnly -VScroll w" w, tipList.about)
-            if (tipList.link) {
-                g.AddLink(, tipList.link)
-            }
-            g.OnEvent("Close", fn_close)
-            fn_close(*) {
-                g.Destroy()
-                try {
-                    gc.w.subGui.Destroy()
-                    gc.w.subGui := ""
-                }
-            }
+            g.AddEdit("Section r11 w" w, "1. 简要说明`n   - 这个菜单用来配置【" args.tab "】的匹配规则`n   - 下方是对应的规则列表`n`n2. 规则列表 —— 进程名称`n   - 窗口实际的应用进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【进程级】或【标题级】`n   - 【进程级】: 只要在这一个进程中时，就会触发`n   - 【标题级】: 只有在这个进程中，且标题匹配成功时，才会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发`n   - 【正则】: 使用正则表达式匹配标题，匹配成功才会触发`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式`n   - 它会根据匹配模式进行匹配`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取当前窗口相关进程信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 添加规则`n   - 点击它，可以添加一条规则")
+            g.AddLink(, args.link)
             return g
         }
     }
 }
+
 
 fn_white_list(*) {
     fn_common({

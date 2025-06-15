@@ -253,7 +253,7 @@ fn_restart(*) {
 
 
 /**
- * 通用的 窗口级、标题级匹配菜单
+ * 通用的 进程级、标题级匹配菜单
  * @param {Object} args 传入的参数，格式为 {title: "窗口标题", ...}
  * @param {String} args.title - 窗口标题
  * @param {String} args.tab - 标签页名称
@@ -296,7 +296,7 @@ fn_common(args, cb_updateVar) {
                         title := part[4]
                     }
 
-                    tipGlobal := isGlobal ? "窗口级" : "标题级"
+                    tipGlobal := isGlobal ? "进程级" : "标题级"
 
                     tipRegex := isRegex ? "正则" : "相等"
                     gc.%LV%.Add(, name, tipGlobal, tipRegex, title, kv[1])
@@ -386,7 +386,7 @@ fn_common(args, cb_updateVar) {
                 }
 
                 g.AddText("xs", "2. 匹配范围: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["窗口级", "标题级"])
+                _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
                 _.Text := itemValue.isGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
@@ -434,7 +434,7 @@ fn_common(args, cb_updateVar) {
                     if (delete) {
                         LV.Delete(RowNumber)
                     } else {
-                        isGlobal := itemValue.isGlobal == "窗口级" ? 1 : 0
+                        isGlobal := itemValue.isGlobal == "进程级" ? 1 : 0
                         isRegex := itemValue.isRegex == "正则" ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
                         ; 没有进行移动
@@ -471,7 +471,7 @@ fn_common(args, cb_updateVar) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        isGlobal: "窗口级",
+                        isGlobal: "进程级",
                         isRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
@@ -485,7 +485,7 @@ fn_common(args, cb_updateVar) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        isGlobal: "窗口级",
+                        isGlobal: "进程级",
                         isRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,

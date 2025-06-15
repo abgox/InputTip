@@ -32,7 +32,7 @@ fn_switch_window(*) {
                             title := part[4]
                         }
 
-                        tipGlobal := isGlobal ? "窗口级" : "标题级"
+                        tipGlobal := isGlobal ? "进程级" : "标题级"
 
                         tipRegex := isRegex ? "正则" : "相等"
                         gc.%"LV_" state%.Add(, name, tipGlobal, tipRegex, title, kv[1])
@@ -126,7 +126,7 @@ fn_switch_window(*) {
                 }
 
                 g.AddText("xs", "3. 匹配范围: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["窗口级", "标题级"])
+                _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
                 _.Text := itemValue.isGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
@@ -175,7 +175,7 @@ fn_switch_window(*) {
                         LV.Delete(RowNumber)
                         gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
                     } else {
-                        isGlobal := itemValue.isGlobal == "窗口级" ? 1 : 0
+                        isGlobal := itemValue.isGlobal == "进程级" ? 1 : 0
                         isRegex := itemValue.isRegex == "正则" ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
                         ; 没有进行移动
@@ -255,7 +255,7 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: windowInfo.exe_name,
                         status: stateMap.%state%,
-                        isGlobal: "窗口级",
+                        isGlobal: "进程级",
                         isRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
@@ -271,7 +271,7 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: windowInfo.exe_name,
                         status: stateMap.%state%,
-                        isGlobal: "窗口级",
+                        isGlobal: "进程级",
                         isRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
@@ -280,7 +280,7 @@ fn_switch_window(*) {
                 }
             }
 
-            g.AddEdit("ReadOnly VScroll r12 w" w, "1. 简要说明`n   - 这个菜单用来设置【指定窗口自动切换状态】的匹配规则`n   - 上方是三个 Tab 标签页: 【中文状态】【英文状态】【大写锁定】`n   - 下方是对应的规则列表`n`n2. 规则列表 —— 进程名称`n   - 窗口实际的应用进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【窗口级】或【标题级】，它控制自动切换的时机`n   - 【窗口级】: 只有从其他窗口切换到此窗口时，才会触发`n   - 【标题级】: 只要窗口标题发生变化，且匹配成功，就会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发自动切换`n   - 【正则】: 使用正则表达式匹配标题，匹配成功则触发自动切换`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式`n   - 它会根据匹配模式进行匹配，匹配成功则触发自动切换`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取当前窗口相关进程信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 添加一条自动切换规则`n   - 点击它，可以添加一条新的自动切换规则`n   - 白名单机制下，如果此应用进程不在白名单中，则会自动添加到白名单中`n`n9. 需要特别注意:`n   - 自动切换生效的前提是当前选择的输入法可以切换状态`n   - 以【美式键盘 ENG】为例`n   - 它只有英文状态和大写锁定，所以只有英文状态的和大写锁定的自动切换有效")
+            g.AddEdit("ReadOnly VScroll r12 w" w, "1. 简要说明`n   - 这个菜单用来设置【指定窗口自动切换状态】的匹配规则`n   - 上方是三个 Tab 标签页: 【中文状态】【英文状态】【大写锁定】`n   - 下方是对应的规则列表`n`n2. 规则列表 —— 进程名称`n   - 窗口实际的应用进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【进程级】或【标题级】，它控制自动切换的时机`n   - 【进程级】: 只有从一个进程切换到另一个进程时，才会触发`n   - 【标题级】: 只要窗口标题发生变化，且匹配成功，就会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发自动切换`n   - 【正则】: 使用正则表达式匹配标题，匹配成功则触发自动切换`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式`n   - 它会根据匹配模式进行匹配，匹配成功则触发自动切换`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取当前窗口相关进程信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 添加一条自动切换规则`n   - 点击它，可以添加一条新的自动切换规则`n   - 白名单机制下，如果此应用进程不在白名单中，则会自动添加到白名单中`n`n9. 需要特别注意:`n   - 自动切换生效的前提是当前选择的输入法可以切换状态`n   - 以【美式键盘 ENG】为例`n   - 它只有英文状态和大写锁定，所以只有英文状态的和大写锁定的自动切换有效")
             g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/switch-state">关于指定窗口自动切换状态</a>')
 
             g.OnEvent("Close", fn_close)

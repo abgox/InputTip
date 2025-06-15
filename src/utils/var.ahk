@@ -685,24 +685,22 @@ updateCursorMode(init := 0) {
         ACC: ":" arrJoin(defaultModeList.ACC, ":") ":",
         JAB: ":" arrJoin(defaultModeList.JAB, ":") ":"
     }
-    HOOK := readIni('cursor_mode_HOOK', '')
-    UIA := readIni('cursor_mode_UIA', '')
-    GUI_UIA := readIni('cursor_mode_GUI_UIA', '')
-    MSAA := readIni('cursor_mode_MSAA', '')
-    HOOK_DLL := readIni('cursor_mode_HOOK_DLL', '')
-    WPF := readIni('cursor_mode_WPF', '')
-    ACC := readIni('cursor_mode_ACC', '')
-    JAB := readIni('cursor_mode_JAB', '')
 
-    for item in modeNameList {
-        for v in StrSplit(%item%, ":") {
+    InputCursorMode := StrSplit(readIniSection("InputCursorMode"), "`n")
+
+    for v in InputCursorMode {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 2)
+
+        try {
+            name := part[1]
             for value in modeNameList {
-                modeList.%value% := StrReplace(modeList.%value%, ":" v ":", ":")
+                if (InStr(modeList.%value%, ":" name ":")) {
+                    modeList.%value% := StrReplace(modeList.%value%, ":" name ":", ":")
+                }
             }
+            modeList.%part[2]% .= name ":"
         }
-    }
-    for item in modeNameList {
-        modeList.%item% .= %item% ":"
     }
 }
 

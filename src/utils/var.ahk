@@ -98,6 +98,7 @@ lastWindow := "", lastSymbol := "", lastCursor := ""
 needHide := 0
 exe_name := ""
 exe_str := "::"
+exe_title := ""
 
 leaveDelay := delay + 500
 

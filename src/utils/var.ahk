@@ -24,9 +24,6 @@ checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 switchStatus := readIni("switchStatus", 1)
 switchStatusList := ["{LShift}", "{RShift}", "^{Space}"]
 
-; 是否使用白名单机制
-useWhiteList := readIni("useWhiteList", 0)
-
 ; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)
 
@@ -43,7 +40,7 @@ symbolOffsetBase := readIni("symbolOffsetBase", 0)
 ; 是否在任意窗口中，符号都显示在鼠标附近
 showCursorPos := readIni("showCursorPos", 0)
 ; 需要将符号显示在鼠标附近的窗口列表
-showCursorPosList := ":" readIni("showCursorPosList", "wps.exe") ":"
+ShowNearCursor := StrSplit(readIniSection("ShowNearCursor"), "`n")
 ; 符号显示在鼠标附近时的特殊偏移量 x
 showCursorPos_x := readIni("showCursorPos_x", 0)
 ; 符号显示在鼠标附近时的特殊偏移量 y
@@ -96,12 +93,19 @@ left := 0, top := 0, right := 0, bottom := 0
 lastWindow := "", lastSymbol := "", lastCursor := ""
 
 needHide := 0
-exe_name := ""
-exe_str := "::"
+
+exe_name := "explorer.exe"
+exe_title := ""
+exe_str := ":" exe_name ":"
 
 leaveDelay := delay + 500
 
 isWait := 0
+
+; 配置菜单默认的宽度参考线
+gui_width_line := "------------------------------------------------------------------------------------"
+
+gui_help_tip := "你首先应该点击上方的【关于】或相关文档查看此菜单的使用说明"
 
 canShowSymbol := 0
 
@@ -190,27 +194,29 @@ updateCursor(init := 0) {
     if (!init) {
         restartJAB()
     }
+    _ := {}
 
-    CN_cursor := readIni("CN_cursor", "InputTipCursor\default\CN")
-    EN_cursor := readIni("EN_cursor", "InputTipCursor\default\EN")
-    Caps_cursor := readIni("Caps_cursor", "InputTipCursor\default\Caps")
+    for state in ["CN", "EN", "Caps"] {
+        dir := readIni(state "_cursor", "InputTipCursor\default\" state)
+        if (!DirExist(dir)) {
+            writeIni(state "_cursor", "InputTipCursor\default\" state)
+            dir := "InputTipCursor\default\" state
+        }
+        _.%state% := dir
 
-    cursor_dir := {
-        EN: EN_cursor,
-        CN: CN_cursor,
-        Caps: Caps_cursor
-    }
-
-    for key in cursor_dir.OwnProps() {
-        Loop Files cursor_dir.%key% "\*.*" {
+        Loop Files dir "\*.*" {
             n := SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4)
             for v in cursorInfo {
                 if (v.type = n) {
-                    v.%key% := A_LoopFileFullPath
+                    v.%state% := A_LoopFileFullPath
                 }
             }
         }
     }
+
+    CN_cursor := _.CN
+    EN_cursor := _.EN
+    Caps_cursor := _.Caps
 }
 loadCursor(state, change := 0) {
     global lastCursor
@@ -277,10 +283,16 @@ updateSymbol(init := 0) {
     }
 
     for state in ["", "CN", "EN", "Caps"] {
-        ; * 图片字符相关配置
+        ; * 图片符号相关配置
         ; 文件路径
         if (state) {
-            symbolConfig.%state "_pic"% := readIni(state "_pic", "InputTipSymbol\default\" state ".png")
+            defaultPath := "InputTipSymbol\default\" state ".png"
+            picPath := readIni(state "_pic", defaultPath)
+            if (!FileExist(picPath)) {
+                writeIni(state "_pic", defaultPath)
+                picPath := defaultPath
+            }
+            symbolConfig.%state "_pic"% := picPath
         }
         ; 偏移量
         _ := "pic_offset_x" state
@@ -592,6 +604,7 @@ restartJAB() {
     }
 }
 
+; 更新符号显示黑白名单和自动切换列表
 updateList(init := 0) {
     global
 
@@ -599,11 +612,17 @@ updateList(init := 0) {
         restartJAB()
     }
     ; 应用列表: 符号显示黑名单
-    app_hide_state := ":" readIni('app_hide_state', '') ":"
+    app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
 
     ; 应用列表: 符号显示白名单
-    app_show_state := ":" readIni('app_show_state', '') ":"
+    app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
 
+    updateAutoSwitchList()
+}
+
+; 更新自动切换列表
+updateAutoSwitchList() {
+    global
     ; 应用列表: 自动切换到中文
     app_CN := StrSplit(readIniSection("App-CN"), "`n")
     ; 应用列表: 自动切换到英文
@@ -611,20 +630,34 @@ updateList(init := 0) {
     ; 应用列表: 自动切换到大写锁定
     app_Caps := StrSplit(readIniSection("App-Caps"), "`n")
 }
+
+/**
+ * 将进程以【进程级】添加到白名单中
+ * @param app 要添加的进程名称
+ */
 updateWhiteList(app) {
-    if (!useWhiteList) {
-        return
-    }
-    global app_show_state
-    _app_show_state := readIni("app_show_state", "")
-    if (!InStr(app_show_state, ":" app ":")) {
-        if (_app_show_state) {
-            _app_show_state .= ":" app
-        } else {
-            _app_show_state := app
+    exist := 0
+
+    for v in StrSplit(readIniSection("App-ShowSymbol"), "`n") {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 3)
+        try {
+            if (part[1] == app) {
+                isGlobal := part[2]
+                if (isGlobal) {
+                    exist := 1
+                    return
+                } else {
+                    continue
+                }
+            }
         }
-        app_show_state := ":" _app_show_state ":"
-        writeIni("app_show_state", _app_show_state)
+    }
+    if (!exist) {
+        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+        writeIni(id, app ":1", "App-ShowSymbol")
+
+        global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
     }
 }
 updateAppOffset(init := 0) {
@@ -658,24 +691,22 @@ updateCursorMode(init := 0) {
         ACC: ":" arrJoin(defaultModeList.ACC, ":") ":",
         JAB: ":" arrJoin(defaultModeList.JAB, ":") ":"
     }
-    HOOK := readIni('cursor_mode_HOOK', '')
-    UIA := readIni('cursor_mode_UIA', '')
-    GUI_UIA := readIni('cursor_mode_GUI_UIA', '')
-    MSAA := readIni('cursor_mode_MSAA', '')
-    HOOK_DLL := readIni('cursor_mode_HOOK_DLL', '')
-    WPF := readIni('cursor_mode_WPF', '')
-    ACC := readIni('cursor_mode_ACC', '')
-    JAB := readIni('cursor_mode_JAB', '')
 
-    for item in modeNameList {
-        for v in StrSplit(%item%, ":") {
+    InputCursorMode := StrSplit(readIniSection("InputCursorMode"), "`n")
+
+    for v in InputCursorMode {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 2)
+
+        try {
+            name := part[1]
             for value in modeNameList {
-                modeList.%value% := StrReplace(modeList.%value%, ":" v ":", ":")
+                if (InStr(modeList.%value%, ":" name ":")) {
+                    modeList.%value% := StrReplace(modeList.%value%, ":" name ":", ":")
+                }
             }
+            modeList.%part[2]% .= name ":"
         }
-    }
-    for item in modeNameList {
-        modeList.%item% .= %item% ":"
     }
 }
 

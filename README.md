@@ -31,7 +31,7 @@
 >
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被误判为游戏外挂，exe 版本可能被误判为病毒程序](https://inputtip.abgox.com/FAQ/about-virus)
->   - [推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
+>   - [只推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 > - InputTip 只适用于 **Windows** 系统: **Win10** 以上可用，以下未知
 > - `托盘菜单` 指的是在底部任务栏右边的 InputTip 应用托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
@@ -245,14 +245,14 @@
 #### 符号显示方案
 
 - 根据输入法状态在输入光标附近显示不同的 [符号](#关于符号)
-- 默认使用 [白名单机制](https://inputtip.abgox.com/FAQ/white-list/)
+- 需要搭配 [符号的白名单机制](https://inputtip.abgox.com/FAQ/white-list/) 使用
 - 需要注意:
   - 此方案涉及到调用系统 DLL 获取应用窗口中的输入光标位置信息
   - InputTip 将通过 [指定的光标获取模式](https://inputtip.abgox.com/FAQ/cursor-mode) 尝试获取到输入光标位置信息
   - 你可以通过 `设置光标获取模式` 显示指定应用使用哪种模式
     - 如果获取不到:
       - 符号无法显示
-      - 这就只能使用 [鼠标样式方案](#鼠标样式方案) 或者 `设置符号显示位置`
+      - 这就只能使用 [鼠标样式方案](#鼠标样式方案) 或者 `设置符号显示在鼠标附近`
     - 获取到了，只是符号位置有偏差，但在此应用中，所有窗口的偏差相同:
       - 符号会显示，但符号显示的位置有偏差
       - 由于偏差相同，可以通过 `偏移量`、`设置特殊偏移量` 解决
@@ -267,7 +267,8 @@
 
 > [!Warning]
 >
-> 如果不使用 [符号显示方案](#符号显示方案)，不需要进行以下步骤
+> - 如果不使用 [符号显示方案](#符号显示方案)，不需要进行步骤 1 和 2
+> - 直接从步骤 3 开始，让 InputTip 能在 IDE 中正常识别和切换输入法状态即可
 
 > [!Tip]
 >
@@ -294,7 +295,7 @@
      winget install Microsoft.OpenJDK.21
      ```
 
-2. 打开 `Java Access Bridge`
+2. 启用 `Java Access Bridge`
 
    - 如果以下命令不存在，请检查 **步骤 1**
    - 如果以下命令不能正常运行，请检查环境变量是否配置正确
@@ -325,9 +326,9 @@
 >
 > - 部分应用窗口可能无法准确获取到输入光标位置，会导致符号无法显示
 >   - [应用窗口兼容情况](https://inputtip.abgox.com/FAQ/support-app-list) 会记录这些特别的应用窗口
-> - 你可以使用 `v2.33.0` 版本中新增的 `设置符号显示位置` 来解决此问题
+> - 你可以使用 `设置符号显示在鼠标附近` 来解决此问题
 > - 以 `WPS` 为例
->   - 使用 `设置符号显示位置`，根据窗口提示，将它添加到其中，即可实现在鼠标附近显示
+>   - 使用 `设置符号显示在鼠标附近`，根据窗口提示，将它添加到其中，即可实现在鼠标附近显示
 >   - 这是一个折中的处理方案，此前的 `v1` 版本就一直使用它，稳定性非常好
 
 #### [图片符号](https://inputtip.abgox.com/FAQ/symbol-picture)

@@ -24,31 +24,35 @@ while 1 {
             hideSymbol()
             needShow := 0
         }
-        if (symbolType) {
-            if (needSkip(exe_str)) {
-                hideSymbol()
-                lastSymbol := ""
-                lastCursor := ""
-                lastWindow := ""
-                continue
-            }
-            if (useWhiteList) {
-                if (!showCursorPos && !InStr(app_show_state, exe_str) && !WinActive("ahk_class AutoHotkeyGUI")) {
+
+        ; 进程有变化(包含标题变化)
+        hasWindowChange := lastWindow != exe_name ":" exe_title
+        if (hasWindowChange) {
+            if (symbolType) {
+                if (needSkip(exe_str)) {
                     hideSymbol()
-                    needShow := 0
+                    lastSymbol := ""
+                    lastCursor := ""
+                    lastWindow := ""
+                    continue
                 }
-            } else {
-                if (InStr(app_hide_state, exe_str)) {
-                    hideSymbol()
-                    needShow := 0
+
+                if (!showCursorPos && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
+                    try {
+                        path := WinGetProcessPath("A")
+                        ; 当前窗口是 InputTip 自身的配置菜单窗口
+                        self := A_AhkPath == path || (A_IsCompiled && A_ScriptFullPath == path)
+                    } catch {
+                        self := 0
+                    }
+
+                    if (!self) {
+                        hideSymbol()
+                        needShow := 0
+                    }
                 }
             }
-        }
-        if (needHide) {
-            hideSymbol()
-            needShow := 0
-        }
-        if (lastWindow != exe_name ":" exe_title) {
+
             WinWaitActive("ahk_exe " exe_name)
             lastSymbol := ""
             lastCursor := ""
@@ -74,6 +78,11 @@ while 1 {
                 }
             }
             lastWindow := exe_name ":" exe_title
+        }
+
+        if (needHide) {
+            hideSymbol()
+            needShow := 0
         }
         if (GetKeyState("CapsLock", "T")) {
             loadCursor("Caps")
@@ -140,10 +149,75 @@ switchState(exe_name, exe_title) {
     return 0
 }
 
+/**
+ * 是否需要显示在鼠标附近
+ * @param {String} exe_name 程序名
+ * @param {String} exe_title 程序标题
+ * @returns {1 | 0}
+ */
+showBesideCursor(exe_name, exe_title) {
+    if (showCursorPos) {
+        return 1
+    }
+    return validateMatch(exe_name, exe_title, ShowNearCursor)
+}
+
+/**
+ * 验证匹配是否成功(通用)
+ * @param {String} exe_name 程序名
+ * @param {String} exe_title 程序标题
+ * @returns {1 | 0}
+ */
+validateMatch(exe_name, exe_title, configValue) {
+    for v in configValue {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 4)
+        if (part.Length >= 2) {
+            ; 进程名称
+            name := part[1]
+            if (exe_name == name) {
+                ; 如果是进程级
+                if (part[2]) {
+                    return 1
+                }
+            } else {
+                continue
+            }
+        }
+
+        if (part.Length < 4) {
+            continue
+        }
+
+        if (name == exe_name) {
+            ; 是否正则匹配
+            isRegex := part[3]
+            ; 标题
+            title := part[4]
+
+            isMatch := isRegex ? RegExMatch(exe_title, title) : exe_title == title
+            if (isMatch) {
+                return 1
+            }
+        }
+    }
+    return 0
+}
+
 ShowSymbolEx(state) {
+    static last := 0
+    static lastNeedShow := 0
     global canShowSymbol
-    if (needShow) {
-        if (showCursorPos || InStr(showCursorPosList, exe_str)) {
+
+    if (hasWindowChange) {
+        select := showBesideCursor(exe_name, exe_title)
+        lastNeedShow := needShow
+    } else {
+        select := last
+    }
+
+    if (lastNeedShow) {
+        if (select) {
             try {
                 MouseGetPos(&left, &top)
                 canShowSymbol := 1
@@ -151,6 +225,7 @@ ShowSymbolEx(state) {
             } catch {
                 hideSymbol()
             }
+            last := 1
             return
         }
         try {
@@ -165,6 +240,7 @@ ShowSymbolEx(state) {
         } catch {
             hideSymbol()
         }
+        last := 0
     }
 }
 

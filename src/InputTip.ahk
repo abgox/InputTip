@@ -74,6 +74,8 @@ if (A_IsCompiled) {
                 opt: "cRed",
                 text: "以管理员权限启动 InputTip 失败",
             }], "InputTip - 错误").Show()
+            writeIni("runCodeWithAdmin", 0)
+            global runCodeWithAdmin := 0
         }
     }
 }

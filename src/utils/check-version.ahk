@@ -536,17 +536,59 @@ checkUpdateDone() {
     flagFile := A_AppData "/.abgox-InputTip-update-version-done.txt"
     flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
     if (compareVersion(currentVersion, oldVersion) > 0 || FileExist(flagFile) || FileExist(flagFile2)) {
-        try {
-            for v in ["CN", "EN", "Caps"] {
+        for v in ["CN", "EN", "Caps"] {
+            try {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "app_" v), ":")
                 for value in _ {
-                    id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
-                    IniWrite(value ":1", "InputTip.ini", "App-" v, id)
-                    Sleep(5)
+                    if (Trim(value)) {
+                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        IniWrite(value ":1", "InputTip.ini", "App-" v, id)
+                        Sleep(5)
+                    }
                 }
                 IniDelete("InputTip.ini", "Config-v2", "app_" v)
             }
         }
+
+        list := [{
+            old: "showCursorPosList",
+            new: "ShowNearCursor"
+        }, {
+            old: "app_hide_state",
+            new: "App-HideSymbol"
+        }, {
+            old: "app_show_state",
+            new: "App-ShowSymbol"
+        }]
+
+        for v in list {
+            try {
+                _ := StrSplit(IniRead("InputTip.ini", "Config-v2", v.old), ":")
+                for value in _ {
+                    if (Trim(value)) {
+                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        IniWrite(value ":1", "InputTip.ini", v.new, id)
+                        Sleep(5)
+                    }
+                }
+                IniDelete("InputTip.ini", "Config-v2", v.old)
+            }
+        }
+
+        for v in modeNameList {
+            try {
+                _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "cursor_mode_" v), ":")
+                for value in _ {
+                    if (Trim(value)) {
+                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        IniWrite(value ":" v, "InputTip.ini", "InputCursorMode", id)
+                        Sleep(5)
+                    }
+                }
+                IniDelete("InputTip.ini", "Config-v2", "cursor_mode_" v)
+            }
+        }
+
 
         try {
             ignoreUpdate := IniRead("InputTip.ini", "Config-v2", "ignoreUpdate")

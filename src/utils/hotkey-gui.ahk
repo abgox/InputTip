@@ -142,7 +142,7 @@ setHotKeyGui(keyConfigList, label := "") {
         g.AddText("xs", "2.")
         g.AddText("yp cRed", "优先使用【设置单键】或【设置组合快捷键】设置，除非因为快捷键占用无法设置")
         g.AddText("xs", '3.  这里会回显它们的设置，建议先使用它们，然后回到此处适当修改')
-        g.AddLink("xs", '3.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
+        g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.abgox.com/FAQ/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
         for v in keyConfigList {
             try {
                 g.AddText("xs", v.preTip)

@@ -194,27 +194,29 @@ updateCursor(init := 0) {
     if (!init) {
         restartJAB()
     }
+    _ := {}
 
-    CN_cursor := readIni("CN_cursor", "InputTipCursor\default\CN")
-    EN_cursor := readIni("EN_cursor", "InputTipCursor\default\EN")
-    Caps_cursor := readIni("Caps_cursor", "InputTipCursor\default\Caps")
+    for state in ["CN", "EN", "Caps"] {
+        dir := readIni(state "_cursor", "InputTipCursor\default\" state)
+        if (!DirExist(dir)) {
+            writeIni(state "_cursor", "InputTipCursor\default\" state)
+            dir := "InputTipCursor\default\" state
+        }
+        _.%state% := dir
 
-    cursor_dir := {
-        EN: EN_cursor,
-        CN: CN_cursor,
-        Caps: Caps_cursor
-    }
-
-    for key in cursor_dir.OwnProps() {
-        Loop Files cursor_dir.%key% "\*.*" {
+        Loop Files dir "\*.*" {
             n := SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4)
             for v in cursorInfo {
                 if (v.type = n) {
-                    v.%key% := A_LoopFileFullPath
+                    v.%state% := A_LoopFileFullPath
                 }
             }
         }
     }
+
+    CN_cursor := _.CN
+    EN_cursor := _.EN
+    Caps_cursor := _.Caps
 }
 loadCursor(state, change := 0) {
     global lastCursor
@@ -281,10 +283,16 @@ updateSymbol(init := 0) {
     }
 
     for state in ["", "CN", "EN", "Caps"] {
-        ; * 图片字符相关配置
+        ; * 图片符号相关配置
         ; 文件路径
         if (state) {
-            symbolConfig.%state "_pic"% := readIni(state "_pic", "InputTipSymbol\default\" state ".png")
+            defaultPath := "InputTipSymbol\default\" state ".png"
+            picPath := readIni(state "_pic", defaultPath)
+            if (!FileExist(picPath)) {
+                writeIni(state "_pic", defaultPath)
+                picPath := defaultPath
+            }
+            symbolConfig.%state "_pic"% := picPath
         }
         ; 偏移量
         _ := "pic_offset_x" state

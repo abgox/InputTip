@@ -16,4 +16,15 @@ CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
 ;@AHK2Exe-SetVersion 2.40.0
-currentVersion := "2.40.0"
+
+if (A_IsCompiled) {
+    ; 当前版本
+    currentVersion := "2.40.0"
+    ; 版本字段
+    versionKey := "version"
+} else {
+    ; 当前的 zip 版本
+    currentVersion := "2.40.0.2"
+    ; zip 版本字段
+    versionKey := "version-zip"
+}

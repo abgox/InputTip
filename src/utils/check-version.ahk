@@ -532,7 +532,7 @@ getRepoCode(newVersion, silent := silentUpdate) {
  * 当更新完成时弹出提示框，并进行配置更新
  */
 checkUpdateDone() {
-    oldVersion := readIni("version", currentVersion, "UserInfo")
+    oldVersion := readIni(versionKey, currentVersion, "UserInfo")
     flagFile := A_AppData "/.abgox-InputTip-update-version-done.txt"
     flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
     if (compareVersion(currentVersion, oldVersion) > 0 || FileExist(flagFile) || FileExist(flagFile2)) {
@@ -689,17 +689,12 @@ checkUpdateDone() {
         }
 
         handlePostUpdate() {
-            try {
-                newVersion := FileOpen(A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt", "r").ReadLine()
-            } catch {
-                newVersion := currentVersion
-            }
             for v in [flagFile, flagFile2, A_AppData "/abgox-InputTip-update-version.exe", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version.exe"] {
                 try {
                     FileDelete(v)
                 }
             }
-            writeIni("version", newVersion, "UserInfo")
+            writeIni(versionKey, currentVersion, "UserInfo")
             writeIni("clickUpdate", 0)
         }
 

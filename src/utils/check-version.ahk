@@ -468,7 +468,7 @@ getRepoCode(newVersion, silent := silentUpdate) {
                 FileMove(v, RegExReplace(v, "\.new$", ""), 1)
             }
             if (newVersion) {
-                FileAppend("", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt")
+                FileAppend(newVersion, A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt")
                 writeIni("clickUpdate", !silent)
             }
             fn_restart()
@@ -689,12 +689,17 @@ checkUpdateDone() {
         }
 
         handlePostUpdate() {
+            try {
+                newVersion := FileOpen(A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt", "r").ReadLine()
+            } catch {
+                newVersion := currentVersion
+            }
             for v in [flagFile, flagFile2, A_AppData "/abgox-InputTip-update-version.exe", A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version.exe"] {
                 try {
                     FileDelete(v)
                 }
             }
-            writeIni("version", currentVersion, "UserInfo")
+            writeIni("version", newVersion, "UserInfo")
             writeIni("clickUpdate", 0)
         }
 

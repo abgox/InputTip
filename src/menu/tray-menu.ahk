@@ -314,8 +314,9 @@ fn_common(args, cb_updateVar) {
             _.OnEvent("Click", e_add)
             _._LV := LV
             _._config := args.config
+            _._parentTitle := args.title
             e_add(item, *) {
-                fn_add(item._LV, item._config)
+                fn_add(item._LV, item._config, item._parentTitle)
             }
 
             handleClick(LV, RowNumber) {
@@ -457,9 +458,9 @@ fn_common(args, cb_updateVar) {
                 return g
             }
 
-            fn_add(parentLV, configName) {
+            fn_add(parentLV, configName, parentTitle) {
                 args := {
-                    title: "添加规则",
+                    title: parentTitle " - 添加规则",
                     configName: configName,
                     LV: parentLV,
                 }

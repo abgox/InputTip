@@ -94,7 +94,7 @@ lastWindow := "", lastSymbol := "", lastCursor := ""
 
 needHide := 0
 
-exe_name := "explorer.exe"
+exe_name := ""
 exe_title := ""
 exe_str := ":" exe_name ":"
 

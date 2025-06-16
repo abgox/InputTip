@@ -13,6 +13,8 @@
 #Include ./utils/var.ahk
 #Include ./utils/tools.ahk
 
+ID := "JAB"
+
 ; g.SetFont(fontOpt*)
 fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 

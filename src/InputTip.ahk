@@ -14,6 +14,8 @@
 #Include ./utils/tools.ahk
 #Include ./utils/app-list.ahk
 
+ID := "InputTip"
+
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
 favicon_png := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
 

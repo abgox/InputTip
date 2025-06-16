@@ -4,6 +4,7 @@ updateDelay()
 
 ; 鼠标悬浮在符号上
 isOverSymbol := 0
+hasWindowChange := 1
 while 1 {
     Sleep(delay)
     ; 正在使用鼠标或有键盘操作
@@ -20,60 +21,55 @@ while 1 {
             exe_name := ProcessGetName(WinGetPID("A"))
             exe_title := WinGetTitle("A")
             exe_str := ":" exe_name ":"
+
+            if (symbolType && needSkip(exe_str)) {
+                hideSymbol()
+                lastSymbol := ""
+                lastCursor := ""
+                lastWindow := ""
+                continue
+            }
+
+            ; 进程有变化(包含标题变化)
+            hasWindowChange := lastWindow != exe_name ":" exe_title
+
+            if (hasWindowChange) {
+                if (symbolType) {
+                    if (!showCursorPos && !WinActive("ahk_class AutoHotkeyGUI") && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
+                        hideSymbol()
+                        needShow := 0
+                    }
+                }
+
+                lastSymbol := ""
+                lastCursor := ""
+
+                toState := switchState(exe_name, exe_title)
+                if (toState == "CN") {
+                    switch_CN()
+                    if (isCN()) {
+                        loadCursor("CN", 1)
+                        ShowSymbolEx("CN")
+                    }
+                } else if (toState == "EN") {
+                    switch_EN()
+                    if (!isCN()) {
+                        loadCursor("EN", 1)
+                        ShowSymbolEx("EN")
+                    }
+                } else if (toState == "Caps") {
+                    switch_Caps()
+                    if (GetKeyState("CapsLock", "T")) {
+                        loadCursor("Caps", 1)
+                        ShowSymbolEx("Caps")
+                    }
+                }
+            }
         } catch {
             hideSymbol()
             needShow := 0
         }
 
-        ; 进程有变化(包含标题变化)
-        hasWindowChange := lastWindow != exe_name ":" exe_title
-        if (hasWindowChange) {
-            if (symbolType) {
-                if (needSkip(exe_str)) {
-                    hideSymbol()
-                    lastSymbol := ""
-                    lastCursor := ""
-                    lastWindow := ""
-                    continue
-                }
-
-                if (!showCursorPos && !WinActive("ahk_class AutoHotkeyGUI") && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
-                    hideSymbol()
-                    needShow := 0
-                }
-            }
-
-            WinWaitActive("ahk_exe " exe_name)
-            lastSymbol := ""
-            lastCursor := ""
-
-            toState := switchState(exe_name, exe_title)
-            if (toState == "CN") {
-                switch_CN()
-                if (isCN()) {
-                    loadCursor("CN", 1)
-                    ShowSymbolEx("CN")
-                }
-            } else if (toState == "EN") {
-                switch_EN()
-                if (!isCN()) {
-                    loadCursor("EN", 1)
-                    ShowSymbolEx("EN")
-                }
-            } else if (toState == "Caps") {
-                switch_Caps()
-                if (GetKeyState("CapsLock", "T")) {
-                    loadCursor("Caps", 1)
-                    ShowSymbolEx("Caps")
-                }
-            }
-            lastWindow := exe_name ":" exe_title
-        }
-
-        if (needHide) {
-            hideSymbol()
-            needShow := 0
-        }
         if (GetKeyState("CapsLock", "T")) {
             loadCursor("Caps")
             ShowSymbolEx("Caps")
@@ -195,16 +191,22 @@ validateMatch(exe_name, exe_title, configValue) {
 }
 
 ShowSymbolEx(state) {
-    static last := 0
-    global canShowSymbol
+    static lastNeedShow := 0
+    global canShowSymbol, lastWindow
 
-    if (hasWindowChange) {
-        select := showBesideCursor(exe_name, exe_title)
-    } else {
-        select := last
+    if (needHide) {
+        hideSymbol()
+        return
     }
 
-    if (needShow) {
+    if (hasWindowChange) {
+        lastWindow := exe_name ":" exe_title
+        lastNeedShow := needShow
+    }
+
+    if (lastNeedShow) {
+        select := showBesideCursor(exe_name, exe_title)
+
         if (select) {
             try {
                 MouseGetPos(&left, &top)
@@ -213,7 +215,6 @@ ShowSymbolEx(state) {
             } catch {
                 hideSymbol()
             }
-            last := 1
             return
         }
         try {
@@ -228,7 +229,6 @@ ShowSymbolEx(state) {
         } catch {
             hideSymbol()
         }
-        last := 0
     }
 }
 

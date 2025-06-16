@@ -69,11 +69,6 @@ while 1 {
             }
             lastWindow := exe_name ":" exe_title
         }
-
-        if (needHide) {
-            hideSymbol()
-            needShow := 0
-        }
         if (GetKeyState("CapsLock", "T")) {
             loadCursor("Caps")
             ShowSymbolEx("Caps")
@@ -195,16 +190,22 @@ validateMatch(exe_name, exe_title, configValue) {
 }
 
 ShowSymbolEx(state) {
-    static last := 0
+    static last := 0, lastNeedShow := 0
     global canShowSymbol
+
+    if (needHide) {
+        hideSymbol()
+        return
+    }
 
     if (hasWindowChange) {
         select := showBesideCursor(exe_name, exe_title)
+        lastNeedShow := needShow
     } else {
         select := last
     }
 
-    if (needShow) {
+    if (lastNeedShow) {
         if (select) {
             try {
                 MouseGetPos(&left, &top)

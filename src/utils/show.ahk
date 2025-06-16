@@ -37,19 +37,9 @@ while 1 {
                     continue
                 }
 
-                if (!showCursorPos && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
-                    try {
-                        path := WinGetProcessPath("A")
-                        ; 当前窗口是 InputTip 自身的配置菜单窗口
-                        self := A_AhkPath == path || (A_IsCompiled && A_ScriptFullPath == path)
-                    } catch {
-                        self := 0
-                    }
-
-                    if (!self) {
-                        hideSymbol()
-                        needShow := 0
-                    }
+                if (!showCursorPos && !WinActive("ahk_class AutoHotkeyGUI") && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
+                    hideSymbol()
+                    needShow := 0
                 }
             }
 
@@ -206,17 +196,15 @@ validateMatch(exe_name, exe_title, configValue) {
 
 ShowSymbolEx(state) {
     static last := 0
-    static lastNeedShow := 0
     global canShowSymbol
 
     if (hasWindowChange) {
         select := showBesideCursor(exe_name, exe_title)
-        lastNeedShow := needShow
     } else {
         select := last
     }
 
-    if (lastNeedShow) {
+    if (needShow) {
         if (select) {
             try {
                 MouseGetPos(&left, &top)

@@ -24,7 +24,7 @@ if (A_IsCompiled) {
     versionKey := "version"
 } else {
     ; 当前的 zip 版本
-    currentVersion := "2.40.0.2"
+    currentVersion := "2.40.0.3"
     ; zip 版本字段
     versionKey := "version-zip"
 }

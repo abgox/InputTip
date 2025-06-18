@@ -47,7 +47,7 @@ License: MIT License
 LicenseUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
-ShortDescription: "An input method state manager tool: real-time tips(mouse style, symbol display) + auto-switch state per window + hotkey to switch state."
+ShortDescription: "An input method state manager tool: real-time tips(cursor style, symbol display) + auto-switch state per window + hotkey to switch state."
 Tags:
   - autohotkey
   - cursor

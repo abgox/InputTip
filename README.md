@@ -265,17 +265,17 @@
 
 ### [如何在 JetBrains 系列 IDE 中使用 InputTip](https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains)
 
-> [!Warning]
->
-> - 如果不使用 [符号显示方案](#符号显示方案)，不需要进行步骤 1 和 2
-> - 直接从步骤 3 开始，让 InputTip 能在 IDE 中正常识别和切换输入法状态即可
-
 > [!Tip]
 >
 > - [使用 AutoHotkey 官方论坛中的解决方案实现，方案由 Descolada 提出](https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439)
 > - 建议使用 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
 > - 如果使用其他版本的 JDK 或 JRE，需要自行测试可用性
 > - 例如 [Adoptium Temurin](https://adoptium.net/zh-CN/temurin/releases/?os=windows&arch=any)，测试后发现: JDK 版本无效，JRE 版本有效
+
+> [!Warning]
+>
+> - 如果不使用 [符号显示方案](#符号显示方案)，不需要进行步骤 1 和 2
+> - 直接从步骤 3 开始，让 InputTip 能在 IDE 中正常识别和切换输入法状态即可
 
 1. 安装 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
 
@@ -362,7 +362,7 @@
 
 > [!Tip]
 >
-> - 也可以直接下载 [已经适配的鼠标样式](https://inputtip.abgox.com/download/extra) 来使用
+> - 可以直接使用 [已经适配的一些鼠标样式](https://inputtip.abgox.com/download/extra)
 
 1. 你需要在 `InputTipCursor` 目录下创建一个文件夹
 
@@ -416,7 +416,8 @@
 
 > [!Tip]
 >
-> InputTip 使用 **【通用】** 和 **【自定义】** 模式兼容各类输入法，默认使用 **【通用】** 模式
+> - InputTip 使用 **【通用】** 和 **【自定义】** 模式兼容各类输入法，默认使用 **【通用】** 模式
+> - 如果你对当前输入法的状态码和切换码很了解，建议直接使用 **【自定义】** 模式去配置规则
 
 - **【通用】**
 
@@ -510,3 +511,5 @@
 <a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://me.abgox.com/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ![赞赏支持](https://me.abgox.com/support.png)
+
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")

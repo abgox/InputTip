@@ -91,7 +91,7 @@
   ```
 
   ```shell
-  scoop install abyss/InputTip-zip
+  scoop install abyss/abgox.InputTip-zip
   ```
 
 #### exe 版本
@@ -110,7 +110,7 @@
   ```
 
   ```shell
-  scoop install abyss/InputTip
+  scoop install abyss/abgox.InputTip
   ```
 
 - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/)
@@ -286,7 +286,7 @@
      ```
 
      ```shell
-     scoop install abyss/OpenJDK-Microsoft-JDK-21
+     scoop install abyss/Microsoft.OpenJDK.21
      ```
 
    - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/)

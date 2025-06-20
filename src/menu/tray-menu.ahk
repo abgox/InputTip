@@ -310,7 +310,7 @@ fn_common(args, cb_updateVar) {
             gc.%LV%.OnEvent("DoubleClick", handleClick)
             gc.%LV%._LV := LV
             gc.%LV%._config := args.config
-            _ := g.AddButton("xs w" w, "添加规则")
+            _ := g.AddButton("xs w" w / 2, "快捷添加")
             _.OnEvent("Click", e_add)
             _._LV := LV
             _._config := args.config
@@ -318,6 +318,24 @@ fn_common(args, cb_updateVar) {
             e_add(item, *) {
                 fn_add(item._LV, item._config, item._parentTitle)
             }
+
+            _ := g.AddButton("yp w" w / 2, "手动添加")
+            _.OnEvent("Click", e_add_manually)
+            _._LV := LV
+            _._config := args.config
+
+            e_add_manually(item, *) {
+                itemValue := {
+                    exe_name: "",
+                    isGlobal: "进程级",
+                    isRegex: "相等",
+                    title: "",
+                    id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec,
+                    configName: item._config
+                }
+                fn_edit(gc.%item._LV%, 1, "add", itemValue).Show()
+            }
+
 
             handleClick(LV, RowNumber) {
                 if (!RowNumber) {
@@ -460,7 +478,7 @@ fn_common(args, cb_updateVar) {
 
             fn_add(parentLV, configName, parentTitle) {
                 args := {
-                    title: parentTitle " - 添加规则",
+                    title: parentTitle " - 快捷添加",
                     configName: configName,
                     LV: parentLV,
                 }
@@ -496,7 +514,7 @@ fn_common(args, cb_updateVar) {
                 }
             }
             tab.UseTab(2)
-            g.AddEdit("Section r11 w" w, "1. 简要说明`n   - 这个菜单用来配置【" args.tab "】的匹配规则`n   - 下方是对应的规则列表`n`n2. 规则列表 —— 进程名称`n   - 窗口实际的应用进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【进程级】或【标题级】`n   - 【进程级】: 只要在这一个进程中时，就会触发`n   - 【标题级】: 只有在这个进程中，且标题匹配成功时，才会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发`n   - 【正则】: 使用正则表达式匹配标题，匹配成功才会触发`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式`n   - 它会根据匹配模式进行匹配`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取当前窗口相关进程信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 添加规则`n   - 点击它，可以添加一条新的规则`n   - 它会弹出一个新的菜单页面进行操作`n   - 你可以选择列表中的进程进行快速添加，也可以使用【手动添加】`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】")
+            g.AddEdit("Section r11 w" w, "1. 简要说明`n   - 这个菜单用来配置【" args.tab "】的匹配规则`n   - 下方是对应的规则列表`n`n2. 规则列表 —— 进程名称`n   - 窗口实际的应用进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【进程级】或【标题级】`n   - 【进程级】: 只要在这一个进程中时，就会触发`n   - 【标题级】: 只有在这个进程中，且标题匹配成功时，才会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发`n   - 【正则】: 使用正则表达式匹配标题，匹配成功才会触发`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式`n   - 它会根据匹配模式进行匹配`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取当前窗口相关进程信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 快捷添加`n   - 点击它，可以添加一条新的规则`n   - 它会弹出一个新的菜单页面，会显示当前正在运行的进程列表`n   - 你可以选择列表中的进程进行快速添加`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】`n`n9. 按钮 —— 手动添加`n   - 点击它，可以添加一条新的规则`n   - 它会直接弹出添加窗口，你需要手动填写进程名称、标题等信息")
             g.AddLink(, args.link)
             return g
         }

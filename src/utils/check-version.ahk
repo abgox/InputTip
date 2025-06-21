@@ -379,105 +379,119 @@ ignoreUpdateTip() {
 ; 下载最新的源代码文件
 getRepoCode(newVersion, silent := silentUpdate) {
     done := 1
+    ; 是否成功下载 files.ini
+    downloadIni := 0
 
     try {
         FileDelete("files.ini")
     }
+    downloadingGui := downloading(0)
     for u in baseUrl {
         out := "files.ini"
         try {
             Download(u "src/files.ini", out)
+            downloadIni := 1
             break
         }
     }
-
-    try {
-        files := StrSplit(IniRead("files.ini", "files"), "`n")
-        tip := ""
-        downloading(*) {
-            if (newVersion) {
-                g := createGuiOpt("InputTip - 版本更新中 " currentVersion " > " newVersion)
-                g.AddText("cRed", "InputTip 新版本 " newVersion " 下载中...")
-            } else {
-                g := createGuiOpt("InputTip - 正在获取最新的源代码...")
-            }
+    downloading(downloadCodeFile := 1, *) {
+        if (newVersion) {
+            g := createGuiOpt("InputTip - 版本更新中 " currentVersion " > " newVersion)
+            g.AddText("cRed", "InputTip 新版本 " newVersion " 下载中...")
+        } else {
+            g := createGuiOpt("InputTip - 正在与源代码仓库同步...")
+        }
+        if (downloadCodeFile) {
             g.AddText(, "正在下载和校验文件: ")
             tip := g.AddText("xs cRed", "                                                            ")
-
-            g.AddText("xs", "------------------------------------------------------------")
-            g.AddText("xs", "官网:")
-            g.AddLink("yp", '<a href="https://inputtip.abgox.com">https://inputtip.abgox.com</a>')
-            g.AddText("xs", "Github:")
-            g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
-            g.AddText("xs", "Gitee: :")
-            g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
-            g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
-            if (!silent) {
-                g.Show()
-            }
-            g.OnEvent("Close", downloading)
-            return g
+        } else {
+            g.AddText("cRed", "正在下载远程仓库的 file.ini 文件...")
         }
-        downloadingGui := downloading()
 
-        doneFileList := []
-        fileCount := files.Length
-        for i, kv in files {
-            p := StrSplit(kv, "=")
-            for u in baseUrl {
-                tip.Text := i '/' fileCount " : " p[1]
-                out := p[2] ".new"
-                if (InStr(out, "/")) {
-                    dir := RegExReplace(out, "/[^/]*$", "")
-                } else {
-                    dir := ""
-                }
-                try {
-                    if (dir) {
-                        if (!DirExist(dir)) {
-                            DirCreate(dir)
-                        }
+        g.AddText("xs", "------------------------------------------------------------")
+        g.AddText("xs", "官网:")
+        g.AddLink("yp", '<a href="https://inputtip.abgox.com">https://inputtip.abgox.com</a>')
+        g.AddText("xs", "Github:")
+        g.AddLink("yp", '<a href="https://github.com/abgox/InputTip">https://github.com/abgox/InputTip</a>')
+        g.AddText("xs", "Gitee: :")
+        g.AddLink("yp", '<a href="https://gitee.com/abgox/InputTip">https://gitee.com/abgox/InputTip</a>')
+        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+        if (!silent) {
+            g.Show()
+        }
+        g.OnEvent("Close", downloading)
+        return g
+    }
+
+    downloadingGui.Destroy()
+
+    if (downloadIni) {
+        try {
+            files := StrSplit(IniRead("files.ini", "files"), "`n")
+            tip := ""
+            downloadingGui := downloading()
+
+            doneFileList := []
+            fileCount := files.Length
+            for i, kv in files {
+                p := StrSplit(kv, "=")
+                for u in baseUrl {
+                    tip.Text := i '/' fileCount " : " p[1]
+                    out := p[2] ".new"
+                    if (InStr(out, "/")) {
+                        dir := RegExReplace(out, "/[^/]*$", "")
+                    } else {
+                        dir := ""
                     }
-                    Download(u p[1], out)
-                    break
-                }
-            }
-            if (FileExist(out)) {
-                doneFileList.Push(out)
-                if (InStr(out, ".ahk")) {
                     try {
-                        if (!InStr(FileOpen(out, "r").ReadLine(), "InputTip")) {
-                            done := 0
-                            break
+                        if (dir) {
+                            if (!DirExist(dir)) {
+                                DirCreate(dir)
+                            }
                         }
-                    } catch {
-                        done := 0
+                        Download(u p[1], out)
                         break
                     }
                 }
-            } else {
-                done := 0
-                break
+                if (FileExist(out)) {
+                    doneFileList.Push(out)
+                    if (InStr(out, ".ahk")) {
+                        try {
+                            if (!InStr(FileOpen(out, "r").ReadLine(), "InputTip")) {
+                                done := 0
+                                break
+                            }
+                        } catch {
+                            done := 0
+                            break
+                        }
+                    }
+                } else {
+                    done := 0
+                    break
+                }
             }
-        }
 
-        downloadingGui.Destroy()
-
-        if (done) {
-            for v in doneFileList {
-                FileMove(v, RegExReplace(v, "\.new$", ""), 1)
-            }
-            if (newVersion) {
-                FileAppend(newVersion, A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt")
-                writeIni("clickUpdate", !silent)
-            }
-            fn_restart()
-        }
-    } catch {
-        done := 0
-        try {
             downloadingGui.Destroy()
+
+            if (done) {
+                for v in doneFileList {
+                    FileMove(v, RegExReplace(v, "\.new$", ""), 1)
+                }
+                if (newVersion) {
+                    FileAppend(newVersion, A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt")
+                    writeIni("clickUpdate", !silent)
+                }
+                fn_restart()
+            }
+        } catch {
+            done := 0
+            try {
+                downloadingGui.Destroy()
+            }
         }
+    } else {
+        done := 0
     }
 
     if (!done) {
@@ -493,14 +507,15 @@ getRepoCode(newVersion, silent := silentUpdate) {
         createGui(errGui).Show()
         errGui(info) {
             if (newVersion) {
-                g := createGuiOpt("InputTip - 新版本下载错误")
-                g.AddText("cRed", "InputTip 新版本下载错误!")
+                g := createGuiOpt("InputTip - 新版本下载失败")
+                g.AddText("cRed", "InputTip 新版本下载失败!")
             } else {
-                g := createGuiOpt("InputTip - 获取失败")
-                g.AddText("cRed", "最新的源代码获取失败!")
+                g := createGuiOpt("InputTip - 与源代码仓库同步失败")
+                g.AddText("cRed", "与源代码仓库同步失败!")
             }
 
-            g.AddText("cRed", "请手动下载最新版本的 InputTip.Zip 并解压替换。")
+            g.AddText("cRed", "请检查网络连接或稍后重试。")
+            g.AddText("cRed", "也可以前往官网或仓库手动下载。")
             g.AddText(, "--------------------------------------------------")
             g.AddText("xs", "官网:")
             g.AddLink("yp", '<a href="https://inputtip.abgox.com">https://inputtip.abgox.com</a>')

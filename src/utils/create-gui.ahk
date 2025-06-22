@@ -77,7 +77,7 @@ createUniqueGui(callback) {
  * @param {String} guiOption Gui 初始化配置
  * @returns {Gui} 返回 Gui 对象
  */
-createGuiOpt(title := fileDesc, fontOption := fontOpt, guiOption := "AlwaysOnTop") {
+createGuiOpt(title := fileDesc, fontOption := fontOpt, guiOption := "") {
     g := Gui(guiOption, title)
     g.SetFont(fontOption*)
     return g

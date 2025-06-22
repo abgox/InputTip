@@ -309,7 +309,7 @@ checkIni() {
         fz := "s14"
         createGui(confirmGui).Show()
         confirmGui(info) {
-            g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
+            g := Gui(, "InputTip - 初始化引导")
             g.SetFont(fz, "Microsoft YaHei")
             g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
             g.AddText("xs cRed", "InputTip 会使用三套不同颜色的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
@@ -326,7 +326,7 @@ checkIni() {
                 g.Destroy()
                 createGui(yesGui).Show()
                 yesGui(info) {
-                    g := Gui("AlwaysOnTop")
+                    g := Gui()
                     g.SetFont(fz, "Microsoft YaHei")
                     g.AddText(, "你真的确定要修改鼠标样式吗？")
                     g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】=>【更改配置】`n  2. 将【1. 是否同步修改鼠标样式】的值更改为【否】")
@@ -375,7 +375,7 @@ checkIni() {
         showSymbol() {
             createGui(confirmGui).Show()
             confirmGui(info) {
-                g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
+                g := Gui(, "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
                 g.AddText(, "你是否希望 InputTip 显示符号?")
                 g.AddText("xs cRed", "InputTip 会尝试获取输入光标位置，在其附近显示符号")
@@ -416,7 +416,7 @@ checkIni() {
         initWhiteList() {
             createGui(listTipGui).Show()
             listTipGui(info) {
-                g := Gui("AlwaysOnTop", "InputTip - 初始化引导")
+                g := Gui(, "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
                 g.AddText("cRed", "对于符号显示方案，InputTip 核心使用白名单机制")
                 g.AddLink("cRed", '只有在白名单中的应用进程窗口才会显示符号')

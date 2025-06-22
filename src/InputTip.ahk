@@ -1,18 +1,18 @@
 ; InputTip
 
-#Include ./utils/options.ahk
+#Include utils/options.ahk
 
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-SetOrigFilename InputTip.ahk
 ;@Ahk2Exe-UpdateManifest 1
-;@AHK2Exe-SetDescription InputTip - 一个输入法状态管理工具
+;@AHK2Exe-SetDescription InputTip - 一个输入法状态管理工具(提示/切换)
 
-#Include ./utils/ini.ahk
-#Include ./utils/IME.ahk
-#Include ./utils/check-version.ahk
-#Include ./menu/tray-menu.ahk
-#Include ./utils/tools.ahk
-#Include ./utils/app-list.ahk
+#Include utils/ini.ahk
+#Include utils/IME.ahk
+#Include utils/check-version.ahk
+#Include menu/tray-menu.ahk
+#Include utils/tools.ahk
+#Include utils/app-list.ahk
 
 ID := "InputTip"
 
@@ -23,13 +23,13 @@ if (FileExist(favicon_png)) {
     setTrayIcon(favicon_png)
 }
 
-#Include ./utils/verify-file.ahk
-#Include ./utils/create-gui.ahk
-#Include ./utils/hotkey-gui.ahk
+#Include utils/verify-file.ahk
+#Include utils/create-gui.ahk
+#Include utils/hotkey-gui.ahk
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
-fileDesc := "InputTip - 一个输入法状态管理工具"
+fileDesc := "InputTip - 一个输入法状态管理工具(提示/切换)"
 JAB_PID := ""
 
 try {
@@ -638,6 +638,6 @@ showIconTimer() {
     A_IconHidden := 0
 }
 
-; 如果有修改代码的需求，你应该写在此行之前
-; 此行之后的逻辑代码，都会因为 show.ahk 中的死循环而无效
-#Include ./utils/show.ahk
+#Include "*i plugins/InputTip.plugin.ahk"
+
+#Include utils/show.ahk

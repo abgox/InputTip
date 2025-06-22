@@ -1,17 +1,17 @@
 ; InputTip
 
-#Include ./utils/options.ahk
+#Include utils/options.ahk
 
 #NoTrayIcon
 ;@AHK2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
-;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态管理工具
+;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态管理工具(提示/切换)
 
-#Include ./utils/IME.ahk
-#Include ./utils/ini.ahk
-#Include ./utils/app-list.ahk
-#Include ./utils/var.ahk
-#Include ./utils/tools.ahk
+#Include utils/IME.ahk
+#Include utils/ini.ahk
+#Include utils/app-list.ahk
+#Include utils/var.ahk
+#Include utils/tools.ahk
 
 ID := "JAB"
 
@@ -88,6 +88,4 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
     }
 }
 
-; 如果有修改代码的需求，你应该写在此行之前
-; 此行之后的逻辑代码，都会因为 show.ahk 中的死循环而无效
-#Include ./utils/show.ahk
+#Include utils/show.ahk

@@ -57,9 +57,18 @@
 
 ### 常见问题
 
-- 如果有使用问题，请先确认当前使用的 InputTip 是最新版本 <img style="display:inline;vertical-align: text-bottom;" src="https://img.shields.io/github/v/release/abgox/InputTip?label=%20" alt="version">
-  - 在 `托盘菜单` => `关于` 中查看当前版本号
-  - 如果不是最新版本，你应该先更新到最新版本，检查问题是否仍然存在
+- 如果有使用问题，请先确保当前使用的 InputTip 是最新版本
+
+  - 如果是 [zip 版本](#zip-版本):
+
+    - `托盘菜单` => `设置更新检查` => `与源代码仓库同步`
+    - 同步完成后，检查问题是否仍然存在
+
+  - 如果是 [exe 版本](#exe-版本):
+    - 在 `托盘菜单` => `关于` 中查看当前版本号
+    - `托盘菜单` => `设置更新检查` => `立即检查版本更新`
+    - 如果存在新版本，你应该先更新，然后检查问题是否仍然存在
+
 - 然后查看相关的文档
   - 本页面中包含的内容
   - [常见问题(FAQ)](https://inputtip.abgox.com/FAQ/)
@@ -157,46 +166,13 @@
 <img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.gif" />
 </details>
 
-### 编译
-
-> [!Tip]
-> 你可以自行查看源代码并编译 InputTip
-
-> [!Warning]
->
-> 如果修改了项目代码，需要先编译 `InputTip.JAB.JetBrains.ahk`，再编译 `InputTip.ahk`
-
-1. 克隆项目仓库到本地
-
-   - 完成项目克隆后，你也可以直接运行 `InputTip.bat` 来使用 InputTip，它等同于 [zip 版本](#zip-版本)
-   - [Github](https://github.com/abgox/InputTip)
-
-     ```shell
-     git clone https://github.com/abgox/InputTip.git
-     ```
-
-   - [Gitee](https://gitee.com/abgox/InputTip)
-
-     ```shell
-     git clone https://gitee.com/abgox/InputTip.git
-     ```
-
-2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
-3. 打开 `AutoHotKey Dash`
-4. 点击左边的 `Compile`，等待编译器下载完成
-5. 重新点击左边的 `Compile`
-6. 将 `src\InputTip.ahk` 拖入弹出的编译窗口中
-7. 点击左下角的 `Convert` 完成编译
-   - 注意: [编译后的 InputTip.exe 文件可能会被误判为病毒程序](https://inputtip.abgox.com/FAQ/about-virus)，请自行处理
-8. 运行编译后的 `InputTip.exe`
-
 ### 卸载
 
 1. 取消 `开机自启动`: `托盘菜单` => `设置` => `开机自启动`
 2. 退出: `托盘菜单` => `退出`
    - 如果修改了鼠标样式，可以通过 `更改配置` => `显示形式` => `1. 要不要修改鼠标样式` 设置为 `【否】`，会尝试进行恢复
    - 如果未完全恢复，请根据弹窗提示信息进行操作
-3. 删除 [目录结构及数据](#目录结构及数据) 中展示的相关目录即可
+3. 删除下方的 [目录结构及数据](#目录结构及数据) 中展示的相关目录即可
 
 ### 目录结构及数据
 
@@ -231,6 +207,59 @@
 - 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)
   - 这些数据文件或文件夹会保存在 `$env:LocalAppData\Microsoft\WinGet\Packages\abgox.InputTip_Microsoft.Winget.Source_8wekyb3d8bbwe` 中
   - 可以正常通过 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 更新、卸载，不会删除这些数据文件和文件夹
+
+### 编译
+
+> [!Tip]
+>
+> - 你可以自行查看源代码并编译 InputTip
+> - 但是编译没有什么实际意义，因为现在推荐 [zip 版本](#zip-版本)，它就是未编译的版本
+
+> [!Warning]
+>
+> 如果修改了项目代码，需要先编译 `InputTip.JAB.JetBrains.ahk`，再编译 `InputTip.ahk`
+
+1. 克隆项目仓库到本地
+
+   - 完成项目克隆后，你也可以直接运行 `InputTip.bat` 来使用 InputTip，它等同于 [zip 版本](#zip-版本)
+   - [Github](https://github.com/abgox/InputTip)
+
+     ```shell
+     git clone https://github.com/abgox/InputTip.git
+     ```
+
+   - [Gitee](https://gitee.com/abgox/InputTip)
+
+     ```shell
+     git clone https://gitee.com/abgox/InputTip.git
+     ```
+
+2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
+3. 打开 `AutoHotKey Dash`
+4. 点击左边的 `Compile`，等待编译器下载完成
+5. 重新点击左边的 `Compile`
+6. 将 `src\InputTip.ahk` 拖入弹出的编译窗口中
+7. 点击左下角的 `Convert` 完成编译
+   - 注意: [编译后的 InputTip.exe 文件可能会被误判为病毒程序](https://inputtip.abgox.com/FAQ/about-virus)，请自行处理
+8. 运行编译后的 `InputTip.exe`
+
+### 自定义功能
+
+> [!Caution]
+>
+> - 它是 [zip 版本](#zip-版本) 独有的功能，因为 [exe 版本](#exe-版本) 无法实现它
+> - 只有熟悉 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言开发([v2 版本](https://www.autohotkey.com/docs/v2/))才可以使用它
+>   - 不要修改 `plugins` 目录以外的其他源代码文件
+>   - 新增的所有内容不能包含死循环
+
+- 在 `v2.40.3.3` 版本中，在 `src` 目录下新增了 `plugins` 目录
+- 目录中添加了一个空的 `InputTip.plugin.ahk` 文件
+- InputTip 会引入这个文件，你可以在其中添加自定义功能，比如 **自定义热键**、**自定义热字串** 等
+- 或者，在 `plugins` 目录中新建 `.ahk` 文件，然后在 `InputTip.plugin.ahk` 中 `#Include` 它
+- `plugins` 目录的特点:
+  - 在 `plugins` 目录中的文件不会因为内置的更新而被覆盖
+  - 如果你使用 [Scoop](https://scoop.sh/) 安装 [abgox/abyss](https://github.com/abgox/abyss) 下的 `abgox.InputTip-zip`，`plugins` 目录会被 `persist`
+    - 因此，也可以通过 [Scoop](https://scoop.sh/) 更新，而不会覆盖 `plugins` 目录中的文件
 
 ### 关于状态提示方案
 

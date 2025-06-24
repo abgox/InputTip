@@ -76,7 +76,7 @@ checkVersion(currentVersion, callback, urls := [
  */
 checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
     if (checkUpdateDelay || force) {
-        updateTitle := "InputTip - " (A_IsCompiled ? "exe 版本(编译运行方案)" : "zip 版本(项目源代码运行方案)")
+        updateTitle := "InputTip - " (A_IsCompiled ? "exe 版本 (编译运行方案)" : "zip 版本 (项目源代码运行方案)")
         if (once) {
             _checkUpdate()
             return

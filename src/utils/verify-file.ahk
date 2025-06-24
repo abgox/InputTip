@@ -343,14 +343,14 @@ checkIni() {
                     w := info.w
                     bw := w - g.MarginX * 2
 
-                    g.AddButton("xs cRed w" bw, "【是】对，我很确定").OnEvent("Click", e_yes)
+                    g.AddButton("xs cRed w" bw, "【是】").OnEvent("Click", e_yes)
                     e_yes(*) {
                         g.Destroy()
                         writeIni("changeCursor", 1)
                         global changeCursor := 1
                         showSymbol()
                     }
-                    g.AddButton("w" bw, "【否】不，我点错了").OnEvent("Click", e_no)
+                    g.AddButton("w" bw, "【否】").OnEvent("Click", e_no)
                     e_no(*) {
                         g.Destroy()
                         writeIni("changeCursor", 0)

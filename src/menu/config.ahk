@@ -33,7 +33,6 @@ fn_config(*) {
         g.AddText("xs", "1. 是否同步修改鼠标样式: ")
         _ := g.AddDropDownList("w" bw / 2 " yp AltSubmit Choose" changeCursor + 1, ["【否】不要修改鼠标样式，保持原本的鼠标样式", "【是】需要修改鼠标样式，随输入法状态而变化"])
         g.AddText("xs cGray", "推荐设置为【是】，它与符号一起搭配使用才是更完美的输入法状态提示方案")
-        _.Focus()
         _.OnEvent("Change", e_change_cursor)
         e_change_cursor(item, *) {
             static last := changeCursor + 1
@@ -68,7 +67,6 @@ fn_config(*) {
                     bw := w - g.MarginX * 2
 
                     y := g.AddButton("w" bw, "我知道了")
-                    y.Focus()
                     y.OnEvent("Click", yes)
                     yes(*) {
                         g.Destroy()

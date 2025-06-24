@@ -25,7 +25,6 @@ fn_JAB(item, *) {
             g.AddButton("xs w" w, "【设置光标获取模式】").OnEvent("Click", fn_cursor_mode)
             g.AddButton("xs w" w, "【设置特殊偏移量】").OnEvent("Click", fn_app_offset)
             y := g.AddButton("xs w" w, "我知道了")
-            y.Focus()
             y.OnEvent("Click", e_close)
             e_close(*) {
                 g.Destroy()

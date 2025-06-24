@@ -69,7 +69,6 @@ fn_app_offset(*) {
                             bw := w - g.MarginX * 2
 
                             y := g.AddButton("xs w" bw, "重新输入")
-                            y.Focus()
                             y.OnEvent("click", e_close)
                             e_close(*) {
                                 g.Destroy()
@@ -421,9 +420,8 @@ fn_app_offset(*) {
                     w := info.w
                     bw := w - g.MarginX * 2
 
-                    g.AddButton("xs w" bw, "【是】我确定要清空").OnEvent("Click", yes)
-                    _ := g.AddButton("xs w" bw, "【否】不，我点错了")
-                    _.Focus()
+                    g.AddButton("xs w" bw, "【是】").OnEvent("Click", yes)
+                    _ := g.AddButton("xs w" bw, "【否】")
                     _.OnEvent("Click", no)
                     yes(*) {
                         g.Destroy()

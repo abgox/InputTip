@@ -16,7 +16,6 @@ fn_bw_list(*) {
         bw := w - g.MarginX * 2
 
         _c := g.AddButton("xs w" bw, "白名单")
-        _c.Focus()
         _c.OnEvent("Click", set_white_list)
         set_white_list(*) {
             g.Destroy()

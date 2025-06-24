@@ -199,7 +199,6 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         bw := w - g.MarginX * 2
 
                         y := g.AddButton("xs w" bw / 2, "确认更新")
-                        y.Focus()
                         y.OnEvent("Click", e_yes)
                         e_yes(*) {
                             fn_close()
@@ -224,7 +223,6 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                                     bw := w - g.MarginX * 2
 
                                     y := g.AddButton("xs w" bw, "我知道了")
-                                    y.Focus()
                                     y.OnEvent("Click", yes)
                                     g.OnEvent("Close", yes)
                                     yes(*) {
@@ -311,7 +309,6 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         bw := w - g.MarginX * 2
 
                         y := g.AddButton("w" bw / 2, "确认更新")
-                        y.Focus()
                         y.OnEvent("Click", e_yes)
                         e_yes(*) {
                             fn_close()
@@ -531,7 +528,6 @@ getRepoCode(newVersion, silent := silentUpdate) {
             bw := w - g.MarginX * 2
 
             y := g.AddButton("xs w" bw, "我知道了")
-            y.Focus()
             y.OnEvent("Click", yes)
             g.OnEvent("Close", yes)
             yes(*) {
@@ -730,7 +726,6 @@ checkUpdateDone() {
             bw := w - g.MarginX * 2
 
             y := g.AddButton("xs w" bw, "我知道了")
-            y.Focus()
             g.OnEvent("Close", yes)
             y.OnEvent("Click", yes)
             yes(*) {

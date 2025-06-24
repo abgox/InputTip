@@ -61,7 +61,6 @@ fn_about(*) {
 
         tab.UseTab(0)
         btn := g.AddButton("Section w" w, "关闭")
-        btn.Focus()
         btn.OnEvent("Click", e_close)
         e_close(*) {
             g.Destroy()

@@ -106,7 +106,6 @@ createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
 
         btn := g.AddButton("xs w" w, btnText)
         btn.OnEvent("Click", e_close)
-        btn.Focus()
         e_close(*) {
             g.Destroy()
         }

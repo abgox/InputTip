@@ -44,7 +44,6 @@ fn_startup(item, *) {
             bw := w - g.MarginX * 2
 
             y := g.AddButton("w" w, "我知道了")
-            y.Focus()
             y.OnEvent("Click", e_yes)
             e_yes(*) {
                 g.Destroy()
@@ -76,7 +75,6 @@ fn_startup(item, *) {
 
             btn := g.AddButton("Section w" bw btnOpt, "任务计划程序")
 
-            btn.Focus()
             btn.OnEvent("Click", e_useTask)
             e_useTask(*) {
                 if (A_IsCompiled) {

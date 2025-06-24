@@ -262,7 +262,6 @@ if (A_IsCompiled) {
                 bw := w - g.MarginX * 2
 
                 y := g.AddButton("xs w" bw, "我知道了")
-                y.Focus()
                 y.OnEvent("Click", yes)
                 g.OnEvent("Close", yes)
                 yes(*) {
@@ -362,7 +361,6 @@ checkIni() {
                 }
             }
             _ := g.AddButton("w" bw, "【否】保留现有样式")
-            _.Focus()
             _.OnEvent("Click", e_no)
             e_no(*) {
                 g.Destroy()
@@ -402,7 +400,6 @@ checkIni() {
                     initWhiteList()
                 }
                 _ := g.AddButton("w" bw, "【否】不显示符号")
-                _.Focus()
                 _.OnEvent("Click", e_no)
                 e_no(*) {
                     g.Destroy()
@@ -437,14 +434,12 @@ checkIni() {
                 bw := w - g.MarginX * 2
 
                 _c := g.AddButton("w" bw, "【是】现在去添加")
-                _c.Focus()
                 _c.OnEvent("Click", add_white_list)
                 add_white_list(*) {
                     close()
                     fn_white_list()
                 }
                 _ := g.AddButton("w" bw, "【否】暂时不添加")
-                _.Focus()
                 _.OnEvent("Click", close)
                 close(*) {
                     g.Destroy()

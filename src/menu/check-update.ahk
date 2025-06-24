@@ -23,7 +23,6 @@ fn_check_update(*) {
 
         _ := g.AddEdit("yp Number Limit5")
         _.Value := readIni("checkUpdateDelay", 1440)
-        _.Focus()
         _.OnEvent("Change", e_setIntervalTime)
         e_setIntervalTime(item, *) {
             value := item.value

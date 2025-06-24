@@ -38,7 +38,6 @@ fn_symbol_pos(*) {
         }
 
         _c := g.AddButton("xs w" bw, "设置符号显示在鼠标附近的应用")
-        _c.Focus()
         _c.OnEvent("Click", set_app_list)
         set_app_list(*) {
             g.Destroy()

@@ -121,18 +121,18 @@ makeTrayMenu() {
             g.AddText("xs cRed", "路径: ").GetPos(, , &_w)
             gc.app_path := g.AddEdit("yp ReadOnly -VScroll w" _width)
             e_window_info(*) {
-                if (gc.timer) {
-                    gc.timer := 0
+                if (gc.timer2) {
+                    gc.timer2 := 0
                     gc._window_info.Text := "点击获取"
                     return
                 }
-                gc.timer := 1
+                gc.timer2 := 1
                 gc._window_info.Text := "停止获取"
                 SetTimer(statusTimer, 25)
                 statusTimer() {
                     static first := "", last := ""
 
-                    if (!gc.timer) {
+                    if (!gc.timer2) {
                         SetTimer(, 0)
                         first := ""
                         last := ""

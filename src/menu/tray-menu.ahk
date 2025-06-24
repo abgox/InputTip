@@ -102,7 +102,7 @@ makeTrayMenu() {
     fn_process_info(*) {
         createUniqueGui(processInfoGui).Show()
         processInfoGui(info) {
-            g := createGuiOpt("InputTip - 实时获取当前激活的窗口进程信息")
+            g := createGuiOpt("InputTip - 实时获取当前激活的窗口进程信息", , "AlwaysOnTop")
             g.AddText("cRed", "获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)")
             if (info.i) {
                 return g

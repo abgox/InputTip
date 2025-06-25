@@ -455,6 +455,8 @@
   - [QQ 输入法](https://qq.pinyin.cn/)
   - [百度输入法](https://shurufa.baidu.com/)
   - 微软拼音，微软五笔，微软仓颉...
+    - 微软输入法只有当聚焦到输入框时，才能正常切换输入法状态
+    - 这会导致 InputTip 的自动切换失效
   - [冰凌输入法](https://icesofts.com/)
   - [手心输入法](https://www.xinshuru.com/): 使用 `Shift` 切换中英文状态无法正常识别，需要参照下方的使用方式
 

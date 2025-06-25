@@ -15,16 +15,16 @@ InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2.40.3
+;@AHK2Exe-SetVersion 2.40.4
 
 if (A_IsCompiled) {
     ; 当前的 exe 版本
-    currentVersion := "2.40.3"
+    currentVersion := "2.40.4"
     ; exe 版本字段
     versionKey := "version"
 } else {
     ; 当前的 zip 版本
-    currentVersion := "2.40.3.3"
+    currentVersion := "2.40.4"
     ; zip 版本字段
     versionKey := "version-zip"
 }

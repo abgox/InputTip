@@ -61,9 +61,9 @@ fn_input_mode(*) {
                     _.OnEvent("Click", e_no)
                     e_yes(*) {
                         _g.Destroy()
-                        gc.switchStatus.Value := 1
-                        writeIni("switchStatus", 0)
-                        global switchStatus := 0
+                        gc.switchStatus.Value := value + 1
+                        writeIni("switchStatus", value)
+                        global switchStatus := value
                         restartJAB()
                     }
                     e_no(*) {

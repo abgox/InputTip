@@ -102,8 +102,8 @@ makeTrayMenu() {
     fn_process_info(*) {
         createUniqueGui(processInfoGui).Show()
         processInfoGui(info) {
-            g := createGuiOpt("InputTip - 实时获取当前激活的窗口进程信息", , "AlwaysOnTop")
-            g.AddText("cRed", "获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)")
+            g := createGuiOpt("InputTip - 获取当前窗口相关进程信息", , "AlwaysOnTop")
+            g.AddText("cRed", "实时获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)").Focus()
             if (info.i) {
                 return g
             }
@@ -200,10 +200,9 @@ fn_update_user(uname, *) {
             return g
         }
 
-        g.AddText("xs ReadOnly cGray", "设置完成后，直接关闭这个窗口即可")
+        g.AddText("xs ReadOnly cGray", "设置完成后，直接关闭这个窗口即可").Focus()
         _._config := "userName"
         _.Value := uname
-        _.Focus()
         _.OnEvent("Change", fn_change)
         fn_change(item, *) {
             global userName := item.value

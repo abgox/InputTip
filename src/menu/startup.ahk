@@ -35,7 +35,7 @@ fn_startup(item, *) {
             g.AddText(, "InputTip 的")
             g.AddText("yp cRed", "开机自启动")
             g.AddText("yp", "已取消")
-            g.AddText("xs", "可通过【托盘菜单】=>【开机自启动】再次启用")
+            g.AddText("xs", "可通过【托盘菜单】=>【开机自启动】再次启用").Focus()
 
             if (info.i) {
                 return g

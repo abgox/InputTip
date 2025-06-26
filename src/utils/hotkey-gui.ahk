@@ -21,7 +21,7 @@ setHotKeyGui(keyConfigList, label := "") {
         g.AddText("Section", "1.")
         g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
         g.AddText("xs", "2.  LShift 指的是左边的 Shift 键，RShift 指的是右边的 Shift 键，其他按键以此类推")
-        g.AddText("xs", "3.  使用单键不会覆盖原本的按键功能，因为是在单键抬起时才会触发")
+        g.AddText("xs", "3.  使用单键作为快捷键不会覆盖原本的按键功能，因为是在按键抬起时才会触发")
 
         if (info.i) {
             return g

@@ -96,7 +96,7 @@ createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
         g := createGuiOpt(title)
 
         for v in Tips {
-            g.AddLink(v.opt, v.text)
+            g.AddLink(v.opt, v.text).Focus()
         }
 
         if (info.i) {

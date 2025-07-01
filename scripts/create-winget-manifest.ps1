@@ -43,7 +43,7 @@ PublisherSupportUrl: https://github.com/abgox/InputTip/issues
 Author: abgox
 PackageName: InputTip
 PackageUrl: https://inputtip.abgox.com/
-License: MIT License
+License: AGPL-3.0-only
 LicenseUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
@@ -86,7 +86,7 @@ PublisherSupportUrl: https://pd.qq.com/s/gyers18g6?businessType=5
 Author: abgox
 PackageName: InputTip
 PackageUrl: https://inputtip.abgox.com/
-License: MIT License
+License: AGPL-3.0-only
 LicenseUrl: https://gitee.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://gitee.com/abgox/InputTip/blob/main/LICENSE

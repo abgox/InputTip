@@ -22,7 +22,7 @@ checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
 ; 指定内部实现切换输入法状态的方式
 switchStatus := readIni("switchStatus", 1)
-switchStatusList := ["{LShift}", "{RShift}", "^{Space}"]
+switchStatusList := ["{LShift}", "{RShift}", "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}"]
 
 ; 是否改变鼠标样式
 changeCursor := readIni("changeCursor", 0)

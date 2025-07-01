@@ -288,7 +288,7 @@ updateSymbol(init := 0) {
         if (state) {
             defaultPath := "InputTipSymbol\default\" state ".png"
             picPath := readIni(state "_pic", defaultPath)
-            if (!FileExist(picPath)) {
+            if (picPath && (!RegExMatch(picPath, ".*\.png$") || !FileExist(picPath))) {
                 writeIni(state "_pic", defaultPath)
                 picPath := defaultPath
             }

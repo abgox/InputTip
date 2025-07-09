@@ -54,9 +54,9 @@ fn_about(*) {
         g.AddLink("Section cRed w" bw, '关于我的其他项目，可以通过访问 <a href="https://me.abgox.com/">我的主页</a>、<a href="https://github.com/abgox">Github</a>、<a href="https://gitee.com/abgox">Gitee</a> 等方式了解')
         g.SetFont("s" readIni("gui_font_size", "12") / 1.1)
         g.AddLink("Section w" bw, '1. <a href="https://pscompletions.abgox.com/">PSCompletions</a> (<a href="https://github.com/abgox/PSCompletions">Github</a> | <a href="https://gitee.com/abgox/PSCompletions">Gitee</a>) : 一个 PowerShell 补全模块，它能让你在 PowerShell 中更简单、更方便地使用命令补全。')
-        g.AddLink("Section w" bw, '2. filename-lint (<a href="https://github.com/abgox/filename-lint">Github</a> | <a href="https://gitee.com/abgox/filename-lint">Gitee</a>) : 一个 vscode 扩展插件，用于统一文件及文件夹的命名规范。')
-        g.AddLink("Section w" bw, '3. abyss (<a href="https://github.com/abgox/abyss">Github</a> | <a href="https://gitee.com/abgox/abyss">Gitee</a>) : 一个 scoop bucket 软件仓库，它具备更完善的 persist，优化的 Link 方案、进程终止功能和本地化输出(中文/英文)。')
-        g.AddLink("Section w" bw, '4. scoop-install (<a href="https://github.com/abgox/scoop-install">Github</a> | <a href="https://gitee.com/abgox/scoop-install">Gitee</a>) : 一个 PowerShell 脚本，它允许你添加 Scoop 配置，在 Scoop 安装应用时使用替换后的 url 而不是原始的 url。')
+        g.AddLink("Section w" bw, '2. abyss (<a href="https://github.com/abgox/abyss">Github</a> | <a href="https://gitee.com/abgox/abyss">Gitee</a>) : 一个 scoop bucket 软件仓库，它具备更完善的 persist，优化的 Link 方案、进程终止功能和本地化输出(中文/英文)。')
+        g.AddLink("Section w" bw, '3. scoop-tools (<a href="https://github.com/abgox/scoop-tools">Github</a> | <a href="https://gitee.com/abgox/scoop-tools">Gitee</a>) : PowerShell 脚本，它允许你添加 Scoop 配置，在 Scoop 安装或更新应用时使用替换后的 url 而不是原始的 url。')
+        g.AddLink("Section w" bw, '4. filename-lint (<a href="https://github.com/abgox/filename-lint">Github</a> | <a href="https://gitee.com/abgox/filename-lint">Gitee</a>) : 一个 vscode 扩展插件，用于统一文件及文件夹的命名规范。')
         g.AddLink("Section w" bw, '5. ...')
 
         tab.UseTab(0)

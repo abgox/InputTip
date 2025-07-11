@@ -8,14 +8,8 @@ fn_app_offset(*) {
         tip: gui_help_tip,
         list: "特殊偏移量列表",
         color: "cRed",
-        about: '1. 简要说明`n   - 这个菜单用来配置应用进程在不同屏幕中的符号显示偏移量`n`n   - 上方是当前系统正在运行的【应用进程列表】`n   - 为了便于操作，白名单中的应用进程也会添加到列表中`n   - 双击列表中任意一行，就可以将其添加到【特殊偏移量列表】中`n`n   - 下方是【特殊偏移量列表】，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，可以编辑或移除`n`n2. 按钮 —— 刷新此界面`n   - 因为列表中显示的是当前正在运行的应用进程`n   - 如果你是先打开这个配置菜单，再打开对应的应用，它不会显示在这里`n   - 你需要重新打开这个配置菜单，或者点击这个按钮进行刷新`n`n3. 按钮 —— 手动添加`n   - 在【应用进程列表】中，可能没有你想要添加的进程，你需要点击这个按钮手动添加`n   - 可以配合【托盘菜单】中的【获取当前窗口相关进程信息】一起使用`n`n4. 按钮 —— 显示更多进程`n   - 默认情况下，【应用进程列表】中显示的是前台应用进程，就是有窗口的应用进程`n   - 你可以点击它来显示更多的进程，比如后台进程`n`n5. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过坐标信息判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左边，副屏幕在右边`n      - 那么副屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
+        about: '1. 简要说明`n   - 这个菜单用来配置应用进程在不同屏幕中的符号显示偏移量`n`n   - 上方是当前系统正在运行的【应用进程列表】`n   - 双击列表中任意一行，就可以将其添加到【特殊偏移量列表】中`n`n   - 下方是【特殊偏移量列表】，可以设置指定应用在不同屏幕下的符号显示偏移量`n   - 双击列表中任意应用进程，会弹出偏移量设置窗口，可以编辑或移除`n`n2. 应用进程列表 —— 进程名称`n   - 应用程序实际运行的进程名称`n   - 如果不清楚是哪个应用的进程，可能需要通过【窗口标题】、【文件路径】来判断`n   - 或者使用第 6 点的技巧`n`n3. 应用进程列表 —— 来源`n   - 【系统】表明这个进程是从系统中获取的，它正在运行`n   - 【白名单】表明这个进程是存在于白名单中的，为了方便操作，被添加到列表中`n`n4. 应用进程列表 —— 窗口标题`n   - 这个应用进程所显示的窗口的标题`n   - 你可能需要通过它来判断这是哪一个应用的进程`n`n5. 应用进程列表 —— 文件路径`n   - 这个应用进程的可执行文件的所在路径`n   - 你可能需要通过它来判断这是哪一个应用的进程`n`n6. 技巧 —— 获取当前窗口的实时的相关进程信息`n   - 你可以使用【托盘菜单】中的【获取当前窗口相关进程信息】`n   - 它会实时获取当前激活的窗口的【进程名称】【窗口标题】【文件路径】`n`n7. 按钮 —— 刷新此界面`n   - 因为列表中显示的是当前正在运行的应用进程`n   - 如果你是先打开这个配置菜单，再打开对应的应用，它不会显示在这里`n   - 你需要重新打开这个配置菜单，或者点击这个按钮进行刷新`n`n8. 按钮 —— 手动添加`n   - 在【应用进程列表】中，可能没有你想要添加的进程，你需要点击这个按钮手动添加`n   - 可以配合第 6 点的技巧，让手动添加更方便`n`n9. 按钮 —— 显示更多进程`n   - 默认情况下，【应用进程列表】中显示的是前台应用进程，就是有窗口的应用进程`n   - 你可以点击它来显示更多的进程，比如后台进程`n`n10. 按钮 —— 显示更少进程`n   - 当你点击【显示更多进程】按钮后，会出现这个按钮`n   - 点击它又会重新显示前台应用进程`n`n11. 按钮 —— 设置不同屏幕下的基础偏移量`n   - 它会弹出一个新的配置界面，用来设置不同屏幕下的基础偏移量`n   - 偏移量的计算方式: 符号偏移量 + 不同屏幕的基础偏移量 + 特殊偏移量`n   - 符号偏移量: 所使用的符号(图片/方块/文本)的偏移量配置`n`n12. 如何设置偏移量？`n   - 当双击任意应用进程后，会弹出偏移量设置窗口`n   - 通过屏幕标识和坐标信息，判断是哪一块屏幕，然后设置对应的偏移量`n   - 偏移量的修改实时生效，你可以立即在对应窗口中看到效果`n   - 如何通过坐标信息判断屏幕？`n      - 假设你有两块屏幕，主屏幕在左边，副屏幕在右边`n      - 那么副屏幕的左上角 X 坐标一定大于或等于主屏幕的右下角 X 坐标',
         link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/app-offset">关于特殊偏移量</a>',
-    }
-    handleFn(*) {
-        gc.appOffsetGui_LV_rm_title.Text := "特殊偏移量列表 ( " gc.appOffsetGui_LV_rm.GetCount() " 个 )"
-        writeIni("app_offset", "")
-        global app_offset := {}
-        restartJAB()
     }
 
     addClickFn(LV, RowNumber, tipList) {
@@ -331,7 +325,7 @@ fn_app_offset(*) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            tabs := ["应用进程列表", "来源", "窗口标题", "应用进程文件所在位置"]
+            tabs := ["进程名称", "来源", "窗口标题", "应用进程文件所在位置"]
             _gui := tipList.gui
 
             LV_add := gc.%_gui "_LV_add"% := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, tabs)
@@ -401,44 +395,6 @@ fn_app_offset(*) {
             e_add_by_hand(*) {
                 addFn(tipList)
             }
-            g.AddButton("xs w" w / 2, "一键清空【" tipList.list "】").OnEvent("Click", e_clear)
-            e_clear(*) {
-                count := gc.%tipList.gui "_LV_rm"%.GetCount()
-                if (gc.w.subGui) {
-                    gc.w.subGui.Destroy()
-                    gc.w.subGui := ""
-                }
-                createGui(clearGui).Show()
-                clearGui(info) {
-                    g := createGuiOpt("InputTip - 警告")
-                    g.AddText(, "确定要清空【" tipList.list "】吗？")
-                    g.AddText("cRed", "请谨慎选择，它会移除其中的 " count " 个应用进程`n一旦清空，无法恢复，只能重新一个一个添加")
-
-                    if (info.i) {
-                        return g
-                    }
-                    w := info.w
-                    bw := w - g.MarginX * 2
-
-                    g.AddButton("xs w" bw, "【是】").OnEvent("Click", yes)
-                    _ := g.AddButton("xs w" bw, "【否】")
-                    _.OnEvent("Click", no)
-                    yes(*) {
-                        g.Destroy()
-                        gc.%_gui "_LV_rm"%.Delete()
-                        autoHdrLV(gc.%_gui "_LV_rm"%)
-                        writeIni(tipList.config, "")
-                        handleFn("")
-                        fn_close()
-                        showGui(deep)
-                    }
-                    no(*) {
-                        g.Destroy()
-                    }
-                    gc.w.subGui := g
-                    return g
-                }
-            }
             if (deep) {
                 g.AddButton("xs w" w / 2, "显示更少进程").OnEvent("Click", e_less_window)
                 e_less_window(*) {
@@ -450,6 +406,71 @@ fn_app_offset(*) {
                 e_more_window(*) {
                     fn_close()
                     showGui(1)
+                }
+            }
+            g.AddButton("xs w" w / 2, "设置不同屏幕下的基础偏移量").OnEvent("Click", e_clear)
+            e_clear(*) {
+                createUniqueGui(offsetScreenGui).Show()
+                offsetScreenGui(info) {
+                    g := createGuiOpt("InputTip - 设置不同屏幕下的基础偏移量")
+                    g.AddText("Section cRed", "- 设置不同屏幕下的基础偏移量`n- 点击右上角的 x 关闭此窗口后，基础偏移量才会完全生效")
+                    pages := []
+                    for v in screenList {
+                        pages.push("屏幕 " v.num)
+                    }
+                    tab := g.AddTab3("xs -Wrap", pages)
+
+                    for v in screenList {
+                        tab.UseTab(v.num)
+                        if (v.num = v.main) {
+                            g.AddText(, "这是主屏幕(主显示器)，屏幕标识: " v.num)
+                        } else {
+                            g.AddText(, "这是副屏幕(副显示器)，屏幕标识: " v.num)
+                        }
+
+                        g.AddText(, "屏幕坐标信息(X,Y): 左上角(" v.left ", " v.top ")，右下角(" v.right ", " v.bottom ")")
+
+                        try {
+                            x := app_offset_screen.%v.num%.x
+                            y := app_offset_screen.%v.num%.y
+                        } catch {
+                            app_offset_screen.%v.num% := { x: 0, y: 0 }
+                            x := 0, y := 0
+                        }
+
+                        g.AddText("Section", "水平方向的偏移量: ")
+                        _ := g.AddEdit("yp")
+                        _.Value := x
+                        _.__num := v.num
+                        _.OnEvent("Change", e_change_offset_x)
+                        e_change_offset_x(item, *) {
+                            app_offset_screen.%item.__num%.x := returnNumber(item.value)
+                        }
+                        g.AddText("xs", "垂直方向的偏移量: ")
+                        _ := g.AddEdit("yp")
+                        _.Value := y
+                        _.__num := v.num
+                        _.OnEvent("Change", e_change_offset_y)
+                        e_change_offset_y(item, *) {
+                            app_offset_screen.%item.__num%.y := returnNumber(item.value)
+                        }
+                    }
+
+                    if (info.i) {
+                        return g
+                    }
+                    w := info.w
+                    bw := w - g.MarginX * 2
+                    g.OnEvent("Close", close)
+                    close(*) {
+                        g.Destroy()
+                        for k, v in app_offset_screen.OwnProps() {
+                            writeIni(k, v.x "/" v.y, "App-Offset-Screen")
+                        }
+                        updateAppOffset()
+                        restartJAB()
+                    }
+                    return g
                 }
             }
             autoHdrLV(LV_add)

@@ -39,7 +39,13 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     }
     try {
         s := isWhichScreen(screenList)
-        if (s != "") {
+        if (s.num) {
+            try {
+                left += app_offset_screen.%s.num%.x
+                top += app_offset_screen.%s.num%.y
+            } catch {
+                writeIni(s.num, "0/0", "App-Offset-Screen")
+            }
             left += app_offset.%exe_name%.%s.num%.x
             top += app_offset.%exe_name%.%s.num%.y
         }

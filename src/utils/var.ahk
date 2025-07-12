@@ -662,18 +662,28 @@ updateWhiteList(app) {
 }
 updateAppOffset(init := 0) {
     global app_offset := {}
+    global app_offset_screen := {}
+    global AppOffsetScreen := StrSplit(readIniSection("App-Offset-Screen"), "`n")
+
     if (!init) {
         restartJAB()
     }
-    for i, v in StrSplit(readIni("app_offset", ""), ":") {
+    for v in StrSplit(readIni("app_offset", ""), ":") {
         part := StrSplit(v, "|")
         app_offset.%part[1]% := {}
-        for i, v in StrSplit(part[2], "*") {
+        for v in StrSplit(part[2], "*") {
             p := StrSplit(v, "/")
             app_offset.%part[1]%.%p[1]% := {}
             app_offset.%part[1]%.%p[1]%.x := p[2]
             app_offset.%part[1]%.%p[1]%.y := p[3]
         }
+    }
+    for v in AppOffsetScreen {
+        kv := StrSplit(v, "=")
+        app_offset_screen.%kv[1]% := { x: 0, y: 0 }
+        part := StrSplit(kv[2], "/")
+        app_offset_screen.%kv[1]%.x := part[1]
+        app_offset_screen.%kv[1]%.y := part[2]
     }
 }
 updateCursorMode(init := 0) {

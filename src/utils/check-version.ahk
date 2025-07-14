@@ -76,7 +76,7 @@ checkVersion(currentVersion, callback, urls := [
  */
 checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
     if (checkUpdateDelay || force) {
-        updateTitle := "InputTip - " (A_IsCompiled ? "exe 版本 (编译运行方案)" : "zip 版本 (项目源代码运行方案)")
+        updateTitle := "InputTip - " versionType " 版本"
         if (once) {
             _checkUpdate()
             return
@@ -181,6 +181,13 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         return
                     }
 
+                    downloadLog := 0
+                    tempLog := A_Temp "\abgox.InputTip-CHANGELOG.md"
+                    try {
+                        Download(StrReplace(url, '/version.txt', '/CHANGELOG.md'), tempLog)
+                        downloadLog := 1
+                    }
+
                     createGui(updateGui).Show()
                     updateGui(info) {
                         g := createGuiOpt(updateTitle)
@@ -188,15 +195,23 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         g.AddText("yp cff5050", currentVersion)
                         g.AddText("yp", ">")
                         g.AddText("yp cRed", newVersion)
-                        g.AddText("xs", "--------------------------------------------------------------------------")
-                        g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+                        g.AddText("xs", gui_width_line).Focus()
 
                         if (info.i) {
                             return g
                         }
                         w := info.w
                         bw := w - g.MarginX * 2
+
+                        if (downloadLog) {
+                            logContent := FileRead(tempLog, "UTF-8")
+                            g.AddEdit("xs ReadOnly cGray VScroll r9 w" w, SubStr(logContent, InStr(logContent, "#")))
+                        } else {
+                            g.AddText("xs cGray", "版本日志加载失败，你可以通过以下链接查看在线的版本更新日志")
+                        }
+
+                        g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
 
                         y := g.AddButton("xs w" bw / 2, "确认更新")
                         y.OnEvent("Click", e_yes)
@@ -283,6 +298,13 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         }
                         return
                     }
+
+                    downloadLog := 0
+                    tempLog := A_Temp "\abgox.InputTip-CHANGELOG.md"
+                    try {
+                        Download(StrReplace(url, '/version-zip.txt', '/CHANGELOG.md'), tempLog)
+                        downloadLog := 1
+                    }
                     createGui(fn).Show()
                     fn(info) {
                         g := createGuiOpt(updateTitle)
@@ -290,17 +312,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         g.AddText("yp cff5050", "v" currentVersion)
                         g.AddText("yp ", ">")
                         g.AddText("yp cRed", "v" newVersion)
-                        g.AddText("xs", "--------------------------------------------------------------------------")
-                        g.AddLink("xs", '使用 <a href="https://git-scm.com/">git</a> :')
-                        g.AddText("yp cRed", "git clone")
-                        g.AddText("yp", "克隆仓库, 然后通过")
-                        g.AddText("yp cRed", "git pull")
-                        g.AddText("yp", "更新")
-                        g.AddLink("xs", '不用 <a href="https://git-scm.com/">git</a> :')
-                        g.AddLink("yp", '使用下方的【确认更新】按钮进行更新')
-                        g.AddText("xs", "--------------------------------------------------------------------------")
-                        g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+                        g.AddText("xs", gui_width_line).Focus()
 
                         if (info.i) {
                             return g
@@ -308,15 +320,26 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         w := info.w
                         bw := w - g.MarginX * 2
 
-                        y := g.AddButton("w" bw / 2, "确认更新")
+                        if (downloadLog) {
+                            logContent := FileRead(tempLog, "UTF-8")
+                            g.AddEdit("xs ReadOnly cGray VScroll r9 w" w, SubStr(logContent, InStr(logContent, "#")))
+                        } else {
+                            g.AddText("xs cGray", "版本日志加载失败，你可以通过以下链接查看在线的版本更新日志")
+                        }
+
+                        g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+                        g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+
+
+                        y := g.AddButton("w" w / 2, "确认更新")
                         y.OnEvent("Click", e_yes)
                         e_yes(*) {
                             fn_close()
                             getRepoCode(newVersion, 0)
                         }
-                        g.AddButton("yp w" bw / 2, "取消更新").OnEvent("Click", fn_close)
-                        g.AddButton("xs w" bw / 2, "关闭更新检查").OnEvent("Click", e_no)
-                        g.AddButton("yp w" bw / 2, "启用静默更新").OnEvent("Click", e_silent)
+                        g.AddButton("yp w" w / 2, "取消更新").OnEvent("Click", fn_close)
+                        g.AddButton("xs w" w / 2, "关闭更新检查").OnEvent("Click", e_no)
+                        g.AddButton("yp w" w / 2, "启用静默更新").OnEvent("Click", e_silent)
                         e_no(*) {
                             fn_close()
                             SetTimer(checkUpdateTimer, 0)
@@ -356,7 +379,7 @@ ignoreUpdateTip() {
         g.AddText("xs", "现在 InputTip 不会再检查版本更新，除非重新设置更新检查间隔")
         g.AddText("xs", "设置方式:【托盘菜单】=>【设置更新检查】")
 
-        g.AddText("cGray", "如果在使用过程中有任何问题，先检查当前是否为最新版本`n如果更新到最新版本，问题依然存在，可以进行反馈`n【托盘菜单】的【关于】中有代码仓库、腾讯频道等反馈渠道")
+        g.AddText("cGray", "如果在使用过程中有任何问题，先检查当前是否为最新版本`n如果更新到最新版本，问题依然存在，可以进行反馈`n【托盘菜单】的【关于】中有源代码仓库、腾讯频道等反馈渠道")
 
         if (info.i) {
             return g
@@ -388,6 +411,7 @@ getRepoCode(newVersion, silent := silentUpdate) {
         try {
             Download(u "src/files.ini", out)
             downloadIni := 1
+            Sleep(1000)
             break
         }
     }

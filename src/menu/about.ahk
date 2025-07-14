@@ -3,7 +3,7 @@
 fn_about(*) {
     createUniqueGui(aboutGui).Show()
     aboutGui(info) {
-        g := createGuiOpt("InputTip - " (A_IsCompiled ? "exe 版本" : "zip 版本") " - " (A_IsAdmin ? "以管理员权限启动" : "以当前用户权限启动"))
+        g := createGuiOpt("InputTip - " versionType " 版本 - " (A_IsAdmin ? "以管理员权限启动" : "以当前用户权限启动"))
 
         g.AddText("Center w" info.w, "InputTip - 一个输入法状态管理工具")
         g.SetFont("s" readIni("gui_font_size", "12") / 1.2)

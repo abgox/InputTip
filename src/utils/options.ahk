@@ -20,11 +20,13 @@ SetStoreCapsLockMode 0
 if (A_IsCompiled) {
     ; 当前的 exe 版本
     currentVersion := "2025.07.12"
-    ; exe 版本字段
+
+    versionType := "exe"
     versionKey := "version"
 } else {
     ; 当前的 zip 版本
     currentVersion := "2025.07.12"
-    ; zip 版本字段
+
+    versionType := "zip"
     versionKey := "version-zip"
 }

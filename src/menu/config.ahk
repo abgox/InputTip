@@ -117,7 +117,7 @@ fn_config(*) {
             reloadSymbol()
             gc._focusSymbol.Focus()
         }
-        g.AddLink("xs cGray", '输入光标附近显示的符号的垂直偏移量会基于这个参考原点进行偏移。JAB 程序无效，<a href="https://inputtip.abgox.com/FAQ/symbol-pos-base">点击查看详细说明</a>')
+        g.AddLink("xs cGray", '输入光标附近显示的符号的垂直偏移量会基于这个参考原点进行偏移。`nJAB/JetBrains IDE 程序中它是无效的，只能使用【设置特殊偏移量】特殊处理。<a href="https://inputtip.abgox.com/FAQ/symbol-pos-base">点击查看详细说明</a>')
         g.AddText("xs", "4. 无键盘和鼠标左键点击操作时，符号在多少")
         g.AddText("yp cRed", "毫秒")
         g.AddText("yp", "后隐藏:")
@@ -160,7 +160,7 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddText("xs cGray w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会大一点，根据电脑性能适当调整")
+        g.AddText("xs cGray w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会稍微大一点，根据电脑性能适当调整")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")

@@ -29,8 +29,8 @@ writeIni(key, value, section := "Config-v2", path := "InputTip.ini") {
     } catch {
         createTipGui([{
             opt: "cRed",
-            text: "配置文件写入失败`n请重启 InputTip",
-        }], "InputTip - 错误").Show()
+            text: "InputTip.ini 配置文件写入失败`n- 尝试重启 InputTip 解决问题`n- 检查 InputTip.ini 配置文件是否存在系统读写权限限制`n- 移除配置文件(自行备份)，并重启以重新初始化配置文件",
+        }], "InputTip - 配置文件写入失败").Show()
     }
 }
 
@@ -61,7 +61,7 @@ writeIniSection(value, section, path := "InputTip.ini") {
     } catch {
         createTipGui([{
             opt: "cRed",
-            text: "配置文件写入失败`n请重启 InputTip",
-        }], "InputTip - 错误").Show()
+            text: "InputTip.ini 配置文件写入失败`n- 尝试重启 InputTip 解决问题`n- 检查 InputTip.ini 配置文件是否存在系统读写权限限制`n- 移除配置文件(自行备份)，并重启以重新初始化配置文件",
+        }], "InputTip - 配置文件写入失败").Show()
     }
 }

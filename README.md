@@ -75,7 +75,7 @@
   - [输入法和应用窗口兼容情况](#兼容情况)
   - [issues](https://github.com/abgox/InputTip/issues)
   - ...
-- 如果仍有问题，可以前往 [腾讯频道](https://pd.qq.com/s/gyers18g6?businessType=5) 或 [QQ 反馈交流群(451860327)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=ZfHFP_gIMyY6kZvqRmJhrsMlvnLDjLf6&authKey=lXo50SvLgudu%2BettInNZdb2OXGjs%2BxsoqsKIB88Vcq%2FjMb9uEW5thwU5Nm85KNX4&noverify=0&group_code=451860327) 交流反馈
+- 如果仍有问题，可以前往 [腾讯频道](https://pd.qq.com/s/gyers18g6?businessType=5) 或 [QQ 反馈交流群(451860327)](https://qm.qq.com/q/Ch6T7YILza) 交流反馈
 
 ### 演示
 
@@ -95,13 +95,21 @@
 - [前往官网下载 InputTip.zip](https://inputtip.abgox.com/download)
 - 使用 [Scoop](https://scoop.sh/)
 
-  ```shell
-  scoop bucket add abyss https://github.com/abgox/abyss.git
-  ```
+  - 添加 bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
-  ```shell
-  scoop install abyss/abgox.InputTip-zip
-  ```
+    ```shell
+    scoop bucket add abyss https://github.com/abgox/abyss
+    ```
+
+    ```shell
+    scoop bucket add abyss https://gitee.com/abgox/abyss
+    ```
+
+  - 安装 `InputTip-zip`
+
+    ```shell
+    scoop install abyss/abgox.InputTip-zip
+    ```
 
 #### exe 版本
 
@@ -114,13 +122,21 @@
 
 - 使用 [Scoop](https://scoop.sh/)
 
-  ```shell
-  scoop bucket add abyss https://github.com/abgox/abyss.git
-  ```
+  - 添加 bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
-  ```shell
-  scoop install abyss/abgox.InputTip
-  ```
+    ```shell
+    scoop bucket add abyss https://github.com/abgox/abyss
+    ```
+
+    ```shell
+    scoop bucket add abyss https://gitee.com/abgox/abyss
+    ```
+
+  - 安装 `InputTip`
+
+    ```shell
+    scoop install abyss/abgox.InputTip
+    ```
 
 - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/)
 
@@ -225,13 +241,13 @@
    - [Github](https://github.com/abgox/InputTip)
 
      ```shell
-     git clone https://github.com/abgox/InputTip.git
+     git clone https://github.com/abgox/InputTip
      ```
 
    - [Gitee](https://gitee.com/abgox/InputTip)
 
      ```shell
-     git clone https://gitee.com/abgox/InputTip.git
+     git clone https://gitee.com/abgox/InputTip
      ```
 
 2. 安装 [AutoHotkey v2](https://www.autohotkey.com/)
@@ -252,7 +268,7 @@
 >   - 不要修改 `plugins` 目录以外的其他源代码文件
 >   - 新增的所有内容不能包含死循环
 
-- 在 `v2.40.3.3` 版本中，在 `src` 目录下新增了 `plugins` 目录
+- 在 `src` 目录下有一个 `plugins` 目录
 - 目录中添加了一个空的 `InputTip.plugin.ahk` 文件
 - InputTip 会引入这个文件，你可以在其中添加自定义功能，比如 **自定义热键**、**自定义热字串** 等
 - 或者，在 `plugins` 目录中新建 `.ahk` 文件，然后在 `InputTip.plugin.ahk` 中 `#Include` 它
@@ -310,13 +326,21 @@
 
    - 使用 [Scoop](https://scoop.sh/)
 
-     ```shell
-     scoop bucket add abyss https://github.com/abgox/abyss.git
-     ```
+     - 添加 bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
-     ```shell
-     scoop install abyss/Microsoft.OpenJDK.21
-     ```
+       ```shell
+       scoop bucket add abyss https://github.com/abgox/abyss
+       ```
+
+       ```shell
+       scoop bucket add abyss https://gitee.com/abgox/abyss
+       ```
+
+     - 安装 `Microsoft.OpenJDK.21`
+
+       ```shell
+       scoop install abyss/Microsoft.OpenJDK.21
+       ```
 
    - 使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/)
 

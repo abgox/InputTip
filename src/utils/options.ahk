@@ -25,7 +25,7 @@ if (A_IsCompiled) {
     versionKey := "version"
 } else {
     ; 当前的 zip 版本
-    currentVersion := "2025.07.12.1"
+    currentVersion := "2025.07.12.2"
 
     versionType := "zip"
     versionKey := "version-zip"

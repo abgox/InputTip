@@ -1,6 +1,7 @@
 {
-  "editor.formatOnSave": true,
   "[ahk]": {
     "editor.defaultFormatter": "thqby.vscode-autohotkey2-lsp"
-  }
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }

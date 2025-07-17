@@ -31,21 +31,18 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     try {
         GetCaretPosFromJAB(&left, &top, &right, &bottom)
     } catch {
-        left := 0
-        top := 0
-        right := 0
-        bottom := 0
+        left := 0, top := 0, right := 0, bottom := 0
         return 0
     }
     try {
         s := isWhichScreen(screenList)
         if (s.num) {
             try {
-                left += app_offset_screen.%s.num%.x
-                top += app_offset_screen.%s.num%.y
-            } catch {
-                writeIni(s.num, "0/0", "App-Offset-Screen")
+                base := app_offset_screen.%s.num%
+                left += base.x
+                top += base.y
             }
+
             left += app_offset.%exe_name%.%s.num%.x
             top += app_offset.%exe_name%.%s.num%.y
         }

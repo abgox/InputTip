@@ -1,8 +1,8 @@
-src/InputTipCursor/default
-src/InputTipSymbol/default
+src/*.exe
+src/InputTipCursor
+src/InputTipSymbol
 src/InputTip.ini
-src/InputTip.exe
-src/InputTip.JAB.JetBrains.exe
-test/**
+test/
+todo/
 
 src/utils/app-update/target/*

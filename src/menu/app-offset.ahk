@@ -455,12 +455,13 @@ fn_app_offset(*) {
                             app_offset_screen.%item.__num%.y := returnNumber(item.value)
                         }
                     }
+                    tab.UseTab(0)
+                    g.AddText("Section cGray", "如果不知道如何区分屏幕，可查看【设置特殊偏移量】中的【关于】")
 
                     if (info.i) {
                         return g
                     }
-                    w := info.w
-                    bw := w - g.MarginX * 2
+
                     g.OnEvent("Close", close)
                     close(*) {
                         g.Destroy()

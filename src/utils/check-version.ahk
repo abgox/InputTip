@@ -611,12 +611,15 @@ checkUpdateDone() {
         }
 
         try {
-            _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "app_offset"), ":")
-            for value in _ {
-                if (Trim(value)) {
-                    id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
-                    IniWrite(StrReplace(StrReplace(value, "|", ":1:0:"), "*", "|") ":", "InputTip.ini", "App-Offset", id)
-                    Sleep(5)
+            IniRead("InputTip.ini", "App-Offset")
+        } catch {
+            try {
+                for value in StrSplit(IniRead("InputTip.ini", "Config-v2", "app_offset"), ":") {
+                    if (Trim(value)) {
+                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        IniWrite(StrReplace(StrReplace(value, "|", ":1:0:"), "*", "|") ":", "InputTip.ini", "App-Offset", id)
+                        Sleep(5)
+                    }
                 }
             }
         }

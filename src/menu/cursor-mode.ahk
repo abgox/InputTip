@@ -132,12 +132,11 @@ fn_cursor_mode(*) {
                 fn_set(action, delete) {
                     g.Destroy()
 
-                    try {
-                        IniDelete("InputTip.ini", "InputCursorMode", itemValue.id)
-                    }
-
                     if (delete) {
-                        LV.Delete(RowNumber)
+                        try {
+                            IniDelete("InputTip.ini", "InputCursorMode", itemValue.id)
+                            LV.Delete(RowNumber)
+                        }
                     } else {
                         value := itemValue.exe_name ":" itemValue.mode
                         ; 没有进行移动

@@ -670,26 +670,49 @@ updateAppOffset(init := 0) {
     global app_offset := {}
     global app_offset_screen := {}
     global AppOffsetScreen := StrSplit(readIniSection("App-Offset-Screen"), "`n")
+    global AppOffset := StrSplit(readIniSection("App-Offset"), "`n")
 
     if (!init) {
         restartJAB()
     }
-    for v in StrSplit(readIni("app_offset", ""), ":") {
-        part := StrSplit(v, "|")
-        app_offset.%part[1]% := {}
-        for v in StrSplit(part[2], "*") {
-            p := StrSplit(v, "/")
-            app_offset.%part[1]%.%p[1]% := {}
-            app_offset.%part[1]%.%p[1]%.x := p[2]
-            app_offset.%part[1]%.%p[1]%.y := p[3]
+
+    for v in AppOffset {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 5)
+        if (part.Length >= 2) {
+            name := part[1]
+            isGlobal := part[2]
+            isRegex := ""
+            title := ""
+            offset := ""
+            if (part.Length == 5) {
+                isRegex := part[3]
+                offset := part[4]
+                title := part[5]
+            }
+
+            tipGlobal := isGlobal ? "进程级" : "标题级"
+            tipRegex := isRegex ? "正则" : "相等"
+            key := isGlobal ? name : name title
+            app_offset.%key% := {}
+
+            for v in StrSplit(offset, "|") {
+                if (v) {
+                    p := StrSplit(v, "/")
+                    try {
+                        app_offset.%key%.%p[1]% := { x: p[2], y: p[3] }
+                    } catch {
+                        app_offset.%key%.%p[1]% := { x: 0, y: 0 }
+                    }
+                }
+
+            }
         }
     }
     for v in AppOffsetScreen {
         kv := StrSplit(v, "=")
-        app_offset_screen.%kv[1]% := { x: 0, y: 0 }
         part := StrSplit(kv[2], "/")
-        app_offset_screen.%kv[1]%.x := part[1]
-        app_offset_screen.%kv[1]%.y := part[2]
+        app_offset_screen.%kv[1]% := { x: part[1], y: part[2] }
     }
 }
 updateCursorMode(init := 0) {

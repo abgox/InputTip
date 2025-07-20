@@ -167,13 +167,12 @@ fn_switch_window(*) {
                 fn_set(action, delete) {
                     g.Destroy()
 
-                    try {
-                        IniDelete("InputTip.ini", "App-" from, itemValue.id)
-                    }
-
                     if (delete) {
-                        LV.Delete(RowNumber)
-                        gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                        try {
+                            IniDelete("InputTip.ini", "App-" from, itemValue.id)
+                            LV.Delete(RowNumber)
+                            gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                        }
                     } else {
                         isGlobal := itemValue.tipGlobal == "进程级" ? 1 : 0
                         isRegex := itemValue.tipRegex == "正则" ? 1 : 0

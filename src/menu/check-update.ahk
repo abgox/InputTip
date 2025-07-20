@@ -24,17 +24,18 @@ fn_check_update(*) {
         _ := g.AddEdit("yp Number Limit5")
         _.Value := readIni("checkUpdateDelay", 1440)
         _.OnEvent("Change", e_setIntervalTime)
+        _.OnEvent("LoseFocus", e_setIntervalTime)
         e_setIntervalTime(item, *) {
             value := item.value
             if (value != "") {
                 if (value > 50000) {
                     value := 50000
                 }
-                writeIni("checkUpdateDelay", value)
                 global checkUpdateDelay := value
-                if (checkUpdateDelay) {
-                    checkUpdate()
+                if (item.Focused) {
+                    return
                 }
+                writeIni("checkUpdateDelay", value)
             }
         }
         g.AddText("xs", "2. 是否启用自动静默更新: ")

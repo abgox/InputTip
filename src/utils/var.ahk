@@ -245,123 +245,129 @@ reloadCursor() {
     }
 }
 
-updateSymbol(init := 0) {
+updateSymbol(init := 0, configName := "", configValue := "") {
     global symbolGui, symbolConfig
 
     hideSymbol()
 
-    if (!init) {
-        restartJAB()
-    }
-    ; 存放不同状态下的符号
-    symbolGui := {
-        EN: "",
-        CN: "",
-        Caps: ""
-    }
-    symbolConfig := {
-        ; 启用独立配置
-        enableIsolateConfigPic: readIni("enableIsolateConfigPic", 0),
-        enableIsolateConfigBlock: readIni("enableIsolateConfigBlock", 0),
-        enableIsolateConfigText: readIni("enableIsolateConfigText", 0),
-    }
+    if (configName) {
+        for state in ["", "CN", "EN", "Caps"] {
+            symbolConfig.%configName state% := configValue
+        }
+    } else {
+        if (!init) {
+            restartJAB()
+        }
+        ; 存放不同状态下的符号
+        symbolGui := {
+            EN: "",
+            CN: "",
+            Caps: ""
+        }
+        symbolConfig := {
+            ; 启用独立配置
+            enableIsolateConfigPic: readIni("enableIsolateConfigPic", 0),
+            enableIsolateConfigBlock: readIni("enableIsolateConfigBlock", 0),
+            enableIsolateConfigText: readIni("enableIsolateConfigText", 0),
+        }
 
-    infoCN := {
-        CN_color: "red",
-        CN_Text: "中",
-        textSymbol_CN_color: "red",
-    }
-    infoEN := {
-        EN_color: "blue",
-        EN_Text: "英",
-        textSymbol_EN_color: "blue",
-    }
-    infoCaps := {
-        Caps_color: "green",
-        Caps_Text: "大",
-        textSymbol_Caps_color: "green",
-    }
+        infoCN := {
+            CN_color: "red",
+            CN_Text: "中",
+            textSymbol_CN_color: "red",
+        }
+        infoEN := {
+            EN_color: "blue",
+            EN_Text: "英",
+            textSymbol_EN_color: "blue",
+        }
+        infoCaps := {
+            Caps_color: "green",
+            Caps_Text: "大",
+            textSymbol_Caps_color: "green",
+        }
 
-    for state in ["", "CN", "EN", "Caps"] {
-        ; * 图片符号相关配置
-        ; 文件路径
-        if (state) {
-            defaultPath := "InputTipSymbol\default\" state ".png"
-            picPath := readIni(state "_pic", defaultPath)
-            if (picPath && (!RegExMatch(picPath, ".*\.png$") || !FileExist(picPath))) {
-                writeIni(state "_pic", defaultPath)
-                picPath := defaultPath
+        for state in ["", "CN", "EN", "Caps"] {
+            ; * 图片符号相关配置
+            ; 文件路径
+            if (state) {
+                defaultPath := "InputTipSymbol\default\" state ".png"
+                picPath := readIni(state "_pic", defaultPath)
+                if (picPath && (!RegExMatch(picPath, ".*\.png$") || !FileExist(picPath))) {
+                    writeIni(state "_pic", defaultPath)
+                    picPath := defaultPath
+                }
+                symbolConfig.%state "_pic"% := picPath
             }
-            symbolConfig.%state "_pic"% := picPath
-        }
-        ; 偏移量
-        _ := "pic_offset_x" state
-        symbolConfig.%_% := readIni(_, -30)
-        _ := "pic_offset_y" state
-        symbolConfig.%_% := readIni(_, -40)
-        ; 宽高
-        _ := "pic_symbol_width" state
-        symbolConfig.%_% := readIni(_, 15)
-        _ := "pic_symbol_height" state
-        symbolConfig.%_% := readIni(_, 15)
+            ; 偏移量
+            _ := "pic_offset_x" state
+            symbolConfig.%_% := readIni(_, -30)
+            _ := "pic_offset_y" state
+            symbolConfig.%_% := readIni(_, -40)
+            ; 宽高
+            _ := "pic_symbol_width" state
+            symbolConfig.%_% := readIni(_, 15)
+            _ := "pic_symbol_height" state
+            symbolConfig.%_% := readIni(_, 15)
 
-        ; * 方块符号相关配置
-        ; 背景颜色
-        if (state) {
-            _ := state "_color"
-            symbolConfig.%_% := StrReplace(readIni(_, %"info" state%.%_%), '#', '')
-        }
-        ; 偏移量
-        _ := "offset_x" state
-        symbolConfig.%_% := readIni(_, 10)
-        _ := "offset_y" state
-        symbolConfig.%_% := readIni(_, -30)
-        ; 透明度
-        _ := "transparent" state
-        symbolConfig.%_% := readIni(_, 222)
-        ; 宽高
-        _ := "symbol_width" state
-        symbolConfig.%_% := readIni(_, 9)
-        _ := "symbol_height" state
-        symbolConfig.%_% := readIni(_, 9)
-        ; 边框样式: 0(无边框),1(样式1),2(样式2),3(样式3)
-        _ := "border_type" state
-        symbolConfig.%_% := readIni(_, 1)
+            ; * 方块符号相关配置
+            ; 背景颜色
+            if (state) {
+                _ := state "_color"
+                symbolConfig.%_% := StrReplace(readIni(_, %"info" state%.%_%), '#', '')
+            }
+            ; 偏移量
+            _ := "offset_x" state
+            symbolConfig.%_% := readIni(_, 10)
+            _ := "offset_y" state
+            symbolConfig.%_% := readIni(_, -30)
+            ; 透明度
+            _ := "transparent" state
+            symbolConfig.%_% := readIni(_, 222)
+            ; 宽高
+            _ := "symbol_width" state
+            symbolConfig.%_% := readIni(_, 9)
+            _ := "symbol_height" state
+            symbolConfig.%_% := readIni(_, 9)
+            ; 边框样式: 0(无边框),1(样式1),2(样式2),3(样式3)
+            _ := "border_type" state
+            symbolConfig.%_% := readIni(_, 1)
 
-        ; * 文本符号相关配置
-        ; 文本字符
-        if (state) {
-            _ := state "_Text"
-            symbolConfig.%_% := readIni(_, %"info" state%.%_%)
+            ; * 文本符号相关配置
+            ; 文本字符
+            if (state) {
+                _ := state "_Text"
+                symbolConfig.%_% := readIni(_, %"info" state%.%_%)
+            }
+            ; 背景颜色
+            if (state) {
+                _ := "textSymbol_" state "_color"
+                symbolConfig.%_% := StrReplace(readIni(_, %"info" state%.%_%), '#', '')
+            }
+            ; 字体
+            _ := "font_family" state
+            symbolConfig.%_% := readIni(_, 'Microsoft YaHei')
+            ; 大小
+            _ := "font_size" state
+            symbolConfig.%_% := readIni(_, 12)
+            ; 粗细
+            _ := "font_weight" state
+            symbolConfig.%_% := readIni(_, 600)
+            ; 颜色
+            _ := "font_color" state
+            symbolConfig.%_% := StrReplace(readIni(_, 'ffffff'), '#', '')
+            ; 偏移量
+            _ := "textSymbol_offset_x" state
+            symbolConfig.%_% := readIni(_, 0)
+            _ := "textSymbol_offset_y" state
+            symbolConfig.%_% := readIni(_, -45)
+            ; 透明度
+            _ := "textSymbol_transparent" state
+            symbolConfig.%_% := readIni(_, 222)
+            ; 边框样式: 0(无边框),1(样式1),2(样式2),3(样式3)
+            _ := "textSymbol_border_type" state
+            symbolConfig.%_% := readIni(_, 1)
         }
-        ; 背景颜色
-        if (state) {
-            _ := "textSymbol_" state "_color"
-            symbolConfig.%_% := StrReplace(readIni(_, %"info" state%.%_%), '#', '')
-        }
-        ; 字体
-        _ := "font_family" state
-        symbolConfig.%_% := readIni(_, 'Microsoft YaHei')
-        ; 大小
-        _ := "font_size" state
-        symbolConfig.%_% := readIni(_, 12)
-        ; 粗细
-        _ := "font_weight" state
-        symbolConfig.%_% := readIni(_, 600)
-        ; 颜色
-        _ := "font_color" state
-        symbolConfig.%_% := StrReplace(readIni(_, 'ffffff'), '#', '')
-        ; 偏移量
-        _ := "textSymbol_offset_x" state
-        symbolConfig.%_% := readIni(_, 0)
-        _ := "textSymbol_offset_y" state
-        symbolConfig.%_% := readIni(_, -45)
-        ; 透明度
-        _ := "textSymbol_transparent" state
-        symbolConfig.%_% := readIni(_, 222)
-        ; 边框样式: 0(无边框),1(样式1),2(样式2),3(样式3)
-        _ := "textSymbol_border_type" state
-        symbolConfig.%_% := readIni(_, 1)
     }
 
     switch symbolType {
@@ -664,26 +670,49 @@ updateAppOffset(init := 0) {
     global app_offset := {}
     global app_offset_screen := {}
     global AppOffsetScreen := StrSplit(readIniSection("App-Offset-Screen"), "`n")
+    global AppOffset := StrSplit(readIniSection("App-Offset"), "`n")
 
     if (!init) {
         restartJAB()
     }
-    for v in StrSplit(readIni("app_offset", ""), ":") {
-        part := StrSplit(v, "|")
-        app_offset.%part[1]% := {}
-        for v in StrSplit(part[2], "*") {
-            p := StrSplit(v, "/")
-            app_offset.%part[1]%.%p[1]% := {}
-            app_offset.%part[1]%.%p[1]%.x := p[2]
-            app_offset.%part[1]%.%p[1]%.y := p[3]
+
+    for v in AppOffset {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(kv[2], ":", , 5)
+        if (part.Length >= 2) {
+            name := part[1]
+            isGlobal := part[2]
+            isRegex := ""
+            title := ""
+            offset := ""
+            if (part.Length == 5) {
+                isRegex := part[3]
+                offset := part[4]
+                title := part[5]
+            }
+
+            tipGlobal := isGlobal ? "进程级" : "标题级"
+            tipRegex := isRegex ? "正则" : "相等"
+            key := isGlobal ? name : name title
+            app_offset.%key% := {}
+
+            for v in StrSplit(offset, "|") {
+                if (v) {
+                    p := StrSplit(v, "/")
+                    try {
+                        app_offset.%key%.%p[1]% := { x: p[2], y: p[3] }
+                    } catch {
+                        app_offset.%key%.%p[1]% := { x: 0, y: 0 }
+                    }
+                }
+
+            }
         }
     }
     for v in AppOffsetScreen {
         kv := StrSplit(v, "=")
-        app_offset_screen.%kv[1]% := { x: 0, y: 0 }
         part := StrSplit(kv[2], "/")
-        app_offset_screen.%kv[1]%.x := part[1]
-        app_offset_screen.%kv[1]%.y := part[2]
+        app_offset_screen.%kv[1]% := { x: part[1], y: part[2] }
     }
 }
 updateCursorMode(init := 0) {

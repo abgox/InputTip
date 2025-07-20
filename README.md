@@ -1,6 +1,4 @@
-<p align="center">
-  <h1 align="center">✨<a href="https://inputtip.abgox.com/">InputTip</a>✨</h1>
-</p>
+<h1 align="center">✨<a href="https://inputtip.abgox.com/">InputTip</a>✨</h1>
 
 <p align="center">
     <a href="https://github.com/abgox/InputTip">Github</a> |

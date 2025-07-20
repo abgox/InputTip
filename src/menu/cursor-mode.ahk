@@ -67,7 +67,7 @@ fn_cursor_mode(*) {
             }
 
             fn_edit(LV, RowNumber, action, itemValue) {
-                ; 是否自动添加到白名单中
+                ; 是否自动添加到符号显示白名单中
                 needAddWhiteList := 1
 
                 if (action == "edit") {
@@ -88,7 +88,7 @@ fn_cursor_mode(*) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit") {
-                    g.AddText("cRed", "是否自动添加到白名单中: ")
+                    g.AddText("cRed", "是否添加到【符号显示白名单】中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)
@@ -132,12 +132,11 @@ fn_cursor_mode(*) {
                 fn_set(action, delete) {
                     g.Destroy()
 
-                    try {
-                        IniDelete("InputTip.ini", "InputCursorMode", itemValue.id)
-                    }
-
                     if (delete) {
-                        LV.Delete(RowNumber)
+                        try {
+                            IniDelete("InputTip.ini", "InputCursorMode", itemValue.id)
+                            LV.Delete(RowNumber)
+                        }
                     } else {
                         value := itemValue.exe_name ":" itemValue.mode
                         ; 没有进行移动

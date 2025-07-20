@@ -62,8 +62,8 @@ fn_switch_window(*) {
                 itemValue := {
                     exe_name: LV.GetText(RowNumber, 1),
                     status: stateMap.%from%,
-                    isGlobal: LV.GetText(RowNumber, 2),
-                    isRegex: LV.GetText(RowNumber, 3),
+                    tipGlobal: LV.GetText(RowNumber, 2),
+                    tipRegex: LV.GetText(RowNumber, 3),
                     title: LV.GetText(RowNumber, 4),
                     id: LV.GetText(RowNumber, 5)
                 }
@@ -74,8 +74,8 @@ fn_switch_window(*) {
             }
 
             fn_edit(LV, RowNumber, from, action, itemValue) {
-                ; 是否自动添加到白名单中
-                needAddWhiteList := 0
+                ; 是否自动添加到符号显示白名单中
+                needAddWhiteList := 1
 
                 if (action == "edit") {
                     actionText := "编辑"
@@ -95,7 +95,7 @@ fn_switch_window(*) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit") {
-                    g.AddText("cRed", "是否自动添加到白名单中: ")
+                    g.AddText("cRed", "是否添加到【符号显示白名单】中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)
@@ -127,21 +127,21 @@ fn_switch_window(*) {
 
                 g.AddText("xs", "3. 匹配范围: ")
                 _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
-                _.Text := itemValue.isGlobal
+                _.Text := itemValue.tipGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
                     v := item.Text
-                    itemValue.isGlobal := v
+                    itemValue.tipGlobal := v
                 }
 
                 g.AddText("xs cGray", "【匹配模式】和【匹配标题】仅在【匹配范围】为【标题级】时有效")
                 g.AddText("xs", "4. 匹配模式: ")
                 _ := g.AddDropDownList("yp w" scaleWidth, ["相等", "正则"])
-                _.Text := itemValue.isRegex
+                _.Text := itemValue.tipRegex
                 _.OnEvent("Change", e_changeMatch)
                 e_changeMatch(item, *) {
                     v := item.Text
-                    itemValue.isRegex := v
+                    itemValue.tipRegex := v
                 }
 
                 g.AddText("xs", "5. 匹配标题: ")
@@ -167,21 +167,20 @@ fn_switch_window(*) {
                 fn_set(action, delete) {
                     g.Destroy()
 
-                    try {
-                        IniDelete("InputTip.ini", "App-" from, itemValue.id)
-                    }
-
                     if (delete) {
-                        LV.Delete(RowNumber)
-                        gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                        try {
+                            IniDelete("InputTip.ini", "App-" from, itemValue.id)
+                            LV.Delete(RowNumber)
+                            gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                        }
                     } else {
-                        isGlobal := itemValue.isGlobal == "进程级" ? 1 : 0
-                        isRegex := itemValue.isRegex == "正则" ? 1 : 0
+                        isGlobal := itemValue.tipGlobal == "进程级" ? 1 : 0
+                        isRegex := itemValue.tipRegex == "正则" ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
                         ; 没有进行移动
                         if (itemValue.status == from) {
                             writeIni(itemValue.id, value, "App-" from, "InputTip.ini")
-                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                         } else {
                             if (action == "edit") {
                                 LV.Delete(RowNumber)
@@ -189,7 +188,7 @@ fn_switch_window(*) {
                             }
                             state := stateTextMap.%itemValue.status%
                             writeIni(itemValue.id, value, "App-" state, "InputTip.ini")
-                            gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                            gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                             gc.%state "_title"%.Text := "( " gc.%"LV_" state%.GetCount() " 个 )"
                         }
                         if (needAddWhiteList) {
@@ -212,17 +211,8 @@ fn_switch_window(*) {
                 g.AddText("yp", "的应用窗口")
                 gc.%v "_title"% := g.AddText("yp cRed w" bw / 3, "( 0 个 )")
 
-                if (symbolType = 3) {
-                    c := symbolConfig.%"textSymbol_" v "_color"% ? "c" StrReplace(symbolConfig.%"textSymbol_" v "_color"%, "#") : ""
-                } else {
-                    c := symbolConfig.%v "_color"% ? "c" StrReplace(symbolConfig.%v "_color"%, "#") : ""
-                }
                 LV := "LV_" v
-                try {
-                    gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w " " c, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
-                } catch {
-                    gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
-                }
+                gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
                 addItem(v)
                 autoHdrLV(gc.%LV%)
                 gc.%LV%.OnEvent("DoubleClick", fn_dbClick)
@@ -245,8 +235,8 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: "",
                         status: stateMap.%item._type%,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: "",
                         id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
                     }
@@ -273,8 +263,8 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: windowInfo.exe_name,
                         status: stateMap.%state%,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
                     }
@@ -289,8 +279,8 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: windowInfo.exe_name,
                         status: stateMap.%state%,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
                     }

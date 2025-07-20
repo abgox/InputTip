@@ -365,7 +365,7 @@ fn_common(args, cb_updateVar) {
             }
 
             fn_edit(LV, RowNumber, action, itemValue) {
-                ; 是否自动添加到白名单中
+                ; 是否自动添加到符号显示白名单中
                 needAddWhiteList := 1
 
                 if (action == "edit") {
@@ -386,7 +386,7 @@ fn_common(args, cb_updateVar) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit" && itemValue.configName != "App-ShowSymbol") {
-                    g.AddText("cRed", "是否自动添加到白名单中: ")
+                    g.AddText("cRed", "是否添加到【符号显示白名单】中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)

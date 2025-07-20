@@ -74,8 +74,8 @@ fn_switch_window(*) {
             }
 
             fn_edit(LV, RowNumber, from, action, itemValue) {
-                ; 是否自动添加到白名单中
-                needAddWhiteList := 0
+                ; 是否自动添加到符号显示白名单中
+                needAddWhiteList := 1
 
                 if (action == "edit") {
                     actionText := "编辑"
@@ -95,7 +95,7 @@ fn_switch_window(*) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit") {
-                    g.AddText("cRed", "是否自动添加到白名单中: ")
+                    g.AddText("cRed", "是否添加到【符号显示白名单】中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)

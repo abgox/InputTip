@@ -202,8 +202,12 @@ fn_app_offset(*) {
                 _.Value := x
                 _.__num := v.num
                 _.OnEvent("Change", e_change_offset_x)
+                _.OnEvent("LoseFocus", e_change_offset_x)
                 e_change_offset_x(item, *) {
                     app_offset.%app%.%item.__num%.x := returnNumber(item.value)
+                    if (item.Focused) {
+                        return
+                    }
                     fn_write_offset()
                 }
                 g.AddText("xs", "垂直方向的偏移量: ")
@@ -211,8 +215,12 @@ fn_app_offset(*) {
                 _.Value := y
                 _.__num := v.num
                 _.OnEvent("Change", e_change_offset_y)
+                _.OnEvent("LoseFocus", e_change_offset_y)
                 e_change_offset_y(item, *) {
                     app_offset.%app%.%item.__num%.y := returnNumber(item.value)
+                    if (item.Focused) {
+                        return
+                    }
                     fn_write_offset()
                 }
             }

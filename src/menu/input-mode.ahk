@@ -22,19 +22,23 @@ fn_input_mode(*) {
         gc.mode.Value := gc.modeList[mode + 1]
         g.AddEdit("xs ReadOnly cGray w" w, "输入法模式只有【通用】和【自定义】，这里显示的模式会根据实际的配置情况自动变化")
         g.AddText("xs", "2. 设置获取输入法状态的超时时间: ")
-        timeout := g.AddEdit("yp Number Limit5")
-        timeout.Focus()
-        timeout.OnEvent("Change", e_setTimeout)
+        _ := g.AddEdit("yp Number Limit5")
+        _.Focus()
+        _.OnEvent("Change", e_setTimeout)
+        _.OnEvent("LoseFocus", e_setTimeout)
+        _.Value := checkTimeout
         e_setTimeout(item, *) {
             value := item.value
             if (value = "") {
                 return
             }
-            writeIni("checkTimeout", value, "InputMethod")
             global checkTimeout := value
+            if (item.Focused) {
+                return
+            }
+            writeIni("checkTimeout", value, "InputMethod")
             restartJAB()
         }
-        timeout.Value := checkTimeout
         g.AddEdit("xs ReadOnly cGray -VScroll w" w, "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
         g.AddText("xs", "3. 指定内部实现切换输入法状态的方式: ")
         gc.switchStatus := g.AddDropDownList("yp Choose" switchStatus + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift", "模拟输入 Ctrl+Space"])

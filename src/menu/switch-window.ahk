@@ -212,17 +212,8 @@ fn_switch_window(*) {
                 g.AddText("yp", "的应用窗口")
                 gc.%v "_title"% := g.AddText("yp cRed w" bw / 3, "( 0 个 )")
 
-                if (symbolType = 3) {
-                    c := symbolConfig.%"textSymbol_" v "_color"% ? "c" StrReplace(symbolConfig.%"textSymbol_" v "_color"%, "#") : ""
-                } else {
-                    c := symbolConfig.%v "_color"% ? "c" StrReplace(symbolConfig.%v "_color"%, "#") : ""
-                }
                 LV := "LV_" v
-                try {
-                    gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w " " c, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
-                } catch {
-                    gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
-                }
+                gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
                 addItem(v)
                 autoHdrLV(gc.%LV%)
                 gc.%LV%.OnEvent("DoubleClick", fn_dbClick)

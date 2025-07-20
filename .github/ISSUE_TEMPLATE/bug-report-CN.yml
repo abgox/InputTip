@@ -24,7 +24,8 @@ body:
         - 如果不是最新版本，请先更新到最新版本。
         - exe 版本可能落后，请使用 zip 版本。
         - 如果问题依然存在，再提交 issue。
-      placeholder: v2.40.5
+        - 不要使用 **最新版本** 这样的描述，必须是具体的版本号。
+      placeholder: v2025.07.20
     validations:
       required: true
   - type: dropdown
@@ -92,6 +93,6 @@ body:
     attributes:
       label: 还有其他你想要补充的信息吗？
       placeholder: |
-        提供应用的下载地址以方便测试。
+        提供有问题的应用的下载地址以方便测试。
         你对这个问题有什么看法?
         ...

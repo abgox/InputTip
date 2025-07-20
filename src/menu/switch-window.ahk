@@ -62,8 +62,8 @@ fn_switch_window(*) {
                 itemValue := {
                     exe_name: LV.GetText(RowNumber, 1),
                     status: stateMap.%from%,
-                    isGlobal: LV.GetText(RowNumber, 2),
-                    isRegex: LV.GetText(RowNumber, 3),
+                    tipGlobal: LV.GetText(RowNumber, 2),
+                    tipRegex: LV.GetText(RowNumber, 3),
                     title: LV.GetText(RowNumber, 4),
                     id: LV.GetText(RowNumber, 5)
                 }
@@ -127,21 +127,21 @@ fn_switch_window(*) {
 
                 g.AddText("xs", "3. 匹配范围: ")
                 _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
-                _.Text := itemValue.isGlobal
+                _.Text := itemValue.tipGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
                     v := item.Text
-                    itemValue.isGlobal := v
+                    itemValue.tipGlobal := v
                 }
 
                 g.AddText("xs cGray", "【匹配模式】和【匹配标题】仅在【匹配范围】为【标题级】时有效")
                 g.AddText("xs", "4. 匹配模式: ")
                 _ := g.AddDropDownList("yp w" scaleWidth, ["相等", "正则"])
-                _.Text := itemValue.isRegex
+                _.Text := itemValue.tipRegex
                 _.OnEvent("Change", e_changeMatch)
                 e_changeMatch(item, *) {
                     v := item.Text
-                    itemValue.isRegex := v
+                    itemValue.tipRegex := v
                 }
 
                 g.AddText("xs", "5. 匹配标题: ")
@@ -175,13 +175,13 @@ fn_switch_window(*) {
                         LV.Delete(RowNumber)
                         gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
                     } else {
-                        isGlobal := itemValue.isGlobal == "进程级" ? 1 : 0
-                        isRegex := itemValue.isRegex == "正则" ? 1 : 0
+                        isGlobal := itemValue.tipGlobal == "进程级" ? 1 : 0
+                        isRegex := itemValue.tipRegex == "正则" ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
                         ; 没有进行移动
                         if (itemValue.status == from) {
                             writeIni(itemValue.id, value, "App-" from, "InputTip.ini")
-                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                         } else {
                             if (action == "edit") {
                                 LV.Delete(RowNumber)
@@ -189,7 +189,7 @@ fn_switch_window(*) {
                             }
                             state := stateTextMap.%itemValue.status%
                             writeIni(itemValue.id, value, "App-" state, "InputTip.ini")
-                            gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                            gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                             gc.%state "_title"%.Text := "( " gc.%"LV_" state%.GetCount() " 个 )"
                         }
                         if (needAddWhiteList) {
@@ -245,8 +245,8 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: "",
                         status: stateMap.%item._type%,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: "",
                         id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
                     }
@@ -273,8 +273,8 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: windowInfo.exe_name,
                         status: stateMap.%state%,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
                     }
@@ -289,8 +289,8 @@ fn_switch_window(*) {
                     itemValue := {
                         exe_name: windowInfo.exe_name,
                         status: stateMap.%state%,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
                     }

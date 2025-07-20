@@ -330,8 +330,8 @@ fn_common(args, cb_updateVar) {
             e_add_manually(item, *) {
                 itemValue := {
                     exe_name: "",
-                    isGlobal: "进程级",
-                    isRegex: "相等",
+                    tipGlobal: "进程级",
+                    tipRegex: "相等",
                     title: "",
                     id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec,
                     configName: item._config
@@ -352,8 +352,8 @@ fn_common(args, cb_updateVar) {
 
                 itemValue := {
                     exe_name: LV.GetText(RowNumber, 1),
-                    isGlobal: LV.GetText(RowNumber, 2),
-                    isRegex: LV.GetText(RowNumber, 3),
+                    tipGlobal: LV.GetText(RowNumber, 2),
+                    tipRegex: LV.GetText(RowNumber, 3),
                     title: LV.GetText(RowNumber, 4),
                     id: LV.GetText(RowNumber, 5),
                     configName: LV._config
@@ -409,21 +409,21 @@ fn_common(args, cb_updateVar) {
 
                 g.AddText("xs", "2. 匹配范围: ")
                 _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
-                _.Text := itemValue.isGlobal
+                _.Text := itemValue.tipGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
                     v := item.Text
-                    itemValue.isGlobal := v
+                    itemValue.tipGlobal := v
                 }
 
                 g.AddText("xs cGray", "【匹配模式】和【匹配标题】仅在【匹配范围】为【标题级】时有效")
                 g.AddText("xs", "3. 匹配模式: ")
                 _ := g.AddDropDownList("yp w" scaleWidth, ["相等", "正则"])
-                _.Text := itemValue.isRegex
+                _.Text := itemValue.tipRegex
                 _.OnEvent("Change", e_changeMatch)
                 e_changeMatch(item, *) {
                     v := item.Text
-                    itemValue.isRegex := v
+                    itemValue.tipRegex := v
                 }
 
                 g.AddText("xs", "4. 匹配标题: ")
@@ -456,15 +456,15 @@ fn_common(args, cb_updateVar) {
                     if (delete) {
                         LV.Delete(RowNumber)
                     } else {
-                        isGlobal := itemValue.isGlobal == "进程级" ? 1 : 0
-                        isRegex := itemValue.isRegex == "正则" ? 1 : 0
+                        isGlobal := itemValue.tipGlobal == "进程级" ? 1 : 0
+                        isRegex := itemValue.tipRegex == "正则" ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
                         ; 没有进行移动
                         writeIni(itemValue.id, value, itemValue.configName, "InputTip.ini")
                         if (action == "edit") {
-                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                            LV.Modify(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                         } else {
-                            LV.Insert(RowNumber, , itemValue.exe_name, itemValue.isGlobal, itemValue.isRegex, itemValue.title, itemValue.id)
+                            LV.Insert(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                         }
 
                         if (needAddWhiteList) {
@@ -493,8 +493,8 @@ fn_common(args, cb_updateVar) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
                         configName: args.parentArgs.configName
@@ -507,8 +507,8 @@ fn_common(args, cb_updateVar) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        isGlobal: "进程级",
-                        isRegex: "相等",
+                        tipGlobal: "进程级",
+                        tipRegex: "相等",
                         title: windowInfo.title,
                         id: windowInfo.id,
                         configName: args.parentArgs.configName

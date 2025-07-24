@@ -50,22 +50,10 @@ while 1 {
                 toState := switchState(exe_name, exe_title)
                 if (toState == "CN") {
                     switch_CN()
-                    if (isCN()) {
-                        loadCursor("CN", 1)
-                        ShowSymbolEx("CN")
-                    }
                 } else if (toState == "EN") {
                     switch_EN()
-                    if (!isCN()) {
-                        loadCursor("EN", 1)
-                        ShowSymbolEx("EN")
-                    }
                 } else if (toState == "Caps") {
                     switch_Caps()
-                    if (GetKeyState("CapsLock", "T")) {
-                        loadCursor("Caps", 1)
-                        ShowSymbolEx("Caps")
-                    }
                 }
             }
         } catch {

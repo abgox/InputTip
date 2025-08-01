@@ -10,13 +10,7 @@ while 1 {
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
         needShow := symbolType
-        if (symbolType && hoverHide) {
-            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol()
-                isOverSymbol := 1
-                continue
-            }
-        }
+
         try {
             exe_name := ProcessGetName(WinGetPID("A"))
             exe_title := WinGetTitle("A")
@@ -42,7 +36,7 @@ while 1 {
                 }
 
                 ; 等待窗口完成激活，防止切换状态冲突，导致状态切换失败
-                WinWaitActive(exe_title " ahk_exe" exe_name, , 15)
+                WinWaitActive(exe_title " ahk_exe " exe_name, , 15)
 
                 lastSymbol := ""
                 lastCursor := ""
@@ -59,6 +53,14 @@ while 1 {
         } catch {
             hideSymbol()
             needShow := 0
+        }
+
+        if (symbolType && hoverHide) {
+            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
+                hideSymbol()
+                isOverSymbol := 1
+                continue
+            }
         }
 
         if (GetKeyState("CapsLock", "T")) {

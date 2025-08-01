@@ -38,11 +38,23 @@ fn_cursor_mode(*) {
 
             gc.%LV%.OnEvent("DoubleClick", handleClick)
             gc.%LV%._LV := LV
-            _ := g.AddButton("xs w" w, "添加应用的光标获取模式")
+            _ := g.AddButton("xs w" w / 2, "快捷添加")
             _.OnEvent("Click", e_add)
             _._LV := LV
             e_add(item, *) {
                 fn_add(item._LV)
+            }
+
+            _ := g.AddButton("yp w" w / 2, "手动添加")
+            _.OnEvent("Click", e_add_manually)
+            _._LV := LV
+            e_add_manually(item, *) {
+                itemValue := {
+                    exe_name: "",
+                    mode: "HOOK",
+                    id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                }
+                fn_edit(gc.%item._LV%, 1, "add", itemValue).Show()
             }
 
             handleClick(LV, RowNumber) {
@@ -161,7 +173,7 @@ fn_cursor_mode(*) {
 
             fn_add(parentLV) {
                 args := {
-                    title: "添加应用的光标获取模式",
+                    title: "快捷添加",
                     configName: "",
                     LV: parentLV,
                 }

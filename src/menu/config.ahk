@@ -155,8 +155,8 @@ fn_config(*) {
                 return
             }
             value += value <= 0
-            if (value > 500) {
-                value := 500
+            if (value > 100) {
+                value := 100
             }
             global delay := value
             if (item.Focused) {
@@ -168,7 +168,7 @@ fn_config(*) {
         }
 
         ; g.AddUpDown("Range1-500", delay)
-        g.AddText("xs cGray w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-500，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会稍微大一点(影响不大)，根据电脑性能适当调整")
+        g.AddText("xs cGray w" bw, "单位：毫秒，默认为 20 毫秒，建议 20-50 之间。最大范围是 1-100，超出范围则使用最近的有效值`n值越小，响应越快，性能消耗会稍微大一点(影响不大)，根据电脑性能适当调整`n除非电脑性能限制，否则不建议设置过高，如果电脑性能允许，建议 20 毫秒以内")
 
         tab.UseTab(2)
         g.AddText("Section", "- 你应该首先查看")

@@ -107,8 +107,38 @@ returnNumber(value) {
     return numbers[1]
 }
 
+/**
+ * 比对版本号
+ * @param new 新版本号
+ * @param old 旧版本号
+ * @returns {1 | -1 | 0}
+ * - new > old : 1
+ * - new < old : -1
+ * - new = old : 0
+ */
+compareVersion(new, old) {
+    newParts := StrSplit(new, ".")
+    oldParts := StrSplit(old, ".")
+    for i, part1 in newParts {
+        try {
+            part2 := oldParts[i]
+        } catch {
+            part2 := 0
+        }
+        if (part1 > part2) {
+            return 1  ; new > old
+        } else if (part1 < part2) {
+            return -1  ; new < old
+        }
+    }
+    return 0  ; new = old
+}
+
 ; 设置托盘图标
 setTrayIcon(path) {
+    if isJAB
+        return
+
     try {
         TraySetIcon(path, , 1)
     } catch {

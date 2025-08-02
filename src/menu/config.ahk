@@ -265,7 +265,7 @@ fn_config(*) {
         }
         e_pic_config(item, *) {
             value := returnNumber(item.value)
-            updateSymbol(1, item._config, value)
+            updateSymbol(item._config, value)
             reloadSymbol()
             if (item.Focused) {
                 return
@@ -282,7 +282,7 @@ fn_config(*) {
         fn_writeIsolateConfig(item, *) {
             value := RegExMatch(item._config, "color|font|Text") ? item.Text : returnNumber(item.Text)
             if (item._update) {
-                updateSymbol(1, item._config, value)
+                updateSymbol(item._config, value)
                 reloadSymbol()
                 if (item.Focused) {
                     return
@@ -467,7 +467,7 @@ fn_config(*) {
         }
         e_color_config(item, *) {
             value := item.Text
-            updateSymbol(1, item._config, value)
+            updateSymbol(item._config, value)
             reloadSymbol()
             if (item.Focused) {
                 return
@@ -492,7 +492,7 @@ fn_config(*) {
                     value := 255
                 }
             }
-            updateSymbol(1, item._config, value)
+            updateSymbol(item._config, value)
             reloadSymbol()
             if (item.Focused) {
                 return
@@ -710,7 +710,7 @@ fn_config(*) {
             } else if (item._config = "textSymbol_offset_x" || item._config = "textSymbol_offset_y") {
                 value := returnNumber(value)
             }
-            updateSymbol(1, item._config, value)
+            updateSymbol(item._config, value)
             reloadSymbol()
             if (item.Focused) {
                 return

@@ -1,10 +1,48 @@
 ; InputTip
 
-; 更新检查时间间隔，默认是 1440 分钟，即 24 小时
-checkUpdateDelay := readIni("checkUpdateDelay", 1440)
+baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
+
+setTrayIcon(readIni("iconRunning", "InputTipSymbol\default\favicon.png"))
+
+filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
+fileLnk := filename ".lnk"
+fileDesc := "InputTip - 一个输入法状态管理工具(提示/切换)"
+JAB_PID := ""
+
+try {
+    keyCount := A_Args[1]
+    if (!IsNumber(keyCount)) {
+        keyCount := 0
+    }
+} catch {
+    keyCount := 0
+}
+
+gc := {
+    init: 0,
+    timer: 0,
+    timer2: 0,
+    tab: 0,
+    ; 记录窗口 Gui，同一个 Gui 只允许存在一个
+    w: {
+        updateGui: "",
+        subGui: ""
+    }
+}
+
+userName := readIni("userName", A_UserName, "UserInfo")
 
 ; 输入法模式
 mode := readIni("mode", 1, "InputMethod")
+
+; 更新检查时间间隔，默认是 1440 分钟，即 24 小时
+checkUpdateDelay := readIni("checkUpdateDelay", 1440)
+
+; 是否静默自动更新
+silentUpdate := readIni("silentUpdate", 0)
+
+; 当运行源代码时，是否直接以管理员权限运行
+runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
 
 ; 光标获取模式
 modeList := {}
@@ -109,13 +147,7 @@ gui_help_tip := "你首先应该点击上方的【关于】或相关文档查看
 
 canShowSymbol := 0
 
-updateList(1)
-
 screenList := getScreenInfo()
-
-updateAppOffset(1)
-
-updateCursorMode(1)
 
 ; 鼠标样式相关信息
 cursorInfo := [{
@@ -171,8 +203,6 @@ cursorInfo := [{
     type: "PEN", value: "32631", origin: "", CN: "", EN: "", Caps: ""
 }]
 
-updateCursor(1)
-
 for v in cursorInfo {
     if (v.type = "CROSS") {
         value := "Crosshair"
@@ -186,14 +216,19 @@ for v in cursorInfo {
     }
 }
 
-updateSymbol(1)
 
-updateCursor(init := 0) {
+updateList()
+updateAppOffset()
+updateCursorMode()
+updateCursor()
+updateSymbol()
+
+; 更新鼠标样式
+updateCursor() {
     global CN_cursor, EN_cursor, Caps_cursor, cursorInfo
 
-    if (!init) {
-        restartJAB()
-    }
+    restartJAB()
+
     _ := {}
 
     for state in ["CN", "EN", "Caps"] {
@@ -218,6 +253,7 @@ updateCursor(init := 0) {
     EN_cursor := _.EN
     Caps_cursor := _.Caps
 }
+; 加载鼠标样式
 loadCursor(state, change := 0) {
     global lastCursor
     if (changeCursor) {
@@ -231,6 +267,7 @@ loadCursor(state, change := 0) {
         }
     }
 }
+; 重载鼠标样式
 reloadCursor() {
     if (changeCursor) {
         if (GetKeyState("CapsLock", "T")) {
@@ -245,7 +282,9 @@ reloadCursor() {
     }
 }
 
-updateSymbol(init := 0, configName := "", configValue := "") {
+
+; 更新符号相关数据
+updateSymbol(configName := "", configValue := "") {
     global symbolGui, symbolConfig
 
     hideSymbol()
@@ -255,9 +294,8 @@ updateSymbol(init := 0, configName := "", configValue := "") {
             symbolConfig.%configName state% := configValue
         }
     } else {
-        if (!init) {
-            restartJAB()
-        }
+        restartJAB()
+
         ; 存放不同状态下的符号
         symbolGui := {
             EN: "",
@@ -452,6 +490,7 @@ updateSymbol(init := 0, configName := "", configValue := "") {
             }
     }
 }
+; 加载符号
 loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
     global lastSymbol, isOverSymbol
     static old_left := 0, old_top := 0
@@ -536,6 +575,7 @@ loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
     old_top := top
     old_left := left
 }
+; 重载符号
 reloadSymbol() {
     if (symbolType) {
         canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
@@ -553,6 +593,7 @@ reloadSymbol() {
         }
     }
 }
+; 隐藏符号
 hideSymbol() {
     for state in ["CN", "EN", "Caps"] {
         try {
@@ -562,61 +603,13 @@ hideSymbol() {
     global lastSymbol := ""
 }
 
-pauseApp(*) {
-    if (A_IsPaused) {
-        updateTip(!A_IsPaused)
-        A_TrayMenu.Uncheck("暂停/运行")
-        setTrayIcon(iconRunning)
-        reloadSymbol()
-        if (enableJABSupport) {
-            runJAB()
-        }
-    } else {
-        updateTip(!A_IsPaused)
-        A_TrayMenu.Check("暂停/运行")
-        setTrayIcon(iconPaused)
-        hideSymbol()
-        if (enableJABSupport) {
-            killJAB(0)
-        }
-    }
-    Pause(-1)
-
-    for state in ["CN", "EN", "Caps"] {
-        if (%"hotkey_" state%) {
-            try {
-                Hotkey(%"hotkey_" state%, "Toggle")
-            }
-        }
-    }
-}
-restartJAB() {
-    static done := 1
-    if (done && enableJABSupport) {
-        SetTimer(restartAppTimer, -1)
-        restartAppTimer() {
-            done := 0
-            killJAB(1)
-            if (A_IsAdmin) {
-                try {
-                    Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-                }
-            } else {
-                global JAB_PID
-                Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
-            }
-            done := 1
-        }
-    }
-}
-
 ; 更新符号显示黑白名单和自动切换列表
-updateList(init := 0) {
+updateList() {
     global
 
-    if (!init) {
-        restartJAB()
-    }
+    restartJAB()
+
+
     ; 应用列表: 符号显示黑名单
     app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
 
@@ -666,15 +659,14 @@ updateWhiteList(app) {
         global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
     }
 }
-updateAppOffset(init := 0) {
+
+updateAppOffset() {
     global app_offset := {}
     global app_offset_screen := {}
     global AppOffsetScreen := StrSplit(readIniSection("App-Offset-Screen"), "`n")
     global AppOffset := StrSplit(readIniSection("App-Offset"), "`n")
 
-    if (!init) {
-        restartJAB()
-    }
+    restartJAB()
 
     for v in AppOffset {
         kv := StrSplit(v, "=", , 2)
@@ -715,11 +707,10 @@ updateAppOffset(init := 0) {
         app_offset_screen.%kv[1]% := { x: part[1], y: part[2] }
     }
 }
-updateCursorMode(init := 0) {
+updateCursorMode() {
     global modeList
-    if (!init) {
-        restartJAB()
-    }
+    restartJAB()
+
     modeList := {
         HOOK: ":" arrJoin(defaultModeList.HOOK, ":") ":",
         UIA: ":" arrJoin(defaultModeList.UIA, ":") ":",
@@ -749,30 +740,120 @@ updateCursorMode(init := 0) {
     }
 }
 
-; 显示实时的状态码和切换码
-showCode(*) {
-    if (gc.timer) {
-        gc.timer := 0
-        try {
-            gc.status_btn.Text := "显示实时的状态码和切换码(双击设置快捷键)"
-        }
+; 重启 JAB 程序
+restartJAB() {
+    static done := 1
+
+    if isJAB
         return
-    }
 
-    gc.timer := 1
-    try {
-        gc.status_btn.Text := "停止显示实时的状态码和切换码(双击设置快捷键)"
-    }
-
-    SetTimer(statusTimer, 25)
-    statusTimer() {
-        if (!gc.timer) {
-            ToolTip()
-            SetTimer(, 0)
-            return
+    if (done && enableJABSupport) {
+        SetTimer(restartAppTimer, -1)
+        restartAppTimer() {
+            done := 0
+            killJAB(1)
+            if (A_IsAdmin) {
+                try {
+                    Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+                }
+            } else {
+                global JAB_PID
+                Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
+            }
+            done := 1
         }
-
-        info := IME.CheckInputMode()
-        ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
     }
+}
+
+/**
+ * 启动 JAB 进程
+ * @returns {1 | 0} 1/0: 是否存在错误
+ */
+runJAB() {
+    if (A_IsCompiled) {
+        try {
+            if (compareVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
+                FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+            }
+        } catch {
+            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+        }
+        SetTimer(runAppTimer1, -1)
+        runAppTimer1() {
+            try {
+                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited", 1)
+                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            }
+        }
+    } else if (A_IsAdmin) {
+        SetTimer(runAppTimer2, -1)
+        runAppTimer2() {
+            try {
+                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited", 1)
+                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            }
+        }
+    } else {
+        global JAB_PID
+        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
+    }
+    return 0
+}
+/**
+ * 停止 JAB 进程
+ * @param {1 | 0} wait 等待停止进程
+ * @param {1 | 0} delete 停止进程后，是否需要删除相关任务计划程序
+ */
+killJAB(wait := 1, delete := 0) {
+    if (A_IsAdmin) {
+        cmd := 'schtasks /End /tn "abgox.InputTip.JAB.JetBrains"'
+        try {
+            wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
+        }
+        if (delete) {
+            try {
+                Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
+            }
+        }
+    } else {
+        ProcessClose(JAB_PID)
+    }
+}
+
+
+/**
+ * 创建/更新任务计划程序
+ * @param {String} path 要执行的应用程序
+ * @param {String} taskName 任务计划名称
+ * @param {Array} args 运行参数
+ * @param {Highest | Limited} runLevel 运行级别
+ * @param {1 | 0} isWait 是否等待完成
+ * @param {1 | 0} needStartUp 是否需要开机启动
+ * @returns {1 | 0} 是否创建成功
+ */
+createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 0, needStartUp := 0, *) {
+    if (A_IsAdmin) {
+        cmd := 'powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' path '\"`'" '
+        if (args.Length) {
+            cmd .= '-Argument ' "'"
+            for v in args {
+                cmd .= '\"' v '\" '
+            }
+            cmd .= "'"
+        }
+        cmd .= ';$principal = New-ScheduledTaskPrincipal -UserId "' userName '" -RunLevel ' runLevel ';$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1);'
+        if (needStartUp) {
+            cmd .= '$trigger = New-ScheduledTaskTrigger -AtLogOn;$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings -Trigger $trigger;'
+        } else {
+            cmd .= '$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings;'
+        }
+        cmd .= 'Register-ScheduledTask -TaskName ' taskName ' -InputObject $task -Force;'
+        try {
+            isWait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
+            return 1
+        } catch {
+            return 0
+        }
+    }
+    return 0
 }

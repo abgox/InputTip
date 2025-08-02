@@ -167,7 +167,7 @@ if (A_IsCompiled) {
     }
 } else {
     if (!FileExist("../InputTip.bat")) {
-        FileAppend('REM InputTip.bat' "`n" 'start "" /min "%~dp0\src\AutoHotkey\AutoHotkey64.exe" "%~dp0\src\InputTip.ahk"`n', "..\InputTip.bat", "`n UTF-8-Raw")
+        FileAppend('REM InputTip.bat' "`n" 'start "InputTip" /min "%~dp0\src\AutoHotkey\AutoHotkey64.exe" "%~dp0\src\InputTip.ahk"`n', "..\InputTip.bat", "`n UTF-8-Raw")
     }
 
     if (!FileExist("plugins/InputTip.plugin.ahk")) {
@@ -206,9 +206,7 @@ if (A_IsCompiled) {
         }
     }
     if (missFileList.Length) {
-        fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
         downloading(*) {
-
             g := createGuiOpt("InputTip - 正在处理文件丢失...")
             g.AddText(, "正在下载丢失的文件: ")
             g.tip := g.AddText("xs cRed", "------------------------------------------------------------")
@@ -250,25 +248,13 @@ if (A_IsCompiled) {
         downloadingGui.Destroy()
 
         if (!done) {
-            createGui(errGui).Show()
-            errGui(info) {
-                g := createGuiOpt("InputTip - 正在处理文件丢失...")
-                g.AddText("cRed", "可能因为网络等其他原因，文件没有正常恢复，请手动处理")
-                g.AddLink("cGray", '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载')
-                if (info.i) {
-                    return g
-                }
-                w := info.w
-                bw := w - g.MarginX * 2
-
-                y := g.AddButton("xs w" bw, "我知道了")
-                y.OnEvent("Click", yes)
-                g.OnEvent("Close", yes)
-                yes(*) {
-                    g.Destroy()
-                }
-                return g
-            }
+            createTipGui([{
+                opt: "cRed",
+                text: "可能因为网络等其他原因，文件没有正常恢复，请手动处理",
+            }, {
+                opt: "cGray",
+                text: '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载'
+            }], "InputTip - 正在处理文件丢失...").Show()
         }
     }
 }
@@ -302,12 +288,12 @@ ensureFile(urlPath, filePath) {
  * - 当配置文件不存在(无法读取 mode 配置项)时，进入初始化引导
  */
 checkIni() {
+    global mode
+
     try {
         mode := IniRead("InputTip.ini", "InputMethod", "mode")
     } catch {
         gc.init := 1
-
-        userName := readIni("userName", A_UserName, "UserInfo")
 
         ; 输入法模式
         mode := readIni("mode", 1, "InputMethod")

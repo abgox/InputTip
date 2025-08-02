@@ -7,68 +7,25 @@
 ;@Ahk2Exe-UpdateManifest 1
 ;@AHK2Exe-SetDescription InputTip - 一个输入法状态管理工具(提示/切换)
 
+isJAB := 0
+
+#Include utils/tools.ahk
+#Include utils/create-gui.ahk
 #Include utils/ini.ahk
 #Include utils/IME.ahk
-#Include utils/check-version.ahk
-#Include menu/tray-menu.ahk
-#Include utils/tools.ahk
 #Include utils/app-list.ahk
-
-ID := "InputTip"
-
-baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
-favicon_png := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
-
-if (FileExist(favicon_png)) {
-    setTrayIcon(favicon_png)
-}
-
-#Include utils/verify-file.ahk
-#Include utils/create-gui.ahk
 #Include utils/hotkey-gui.ahk
-
-filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
-fileLnk := filename ".lnk"
-fileDesc := "InputTip - 一个输入法状态管理工具(提示/切换)"
-JAB_PID := ""
-
-try {
-    keyCount := A_Args[1]
-    if (!IsNumber(keyCount)) {
-        keyCount := 0
-    }
-} catch {
-    keyCount := 0
-}
-
-gc := {
-    init: 0,
-    timer: 0,
-    timer2: 0,
-    tab: 0,
-    ; 记录窗口 Gui，同一个 Gui 只允许存在一个
-    w: {
-        updateGui: "",
-        subGui: ""
-    }
-}
-
-setTrayIcon(favicon_png)
+#Include menu/tray-menu.ahk
+#Include utils/verify-file.ahk
+#Include utils/var.ahk
+#Include utils/check-version.ahk
 
 checkIni() ; 检查配置文件
-
-userName := readIni("userName", A_UserName, "UserInfo")
-
-; g.SetFont(fontOpt*)
-fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
 } else {
     favicon := A_ScriptDir "\img\favicon.ico"
-
-    ; 当运行源代码时，是否直接以管理员权限运行
-    runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
     if (runCodeWithAdmin && !A_IsAdmin) {
         try {
             Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
@@ -83,12 +40,7 @@ if (A_IsCompiled) {
     }
 }
 
-; 是否静默自动更新
-silentUpdate := readIni("silentUpdate", 0)
-
 checkUpdateDone()
-
-#Include ./utils/var.ahk
 
 checkUpdate(1)
 

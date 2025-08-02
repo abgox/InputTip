@@ -110,7 +110,7 @@ makeTrayMenu() {
             w := info.w
             bw := w - g.MarginX * 2
 
-            createGuiOpt().AddText(, " ").GetPos(, , &__w)
+            createGuiOpt("").AddText(, " ").GetPos(, , &__w)
             gc._window_info := g.AddButton("xs w" bw, "点击获取")
             gc._window_info.OnEvent("Click", e_window_info)
             g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
@@ -609,58 +609,61 @@ getFontList() {
     return list
 }
 
-/**
- * 启动 JAB 进程
- * @returns {1 | 0} 1/0: 是否存在错误
- */
-runJAB() {
-    if (A_IsCompiled) {
-        try {
-            if (compareVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
-                FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-            }
-        } catch {
-            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-        }
-        SetTimer(runAppTimer1, -1)
-        runAppTimer1() {
-            try {
-                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited", 1)
-                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-            }
-        }
-    } else if (A_IsAdmin) {
-        SetTimer(runAppTimer2, -1)
-        runAppTimer2() {
-            try {
-                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited", 1)
-                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-            }
+pauseApp(*) {
+    if (A_IsPaused) {
+        updateTip(!A_IsPaused)
+        A_TrayMenu.Uncheck("暂停/运行")
+        setTrayIcon(iconRunning)
+        reloadSymbol()
+        if (enableJABSupport) {
+            runJAB()
         }
     } else {
-        global JAB_PID
-        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
+        updateTip(!A_IsPaused)
+        A_TrayMenu.Check("暂停/运行")
+        setTrayIcon(iconPaused)
+        hideSymbol()
+        if (enableJABSupport) {
+            killJAB(0)
+        }
     }
-    return 0
-}
-/**
- * 停止 JAB 进程
- * @param {1 | 0} wait 等待停止进程
- * @param {1 | 0} delete 停止进程后，是否需要删除相关任务计划程序
- */
-killJAB(wait := 1, delete := 0) {
-    if (A_IsAdmin) {
-        cmd := 'schtasks /End /tn "abgox.InputTip.JAB.JetBrains"'
-        try {
-            wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
-        }
-        if (delete) {
+    Pause(-1)
+
+    for state in ["CN", "EN", "Caps"] {
+        if (%"hotkey_" state%) {
             try {
-                Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
+                Hotkey(%"hotkey_" state%, "Toggle")
             }
         }
-    } else {
-        ProcessClose(JAB_PID)
+    }
+}
+
+
+; 显示实时的状态码和切换码
+showCode(*) {
+    if (gc.timer) {
+        gc.timer := 0
+        try {
+            gc.status_btn.Text := "显示实时的状态码和切换码(双击设置快捷键)"
+        }
+        return
+    }
+
+    gc.timer := 1
+    try {
+        gc.status_btn.Text := "停止显示实时的状态码和切换码(双击设置快捷键)"
+    }
+
+    SetTimer(statusTimer, 25)
+    statusTimer() {
+        if (!gc.timer) {
+            ToolTip()
+            SetTimer(, 0)
+            return
+        }
+
+        info := IME.CheckInputMode()
+        ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
     }
 }
 

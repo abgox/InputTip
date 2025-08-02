@@ -7,16 +7,14 @@
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
 ;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态管理工具(提示/切换)
 
-#Include utils/IME.ahk
+isJAB := 1
+
+#Include utils/tools.ahk
+#Include utils/create-gui.ahk
 #Include utils/ini.ahk
+#Include utils/IME.ahk
 #Include utils/app-list.ahk
 #Include utils/var.ahk
-#Include utils/tools.ahk
-
-ID := "JAB"
-
-; g.SetFont(fontOpt*)
-fontOpt := ["s" readIni("gui_font_size", "12"), "Microsoft YaHei"]
 
 /**
  * 跳过非 JAB/JetBrains IDE 程序，交由 InputTip 处理

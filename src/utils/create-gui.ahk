@@ -1,5 +1,18 @@
 ; InputTip
 
+try {
+    gui_font_size := IniRead("InputTip.ini", "Config-v2", "gui_font_size")
+} catch {
+    try {
+        IniWrite("12", "InputTip.ini", "Config-v2", "gui_font_size")
+    }
+    gui_font_size := "12"
+}
+
+; g.SetFont(fontOpt*)
+fontOpt := ["s" gui_font_size, "Microsoft YaHei"]
+
+
 /**
  * - 创建 Gui 对象。
  * - 能够获取窗口最终的坐标和宽高，方便配置控件(如按钮宽度)。
@@ -12,7 +25,7 @@
  * @example
  * createGui(helloGui).Show()
  * helloGui(info) {
- *     g := createGuiOpt()
+ *     g := createGuiOpt("")
  *     g.AddText(, "xxxxxxxxxxxxxxxxxxx")
  *     ; 第一次隐藏显示，可以通过它在合适的地方直接返回，减少多余的执行
  *     if (info.i) {
@@ -43,7 +56,7 @@ createGui(callback) {
  * @example
  * createUniqueGui(helloGui).Show()
  * helloGui(info) {
- *     g := createGuiOpt()
+ *     g := createGuiOpt("")
  *     g.AddText(, "xxxxxxxxxxxxxxxxxxx")
  *     ; 第一次隐藏显示，可以通过它在合适的地方直接返回，减少多余的执行
  *     if (info.i) {
@@ -63,8 +76,10 @@ createUniqueGui(callback) {
     ; 基本确保唯一性
     id := g.Title "_" width "_" height
     if (w.Has(id)) {
-        w.Get(id).Destroy()
-        w.Delete(id)
+        try {
+            w.Get(id).Destroy()
+            w.Delete(id)
+        }
     }
     w.Set(id, g)
     return g
@@ -77,7 +92,7 @@ createUniqueGui(callback) {
  * @param {String} guiOption Gui 初始化配置
  * @returns {Gui} 返回 Gui 对象
  */
-createGuiOpt(title := fileDesc, fontOption := fontOpt, guiOption := "") {
+createGuiOpt(title, fontOption := fontOpt, guiOption := "") {
     g := Gui(guiOption, title)
     g.SetFont(fontOption*)
     return g

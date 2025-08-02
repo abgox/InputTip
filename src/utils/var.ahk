@@ -660,7 +660,7 @@ updateWhiteList(app) {
         }
     }
     if (!exist) {
-        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+        id := returnId()
         writeIni(id, app ":1", "App-ShowSymbol")
 
         global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")

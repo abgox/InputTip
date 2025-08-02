@@ -83,7 +83,7 @@ fn_app_offset(*) {
                     tipGlobal: "进程级",
                     tipRegex: "相等",
                     title: "",
-                    id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec,
+                    id: returnId(),
                     configName: item._config
                 }
                 fn_edit(gc.%item._LV%, 1, "add", itemValue).Show()

@@ -52,7 +52,7 @@ fn_cursor_mode(*) {
                 itemValue := {
                     exe_name: "",
                     mode: "HOOK",
-                    id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                    id: returnId()
                 }
                 fn_edit(gc.%item._LV%, 1, "add", itemValue).Show()
             }

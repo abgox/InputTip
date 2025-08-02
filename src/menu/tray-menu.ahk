@@ -333,7 +333,7 @@ fn_common(args, cb_updateVar) {
                     tipGlobal: "进程级",
                     tipRegex: "相等",
                     title: "",
-                    id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec,
+                    id: returnId(),
                     configName: item._config
                 }
                 fn_edit(gc.%item._LV%, 1, "add", itemValue).Show()
@@ -711,7 +711,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                     windowInfo := {
                         exe_name: LV.GetText(RowNumber, 1),
                         title: LV.GetText(RowNumber, 3),
-                        id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        id: returnId()
                     }
                     cb_addClick({
                         windowInfo: windowInfo,
@@ -763,7 +763,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                 ;     windowInfo := {
                 ;         exe_name: "",
                 ;         title: "",
-                ;         id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                ;         id: returnId()
                 ;     }
                 ;     cb_addManual({
                 ;         windowInfo: windowInfo,

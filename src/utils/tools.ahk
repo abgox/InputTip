@@ -131,3 +131,8 @@ setTrayIcon(path) {
         TraySetIcon(path, , 1)
     }
 }
+
+; 返回当前的时间，作为唯一标识符
+returnId() {
+    return FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+}

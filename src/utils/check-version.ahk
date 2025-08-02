@@ -576,7 +576,7 @@ checkUpdateDone() {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "app_" v), ":")
                 for value in _ {
                     if (Trim(value)) {
-                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        id := returnId()
                         IniWrite(value ":1", "InputTip.ini", "App-" v, id)
                         Sleep(5)
                     }
@@ -601,7 +601,7 @@ checkUpdateDone() {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", v.old), ":")
                 for value in _ {
                     if (Trim(value)) {
-                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        id := returnId()
                         IniWrite(value ":1", "InputTip.ini", v.new, id)
                         Sleep(5)
                     }
@@ -616,7 +616,7 @@ checkUpdateDone() {
             try {
                 for value in StrSplit(IniRead("InputTip.ini", "Config-v2", "app_offset"), ":") {
                     if (Trim(value)) {
-                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        id := returnId()
                         IniWrite(StrReplace(StrReplace(value, "|", ":1:0:"), "*", "|") ":", "InputTip.ini", "App-Offset", id)
                         Sleep(5)
                     }
@@ -629,7 +629,7 @@ checkUpdateDone() {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "cursor_mode_" v), ":")
                 for value in _ {
                     if (Trim(value)) {
-                        id := FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        id := returnId()
                         IniWrite(value ":" v, "InputTip.ini", "InputCursorMode", id)
                         Sleep(5)
                     }

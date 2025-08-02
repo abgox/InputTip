@@ -238,7 +238,7 @@ fn_switch_window(*) {
                         tipGlobal: "进程级",
                         tipRegex: "相等",
                         title: "",
-                        id: FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+                        id: returnId()
                     }
                     fn_edit(item._LV, 1, item._type, "add", itemValue).Show()
                 }

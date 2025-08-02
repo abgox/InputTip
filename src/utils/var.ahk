@@ -766,40 +766,6 @@ restartJAB() {
 }
 
 /**
- * 启动 JAB 进程
- * @returns {1 | 0} 1/0: 是否存在错误
- */
-runJAB() {
-    if (A_IsCompiled) {
-        try {
-            if (compareVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
-                FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-            }
-        } catch {
-            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
-        }
-        SetTimer(runAppTimer1, -1)
-        runAppTimer1() {
-            try {
-                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited", 1)
-                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-            }
-        }
-    } else if (A_IsAdmin) {
-        SetTimer(runAppTimer2, -1)
-        runAppTimer2() {
-            try {
-                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited", 1)
-                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
-            }
-        }
-    } else {
-        global JAB_PID
-        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
-    }
-    return 0
-}
-/**
  * 停止 JAB 进程
  * @param {1 | 0} wait 等待停止进程
  * @param {1 | 0} delete 停止进程后，是否需要删除相关任务计划程序

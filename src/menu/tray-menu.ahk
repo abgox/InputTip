@@ -638,6 +638,43 @@ pauseApp(*) {
     }
 }
 
+/**
+ * 启动 JAB 进程
+ * @returns {1 | 0} 1/0: 是否存在错误
+ */
+runJAB() {
+    if isJAB
+        return
+    if (A_IsCompiled) {
+        try {
+            if (compareVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
+                FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+            }
+        } catch {
+            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+        }
+        SetTimer(runAppTimer1, -1)
+        runAppTimer1() {
+            try {
+                createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited", 1)
+                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            }
+        }
+    } else if (A_IsAdmin) {
+        SetTimer(runAppTimer2, -1)
+        runAppTimer2() {
+            try {
+                createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [A_ScriptDir "\InputTip.JAB.JetBrains.ahk"], "Limited", 1)
+                Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            }
+        }
+    } else {
+        global JAB_PID
+        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.JAB.JetBrains.ahk"', , "Hide", &JAB_PID)
+    }
+    return 0
+}
+
 
 ; 显示实时的状态码和切换码
 showCode(*) {

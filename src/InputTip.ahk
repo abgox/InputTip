@@ -197,6 +197,8 @@ needSkip(exe_str) {
 }
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
+    res := 0
+
     try {
         res := GetCaretPosEx(&left, &top, &right, &bottom)
     } catch {
@@ -204,25 +206,27 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         return 0
     }
 
-    try {
-        s := isWhichScreen(screenList)
-        if (s.num) {
+    s := isWhichScreen(screenList)
+    if (s.num) {
+        try {
+            offset := app_offset_screen.%s.num%
+            left += offset.x
+            top += offset.y
+        }
+        try {
+            offset := app_offset.%exe_name exe_title%.%s.num%
+            left += offset.x
+            top += offset.y
+        } catch {
             try {
-                offset := app_offset_screen.%s.num%
-                left += offset.x
-                top += offset.y
-            }
-            try {
-                offset := app_offset.%exe_name exe_title%.%s.num%
-                left += offset.x
-                top += offset.y
-            } catch {
                 left += app_offset.%exe_name%.%s.num%.x
                 top += app_offset.%exe_name%.%s.num%.y
             }
         }
+        return res && left
     }
-    return res && left
+
+    return 0
 }
 
 

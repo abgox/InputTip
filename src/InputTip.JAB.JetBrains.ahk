@@ -34,25 +34,28 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         left := 0, top := 0, right := 0, bottom := 0
         return 0
     }
-    try {
-        s := isWhichScreen(screenList)
-        if (s.num) {
+
+    s := isWhichScreen(screenList)
+    if (s.num) {
+        try {
+            offset := app_offset_screen.%s.num%
+            left += offset.x
+            top += offset.y
+        }
+        try {
+            offset := app_offset.%exe_name exe_title%.%s.num%
+            left += offset.x
+            top += offset.y
+        } catch {
             try {
-                offset := app_offset_screen.%s.num%
-                left += offset.x
-                top += offset.y
-            }
-            try {
-                offset := app_offset.%exe_name exe_title%.%s.num%
-                left += offset.x
-                top += offset.y
-            } catch {
                 left += app_offset.%exe_name%.%s.num%.x
                 top += app_offset.%exe_name%.%s.num%.y
             }
         }
+        return left
     }
-    return left
+
+    return 0
 }
 
 /**

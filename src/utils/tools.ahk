@@ -79,13 +79,6 @@ getScreenInfo() {
 
 /**
  * 激活的窗口在哪个屏幕
- * 
- * 调用时外层必须使用 try 包裹，因为 MouseGetPos 在极少数情况下，会因为权限问题报错拒绝访问
- * @example
- * try {
- *      isWhichScreen()
- *      ; ...
- * }
  */
 isWhichScreen(screenList) {
     try {
@@ -95,7 +88,7 @@ isWhichScreen(screenList) {
         cx := x + w / 2
         cy := y + h / 2
     } catch {
-        return ""
+        return { main: 0, count: 0, num: 0, left: 0, top: 0, right: 0, bottom: 0 }
     }
 
     for v in screenList {

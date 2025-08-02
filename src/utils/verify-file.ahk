@@ -285,18 +285,15 @@ ensureFile(urlPath, filePath) {
 
 /**
  * - 检查配置文件
- * - 当配置文件不存在(无法读取 mode 配置项)时，进入初始化引导
+ * - 当配置文件不存在(无法读取 Installer 中的 init 配置项)时，进入初始化引导
  */
 checkIni() {
-    global mode
-
     try {
-        mode := IniRead("InputTip.ini", "InputMethod", "mode")
+        IniRead("InputTip.ini", "Installer", "init")
     } catch {
         gc.init := 1
 
-        ; 输入法模式
-        mode := readIni("mode", 1, "InputMethod")
+        writeIni("init", 1, "Installer")
 
         fz := "s14"
         createGui(confirmGui).Show()
@@ -357,7 +354,7 @@ checkIni() {
             g.OnEvent("Close", e_exit)
             e_exit(*) {
                 try {
-                    IniDelete("InputTip.ini", "InputMethod", "mode")
+                    IniDelete("InputTip.ini", "Installer", "init")
                 }
                 ExitApp()
             }
@@ -395,7 +392,7 @@ checkIni() {
                 g.OnEvent("Close", e_exit)
                 e_exit(*) {
                     try {
-                        IniDelete("InputTip.ini", "InputMethod", "mode")
+                        IniDelete("InputTip.ini", "Installer", "init")
                     }
                     ExitApp()
                 }

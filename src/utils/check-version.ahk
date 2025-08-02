@@ -544,6 +544,9 @@ checkUpdateDone() {
     flagFile := A_AppData "/.abgox-InputTip-update-version-done.txt"
     flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
     if (compareVersion(currentVersion, oldVersion) > 0 || FileExist(flagFile) || FileExist(flagFile2)) {
+
+        writeIni("init", 1, "Installer")
+
         for v in ["CN", "EN", "Caps"] {
             try {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "app_" v), ":")

@@ -20,8 +20,6 @@ isJAB := 0
 #Include utils/var.ahk
 #Include utils/check-version.ahk
 
-checkIni() ; 检查配置文件
-
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
 } else {
@@ -41,6 +39,8 @@ if (A_IsCompiled) {
 }
 
 checkUpdateDone()
+
+checkIni()
 
 checkUpdate(1)
 

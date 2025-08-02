@@ -174,7 +174,7 @@ if (A_IsCompiled) {
         if (!DirExist("plugins")) {
             DirCreate("plugins")
         }
-        FileAppend("/*`n`n- 你可以在这里自定义想要的功能，例如:`n    - 自定义快捷键`n    - 自定义热字串`n    - ...`n`n- 你也可以在 plugins 目录中新建一个或多个 .ahk 文件，然后在此文件中引入，例如:`n    - 在 plugins 目录中新建一个文件名为 custom.ahk 的文件`n    - 将自定义功能写入 custom.ahk 文件中`n    - 在 InputTip.plugin.ahk 文件中引入 custom.ahk 文件: #Include custom.ahk`n`n- 需要注意: 不能存在死循环`n`n- 详情参考:`n    - Github: https://github.com/abgox/InputTip#自定义功能`n    - Gitee: https://gitee.com/abgox/InputTip#自定义功能`n`n*/`n", "plugins/InputTip.plugin.ahk", "UTF-8")
+        FileAppend("/*`n`n- 你可以在这里自定义想要的功能，例如:`n    - 自定义快捷键`n    - 自定义热字串`n    - ...`n`n- 你也可以在 plugins 目录中新建一个或多个 .ahk 文件，然后在此文件中引入，例如:`n    - 在 plugins 目录中新建一个文件名为 custom.ahk 的文件`n    - 将自定义功能写入 custom.ahk 文件中`n    - 在 InputTip.plugin.ahk 文件中引入 custom.ahk 文件: #Include custom.ahk`n`n- 需要注意: 不能存在死循环`n`n- 详情参考:`n    - 官方文档: https://inputtip.abgox.com/FAQ/plugin`n    - Github: https://github.com/abgox/InputTip#自定义功能`n    - Gitee: https://gitee.com/abgox/InputTip#自定义功能`n`n*/`n", "plugins/InputTip.plugin.ahk", "UTF-8")
     }
 
     ; 丢失的文件列表

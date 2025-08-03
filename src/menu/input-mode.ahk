@@ -25,19 +25,24 @@ fn_input_mode(*) {
         _ := g.AddEdit("yp Number Limit5")
         _.Focus()
         _.OnEvent("Change", e_setTimeout)
-        _.OnEvent("LoseFocus", e_setTimeout)
         _.Value := checkTimeout
         e_setTimeout(item, *) {
+            static db := debounce((value) => (
+                writeIni("checkTimeout", value, "InputMethod"),
+                restartJAB()
+            ))
+
             value := item.value
-            if (value = "") {
+
+            if value == ""
                 return
-            }
+
+            if value < 100
+                value := 100
+
             global checkTimeout := value
-            if (item.Focused) {
-                return
-            }
-            writeIni("checkTimeout", value, "InputMethod")
-            restartJAB()
+
+            db(value)
         }
         g.AddText("xs cGray", "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
         g.AddText("xs", "3. 内部实现切换输入法状态的方式: ")

@@ -27,28 +27,30 @@ fn_symbol_pos(*) {
         _.Value := readIni("showCursorPos_x", 0)
         _._config := "showCursorPos_x"
         _.OnEvent("Change", fn_offset_x)
-        _.OnEvent("LoseFocus", fn_offset_x)
         fn_offset_x(item, *) {
+            static db := debounce((config, value) => (
+                writeIni(config, value)
+            ))
+
             value := returnNumber(item.value)
             global showCursorPos_x := value
-            if (item.Focused) {
-                return
-            }
-            writeIni(item._config, value)
+
+            db(item._config, value)
         }
         g.AddText("xs", "符号显示在鼠标附近时的垂直偏移量: ")
         _ := g.AddEdit("yp")
         _.Value := readIni("showCursorPos_y", -20)
         _._config := "showCursorPos_y"
         _.OnEvent("Change", fn_offset_y)
-        _.OnEvent("LoseFocus", fn_offset_y)
         fn_offset_y(item, *) {
+            static db := debounce((config, value) => (
+                writeIni(config, value)
+            ))
+
             value := returnNumber(item.value)
             global showCursorPos_y := value
-            if (item.Focused) {
-                return
-            }
-            writeIni(item._config, value)
+
+            db(item._config, value)
         }
 
         _c := g.AddButton("xs w" w, "设置符号显示在鼠标附近的应用")

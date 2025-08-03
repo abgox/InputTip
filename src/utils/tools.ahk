@@ -1,6 +1,23 @@
 ; InputTip
 
 /**
+ * 防抖函数
+ * @param {Func} fn 要执行的函数
+ * @param {Number} delay 延迟时间(ms)
+ * @returns {Func} 函数
+ */
+debounce(fn, delay := 1000) {
+    params := []
+    timerFunc := (*) => fn.Call(params*)
+
+    return (args*) => (
+        params := args,
+        SetTimer(timerFunc, 0),
+        SetTimer(timerFunc, -delay)
+    )
+}
+
+/**
  * 将数组转换成字符串，并用指定分隔符连接
  * @param {Array} arr 数组
  * @param {String} separator 分隔符

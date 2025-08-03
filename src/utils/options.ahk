@@ -25,7 +25,7 @@ if (A_IsCompiled) {
     versionKey := "version"
 } else {
     ; zip 版本
-    currentVersion := "2025.08.03"
+    currentVersion := "2025.08.03.1"
 
     versionType := "zip"
     versionKey := "version-zip"

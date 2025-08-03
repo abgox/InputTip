@@ -29,8 +29,7 @@ setHotKeyGui(keyConfigList, label := "") {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddLink("xs", "4.  如果要移除快捷键，请选择【无】")
-        g.AddLink("xs", '5.  <a href="https://inputtip.abgox.com/FAQ/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
+        g.AddLink("xs", '4.  如果要移除快捷键，请选择【无】。<a href="https://inputtip.abgox.com/FAQ/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
 
         keyList := []
         keyList.Push(["无", "Esc", "Shift", "LShift", "RShift", "Ctrl", "LCtrl", "RCtrl", "Alt", "LAlt", "RAlt"]*)

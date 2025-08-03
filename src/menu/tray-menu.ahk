@@ -22,7 +22,7 @@ makeTrayMenu() {
         A_TrayMenu.Check("开机自启动")
     }
     A_TrayMenu.Add("设置更新检查", fn_check_update)
-    A_TrayMenu.Add("更改用户信息", e_update_user)
+    A_TrayMenu.Add("设置用户信息", e_update_user)
     e_update_user(*) {
         fn_update_user(userName)
     }
@@ -37,7 +37,7 @@ makeTrayMenu() {
             } else {
                 createTipGui([{
                     opt: "cRed",
-                    text: "管理员权限无法直接降权至当前用户权限",
+                    text: "【管理员权限】无法直接降权至【用户权限】",
                 }, {
                     opt: "cRed",
                     text: "如果想要立即生效，你需要手动退出并重新启动 InputTip"
@@ -72,7 +72,7 @@ makeTrayMenu() {
             tip: "暂停/运行"
         }], "软件暂停/运行")
     }
-    A_TrayMenu.Add("打开软件所在目录", fn_open_dir)
+    A_TrayMenu.Add("打开软件运行目录", fn_open_dir)
     fn_open_dir(*) {
         Run("explorer.exe /select," A_ScriptFullPath)
     }
@@ -192,21 +192,32 @@ fn_update_user(uname, *) {
     global userName := uname
     createUniqueGui(updateUserGui).Show()
     updateUserGui(info) {
-        g := createGuiOpt("InputTip - 更改用户信息")
-        g.AddText("cRed", "- 如果是普通用户，确保用户名正确即可`n- 如果是域用户，在用户名中需要添加域`n   - 如: xxx\abgox")
-        g.AddText(, "用户名: ")
-        _ := g.AddEdit("yp")
+        g := createGuiOpt("InputTip - 设置用户信息")
+        tab := g.AddTab3("-Wrap", ["设置用户信息", "关于"])
+        tab.UseTab(1)
+        g.AddText("Section cRed", gui_help_tip)
+
         if (info.i) {
             return g
         }
+        w := info.w
+        bw := w - g.MarginX * 2
 
-        g.AddText("xs ReadOnly cGray", "设置完成后，直接关闭这个窗口即可").Focus()
+        g.AddText(, "-------------------------------------------------------------------------")
+
+        g.AddText(, "当前的用户名: ")
+        _ := g.AddEdit("yp")
         _._config := "userName"
         _.Value := uname
         _.OnEvent("Change", fn_change)
         fn_change(item, *) {
             global userName := item.value
         }
+
+        g.AddText("xs ReadOnly cGray", "请自行检查，确保用户名无误后，点击右上角的 × 直接关闭此窗口即可").Focus()
+
+        tab.UseTab(2)
+        g.AddEdit("ReadOnly r6 w" bw, "1. 简要说明`n   - 这个菜单用来设置用户名信息`n   - 如果是域用户，在填写时还需要添加域，参考以下格式`n      - DOMAIN\Username`n      - Username@domain.com`n   - 如果用户名信息有误，以下功能可能会失效`n      - 【开机自启动】中的 【任务计划程序】`n      - 【启用 JAB/JetBrains IDE 支持】")
 
         g.OnEvent("Close", e_close)
         e_close(*) {

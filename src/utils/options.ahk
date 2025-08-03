@@ -18,13 +18,13 @@ SetStoreCapsLockMode 0
 ;@AHK2Exe-SetVersion 2025.08.02
 
 if (A_IsCompiled) {
-    ; 当前的 exe 版本
+    ; exe 版本
     currentVersion := "2025.08.02"
 
     versionType := "exe"
     versionKey := "version"
 } else {
-    ; 当前的 zip 版本
+    ; zip 版本
     currentVersion := "2025.08.02"
 
     versionType := "zip"

@@ -48,7 +48,7 @@ runCodeWithAdmin := readIni("runCodeWithAdmin", 0)
 modeList := {}
 
 ; 默认输入法状态(1: 中文, 0: 英文)
-; 在自定义模式下，如果所有规则都不匹配，则返回此状态
+; 在自定义模式下，如果所有规则都不匹配，则返回此默认状态
 baseStatus := readIni("baseStatus", 0, "InputMethod")
 
 ; 自定义模式下定义的模式规则
@@ -58,7 +58,7 @@ modeRules := StrSplit(modeRule, ":")
 ; 获取输入法状态的超时时间
 checkTimeout := readIni("checkTimeout", 500, "InputMethod")
 
-; 指定内部实现切换输入法状态的方式
+; 内部实现切换输入法状态的方式
 switchStatus := readIni("switchStatus", 1)
 switchStatusList := ["{LShift}", "{RShift}", "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}"]
 

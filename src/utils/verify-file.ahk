@@ -300,7 +300,7 @@ checkIni() {
         confirmGui(info) {
             g := Gui(, "InputTip - 初始化引导")
             g.SetFont(fz, "Microsoft YaHei")
-            g.AddText(, "你是否希望 InputTip 修改鼠标样式?")
+            g.AddText(, "你是否希望 InputTip 加载鼠标样式?")
             g.AddText("xs cRed", "InputTip 会使用三套不同颜色的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
             g.AddLink(, '详情参考【鼠标样式方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标样式方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标样式方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标样式方案">Gitee</a>')
 
@@ -310,15 +310,15 @@ checkIni() {
             w := info.w
             bw := w - g.MarginX * 2
 
-            g.AddButton("xs cRed w" bw, "【是】修改鼠标样式").OnEvent("Click", e_yes)
+            g.AddButton("xs cRed w" bw, "【是】加载鼠标样式").OnEvent("Click", e_yes)
             e_yes(*) {
                 g.Destroy()
                 createGui(yesGui).Show()
                 yesGui(info) {
                     g := Gui()
                     g.SetFont(fz, "Microsoft YaHei")
-                    g.AddText(, "你真的确定要修改鼠标样式吗？")
-                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】=>【更改配置】`n  2. 将【1. 是否同步修改鼠标样式】的值更改为【否】")
+                    g.AddText(, "你真的确定要加载鼠标样式吗？")
+                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】中的【更改配置】`n  2. 将【显示形式】页面中的【加载鼠标样式】的值更改为【否】")
 
                     if (info.i) {
                         return g

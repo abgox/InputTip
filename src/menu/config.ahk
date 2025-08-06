@@ -140,7 +140,7 @@ fn_config(*) {
 
             db("hideSymbolDelay", value)
         }
-        g.AddText("xs cGray w" bw, "它表示无键盘和鼠标左键点击操作时，符号在多久后隐藏`n单位: 毫秒，默认为 0，表示不隐藏符号。不为 0 时，它不能小于 150，建议 500 以上`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
+        g.AddText("xs cGray w" bw, "它表示无键盘和鼠标左键点击操作时，符号在多久后隐藏`n单位: 毫秒，默认为 0，表示不隐藏符号`n当符号隐藏后，下次键盘操作或点击鼠标左键时会再次显示")
         g.AddText("xs", "5. 轮询响应间隔:")
         _ := g.AddEdit("yp Number Limit2 w" bw / 3)
         _.Value := delay

@@ -87,7 +87,7 @@ fn_input_mode(*) {
                 restartJAB()
             }
         }
-        g.AddText("xs cGray", "如果默认的 【模拟输入 LShift】可用，就建议保持默认`n如果想修改这个配置，需要先通过上方的【关于切换输入法状态】标签页了解详情")
+        g.AddText("xs cGray", "建议根据实际情况使用【模拟输入 LShift】或【模拟输入 RShift】`n如果想修改这个配置，需要先通过上方的【关于切换输入法状态】标签页了解详情")
         tab.UseTab(2)
 
         g.AddText("Section ReadOnly cRed -VScroll w" w, "首先需要点击上方的【关于自定义】标签页，查看帮助说明，了解如何设置")

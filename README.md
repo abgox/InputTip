@@ -29,7 +29,7 @@
 >
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被误判为游戏外挂，exe 版本可能被误判为病毒程序](https://inputtip.abgox.com/FAQ/about-virus)
->   - [只推荐使用 zip 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
+>   - [只推荐使用 zip 版本，不要使用 exe 版本](https://inputtip.abgox.com/FAQ/zip-vs-exe)
 > - InputTip 只适用于 **Windows** 系统: **Win10** 以上可用，以下未知
 > - `托盘菜单` 指的是在底部任务栏右边的 InputTip 应用托盘菜单
 > - 在 README、[官网](https://inputtip.abgox.com)、[常见问题(FAQ)](https://inputtip.abgox.com/FAQ/) 等帮助文档中提及的 `托盘菜单` 指的都是通过鼠标右键点击 `托盘菜单`
@@ -42,6 +42,7 @@
     - 使用多套鼠标光标样式，根据输入法状态加载不同的鼠标光标样式
     - 根据输入法状态在输入光标附近显示不同的 [符号](#符号显示方案)
   - 切换不同窗口时，自动切换到指定的输入法状态
+    - 支持 `标题级` 的匹配
   - 设置按键强制切换到指定的输入法状态
   - 详细便捷的配置菜单
     - 所有的配置变动，都只应该在 `托盘菜单` 中进行
@@ -155,13 +156,10 @@
 
 2. 设置开机自启动: `托盘菜单` => `开机自启动`
 
-   - 建议使用 `任务计划程序` 或 `注册表`，`应用快捷方式` 可能会无效
-   - 详情请查看 [关于开机自启动](https://inputtip.abgox.com/FAQ/startup)
-
 3. 设置 `所有配置菜单的字体大小`
 
    - 你可以设置字体大小来优化配置菜单在不同屏幕上的显示效果
-   - `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
+   - `托盘菜单` => `更改配置` => `其他杂项` => `所有配置菜单的字体大小`
 
 4. [设置鼠标样式](https://inputtip.abgox.com/FAQ/cursor-style)
 
@@ -171,14 +169,6 @@
    - [自定义鼠标样式](#自定义鼠标样式)
 
 5. 更多相关配置在 `托盘菜单` 中查看
-
-6. [关于更新检查](https://inputtip.abgox.com/FAQ/check-update)、[自定义托盘菜单图标](https://inputtip.abgox.com/FAQ/custom-tray-menu-icon)、[白名单机制](https://inputtip.abgox.com/FAQ/white-list)、[运行项目源代码](https://inputtip.abgox.com/FAQ/run-source-code)、...
-
-<details>
-<summary>一个通过方块符号实现的有趣的配置</summary>
-<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.png" />
-<img style="width: 70%;" src="https://inputtip.abgox.com/releases/v2/config-demo.gif" />
-</details>
 
 ### 卸载
 
@@ -192,32 +182,42 @@
 
 - zip 版本
 
-  - 解压后的 `InputTip-main` 目录
-    - 启动脚本 `src\InputTip.bat`
-    - 配置文件 `src\InputTip.ini`
-    - 鼠标样式文件夹 `src\InputTipCursor`
-    - 图片符号文件夹 `src\InputTipSymbol`
-    - 其他文件或文件夹
+  ```txt
+  InputTip-zip/
+  ├── InputTip.bat            # 启动脚本
+  ├── src/
+      ├── InputTip.ini        # 配置文件
+      ├── InputTipCursor/     # 鼠标样式
+      ├── InputTipSymbol/     # 图片符号
+      └── ...                 # 其他源代码文件
+  └── ...                     # 其他文件
+
+  ```
 
 - exe 版本
+
   - 没有根目录，建议新建一个目录，将 `InputTip.exe` 放入其中再运行
-    - 程序文件 `InputTip.exe`
-    - 配置文件 `InputTip.ini`
-    - 鼠标样式文件夹 `InputTipCursor`
-    - 图片符号文件夹 `InputTipSymbol`
+
+  ```txt
+  InputTip-exe/
+  ├── InputTip.exe            # 主程序
+  ├── InputTip.ini            # 配置文件
+  ├── InputTipCursor/         # 鼠标样式
+  ├── InputTipSymbol/         # 图片符号
+  └── ...
+  ```
 
 ---
 
 - 如果你需要备份 InputTip 的数据以便于后续使用，请备份它们
 
-  - `InputTip.ini` 配置文件
-  - `InputTipCursor` 鼠标样式文件夹 (如果没有修改，可以忽略)
-  - `InputTipSymbol` 图片符号文件夹 (如果没有修改，可以忽略)
+  - `InputTip.ini`
+  - `InputTipCursor` (如果没有修改，可以忽略)
+  - `InputTipSymbol` (如果没有修改，可以忽略)
 
 - 如果使用 [Scoop](https://scoop.sh/) 安装 [abgox/abyss](https://github.com/abgox/abyss) 下的 `InputTip-zip` 或 `InputTip`
   - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
-  - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们
-  - 注意: 如果卸载时携带 `-p` 或 `--purge` 参数，会删除它们
+  - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们，除非卸载时携带 `-p` 或 `--purge` 参数
 - 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)
   - 这些数据文件或文件夹会保存在 `$env:LocalAppData\Microsoft\WinGet\Packages\abgox.InputTip_Microsoft.Winget.Source_8wekyb3d8bbwe` 中
   - 可以正常通过 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 更新、卸载，不会删除这些数据文件和文件夹
@@ -264,7 +264,6 @@
 > - 它是 [zip 版本](#zip-版本) 独有的功能，因为 [exe 版本](#exe-版本) 无法实现它
 > - 只有熟悉 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言开发([v2 版本](https://www.autohotkey.com/docs/v2/))才可以使用它
 >   - 不要修改 `plugins` 目录以外的其他源代码文件
->   - 新增的所有内容不能包含死循环
 
 - 在 `src` 目录下有一个 `plugins` 目录
 - 目录中添加了一个空的 `InputTip.plugin.ahk` 文件
@@ -318,7 +317,7 @@
 > [!Warning]
 >
 > - 如果不使用 [符号显示方案](#符号显示方案)，不需要进行步骤 1 和 2
-> - 直接从步骤 3 开始，让 InputTip 能在 IDE 中正常识别和切换输入法状态即可
+> - 直接从步骤 3 开始，让 InputTip 能在 JetBrains IDE 中正常识别和切换输入法状态即可
 
 1. 安装 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
 
@@ -390,24 +389,19 @@
   - 不应该放到 `default` 文件夹下
   - 图片必须是 `.png` 格式
   - [更多的符号图片](https://inputtip.abgox.com/download/extra)
-- 设置方法: `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择图片路径
-- 如果选择第一个空白路径，则不会显示对应状态的图片符号
+- 设置: `托盘菜单` => `更改配置` => `图片符号`，在对应的下拉列表中选择图片路径
 
 #### [方块符号](https://inputtip.abgox.com/FAQ/symbol-block)
 
 - 当 `托盘菜单` 中 `更改配置` => `显示形式` => `指定符号类型`，选择 `显示方块符号` 时，会在输入光标附近显示不同颜色的方块符号
 - 默认中文状态为 **红色**，英文状态为 **蓝色**，大写锁定为 **绿色**
-- 方块符号相关的配置: `托盘菜单` => `更改配置` => `方块符号`
-- 当其中的方块符号的颜色设置修改为空时，则不会显示该状态的方块符号
-  - 比如: 你只希望在中文状态下显示方块符号，那么就将 `英文状态时方块符号的颜色` 和 `大写锁定时方块符号的颜色` 的值都设置为空
+- 设置: `托盘菜单` => `更改配置` => `方块符号`
 
 #### [文本符号](https://inputtip.abgox.com/FAQ/symbol-text)
 
-- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `指定符号类型`，选择 `显示文本符号` 时，会显示对应的文本符号
+- 当 `托盘菜单` 中 `更改配置` => `显示形式` => `指定符号类型`，选择 `显示文本符号` 时，会在输入光标附近显示对应的文本符号
 - 默认中文状态为 `中`，英文状态为 `英`，大写锁定为 `大`
-- 文本符号相关的配置: `托盘菜单` => `更改配置` => `文本符号`
-- 当其中的文本字符的值为空时，则不会显示该状态的文本符号
-  - 比如: 你只希望在中文状态下显示文本字符，那么就将 `英文状态时的文本字符` 和 `大写锁定时的文本字符` 的值都设置为空
+- 设置: `托盘菜单` => `更改配置` => `文本符号`
 
 ### 自定义鼠标样式
 
@@ -416,6 +410,8 @@
 > - 可以直接使用 [已经适配的一些鼠标样式](https://inputtip.abgox.com/download/extra)
 
 1. 你需要在 `InputTipCursor` 目录下创建一个文件夹
+
+   - 文件夹不应该放在 `default` 文件夹下
 
    - 文件夹中只能包含鼠标样式文件(后缀名为 `.cur` 或 `.ani`)
 
@@ -468,7 +464,7 @@
 > [!Tip]
 >
 > - InputTip 使用 **【通用】** 和 **【自定义】** 模式兼容各类输入法，默认使用 **【通用】** 模式
-> - 如果你对当前输入法的状态码和切换码很了解，建议直接使用 **【自定义】** 模式去配置规则
+> - 如果你了解了 **【自定义】** 模式，建议直接使用 **【自定义】** 模式去配置规则
 
 - **【通用】**
 

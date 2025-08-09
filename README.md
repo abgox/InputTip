@@ -80,7 +80,11 @@
 
 ### 演示
 
-<video src="https://inputtip.pages.dev/releases/v2/demo.mp4" controls></video>
+> [!Tip]
+>
+> 如果无法正常显示，[可前往官网查看](https://inputtip.abgox.com/)
+
+<video src="https://inputtip.abgox.com/releases/v2/demo.mp4" controls></video>
 
 ### 安装
 

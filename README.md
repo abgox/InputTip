@@ -19,14 +19,14 @@
         <img src="https://img.shields.io/github/repo-size/abgox/InputTip.svg" alt="repo size" />
     </a>
     <a href="https://github.com/abgox/InputTip">
-        <img src="https://img.shields.io/badge/created-2023--5--12-blue" alt="created" />
+        <img src="https://img.shields.io/github/created-at/abgox/InputTip" alt="created" />
     </a>
 </p>
 
 ---
 
 <p align="center">
-  <strong>如果你喜欢这个项目，请给它一个 ⭐️</strong>
+  <strong>如果你喜欢这个项目，请给它一个 ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
 </p>
 
 > [!Tip]
@@ -82,7 +82,7 @@
 
 > [!Tip]
 >
-> 如果无法正常显示，[可前往官网查看](https://inputtip.abgox.com/)
+> 如果这里无法正常显示，[可前往官网查看](https://inputtip.abgox.com/)
 
 <video src="https://inputtip.abgox.com/releases/v2/demo.mp4" controls></video>
 
@@ -561,25 +561,6 @@
 - 之后看到了 [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot) 和 [language-indicator - yakunins](https://github.com/yakunins/language-indicator) 的设计，通过不同颜色加上小符号来判断不同输入法状态
 - InputTip 也参照了这样的设计，因为这样的实现很简单，其实就是 [InputTip v1](../v1) 中带文字的方块符号，去掉文字，加上不同的背景颜色
 
-### Stars
-
-**如果 `InputTip` 对你有所帮助，请考虑给它一个 Star**
-
-<a href="https://github.com/abgox/InputTip">
-  <picture>
-    <source media="(prefers-color-scheme: light)" srcset="http://reporoster.com/stars/abgox/InputTip"> <!-- light theme -->
-    <img alt="stargazer-widget" src="http://reporoster.com/stars/dark/abgox/InputTip"> <!-- dark theme -->
-  </picture>
-</a>
-
-### [赞赏支持](https://support-me.abgox.com/)
-
-> [!Tip]
->
-> 这里是 [赞赏名单](https://inputtip.abgox.com/sponsor)，非常感谢各位!
-
-<a href='https://ko-fi.com/W7W817R6Z3' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://me.abgox.com/buy-me-a-coffee.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
-
-![赞赏支持](https://me.abgox.com/support.png)
+---
 
 [![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")

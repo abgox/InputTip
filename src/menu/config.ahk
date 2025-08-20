@@ -210,21 +210,9 @@ fn_config(*) {
         _._config := "InputTipCursor"
         _.OnEvent("Click", fn_open_dir)
         g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
-        g.AddButton("yp w" _w, "下载鼠标样式扩展包").OnEvent("Click", e_cursor_package)
-        e_cursor_package(*) {
-            if (gc.w.subGui) {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-            g := createGuiOpt("InputTip - 下载鼠标样式扩展包")
-            g.AddText("Center h30", "从以下任意可用地址中下载鼠标样式扩展包:")
-            g.AddLink("xs", '官网: <a href="https://inputtip.abgox.com/download/extra">https://inputtip.abgox.com/download/extra</a>')
-            g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddText(, "其中的鼠标样式已经完成适配，解压到 InputTipCursor 目录中即可使用")
-            g.AddText()
-            g.Show()
-            gc.w.subGui := g
+        g.AddButton("yp w" _w, "下载鼠标样式扩展包").OnEvent("Click", fn_get_extra_resource)
+        fn_get_extra_resource(*) {
+            Run("https://inputtip.abgox.com/download/extra")
         }
 
         tab.UseTab(3)
@@ -397,22 +385,7 @@ fn_config(*) {
         _._config := "InputTipSymbol"
         _.OnEvent("Click", fn_open_dir)
         g.AddButton("yp w" _w, "刷新路径列表").OnEvent("Click", fn_config)
-        g.AddButton("yp w" _w, "下载图片符号扩展包").OnEvent("Click", e_pic_package)
-        e_pic_package(*) {
-            if (gc.w.subGui) {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-            g := createGuiOpt("InputTip - 下载图片符号扩展包")
-            g.AddText("Center h30", "从以下任意可用地址中下载图片符号扩展包:")
-            g.AddLink("xs", '官网: <a href="https://inputtip.abgox.com/download/extra">https://inputtip.abgox.com/download/extra</a>')
-            g.AddLink("xs", 'Github: <a href="https://github.com/abgox/InputTip/releases/tag/extra">https://github.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddLink("xs", 'Gitee: <a href="https://gitee.com/abgox/InputTip/releases/tag/extra">https://gitee.com/abgox/InputTip/releases/tag/extra</a>')
-            g.AddText(, "只要将其中的图片放到 InputTipSymbol 这个目录下就可以使用了")
-            g.AddText()
-            g.Show()
-            gc.w.subGui := g
-        }
+        g.AddButton("yp w" _w, "下载图片符号扩展包").OnEvent("Click", fn_get_extra_resource)
 
         tab.UseTab(4)
         symbolBlockColorConfig := [{

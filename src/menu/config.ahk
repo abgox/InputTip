@@ -87,6 +87,7 @@ fn_config(*) {
             writeIni("symbolType", item.value - 1)
             global symbolType := item.value - 1
             global lastWindow := ""
+            global lastSymbol := ""
             updateSymbol()
             reloadSymbol()
             if (symbolType) {

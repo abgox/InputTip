@@ -588,7 +588,7 @@ getPicList(defaultList := "", disableList := "") {
         defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
     }
     if (!disableList) {
-        disableList := ":InputTipSymbol\default\offer.png:InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:"
+        disableList := ":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:"
     }
     Loop Files "InputTipSymbol\*", "R" {
         if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":") && !InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {

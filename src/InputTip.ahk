@@ -120,7 +120,7 @@ cursorDir := readIni("cursorDir", "")
 SetTimer(getDirTimer, -1)
 getDirTimer() {
     _symbolPaths := arrJoin(getPicList(), ":")
-    _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:", ":InputTipSymbol\default\offer.png:InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
+    _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:", ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
     if (symbolPaths != _symbolPaths) {
         global symbolPaths := _symbolPaths

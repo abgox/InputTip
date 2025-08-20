@@ -18,9 +18,6 @@ if (A_IsCompiled) {
     if (!FileExist("InputTipSymbol/default/Caps.png")) {
         FileInstall("InputTipSymbol/default/Caps.png", "InputTipSymbol/default/Caps.png", 1)
     }
-    if (!FileExist("InputTipSymbol/default/offer.png")) {
-        FileInstall("InputTipSymbol/default/offer.png", "InputTipSymbol/default/offer.png", 1)
-    }
     if (!FileExist("InputTipSymbol/default/favicon.png")) {
         FileInstall("InputTipSymbol/default/favicon.png", "InputTipSymbol/default/favicon.png", 1)
     }
@@ -184,7 +181,6 @@ if (A_IsCompiled) {
         "InputTipSymbol/default/CN.png",
         "InputTipSymbol/default/EN.png",
         "InputTipSymbol/default/Caps.png",
-        "InputTipSymbol/default/offer.png",
         "InputTipSymbol/default/favicon.png",
         "InputTipSymbol/default/favicon-pause.png",
         "img/favicon.ico"

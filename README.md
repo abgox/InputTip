@@ -1,4 +1,4 @@
-<h1 align="center">✨<a href="https://inputtip.abgox.com/">InputTip</a>✨</h1>
+<h1 align="center">✨<a href="https://inputtip.abgox.com">InputTip</a>✨</h1>
 
 <p align="center">
     <a href="https://github.com/abgox/InputTip">Github</a> |
@@ -26,7 +26,7 @@
 ---
 
 <p align="center">
-  <strong>如果你喜欢这个项目，请给它一个 ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
+  <strong>喜欢这个项目？请给它一个 ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
 </p>
 
 > [!Tip]

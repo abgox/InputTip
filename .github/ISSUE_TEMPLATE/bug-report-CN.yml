@@ -13,7 +13,7 @@ body:
           required: true
         - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue。
           required: true
-        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.abgox.com/FAQ/), 其中没有你遇到的问题。
+        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.abgox.com/faq/), 其中没有你遇到的问题。
           required: true
   - type: input
     id: version
@@ -25,7 +25,7 @@ body:
         - exe 版本可能落后，请使用 zip 版本。
         - 如果问题依然存在，再提交 issue。
         - 不要使用 **最新版本** 这样的描述，必须是具体的版本号。
-      placeholder: v2025.07.20
+      placeholder: v2025.08.22
     validations:
       required: true
   - type: dropdown
@@ -34,7 +34,7 @@ body:
       label: 你正在使用哪种类型的安装包?
       description: |
         - 如果你正在使用 exe 版本，建议切换到 zip 版本。
-        - [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/FAQ/zip-vs-exe)
+        - [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/faq/zip-vs-exe)
       options:
         - zip
         - exe
@@ -58,9 +58,9 @@ body:
     attributes:
       label: 哪一个软件出现了问题?软件进程名叫什么?
       description: |
-        - 使用 `托盘菜单` => `获取当前窗口相关进程信息`
+        - 使用 `托盘菜单` => `获取窗口信息`
         - 或者在 `任务管理器` 中找到出现问题的软件进程，右键点击进程名，点击 `打开文件所在的位置` 找到软件的运行进程 exe 文件。
-      placeholder: wps.exe
+      placeholder: code.exe
     validations:
       required: true
   - type: textarea

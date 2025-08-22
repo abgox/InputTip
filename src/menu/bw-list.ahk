@@ -32,7 +32,7 @@ fn_bw_list(*) {
                 title: "设置符号显示黑名单应用",
                 tab: "符号显示黑名单",
                 config: "App-HideSymbol",
-                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">符号显示方案的白名单机制</a>'
+                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/symbol-list-mechanism">符号的名单机制</a>'
             }, fn)
             fn() {
                 global app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
@@ -41,8 +41,8 @@ fn_bw_list(*) {
         }
 
         tab.UseTab(2)
-        g.AddText("Section cRed", "- 白名单是【符号显示方案】的核心，黑名单仅作为它的补充`n- 如果你想要使用【符号显示方案】，就必须设置白名单").Focus()
-        g.AddLink("Section", '- 关于【符号显示方案】，请参考:  <a href="https://inputtip.abgox.com/v2/#符号显示方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号显示方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号显示方案">Gitee</a>`n- 关于【黑白名单机制】，请参考:  <a href="https://inputtip.abgox.com/FAQ/white-list">符号显示方案的白名单机制</a>')
+        g.AddText("Section cRed", "- 白名单是【符号方案】的核心，黑名单仅作为它的补充`n- 如果你想要使用【符号方案】，就必须设置白名单").Focus()
+        g.AddLink("Section", '- 关于【符号方案】，请参考:  <a href="https://inputtip.abgox.com/v2/#符号方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号方案">Gitee</a>`n- 关于【黑白名单机制】，请参考:  <a href="https://inputtip.abgox.com/FAQ/symbol-list-mechanism">符号的名单机制</a>')
         return g
     }
 }

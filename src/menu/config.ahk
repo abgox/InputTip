@@ -428,7 +428,7 @@ fn_config(*) {
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "方块符号")
         g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/symbol-block">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-        g.AddLink("xs", '- 颜色设置为空，表示不显示对应的方块符号。 <a href="https://inputtip.abgox.com/FAQ/color-config">关于颜色配置</a>')
+        g.AddLink("xs", '- 颜色设置为空，表示不显示对应的方块符号。 <a href="https://inputtip.abgox.com/FAQ/color-config">颜色配置</a>')
         g.AddText("xs", line)
         for v in symbolBlockColorConfig {
             g.AddText("xs", v.tip ": ")
@@ -592,7 +592,7 @@ fn_config(*) {
         g.AddText("Section", "- 你应该首先查看")
         g.AddText("yp cRed", "文本符号")
         g.AddLink("yp", '的相关说明:   <a href="https://inputtip.abgox.com/FAQ/symbol-text">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
-        g.AddLink("xs", '- 文本字符可以设置为空，表示不显示对应的文本字符。 <a href="https://inputtip.abgox.com/FAQ/color-config">关于颜色配置</a>   <a href="https://inputtip.abgox.com/FAQ/font-config">关于字体配置</a>')
+        g.AddLink("xs", '- 文本字符可以设置为空，表示不显示对应的文本字符。 <a href="https://inputtip.abgox.com/FAQ/color-config">颜色配置</a>   <a href="https://inputtip.abgox.com/FAQ/font-config">字体配置</a>')
         g.AddText("xs", line)
         symbolTextConfig := [{
             config: "CN_Text",

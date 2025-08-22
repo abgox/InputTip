@@ -298,7 +298,7 @@ checkIni() {
             g.SetFont(fz, "Microsoft YaHei")
             g.AddText(, "你是否希望 InputTip 加载鼠标样式?")
             g.AddText("xs cRed", "InputTip 会使用三套不同颜色的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
-            g.AddLink(, '详情参考【鼠标样式方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标样式方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标样式方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标样式方案">Gitee</a>')
+            g.AddLink(, '详情参考【鼠标方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标方案">Gitee</a>')
 
             if (info.i) {
                 return g
@@ -363,7 +363,7 @@ checkIni() {
                 g.SetFont(fz, "Microsoft YaHei")
                 g.AddText(, "你是否希望 InputTip 显示符号?")
                 g.AddText("xs cRed", "InputTip 会尝试获取输入光标位置，在其附近显示符号")
-                g.AddLink(, '详情参考【符号显示方案】:  <a href="https://inputtip.abgox.com/v2/#符号显示方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号显示方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号显示方案">Gitee</a>')
+                g.AddLink(, '详情参考【符号方案】:  <a href="https://inputtip.abgox.com/v2/#符号方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号方案">Gitee</a>')
 
                 if (info.i) {
                     return g
@@ -401,9 +401,9 @@ checkIni() {
             listTipGui(info) {
                 g := Gui(, "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
-                g.AddText("cRed", "对于符号显示方案，InputTip 核心使用白名单机制")
+                g.AddText("cRed", "对于符号方案，InputTip 核心使用白名单机制")
                 g.AddLink("cRed", '只有在白名单中的应用进程窗口才会显示符号')
-                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/FAQ/white-list">符号显示方案的白名单机制</a>')
+                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/FAQ/symbol-list-mechanism">符号的名单机制</a>')
                 g.AddText(, "建议立即添加常用的应用进程窗口到白名单中")
 
                 if (info.i) {

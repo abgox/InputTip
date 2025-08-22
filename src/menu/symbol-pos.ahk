@@ -61,7 +61,7 @@ fn_symbol_pos(*) {
                 title: "指定在鼠标附近显示符号的应用窗口",
                 tab: "在鼠标附近显示符号的应用窗口",
                 config: "ShowNearCursor",
-                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/symbol-show-pos">关于符号显示位置</a>'
+                link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/show-symbol-near-cursor">在鼠标附近显示符号</a>'
             }, fn)
             fn() {
                 global ShowNearCursor := StrSplit(readIniSection("ShowNearCursor"), "`n")

@@ -540,7 +540,7 @@ fn_white_list(*) {
         title: "设置符号显示白名单应用",
         tab: "符号显示白名单",
         config: "App-ShowSymbol",
-        link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/white-list">符号显示方案的白名单机制</a>'
+        link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/symbol-list-mechanism">符号的名单机制</a>'
     }, fn)
     fn() {
         global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")

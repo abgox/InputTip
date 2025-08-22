@@ -5,27 +5,25 @@
 #Include input-mode.ahk
 #Include cursor-mode.ahk
 #Include bw-list.ahk
-#Include config.ahk
 #Include symbol-pos.ahk
 #Include app-offset.ahk
 #Include switch-window.ahk
-#Include JAB.ahk
 #Include about.ahk
+
+#Include scheme-cursor.ahk
+#Include scheme-symbol.ahk
+#Include other-config.ahk
 
 fontList := getFontList()
 fontList.InsertAt(1, "Microsoft YaHei")
 
 makeTrayMenu() {
     A_TrayMenu.Delete()
-    A_TrayMenu.Add("更新检查", fn_check_update)
     A_TrayMenu.Add("开机自启动", fn_startup)
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")
     }
-    A_TrayMenu.Add("设置用户信息", e_update_user)
-    e_update_user(*) {
-        fn_update_user(userName)
-    }
+
     if (!A_IsCompiled) {
         A_TrayMenu.Add("以管理员权限启动", fn_admin_mode)
         fn_admin_mode(*) {
@@ -50,39 +48,21 @@ makeTrayMenu() {
     }
 
     A_TrayMenu.Add("创建快捷方式到桌面", fn_create_shortcut)
-    fn_create_shortcut(*) {
-        if (isStartUp = 1) {
-            FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
-        } else {
-            if (A_IsCompiled) {
-                FileCreateShortcut(A_ScriptFullPath, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
-            } else {
-                FileCreateShortcut(A_AhkPath, A_Desktop "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
-            }
-        }
-    }
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("暂停/运行", pauseApp)
-    A_TrayMenu.Add("暂停/运行快捷键", fn_pause_key)
-    fn_pause_key(*) {
+    A_TrayMenu.Add("暂停/运行快捷键", (*) => (
         setHotKeyGui([{
             config: "hotkey_Pause",
             preTip: "设置快捷键",
             tip: "暂停/运行"
         }], "软件暂停/运行")
-    }
-    A_TrayMenu.Add("打开软件运行目录", fn_open_dir)
-    fn_open_dir(*) {
-        Run("explorer.exe /select," A_ScriptFullPath)
-    }
+    ))
 
-    A_TrayMenu.Add()
-    A_TrayMenu.Add("更改配置", fn_config)
+    A_TrayMenu.Add("获取当前窗口信息", fn_process_info)
     A_TrayMenu.Add()
     A_TrayMenu.Add("输入法模式", fn_input_mode)
-    A_TrayMenu.Add("状态切换快捷键", fn_switch_key)
-    fn_switch_key(*) {
+    A_TrayMenu.Add("状态切换快捷键", (*) => (
         setHotKeyGui([{
             config: "hotkey_CN",
             preTip: "强制切换到",
@@ -96,77 +76,13 @@ makeTrayMenu() {
             preTip: "强制切换到",
             tip: "大写锁定"
         }], "输入法状态切换")
-    }
+    ))
     A_TrayMenu.Add("指定窗口自动切换状态", fn_switch_window)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("获取当前窗口信息", fn_process_info)
-    fn_process_info(*) {
-        createUniqueGui(processInfoGui).Show()
-        processInfoGui(info) {
-            g := createGuiOpt("InputTip - 获取当前窗口信息", , "AlwaysOnTop")
-            g.AddText("cRed", "实时获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)").Focus()
-            if (info.i) {
-                return g
-            }
-            w := info.w
-            bw := w - g.MarginX * 2
 
-            createGuiOpt("").AddText(, " ").GetPos(, , &__w)
-            gc._window_info := g.AddButton("xs w" bw, "点击获取")
-            gc._window_info.OnEvent("Click", e_window_info)
-            g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
-            _width := bw - _w - g.MarginX + __w
-            gc.app_name := g.AddEdit("yp ReadOnly -VScroll w" _width)
-            g.AddText("xs cRed", "标题: ").GetPos(, , &_w)
-            gc.app_title := g.AddEdit("yp ReadOnly -VScroll w" _width)
-            g.AddText("xs cRed", "路径: ").GetPos(, , &_w)
-            gc.app_path := g.AddEdit("yp ReadOnly -VScroll w" _width)
-            e_window_info(*) {
-                if (gc.timer2) {
-                    gc.timer2 := 0
-                    gc._window_info.Text := "点击获取"
-                    return
-                }
-                gc.timer2 := 1
-                gc._window_info.Text := "停止获取"
-                SetTimer(statusTimer, 25)
-                statusTimer() {
-                    static first := "", last := ""
-
-                    if (!gc.timer2) {
-                        SetTimer(, 0)
-                        first := ""
-                        last := ""
-                        return
-                    }
-                    try {
-                        if (!first) {
-                            name := WinGetProcessName("A")
-                            title := WinGetTitle("A")
-                            path := WinGetProcessPath("A")
-                            gc.app_name.Value := name
-                            gc.app_title.Value := title
-                            gc.app_path.Value := path
-                            first := name title path
-                        }
-
-                        name := WinGetProcessName("A")
-                        title := WinGetTitle("A")
-                        path := WinGetProcessPath("A")
-                        info := name title path
-                        if (info = last || info = first) {
-                            return
-                        }
-                        gc.app_name.Value := name
-                        gc.app_title.Value := title
-                        gc.app_path.Value := path
-                        last := info
-                    }
-                }
-            }
-            return g
-        }
-    }
+    A_TrayMenu.Add()
+    A_TrayMenu.Add("状态提示 - 鼠标方案", fn_scheme_cursor)
+    A_TrayMenu.Add("状态提示 - 符号方案", fn_scheme_symbol)
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("特殊偏移量", fn_app_offset)
@@ -175,11 +91,7 @@ makeTrayMenu() {
     A_TrayMenu.Add("在鼠标附近显示符号", fn_symbol_pos)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add("启用 JAB/JetBrains IDE 支持", fn_JAB)
-    if (enableJABSupport) {
-        A_TrayMenu.Check("启用 JAB/JetBrains IDE 支持")
-        runJAB()
-    }
+    A_TrayMenu.Add("其他设置", fn_ohter_config)
     A_TrayMenu.Add()
     A_TrayMenu.Add("关于", fn_about)
     A_TrayMenu.Add("重启", fn_restart)
@@ -187,6 +99,38 @@ makeTrayMenu() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("退出", fn_exit)
 
+    if (enableJABSupport) {
+        runJAB()
+    }
+}
+
+fn_exit(*) {
+    killJAB()
+    ExitApp()
+}
+fn_restart(*) {
+    if (enableJABSupport) {
+        killJAB()
+    }
+
+    if (A_IsCompiled) {
+        Run('"' A_ScriptFullPath '" ' keyCount)
+    } else {
+        Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' keyCount)
+    }
+    ExitApp()
+}
+
+fn_create_shortcut(*) {
+    if (isStartUp = 1) {
+        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
+    } else {
+        if (A_IsCompiled) {
+            FileCreateShortcut(A_ScriptFullPath, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+        } else {
+            FileCreateShortcut(A_AhkPath, A_Desktop "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
+        }
+    }
 }
 
 fn_update_user(uname, *) {
@@ -244,24 +188,73 @@ fn_update_user(uname, *) {
         return g
     }
 }
+fn_process_info(*) {
+    createUniqueGui(processInfoGui).Show()
+    processInfoGui(info) {
+        g := createGuiOpt("InputTip - 获取当前窗口信息", , "AlwaysOnTop")
+        g.AddText("cRed", "实时获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)").Focus()
+        if (info.i) {
+            return g
+        }
+        w := info.w
+        bw := w - g.MarginX * 2
 
-fn_exit(*) {
-    killJAB()
-    ExitApp()
-}
-fn_restart(*) {
-    if (enableJABSupport) {
-        killJAB()
+        createGuiOpt("").AddText(, " ").GetPos(, , &__w)
+        gc._window_info := g.AddButton("xs w" bw, "点击获取")
+        gc._window_info.OnEvent("Click", e_window_info)
+        g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
+        _width := bw - _w - g.MarginX + __w
+        gc.app_name := g.AddEdit("yp ReadOnly -VScroll w" _width)
+        g.AddText("xs cRed", "标题: ").GetPos(, , &_w)
+        gc.app_title := g.AddEdit("yp ReadOnly -VScroll w" _width)
+        g.AddText("xs cRed", "路径: ").GetPos(, , &_w)
+        gc.app_path := g.AddEdit("yp ReadOnly -VScroll w" _width)
+        e_window_info(*) {
+            if (gc.timer2) {
+                gc.timer2 := 0
+                gc._window_info.Text := "点击获取"
+                return
+            }
+            gc.timer2 := 1
+            gc._window_info.Text := "停止获取"
+            SetTimer(statusTimer, 25)
+            statusTimer() {
+                static first := "", last := ""
+
+                if (!gc.timer2) {
+                    SetTimer(, 0)
+                    first := ""
+                    last := ""
+                    return
+                }
+                try {
+                    if (!first) {
+                        name := WinGetProcessName("A")
+                        title := WinGetTitle("A")
+                        path := WinGetProcessPath("A")
+                        gc.app_name.Value := name
+                        gc.app_title.Value := title
+                        gc.app_path.Value := path
+                        first := name title path
+                    }
+
+                    name := WinGetProcessName("A")
+                    title := WinGetTitle("A")
+                    path := WinGetProcessPath("A")
+                    info := name title path
+                    if (info = last || info = first) {
+                        return
+                    }
+                    gc.app_name.Value := name
+                    gc.app_title.Value := title
+                    gc.app_path.Value := path
+                    last := info
+                }
+            }
+        }
+        return g
     }
-
-    if (A_IsCompiled) {
-        Run('"' A_ScriptFullPath '" ' keyCount)
-    } else {
-        Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' keyCount)
-    }
-    ExitApp()
 }
-
 
 /**
  * 通用的 进程级、标题级匹配菜单

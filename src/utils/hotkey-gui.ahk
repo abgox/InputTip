@@ -12,7 +12,6 @@
  * }], "软件暂停/运行")
  */
 setHotKeyGui(keyConfigList, label := "") {
-    line := "------------------------------------------------------------------------------------"
     createUniqueGui(hotKeyGui).Show()
     hotKeyGui(info) {
         g := createGuiOpt("InputTip - 设置快捷键" (label ? " —— " label : ""))
@@ -28,6 +27,8 @@ setHotKeyGui(keyConfigList, label := "") {
         }
         w := info.w
         bw := w - g.MarginX * 2
+
+        line := gui_width_line "--"
 
         g.AddLink("xs", '4.  如果要移除快捷键，请选择【无】。<a href="https://inputtip.abgox.com/FAQ/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
 

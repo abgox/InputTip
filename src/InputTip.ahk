@@ -117,8 +117,8 @@ symbolPaths := readIni("symbolPaths", "")
 iconPaths := readIni("iconPaths", "")
 cursorDir := readIni("cursorDir", "")
 
-SetTimer(getDirTimer, -1)
-getDirTimer() {
+SetTimer(getPathList, -1)
+getPathList() {
     _symbolPaths := arrJoin(getPicList(), ":")
     _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\favicon.png:InputTipSymbol\default\favicon-pause.png:", ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")

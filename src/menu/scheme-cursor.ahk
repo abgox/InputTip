@@ -1,3 +1,5 @@
+; InputTip
+
 fn_scheme_cursor(*) {
     createUniqueGui(cursorStyleGui).Show()
     cursorStyleGui(info) {

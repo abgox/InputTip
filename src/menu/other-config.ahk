@@ -1,3 +1,5 @@
+; InputTip
+
 fn_ohter_config(*) {
     createUniqueGui(ohterConfigGui).Show()
     ohterConfigGui(info) {

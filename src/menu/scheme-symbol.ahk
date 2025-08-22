@@ -1,3 +1,5 @@
+; InputTip
+
 fn_scheme_symbol(*) {
     createUniqueGui(symbolStyleGui).Show()
     symbolStyleGui(info) {

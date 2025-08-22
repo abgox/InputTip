@@ -428,6 +428,8 @@ updateSymbol(configName := "", configValue := "") {
                     try {
                         _.AddPicture("w" w " h" h, pic_path)
                     }
+                } else {
+                    symbolGui.%state% := ""
                 }
             }
         case 2:
@@ -451,6 +453,8 @@ updateSymbol(configName := "", configValue := "") {
                         case 2: _.Opt("+e0x00000200")
                         case 3: _.Opt("+e0x00020000")
                     }
+                } else {
+                    symbolGui.%state% := ""
                 }
             }
         case 3:
@@ -486,6 +490,8 @@ updateSymbol(configName := "", configValue := "") {
                         case 3: _.Opt("-LastFound +e0x00020000")
                         default: _.Opt("-LastFound")
                     }
+                } else {
+                    symbolGui.%state% := ""
                 }
             }
     }

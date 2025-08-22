@@ -5,9 +5,9 @@ fn_check_update(*) {
 
     createUniqueGui(checkUpdateGui).Show()
     checkUpdateGui(info) {
-        g := createGuiOpt("InputTip - 设置更新检查")
+        g := createGuiOpt("InputTip - 更新检查")
         line := "-------------------------------------------------------------------------"
-        tab := g.AddTab3("-Wrap", ["设置更新检查", "关于"])
+        tab := g.AddTab3("-Wrap", ["更新检查", "关于"])
         tab.UseTab(1)
         g.AddText("Section cRed", gui_help_tip)
 

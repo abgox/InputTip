@@ -5,8 +5,8 @@ fn_cursor_mode(*) {
     showGui(deep := 0) {
         createUniqueGui(modeGui).Show()
         modeGui(info) {
-            g := createGuiOpt("InputTip - 设置光标获取模式")
-            tab := g.AddTab3("-Wrap", ["设置光标获取模式", "关于"])
+            g := createGuiOpt("InputTip - 光标获取模式")
+            tab := g.AddTab3("-Wrap", ["光标获取模式", "关于"])
             tab.UseTab(1)
             g.AddText("Section cRed", gui_help_tip)
 
@@ -203,7 +203,7 @@ fn_cursor_mode(*) {
                 }
             }
             tab.UseTab(2)
-            g.AddEdit("ReadOnly VScroll r11 w" w, "1. 简要说明`n   - 这个菜单用来设置【设置光标获取模式】的匹配规则`n   - 下方是对应的规则列表`n   - 双击列表中的任意一行，进行编辑或删除`n   - 如果需要添加，请查看下方按钮相关的使用说明`n`n2. 规则列表 —— 进程名称`n   - 应用窗口实际的进程名称`n`n3. 规则列表 —— 光标获取模式`n   - 包括【HOOK】【UIA】【MSAA】【JAB】等等`n   - 不用在意这些模式是啥，哪个能用，就用哪个即可`n   - 如果想了解详细的相关内容，可以查看下方相关链接`n`n4. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n5. 按钮 —— 添加应用的光标获取模式`n   - 点击它，可以添加一条新的规则`n   - 这条规则用来指定某个应用进程使用什么光标获取模式`n   - 它会弹出一个新的菜单页面，会显示当前正在运行的【应用进程列表】`n   - 你可以双击【应用进程列表】中的任意一行进行快速添加`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】`n`n6. 光标获取模式 —— JAB`n   - 在所有的光标获取模式中，【JAB】是特殊的`n   - 它仅用于需要使用 Java Access Bridge 的进程，比如 JetBrains IDE`n   - 它需要配合【托盘菜单】中的【启用 JAB/JetBrains IDE 支持】一起使用`n   - 详情参考【启用 JAB/JetBrains IDE 支持】的使用说明")
+            g.AddEdit("ReadOnly VScroll r11 w" w, "1. 简要说明`n   - 这个菜单用来设置【光标获取模式】的匹配规则`n   - 下方是对应的规则列表`n   - 双击列表中的任意一行，进行编辑或删除`n   - 如果需要添加，请查看下方按钮相关的使用说明`n`n2. 规则列表 —— 进程名称`n   - 应用窗口实际的进程名称`n`n3. 规则列表 —— 光标获取模式`n   - 包括【HOOK】【UIA】【MSAA】【JAB】等等`n   - 不用在意这些模式是啥，哪个能用，就用哪个即可`n   - 如果想了解详细的相关内容，可以查看下方相关链接`n`n4. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n5. 按钮 —— 添加应用的光标获取模式`n   - 点击它，可以添加一条新的规则`n   - 这条规则用来指定某个应用进程使用什么光标获取模式`n   - 它会弹出一个新的菜单页面，会显示当前正在运行的【应用进程列表】`n   - 你可以双击【应用进程列表】中的任意一行进行快速添加`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】`n`n6. 光标获取模式 —— JAB`n   - 在所有的光标获取模式中，【JAB】是特殊的`n   - 它仅用于需要使用 Java Access Bridge 的进程，比如 JetBrains IDE`n   - 它需要配合【托盘菜单】中的【启用 JAB/JetBrains IDE 支持】一起使用`n   - 详情参考【启用 JAB/JetBrains IDE 支持】的使用说明")
             g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/cursor-mode">关于光标获取模式</a>   <a href="https://inputtip.abgox.com/FAQ/use-inputtip-in-jetbrains">如何在 JetBrains 系列 IDE 中使用 InputTip</a>')
             g.OnEvent("Close", fn_close)
             fn_close(*) {

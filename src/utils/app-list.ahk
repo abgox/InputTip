@@ -2,7 +2,7 @@
 
 modeNameList := ["HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"]
 
-; 内部的默认模式应用列表，优先级最低，会被通过【设置光标获取模式】设置的配置覆盖
+; 内部的默认模式应用列表，优先级最低，会被【光标获取模式】设置的内容覆盖
 defaultModeList := {
     HOOK: [],
     UIA: [

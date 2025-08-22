@@ -108,7 +108,7 @@ fn_config(*) {
             global hoverHide := item.value
             writeIni("hoverHide", item.value)
         }
-        g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以使用【托盘菜单】中的【设置符号显示在鼠标附近】")
+        g.AddText("xs cGray", "如果某些应用中无法正常显示符号，可以使用【托盘菜单】中的【在鼠标附近显示符号】")
         g.AddText("xs", "3. 符号的垂直偏移量的参考原点: ")
         g.AddDropDownList("yp AltSubmit Choose" symbolOffsetBase + 1, [" 输入光标上方", " 输入光标下方"]).OnEvent("Change", e_offset_base)
         e_offset_base(item, *) {
@@ -118,7 +118,7 @@ fn_config(*) {
             reloadSymbol()
             gc._focusSymbol.Focus()
         }
-        g.AddLink("xs cGray", '输入光标附近显示的符号的垂直偏移量会基于这个参考原点进行偏移，会影响相关的偏移量设置`nJAB/JetBrains IDE 程序中它是无效的，只能使用【设置特殊偏移量】特殊处理。<a href="https://inputtip.abgox.com/FAQ/symbol-pos-base">点击查看详细说明</a>')
+        g.AddLink("xs cGray", '输入光标附近显示的符号的垂直偏移量会基于这个参考原点进行偏移，会影响相关的偏移量设置`nJAB/JetBrains IDE 程序中它是无效的，只能使用【特殊偏移量】特殊处理。<a href="https://inputtip.abgox.com/FAQ/symbol-pos-base">点击查看详细说明</a>')
         g.AddText("xs", "4. 符号延时隐藏:")
         _ := g.AddEdit("yp Number w" bw / 3)
         _.Value := hideSymbolDelay

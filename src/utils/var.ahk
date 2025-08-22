@@ -75,7 +75,7 @@ symbolType := readIni("symbolType", 1)
 ; 符号的垂直偏移量的参考原点
 symbolOffsetBase := readIni("symbolOffsetBase", 0)
 
-; 是否在任意窗口中，符号都显示在鼠标附近
+; 是否在所有窗口中，符号都显示在鼠标附近
 showCursorPos := readIni("showCursorPos", 0)
 ; 需要将符号显示在鼠标附近的窗口列表
 ShowNearCursor := StrSplit(readIniSection("ShowNearCursor"), "`n")

@@ -67,7 +67,7 @@ Documentations:
   - DocumentLabel: README (Gitee)
     DocumentUrl: https://gitee.com/abgox/InputTip/blob/main/README.md
   - DocumentLabel: Some Frequently Asked Questions & Tips (FAQ)
-    DocumentUrl: https://inputtip.abgox.com/FAQ/
+    DocumentUrl: https://inputtip.abgox.com/faq/
   - DocumentLabel: README
     DocumentUrl: https://inputtip.abgox.com/v2/
 ManifestType: locale
@@ -111,7 +111,7 @@ Documentations:
   - DocumentLabel: README (Gitee)
     DocumentUrl: https://gitee.com/abgox/InputTip/blob/main/README.md
   - DocumentLabel: 一些常见问题及使用技巧 (FAQ)
-    DocumentUrl: https://inputtip.abgox.com/FAQ/
+    DocumentUrl: https://inputtip.abgox.com/faq/
   - DocumentLabel: README
     DocumentUrl: https://inputtip.abgox.com/v2/
 ManifestType: defaultLocale

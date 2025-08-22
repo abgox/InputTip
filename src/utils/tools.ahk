@@ -43,9 +43,9 @@ hasChildDir(path) {
 }
 
 /**
- * 鼠标是否悬浮在指定窗口上
+ * 鼠标是否悬停在指定窗口上
  * @param WinTitle  窗口标题
- * @returns 是否悬浮在窗口上
+ * @returns 是否悬停在窗口上
  */
 isMouseOver(WinTitle) {
     try {

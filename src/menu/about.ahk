@@ -33,7 +33,7 @@ fn_about(*) {
         g.AddLink("xs", '2. Github: <a href="https://github.com/abgox/InputTip">github.com/abgox/InputTip</a>')
         g.AddLink("xs", '3. Gitee: <a href="https://gitee.com/abgox/InputTip">gitee.com/abgox/InputTip</a>')
         tab.UseTab(2)
-        g.AddLink("Section", '- 如果你喜欢 InputTip，或者我的其他项目，请为项目仓库点亮一个 Star')
+        g.AddLink("Section", '- 如果你喜欢 <a href="https://inputtip.abgox.com">InputTip</a>，或者我的其他项目，请为项目仓库点亮一个 Star')
         g.AddLink("xs", '- 或者前往 <a href="https://abgox.com/donate">abgox.com/donate</a> 进行赞赏以支持我的付出')
 
         g.AddLink("xs", '    - 建议赞赏时进行必要的留言: 赞赏的项目、目的、想法等内容')

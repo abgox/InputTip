@@ -83,7 +83,7 @@ fn_scheme_cursor(*) {
 
         tab.UseTab(2)
         g.AddEdit("ReadOnly r11 w" bw, "1. 配置 —— 加载鼠标样式`n   - 根据不同的输入法状态加载下方选择的对应的鼠标样式`n`n2. 配置 —— 中文状态/英文状态/大写锁定`n   - 通过下拉列表为不同状态指定鼠标样式`n   - InputTip 会根据当前输入法状态切换鼠标样式`n`n3. 按钮 —— 打开鼠标样式目录`n   - 点击它，会自动打开存放鼠标样式的目录`n   - 在这个目录下添加鼠标样式文件夹后，会显示在下拉列表中`n`n4. 按钮 —— 刷新下拉列表`n   - 当修改了鼠标样式目录，可能需要点击它去刷新下拉列表`n`n5. 按钮 —— 下载其他鼠标样式`n   - 点击它，前往官网查看已经适配的其他鼠标样式`n   - 下载后，解压到鼠标样式目录下即可使用")
-        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/FAQ/custom-cursor-style">自定义鼠标样式</a>')
+        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/faq/custom-cursor-style">自定义鼠标样式</a>')
         return g
     }
 }

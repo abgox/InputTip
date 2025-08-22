@@ -2,7 +2,7 @@
 
 updateDelay()
 
-; 鼠标悬浮在符号上
+; 鼠标悬停在符号上
 isOverSymbol := 0
 hasWindowChange := 1
 while 1 {

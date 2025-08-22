@@ -162,7 +162,7 @@ fn_update_user(uname, *) {
         g.AddText("xs ReadOnly cGray", "请自行检查，确保用户名无误后，点击右上角的 × 直接关闭此窗口即可").Focus()
 
         tab.UseTab(2)
-        g.AddEdit("ReadOnly r6 w" bw, "1. 简要说明`n   - 这个菜单用来设置用户名信息`n   - 如果是域用户，在填写时还需要添加域，参考以下格式`n      - DOMAIN\Username`n      - Username@domain.com`n   - 如果用户名信息有误，以下功能可能会失效`n      - 【开机自启动】中的 【任务计划程序】`n      - 【启用 JAB/JetBrains IDE 支持】")
+        g.AddEdit("ReadOnly r6 w" bw, "1. 简要说明`n   - 这个菜单用来设置用户名信息`n   - 如果是域用户，在填写时还需要添加域，参考以下格式`n      - DOMAIN\Username`n      - Username@domain.com`n   - 如果用户名信息有误，以下功能可能会失效`n      - 【开机自启动】中的 【任务计划程序】`n      - 【其他设置】中的【JAB/JetBrains IDE 支持】")
 
         g.OnEvent("Close", e_close)
         e_close(*) {
@@ -192,12 +192,17 @@ fn_process_info(*) {
     createUniqueGui(processInfoGui).Show()
     processInfoGui(info) {
         g := createGuiOpt("InputTip - 获取当前窗口信息", , "AlwaysOnTop")
-        g.AddText("cRed", "实时获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)").Focus()
+
         if (info.i) {
+            g.AddText(, gui_width_line)
             return g
         }
         w := info.w
         bw := w - g.MarginX * 2
+        line := gui_width_line "-"
+
+        g.AddText("cRed", "实时获取当前激活的窗口进程信息(窗口进程名称、窗口进程路径、窗口标题)").Focus()
+        g.AddText(, line)
 
         createGuiOpt("").AddText(, " ").GetPos(, , &__w)
         gc._window_info := g.AddButton("xs w" bw, "点击获取")
@@ -370,7 +375,7 @@ fn_common(args, cb_updateVar) {
             }
 
             fn_edit(LV, RowNumber, action, itemValue) {
-                ; 是否自动添加到符号显示白名单中
+                ; 是否自动添加到符号的白名单中
                 needAddWhiteList := 1
 
                 if (action == "edit") {
@@ -391,7 +396,7 @@ fn_common(args, cb_updateVar) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit" && itemValue.configName != "App-ShowSymbol") {
-                    g.AddText("cRed", "是否添加到【符号显示白名单】中: ")
+                    g.AddText("cRed", "是否添加到【符号的白名单】中: ")
                     _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)
@@ -530,10 +535,10 @@ fn_common(args, cb_updateVar) {
 
 fn_white_list(*) {
     fn_common({
-        title: "设置符号显示白名单应用",
-        tab: "符号显示白名单",
+        title: "设置符号的白名单",
+        tab: "符号的白名单",
         config: "App-ShowSymbol",
-        link: '相关链接: <a href="https://inputtip.abgox.com/FAQ/symbol-list-mechanism">符号的名单机制</a>'
+        link: '相关链接: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">符号的名单机制</a>'
     }, fn)
     fn() {
         global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")

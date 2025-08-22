@@ -84,7 +84,7 @@ showCursorPos_x := readIni("showCursorPos_x", 0)
 ; 符号显示在鼠标附近时的特殊偏移量 y
 showCursorPos_y := readIni("showCursorPos_y", -20)
 
-; 当鼠标悬浮在符号上时，符号是否需要隐藏
+; 当鼠标悬停在符号上时，符号是否需要隐藏
 hoverHide := readIni("hoverHide", 1)
 
 ; 在多少毫秒后隐藏符号，0 表示永不隐藏
@@ -497,7 +497,7 @@ loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
 
     if (!isShowCursorPos) {
         if (left = old_left && top = old_top) {
-            ; XXX: 如果鼠标一直悬浮在符号上，同时有键盘操作，就会出现符号闪烁
+            ; XXX: 如果鼠标一直悬停在符号上，同时有键盘操作，就会出现符号闪烁
             if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
                 return
             }
@@ -603,17 +603,16 @@ hideSymbol() {
     global lastSymbol := ""
 }
 
-; 更新符号显示黑白名单和自动切换列表
+; 更新符号的黑白名单和自动切换列表
 updateList() {
     global
 
     restartJAB()
 
-
-    ; 应用列表: 符号显示黑名单
+    ; 应用列表: 符号的黑名单
     app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
 
-    ; 应用列表: 符号显示白名单
+    ; 应用列表: 符号的白名单
     app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
 
     updateAutoSwitchList()

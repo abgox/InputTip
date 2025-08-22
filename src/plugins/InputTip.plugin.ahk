@@ -13,7 +13,7 @@
 - 需要注意: 不能存在死循环
 
 - 详情参考:
-    - 官方文档: https://inputtip.abgox.com/FAQ/plugin
+    - 官方文档: https://inputtip.abgox.com/faq/plugin
     - Github: https://github.com/abgox/InputTip#自定义功能
     - Gitee: https://gitee.com/abgox/InputTip#自定义功能
 

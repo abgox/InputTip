@@ -171,7 +171,7 @@ if (A_IsCompiled) {
         if (!DirExist("plugins")) {
             DirCreate("plugins")
         }
-        FileAppend("/*`n`n- 你可以在这里自定义想要的功能，例如:`n    - 自定义快捷键`n    - 自定义热字串`n    - ...`n`n- 你也可以在 plugins 目录中新建一个或多个 .ahk 文件，然后在此文件中引入，例如:`n    - 在 plugins 目录中新建一个文件名为 custom.ahk 的文件`n    - 将自定义功能写入 custom.ahk 文件中`n    - 在 InputTip.plugin.ahk 文件中引入 custom.ahk 文件: #Include custom.ahk`n`n- 需要注意: 不能存在死循环`n`n- 详情参考:`n    - 官方文档: https://inputtip.abgox.com/FAQ/plugin`n    - Github: https://github.com/abgox/InputTip#自定义功能`n    - Gitee: https://gitee.com/abgox/InputTip#自定义功能`n`n*/`n", "plugins/InputTip.plugin.ahk", "UTF-8")
+        FileAppend("/*`n`n- 你可以在这里自定义想要的功能，例如:`n    - 自定义快捷键`n    - 自定义热字串`n    - ...`n`n- 你也可以在 plugins 目录中新建一个或多个 .ahk 文件，然后在此文件中引入，例如:`n    - 在 plugins 目录中新建一个文件名为 custom.ahk 的文件`n    - 将自定义功能写入 custom.ahk 文件中`n    - 在 InputTip.plugin.ahk 文件中引入 custom.ahk 文件: #Include custom.ahk`n`n- 需要注意: 不能存在死循环`n`n- 详情参考:`n    - 官方文档: https://inputtip.abgox.com/faq/plugin`n    - Github: https://github.com/abgox/InputTip#自定义功能`n    - Gitee: https://gitee.com/abgox/InputTip#自定义功能`n`n*/`n", "plugins/InputTip.plugin.ahk", "UTF-8")
     }
 
     ; 丢失的文件列表
@@ -314,7 +314,7 @@ checkIni() {
                     g := Gui()
                     g.SetFont(fz, "Microsoft YaHei")
                     g.AddText(, "你真的确定要加载鼠标样式吗？")
-                    g.AddText("cRed", "请谨慎选择，如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】中的【更改配置】`n  2. 将【显示形式】页面中的【加载鼠标样式】的值更改为【否】")
+                    g.AddText("cRed", "如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】中的【状态提示 - 鼠标方案】`n  2. 将【加载鼠标样式】更改为【否】")
 
                     if (info.i) {
                         return g
@@ -403,7 +403,7 @@ checkIni() {
                 g.SetFont(fz, "Microsoft YaHei")
                 g.AddText("cRed", "对于符号方案，InputTip 核心使用白名单机制")
                 g.AddLink("cRed", '只有在白名单中的应用进程窗口才会显示符号')
-                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/FAQ/symbol-list-mechanism">符号的名单机制</a>')
+                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">符号的名单机制</a>')
                 g.AddText(, "建议立即添加常用的应用进程窗口到白名单中")
 
                 if (info.i) {

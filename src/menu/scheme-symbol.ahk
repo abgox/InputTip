@@ -222,7 +222,7 @@ fn_symbol_pic(*) {
 
         tab.UseTab(3)
         g.AddEdit("ReadOnly r11 w" bw, "1. 配置 —— 水平/垂直偏移量`n   - 它指的是符号在输入光标附近显示时的偏移量`n   - 注意，符号最终的偏移量为 o1 + o2 + o3`n       - o1 指的是这里的偏移量`n       - o2 指的是【特殊偏移量】中的【不同屏幕下的基础偏移量】`n       - o3 指的是【特殊偏移量】中为指定窗口设置的偏移量`n`n2. 配置 —— 宽度/高度`n   - 图片符号的宽度和高度`n`n3. 配置 —— 中文状态/英文状态/大写锁定`n   - 通过下拉列表为不同状态指定图片符号`n   - 如果选择第一个空白路径，则对应状态不显示符号`n   - InputTip 会根据当前输入法状态切换图片符号`n`n4. 按钮 —— 打开图片符号目录`n   - 点击它，会自动打开存放图片符号的目录`n   - 在这个目录下添加 png 图片后，会显示在下拉列表中`n`n5. 按钮 —— 刷新下拉列表`n   - 当存放图片符号的目录有变动，可能需要点击它去刷新下拉列表`n`n6. 按钮 —— 下载其他图片符号`n   - 点击它，前往官网查看其他的图片符号`n   - 下载后，放入图片符号目录中即可使用`n`n7. 关于独立配置`n   - 可以给不同状态设置不同的偏移量和宽高")
-        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/zh-CN/FAQ/symbol-picture">图片符号</a>')
+        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/zh-CN/faq/symbol-picture">图片符号</a>')
         return g
     }
 }
@@ -450,7 +450,7 @@ fn_symbol_block(*) {
 
         tab.UseTab(3)
         g.AddEdit("ReadOnly r10 w" bw, "1. 配置 —— 中文状态/英文状态/大写锁定的颜色`n   - 它用来设置不同状态下符号的颜色`n   - 它需要一个常见的颜色英文或 16 进制颜色值，不包含 #`n   - 如果设置为空，则对应状态不显示符号`n`n2. 配置 —— 水平/垂直偏移量`n   - 它指的是符号在输入光标附近显示时的偏移量`n   - 注意，符号最终的偏移量为 o1 + o2 + o3`n       - o1 指的是这里的偏移量`n       - o2 指的是【特殊偏移量】中的【不同屏幕下的基础偏移量】`n       - o3 指的是【特殊偏移量】中为指定窗口设置的偏移量`n`n3. 配置 —— 宽度/高度`n`n4. 配置 —— 透明度`n`n5. 配置 —— 边框样式`n`n6. 关于独立配置`n   - 如果你需要在不同状态下时偏移量、宽高等有区别`n   - 就可以启用独立配置，然后通过【独立配置】按钮进行设置")
-        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/zh-CN/FAQ/symbol-block">方块符号</a>   <a href="https://inputtip.abgox.com/FAQ/color-config">颜色配置</a>')
+        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/zh-CN/faq/symbol-block">方块符号</a>   <a href="https://inputtip.abgox.com/faq/color-config">颜色配置</a>')
         return g
     }
 }
@@ -737,7 +737,7 @@ fn_symbol_text(*) {
 
         tab.UseTab(3)
         g.AddEdit("ReadOnly r11 w" bw, "1. 配置 —— 中文状态/英文状态/大写锁定的文本字符`n   - 它用来设置不同状态下显示的文本`n   - 如果设置为空，则对应状态不显示符号`n`n2. 配置 —— 中文状态/英文状态/大写锁定的背景颜色`n`n3. 配置 —— 字符的字体`n   - 它用来设置显示的文本的字体`n   - 它有一些注意事项，通过下方相关链接查看`n`n4. 配置 —— 水平/垂直偏移量`n   - 它指的是符号在输入光标附近显示时的偏移量`n   - 注意，符号最终的偏移量为 o1 + o2 + o3`n       - o1 指的是这里的偏移量`n       - o2 指的是【特殊偏移量】中的【不同屏幕下的基础偏移量】`n       - o3 指的是【特殊偏移量】中为指定窗口设置的偏移量`n`n5. 配置 —— 字符透明度`n`n6. 配置 —— 字符的大小`n`n7. 配置 —— 字符的粗细`n`n8. 配置 —— 边框样式`n`n9. 关于独立配置`n   - 如果你需要在不同状态下时偏移量、宽高、大小等有区别`n   - 就可以启用独立配置，然后通过【独立配置】按钮进行设置")
-        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/zh-CN/FAQ/symbol-text">文本符号</a>   <a href="https://inputtip.abgox.com/FAQ/color-config">颜色配置</a>   <a href="https://inputtip.abgox.com/zh-CN/FAQ/font-config">字体配置</a>')
+        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/zh-CN/faq/symbol-text">文本符号</a>   <a href="https://inputtip.abgox.com/faq/color-config">颜色配置</a>   <a href="https://inputtip.abgox.com/zh-CN/faq/font-config">字体配置</a>')
         return g
     }
 }

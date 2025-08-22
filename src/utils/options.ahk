@@ -15,17 +15,17 @@ InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
-;@AHK2Exe-SetVersion 2025.08.20
+;@AHK2Exe-SetVersion 2025.08.22
 
 if (A_IsCompiled) {
     ; exe 版本
-    currentVersion := "2025.08.20"
+    currentVersion := "2025.08.22"
 
     versionType := "exe"
     versionKey := "version"
 } else {
     ; zip 版本
-    currentVersion := "2025.08.20.1"
+    currentVersion := "2025.08.22"
 
     versionType := "zip"
     versionKey := "version-zip"

@@ -93,7 +93,6 @@ updateTip(flag := "") {
             if (!enableKeyCount) {
                 SetTimer(, 0)
                 last := ""
-                keyCount := 0
                 return
             }
             if (A_PriorKey != last) {

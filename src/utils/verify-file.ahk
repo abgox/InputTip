@@ -296,9 +296,9 @@ checkIni() {
         confirmGui(info) {
             g := Gui(, "InputTip - 初始化引导")
             g.SetFont(fz, "Microsoft YaHei")
-            g.AddText(, "你是否希望 InputTip 加载鼠标样式?")
-            g.AddText("xs cRed", "InputTip 会使用三套不同颜色的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
-            g.AddLink(, '详情参考【鼠标方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标方案">Gitee</a>')
+            g.AddText(, "你是否希望 InputTip 使用【鼠标方案】?")
+            g.AddText("xs cRed", "InputTip 会同时使用三套不同的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
+            g.AddLink(, '详情参考【鼠标方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标方案">Gitee</a>').Focus()
 
             if (info.i) {
                 return g
@@ -306,15 +306,16 @@ checkIni() {
             w := info.w
             bw := w - g.MarginX * 2
 
-            g.AddButton("xs cRed w" bw, "【是】加载鼠标样式").OnEvent("Click", e_yes)
+            g.AddButton("xs cRed w" bw, "【是】").OnEvent("Click", e_yes)
             e_yes(*) {
                 g.Destroy()
                 createGui(yesGui).Show()
                 yesGui(info) {
                     g := Gui()
                     g.SetFont(fz, "Microsoft YaHei")
-                    g.AddText(, "你真的确定要加载鼠标样式吗？")
-                    g.AddText("cRed", "如果误点了确定，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】中的【状态提示 - 鼠标方案】`n  2. 将【加载鼠标样式】更改为【否】")
+                    g.AddText(, "你真的确定要使用【鼠标方案】吗？")
+                    g.AddText("cRed", "如果误点了【是】，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】中的【状态提示 - 鼠标方案】`n  2. 将【加载鼠标样式】更改为【否】")
+                    g.AddLink(, '详情参考【鼠标方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标方案">Gitee</a>')
 
                     if (info.i) {
                         return g
@@ -339,7 +340,7 @@ checkIni() {
                     return g
                 }
             }
-            _ := g.AddButton("w" bw, "【否】保留现有样式")
+            _ := g.AddButton("w" bw, "【否】")
             _.OnEvent("Click", e_no)
             e_no(*) {
                 g.Destroy()
@@ -361,7 +362,7 @@ checkIni() {
             confirmGui(info) {
                 g := Gui(, "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
-                g.AddText(, "你是否希望 InputTip 显示符号?")
+                g.AddText(, "你是否希望 InputTip 使用【符号方案】?")
                 g.AddText("xs cRed", "InputTip 会尝试获取输入光标位置，在其附近显示符号")
                 g.AddLink(, '详情参考【符号方案】:  <a href="https://inputtip.abgox.com/v2/#符号方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号方案">Gitee</a>')
 
@@ -371,14 +372,14 @@ checkIni() {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                g.AddButton("xs cRed w" bw, "【是】显示符号").OnEvent("Click", e_yes)
+                g.AddButton("xs cRed w" bw, "【是】").OnEvent("Click", e_yes)
                 e_yes(*) {
                     g.Destroy()
                     writeIni("symbolType", 1)
                     global symbolType := 1
                     initWhiteList()
                 }
-                _ := g.AddButton("w" bw, "【否】不显示符号")
+                _ := g.AddButton("w" bw, "【否】")
                 _.OnEvent("Click", e_no)
                 e_no(*) {
                     g.Destroy()
@@ -401,10 +402,9 @@ checkIni() {
             listTipGui(info) {
                 g := Gui(, "InputTip - 初始化引导")
                 g.SetFont(fz, "Microsoft YaHei")
-                g.AddText("cRed", "对于符号方案，InputTip 核心使用白名单机制")
-                g.AddLink("cRed", '只有在白名单中的应用进程窗口才会显示符号')
-                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">符号的名单机制</a>')
-                g.AddText(, "建议立即添加常用的应用进程窗口到白名单中")
+                g.AddText("cRed", "对于【符号方案】，InputTip 使用强制的白名单机制`n只有添加到【符号的白名单】中的应用进程窗口才会尝试显示符号")
+                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">关于符号方案中的名单机制</a>')
+                g.AddText(, "建议立即添加常用的应用进程窗口到【符号的白名单】中")
 
                 if (info.i) {
                     return g

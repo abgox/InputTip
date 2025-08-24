@@ -21,15 +21,31 @@ fn_scheme_symbol(*) {
         g.addText("xs", "指定符号的类型:")
         g.AddDropDownList("yp AltSubmit Choose" symbolType + 1 " w" bw / 2, [" 【不】显示符号", " 显示【图片】符号", " 显示【方块】符号", " 显示【文本】符号"]).OnEvent("Change", e_symbol_type)
         e_symbol_type(item, *) {
+            static last := symbolType + 1
             writeIni("symbolType", item.value - 1)
             global symbolType := item.value - 1
             global lastWindow := ""
             global lastSymbol := ""
             updateSymbol()
             reloadSymbol()
-            if (symbolType) {
-                gc._focusSymbol.Focus()
+
+            if (item.value != 1 && last == 1) {
+                createTipGui([{
+                    opt: "",
+                    text: "你正在开始使用【符号方案】了"
+                }, {
+                    opt: "cRed",
+                    text: '需要注意:`n【符号方案】使用了强制的白名单机制`n你需要使用【托盘菜单】中的【符号的黑/白名单】去添加应用进程`n只有添加到【符号的白名单】中的应用进程窗口才会尝试显示符号',
+                }, {
+                    opt: "",
+                    text: '详情参考: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">关于符号方案中的名单机制</a>'
+                }], "InputTip - 符号方案的注意事项").Show()
+            } else {
+                if (symbolType) {
+                    gc._focusSymbol.Focus()
+                }
             }
+            last := item.value
         }
 
         g.AddText("yp w20")

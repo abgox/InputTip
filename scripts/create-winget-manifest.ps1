@@ -135,7 +135,7 @@ Remove-Item "abgox.InputTip.exe" -ErrorAction SilentlyContinue
 
 $replaceMap = @(
   @("{{ version }}", $version),
-  @("{{ release_date }}", (Get-Date -Format "yyyy-MM-dd")),
+  @("{{ release_date }}", (Get-Date).ToUniversalTime().AddHours(8).ToString("yyyy-MM-dd")),
   @("{{ sha256 }}", $sha256.Hash)
 )
 

@@ -15,6 +15,16 @@ InstallKeybdHook
 CoordMode 'Mouse', 'Screen'
 SetStoreCapsLockMode 0
 
+OnError LogError
+
+LogError(exception, mode) {
+    if (InStr(exception.Message, "Invalid memory read/write")) {
+        MsgBox("InputTip 内存读写错误，请尝试重启 InputTip", "InputTip 内存读写错误", "0x10")
+        return true
+    }
+    return false
+}
+
 ;@AHK2Exe-SetVersion 2025.08.25
 
 if (A_IsCompiled) {

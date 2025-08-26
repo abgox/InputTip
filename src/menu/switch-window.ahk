@@ -195,9 +195,9 @@ fn_switch_window(*) {
                             updateWhiteList(itemValue.exe_name)
                         }
                     }
-
-                    autoHdrLV(LV)
-
+                    try {
+                        autoHdrLV(gc.%"LV_" state%)
+                    }
                     updateAutoSwitchList()
                 }
                 return g

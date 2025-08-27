@@ -31,9 +31,16 @@ fn_scheme_cursor(*) {
             if (item.value = 1) {
                 writeIni("changeCursor", 0)
                 global changeCursor := 0
-                for v in cursorInfo {
-                    if (v.origin) {
-                        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
+                try {
+                    for v in cursorInfo {
+                        if (v.origin) {
+                            DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
+                        } else {
+                            ; 如果没有获取到原始的工形光标样式文件，则直接加载一个默认的样式
+                            if (v.type == "IBEAM") {
+                                DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", "C:\Windows\Cursors\beam_m.cur", "Ptr"), "Int", v.value)
+                            }
+                        }
                     }
                 }
                 createTipGui([{

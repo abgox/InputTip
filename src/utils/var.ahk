@@ -90,6 +90,8 @@ hoverHide := readIni("hoverHide", 1)
 ; 在多少毫秒后隐藏符号，0 表示永不隐藏
 hideSymbolDelay := readIni("hideSymbolDelay", 0)
 
+symbolShowMode := readIni("symbolShowMode", 1)
+
 ; 轮询响应间隔
 delay := readIni("delay", 20)
 

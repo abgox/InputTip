@@ -219,32 +219,29 @@ fn_switch_window(*) {
                 gc.%LV%._type := v
 
                 _ := g.AddButton("xs w" w / 2, "快捷添加")
-                _.OnEvent("Click", e_add)
                 _._LV := LV
                 _._type := v
-                e_add(item, *) {
-                    fn_add(item._LV, item._type)
-                }
+                _.OnEvent("Click", (item, *) => fn_add(item._LV, item._type))
 
                 _ := g.AddButton("yp w" w / 2, "手动添加")
-                _.OnEvent("Click", e_add_manually)
                 _._LV := LV
                 _._type := v
-
-                e_add_manually(item, *) {
-                    itemValue := {
-                        exe_name: "",
-                        status: stateMap.%item._type%,
-                        tipGlobal: "进程级",
-                        tipRegex: "相等",
-                        title: "",
-                        id: returnId()
-                    }
-                    fn_edit(item._LV, 1, item._type, "add", itemValue).Show()
-                }
+                _.OnEvent("Click", fn_add_manually)
 
                 tab.UseTab(i + 1)
             }
+            fn_add_manually(item, *) {
+                itemValue := {
+                    exe_name: "",
+                    status: stateMap.%item._type%,
+                    tipGlobal: "进程级",
+                    tipRegex: "相等",
+                    title: "",
+                    id: returnId()
+                }
+                fn_edit(item._LV, 1, item._type, "add", itemValue).Show()
+            }
+
             fn_add(LV, state) {
                 args := {
                     title: "快捷添加",

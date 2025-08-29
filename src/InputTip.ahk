@@ -1,6 +1,10 @@
 ; InputTip
 
-#Include utils/options.ahk
+#Warn All, Off
+
+#Include utils/verify-file.ahk
+
+#Include "*i utils/options.ahk"
 
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-SetOrigFilename InputTip.ahk
@@ -9,16 +13,15 @@
 
 isJAB := 0
 
-#Include utils/tools.ahk
-#Include utils/create-gui.ahk
-#Include utils/ini.ahk
-#Include utils/IME.ahk
-#Include utils/app-list.ahk
-#Include utils/hotkey-gui.ahk
-#Include menu/tray-menu.ahk
-#Include utils/verify-file.ahk
-#Include utils/var.ahk
-#Include utils/check-version.ahk
+#Include "*i utils/tools.ahk"
+#Include "*i utils/create-gui.ahk"
+#Include "*i utils/ini.ahk"
+#Include "*i utils/IME.ahk"
+#Include "*i utils/app-list.ahk"
+#Include "*i utils/hotkey-gui.ahk"
+#Include "*i menu/tray-menu.ahk"
+#Include "*i utils/var.ahk"
+#Include "*i utils/check-version.ahk"
 
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
@@ -605,4 +608,4 @@ showIconTimer() {
 
 #Include "*i plugins/InputTip.plugin.ahk"
 
-#Include utils/show.ahk
+#Include "*i utils/show.ahk"

@@ -1,18 +1,18 @@
 ; InputTip
 
-#Include startup.ahk
-#Include check-update.ahk
-#Include input-mode.ahk
-#Include cursor-mode.ahk
-#Include bw-list.ahk
-#Include symbol-pos.ahk
-#Include app-offset.ahk
-#Include switch-window.ahk
-#Include about.ahk
+#Include "*i startup.ahk"
+#Include "*i check-update.ahk"
+#Include "*i input-mode.ahk"
+#Include "*i cursor-mode.ahk"
+#Include "*i bw-list.ahk"
+#Include "*i symbol-pos.ahk"
+#Include "*i app-offset.ahk"
+#Include "*i switch-window.ahk"
+#Include "*i about.ahk"
 
-#Include scheme-cursor.ahk
-#Include scheme-symbol.ahk
-#Include other-config.ahk
+#Include "*i scheme-cursor.ahk"
+#Include "*i scheme-symbol.ahk"
+#Include "*i other-config.ahk"
 
 fontList := getFontList()
 fontList.InsertAt(1, "Microsoft YaHei")

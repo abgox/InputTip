@@ -1,13 +1,11 @@
 ; InputTip
 
-baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
-
-setTrayIcon(readIni("iconRunning", "InputTipSymbol\default\favicon.png"))
-
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
 fileDesc := "InputTip - 一个输入法状态管理工具(提示/切换)"
 JAB_PID := ""
+
+setTrayIcon(readIni("iconRunning", "InputTipSymbol\default\favicon.png"))
 
 try {
     keyCount := A_Args[1]

@@ -1,5 +1,7 @@
 ; InputTip
 
+#Warn All, Off
+
 #Include utils/options.ahk
 
 #NoTrayIcon

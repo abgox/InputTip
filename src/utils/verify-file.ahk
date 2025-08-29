@@ -1,6 +1,8 @@
 ; InputTip
 
-dirList := ["InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/CN", "InputTipCursor/default/EN", "InputTipCursor/default/Caps"]
+baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
+
+dirList := ["plugins", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/CN", "InputTipCursor/default/EN", "InputTipCursor/default/Caps"]
 
 for d in dirList {
     if (!DirExist(d)) {
@@ -163,29 +165,47 @@ if (A_IsCompiled) {
         FileInstall("InputTipCursor/default/Caps/Wait.ani", "InputTipCursor/default/Caps/Wait.ani", 1)
     }
 } else {
-    if (!FileExist("../InputTip.bat")) {
-        FileAppend('REM InputTip.bat' "`n" 'start "InputTip" /min "%~dp0\src\AutoHotkey\AutoHotkey64.exe" "%~dp0\src\InputTip.ahk"`n', "..\InputTip.bat", "`n UTF-8-Raw")
-    }
-
-    if (!FileExist("plugins/InputTip.plugin.ahk")) {
-        if (!DirExist("plugins")) {
-            DirCreate("plugins")
-        }
-        FileAppend("/*`n`n- 你可以在这里自定义想要的功能，例如:`n    - 自定义快捷键`n    - 自定义热字串`n    - ...`n`n- 你也可以在 plugins 目录中新建一个或多个 .ahk 文件，然后在此文件中引入，例如:`n    - 在 plugins 目录中新建一个文件名为 custom.ahk 的文件`n    - 将自定义功能写入 custom.ahk 文件中`n    - 在 InputTip.plugin.ahk 文件中引入 custom.ahk 文件: #Include custom.ahk`n`n- 需要注意: 不能存在死循环`n`n- 详情参考:`n    - 官方文档: https://inputtip.abgox.com/faq/plugin`n    - Github: https://github.com/abgox/InputTip#自定义功能`n    - Gitee: https://gitee.com/abgox/InputTip#自定义功能`n`n*/`n", "plugins/InputTip.plugin.ahk", "UTF-8")
-    }
-
-    ; 丢失的文件列表
-    missFileList := []
-
-    pngList := [
+    fileList := [
+        ; 图片
         "InputTipSymbol/default/CN.png",
         "InputTipSymbol/default/EN.png",
         "InputTipSymbol/default/Caps.png",
         "InputTipSymbol/default/favicon.png",
         "InputTipSymbol/default/favicon-pause.png",
-        "img/favicon.ico"
+        "img/favicon.ico",
+        ; 启动脚本
+        "../InputTip.bat",
+        ; 脚本文件
+        "./InputTip.JAB.JetBrains.ahk",
+        "plugins/InputTip.plugin.ahk",
+        "utils/options.ahk",
+        "utils/tools.ahk",
+        "utils/create-gui.ahk",
+        "utils/ini.ahk",
+        "utils/IME.ahk",
+        "utils/app-list.ahk",
+        "utils/hotkey-gui.ahk",
+        "utils/var.ahk",
+        "utils/check-version.ahk",
+        "utils/show.ahk",
+        "menu/tray-menu.ahk",
+        "menu/startup.ahk",
+        "menu/check-update.ahk",
+        "menu/input-mode.ahk",
+        "menu/cursor-mode.ahk",
+        "menu/bw-list.ahk",
+        "menu/symbol-pos.ahk",
+        "menu/app-offset.ahk",
+        "menu/switch-window.ahk",
+        "menu/about.ahk",
+        "menu/scheme-cursor.ahk",
+        "menu/scheme-symbol.ahk",
+        "menu/other-config.ahk",
     ]
-    for v in pngList {
+
+    missFileList := []
+
+    for v in fileList {
         if (!FileExist(v)) {
             missFileList.Push(v)
         }
@@ -202,8 +222,14 @@ if (A_IsCompiled) {
         }
     }
     if (missFileList.Length) {
+        try {
+            icon := A_IsPaused ? "InputTipSymbol\default\favicon-pause.png" : "InputTipSymbol\default\favicon.png"
+            TraySetIcon(icon, , 1)
+        }
+
         downloading(*) {
-            g := createGuiOpt("InputTip - 正在处理文件丢失...")
+            g := Gui(, "InputTip - 正在处理文件丢失...")
+            g.SetFont("s14", "Microsoft YaHei")
             g.AddText(, "正在下载丢失的文件: ")
             g.tip := g.AddText("xs cRed", "------------------------------------------------------------")
 
@@ -236,21 +262,47 @@ if (A_IsCompiled) {
                 }
             }
 
-            if (!FileExist(f)) {
+            if (FileExist(f)) {
+                if (InStr(f, ".ahk") || InStr(f, ".bat")) {
+                    try {
+                        if (!InStr(FileOpen(f, "r").ReadLine(), "InputTip")) {
+                            done := 0
+                            FileDelete(f)
+                            break
+                        }
+                    } catch {
+                        done := 0
+                        break
+                    }
+                }
+            } else {
                 done := 0
                 break
             }
         }
         downloadingGui.Destroy()
 
-        if (!done) {
-            createTipGui([{
-                opt: "cRed",
-                text: "可能因为网络等其他原因，文件没有正常恢复，请手动处理",
-            }, {
-                opt: "cGray",
-                text: '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载'
-            }], "InputTip - 正在处理文件丢失...").Show()
+        if (done) {
+            Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' 0)
+            ExitApp()
+        } else {
+            g := Gui(, "InputTip - 正在处理文件丢失...")
+            g.SetFont("s14", "Microsoft YaHei")
+            g.AddText("cRed", "可能因为网络等其他原因，文件没有正常恢复，请手动处理")
+            g.AddLink("cGray", '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载')
+            g.Show("Hide")
+            g.GetPos(, , &_w)
+
+            g := Gui(, "InputTip - 正在处理文件丢失...")
+            g.SetFont("s12", "Microsoft YaHei")
+            g.AddText("cRed", "可能因为网络等其他原因，文件没有正常恢复，请手动处理")
+            g.AddLink("cGray", '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载')
+            g.AddButton("xs w" _w, "我知道了").OnEvent("Click", (*) => ExitApp())
+            g.Show()
+
+            while (1) {
+                Sleep(5000)
+            }
         }
     }
 }

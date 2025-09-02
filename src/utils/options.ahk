@@ -25,17 +25,17 @@ LogError(exception, mode) {
     return false
 }
 
-;@AHK2Exe-SetVersion 2025.08.29
+;@AHK2Exe-SetVersion 2025.09.02
 
 if (A_IsCompiled) {
     ; exe 版本
-    currentVersion := "2025.08.29"
+    currentVersion := "2025.09.02"
 
     versionType := "exe"
     versionKey := "version"
 } else {
     ; zip 版本
-    currentVersion := "2025.08.29"
+    currentVersion := "2025.09.02"
 
     versionType := "zip"
     versionKey := "version-zip"

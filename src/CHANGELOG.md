@@ -2,6 +2,11 @@
 
 # v2 版本更新日志
 
+## 2025.09.02
+
+- 允许偏移量设置的值为小数 ([#219](https://github.com/abgox/InputTip/issues/219))
+- 修复 `符号悬停时隐藏` 的闪烁问题 ([#217](https://github.com/abgox/InputTip/issues/217))
+
 ## 2025.08.29
 
 - 添加 `符号的显示模式`

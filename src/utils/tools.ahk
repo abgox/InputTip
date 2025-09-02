@@ -115,12 +115,12 @@ isWhichScreen(screenList) {
     }
 }
 
-; 从字符串中提取出数字，可以带负号
+; 从字符串中提取出数字，支持负数和小数
 returnNumber(value) {
     if (value = "" || !(value ~= "\d")) {
         return 0
     }
-    RegExMatch(value, "(-?\d+)", &numbers)
+    RegExMatch(value, "(-?\d+\.?\d*)", &numbers)
     return numbers[1]
 }
 

@@ -503,14 +503,15 @@ loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
 
     if (!isShowCursorPos) {
         if (left = old_left && top = old_top) {
-            ; XXX: 如果鼠标一直悬停在符号上，同时有键盘操作，就会出现符号闪烁
-            if (state = lastSymbol || (isOverSymbol && A_TimeIdleKeyboard > leaveDelay)) {
+            if (state = lastSymbol || isOverSymbol) {
                 return
             }
         } else {
             isOverSymbol := 0
         }
     }
+    old_top := top
+    old_left := left
 
     if (!symbolType || !canShowSymbol) {
         hideSymbol()
@@ -578,8 +579,6 @@ loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
     }
 
     lastSymbol := state
-    old_top := top
-    old_left := left
 }
 ; 重载符号
 reloadSymbol() {

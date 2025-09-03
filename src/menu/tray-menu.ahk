@@ -106,6 +106,7 @@ makeTrayMenu() {
 
 fn_exit(*) {
     killJAB()
+    revertCursor(cursorInfo)
     ExitApp()
 }
 fn_restart(*) {

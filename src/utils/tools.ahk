@@ -176,3 +176,19 @@ setTrayIcon(path) {
 returnId() {
     return FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
 }
+
+; 还原鼠标样式
+revertCursor(cursorInfo) {
+    try {
+        for v in cursorInfo {
+            if (v.origin) {
+                DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.value)
+            } else {
+                ; 如果没有获取到原始的工形光标样式文件，则直接加载一个默认的样式
+                if (v.type == "IBEAM") {
+                    DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", "C:\Windows\Cursors\beam_m.cur", "Ptr"), "Int", v.value)
+                }
+            }
+        }
+    }
+}

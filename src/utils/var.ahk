@@ -2,7 +2,7 @@
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
-fileDesc := "InputTip - 一个输入法状态管理工具(提示/切换)"
+fileDesc := "InputTip - 输入法状态管理工具"
 JAB_PID := ""
 
 setTrayIcon(readIni("iconRunning", "InputTipSymbol\default\favicon.png"))

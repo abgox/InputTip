@@ -251,6 +251,9 @@ updateDelay() {
                     isWait := 0
                 }
             }
+            if (A_TimeIdleKeyboard <= leaveDelay) {
+                timer := 0
+            }
             if (!isWait) {
                 if (A_TimeIdleKeyboard >= hideSymbolDelay - delay || timer >= hideSymbolDelay) {
                     needHide := 1

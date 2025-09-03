@@ -51,6 +51,8 @@ makeTrayMenu() {
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("暂停/运行", pauseApp)
+    A_TrayMenu.Default := "暂停/运行"
+    A_TrayMenu.ClickCount := 1
     A_TrayMenu.Add("暂停/运行快捷键", (*) => (
         setHotKeyGui([{
             config: "hotkey_Pause",

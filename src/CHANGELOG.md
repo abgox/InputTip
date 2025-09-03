@@ -2,6 +2,12 @@
 
 # v2 版本更新日志
 
+## 2025.09.03
+
+- 使用 `托盘菜单` 中的 `退出` 会恢复鼠标样式
+- 修复 `符号的延时隐藏` 的闪烁问题 ([#218](https://github.com/abgox/InputTip/issues/218))
+- 单击托盘图标暂停/运行 ([#216](https://github.com/abgox/InputTip/issues/216))
+
 ## 2025.09.02
 
 - 允许偏移量设置的值为小数 ([#219](https://github.com/abgox/InputTip/issues/219))

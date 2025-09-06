@@ -25,6 +25,18 @@ LogError(exception, mode) {
     return false
 }
 
+OnMessage(0x20A, WM_MOUSEWHEEL_Handler) ; 0x20A = WM_MOUSEWHEEL
+WM_MOUSEWHEEL_Handler(wParam, lParam, msg, hwnd) {
+    buf := Buffer(256, 0) ; 创建缓冲区
+    DllCall("GetClassName", "ptr", hwnd, "ptr", buf.ptr, "int", buf.size)
+    controlName := StrGet(buf) ; 获取控件类名
+    if (controlName == "ComboBox") {
+        return 0 ; 禁用 ComboBox 控件的鼠标滚轮以避免误切换
+    }
+}
+
+OnMessage(0x20E, (*) => 0) ; 0x20E = WM_MOUSEHWHEEL
+
 ;@AHK2Exe-SetVersion 2025.09.03
 
 if (A_IsCompiled) {

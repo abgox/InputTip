@@ -620,8 +620,8 @@ getFontList() {
 }
 
 pauseApp(*) {
+    updateTip(!A_IsPaused)
     if (A_IsPaused) {
-        updateTip(!A_IsPaused)
         A_TrayMenu.Uncheck("暂停/运行")
         setTrayIcon(iconRunning)
         reloadSymbol()
@@ -629,12 +629,14 @@ pauseApp(*) {
             runJAB()
         }
     } else {
-        updateTip(!A_IsPaused)
         A_TrayMenu.Check("暂停/运行")
         setTrayIcon(iconPaused)
         hideSymbol()
         if (enableJABSupport) {
             killJAB(0)
+        }
+        if (changeCursor) {
+            revertCursor(cursorInfo)
         }
     }
     Pause(-1)

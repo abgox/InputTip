@@ -2,6 +2,7 @@
   "[ahk]": {
     "editor.defaultFormatter": "thqby.vscode-autohotkey2-lsp"
   },
+  "AutoHotkey2.InterpreterPath": "src\\AutoHotkey\\AutoHotkey64.exe",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true
 }

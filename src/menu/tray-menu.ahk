@@ -625,6 +625,7 @@ pauseApp(*) {
         A_TrayMenu.Uncheck("暂停/运行")
         setTrayIcon(iconRunning)
         reloadSymbol()
+        reloadCursor()
         if (enableJABSupport) {
             runJAB()
         }

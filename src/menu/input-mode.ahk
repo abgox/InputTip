@@ -5,7 +5,7 @@ fn_input_mode(*) {
     inputModeGui(info) {
         global mode := readIni("mode", 1, "InputMethod")
 
-        g := createGuiOpt("InputTip - 输入法模式")
+        g := createGuiOpt("InputTip - 输入法相关")
         gc.modeList := ["【自定义】", "【通用】"]
         tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义", "关于切换输入法状态"])
         tab.UseTab(1)

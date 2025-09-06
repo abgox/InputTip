@@ -61,7 +61,7 @@ makeTrayMenu() {
         }], "软件暂停/运行")
     ))
     A_TrayMenu.Add()
-    A_TrayMenu.Add("输入法模式", fn_input_mode)
+    A_TrayMenu.Add("输入法相关", fn_input_mode)
     A_TrayMenu.Add("状态切换快捷键", (*) => (
         setHotKeyGui([{
             config: "hotkey_CN",

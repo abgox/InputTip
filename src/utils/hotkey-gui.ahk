@@ -80,12 +80,6 @@ setHotKeyGui(keyConfigList, label := "") {
             }
         }
         e_change_hotkey(item, *) {
-            static last := ""
-            if (last = item.value) {
-                return
-            }
-            last := item.value
-
             ; 同步修改到【设置组合快捷键】和【手动输入快捷键】
             if (item.Text = "无") {
                 key := ""

@@ -9,49 +9,28 @@ fn_input_mode(*) {
         gc.modeList := ["【自定义】", "【通用】"]
         tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义", "关于切换输入法状态"])
         tab.UseTab(1)
-        g.AddText("Section cRed", "如果【通用】模式不可用，需要点击上方的【自定义】标签页去配置【自定义】模式")
+        g.AddText("Section cRed", gui_help_tip)
 
         if (info.i) {
+            g.AddText(, gui_width_line)
             return g
         }
         w := info.w
         bw := w - g.MarginX * 2
+        line := gui_width_line "----------"
 
-        g.AddText(, "1. 指定输入法的状态识别模式:")
+        g.AddText("xs", line)
 
+        g.AddText("xs", "1. 输入法状态的识别模式:")
         g.AddDropDownList("yp Choose" mode + 1, [" 自定义", " 通用"]).OnEvent("Change", e_changeMode)
         e_changeMode(item, *) {
             value := item.value - 1
             global mode := value
             writeIni("mode", value, "InputMethod")
         }
-        g.AddText("xs cGray", "输入法模式只有【通用】和【自定义】，这里显示的模式会根据实际的配置情况自动变化")
-        g.AddText("xs", "2. 获取输入法状态的超时时间: ")
-        _ := g.AddEdit("yp Number Limit5")
-        _.Focus()
-        _.OnEvent("Change", e_setTimeout)
-        _.Value := checkTimeout
-        e_setTimeout(item, *) {
-            static db := debounce((value) => (
-                writeIni("checkTimeout", value, "InputMethod"),
-                restartJAB()
-            ))
-
-            value := item.value
-
-            if value == ""
-                return
-
-            if value < 100
-                value := 100
-
-            global checkTimeout := value
-
-            db(value)
-        }
-        g.AddText("xs cGray", "单位：毫秒，默认 500 毫秒`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态`n它可能是有时识别不到输入法状态的原因，遇到问题可以尝试调节它")
-        g.AddText("xs", "3. 实现切换输入法状态的方式: ")
-        gc.switchStatus := g.AddDropDownList("yp Choose" switchStatus + 1, ["内部调用 DLL", "模拟输入 LShift", "模拟输入 RShift", "模拟输入 Ctrl+Space"])
+        g.AddText("xs cGray", "建议使用【自定义】，并在上方的【自定义】标签页中进行配置")
+        g.AddText("xs", "2. 输入法状态的切换方式:")
+        gc.switchStatus := g.AddDropDownList("yp Choose" switchStatus + 1, [" 内部调用 DLL", " 模拟输入 LShift", " 模拟输入 RShift", " 模拟输入 Ctrl+Space"])
         gc.switchStatus.OnEvent("Change", e_switchStatus)
         e_switchStatus(item, *) {
             value := item.value - 1
@@ -93,10 +72,34 @@ fn_input_mode(*) {
             }
         }
         g.AddText("xs cGray", "建议根据实际情况使用【模拟输入 LShift】或【模拟输入 RShift】`n如果想修改这个配置，需要先通过上方的【关于切换输入法状态】标签页了解详情")
+        g.AddText("xs", "3. 输入法状态的获取超时:")
+        _ := g.AddEdit("yp Number Limit5")
+        _.Focus()
+        _.OnEvent("Change", e_setTimeout)
+        _.Value := checkTimeout
+        e_setTimeout(item, *) {
+            static db := debounce((value) => (
+                writeIni("checkTimeout", value, "InputMethod"),
+                restartJAB()
+            ))
+
+            value := item.value
+
+            if value == ""
+                return
+
+            if value < 100
+                value := 100
+
+            global checkTimeout := value
+
+            db(value)
+        }
+        g.AddText("xs cGray", "单位：毫秒，默认为 500 毫秒，非特殊情况不应该随意修改它`n每次切换输入法状态，InputTip 会从系统获取新的输入法状态`n如果超过了这个时间，则认为获取失败，直接判断为英文状态")
         tab.UseTab(2)
 
         g.AddText("Section ReadOnly cRed -VScroll w" w, "首先需要点击上方的【关于自定义】标签页，查看帮助说明，了解如何设置")
-        g.AddText("xs cGray", "如果添加了至少一条规则，则自动变为【自定义】模式，反之变回【通用】模式")
+        g.AddText("xs", line)
 
         g.AddText("Section", "默认状态: ")
         g.AddDropDownList("yp Choose" baseStatus + 1, [" 英文状态", " 中文状态"]).OnEvent("Change", e_changeBaseStatus)

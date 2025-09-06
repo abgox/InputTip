@@ -17,9 +17,14 @@ fn_input_mode(*) {
         w := info.w
         bw := w - g.MarginX * 2
 
-        g.AddText(, "1. 当前使用的输入法模式:")
-        gc.mode := g.AddText("yp cRed w" w / 2)
-        gc.mode.Value := gc.modeList[mode + 1]
+        g.AddText(, "1. 指定输入法的状态识别模式:")
+
+        g.AddDropDownList("yp Choose" mode + 1, [" 自定义", " 通用"]).OnEvent("Change", e_changeMode)
+        e_changeMode(item, *) {
+            value := item.value - 1
+            global mode := value
+            writeIni("mode", value, "InputMethod")
+        }
         g.AddText("xs cGray", "输入法模式只有【通用】和【自定义】，这里显示的模式会根据实际的配置情况自动变化")
         g.AddText("xs", "2. 获取输入法状态的超时时间: ")
         _ := g.AddEdit("yp Number Limit5")
@@ -270,12 +275,6 @@ fn_input_mode(*) {
 
                     global modeRule := arrJoin(modeRules, ":")
                     writeIni("modeRule", modeRule, "InputMethod")
-                    if (modeRules.Length) {
-                        global mode := 0
-                        writeIni("mode", 0, "InputMethod")
-                        gc.mode.Value := gc.modeList[1]
-                    }
-
                     fn_reloading_LV(LV)
                 }
                 if (!add) {
@@ -285,11 +284,6 @@ fn_input_mode(*) {
                         LV.Delete(RowNumber)
                         autoHdrLV(LV)
                         modeRules.RemoveAt(RowNumber)
-                        if (!modeRules.Length) {
-                            global mode := 1
-                            writeIni("mode", 1, "InputMethod")
-                            gc.mode.Value := gc.modeList[2]
-                        }
                         global modeRule := arrJoin(modeRules, ":")
                         writeIni("modeRule", modeRule, "InputMethod")
                         fn_reloading_LV(LV)

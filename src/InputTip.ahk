@@ -75,7 +75,7 @@ if (hotkey_ShowCode) {
 
 enableKeyCount := readIni("enableKeyCount", 0)
 trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
-keyCountTemplate := readIni("keyCountTemplate", "%\n%启动至今，有效的按键次数: %keyCount%")
+keyCountTemplate := readIni("keyCountTemplate", "%\n%【统计中】启动以来, 有效的按键输入次数: %keyCount%")
 A_IconTip := StrReplace(trayTipTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
 
 updateTip()

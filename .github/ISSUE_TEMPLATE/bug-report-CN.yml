@@ -15,6 +15,8 @@ body:
           required: true
         - label: 你已经查看了 [一些常见的使用问题](https://inputtip.abgox.com/faq/), 其中没有你遇到的问题。
           required: true
+        - label: 你已经观看了 [InputTip 使用教程](https://www.bilibili.com/video/BV15oYKz5EQ8), 仍未解决你的问题。
+          required: true
   - type: input
     id: version
     attributes:

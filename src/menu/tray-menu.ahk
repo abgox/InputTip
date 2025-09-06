@@ -2,7 +2,7 @@
 
 #Include "*i startup.ahk"
 #Include "*i check-update.ahk"
-#Include "*i input-mode.ahk"
+#Include "*i input-method.ahk"
 #Include "*i cursor-mode.ahk"
 #Include "*i bw-list.ahk"
 #Include "*i symbol-pos.ahk"

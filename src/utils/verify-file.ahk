@@ -191,7 +191,7 @@ if (A_IsCompiled) {
         "menu/tray-menu.ahk",
         "menu/startup.ahk",
         "menu/check-update.ahk",
-        "menu/input-mode.ahk",
+        "menu/input-method.ahk",
         "menu/cursor-mode.ahk",
         "menu/bw-list.ahk",
         "menu/symbol-pos.ahk",

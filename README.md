@@ -25,6 +25,8 @@
 
 ---
 
+![InputTip](https://socialify.git.ci/abgox/InputTip/image?description=1&font=Inter&forks=1&issues=1&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI%2BDQogIDxtYXNrIGlkPSJjdXJzb3JNYXNrIj4NCiAgICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0id2hpdGUiLz4NCiAgICA8IS0tIOWFieagh%2BaVtOS9k%2BaUvuWkpyAxLjEg5YCN5bm25L%2Bd5oyB5Lit5b%2BD5a%2B56b2QIC0tPg0KICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1NiwyNTYpIHNjYWxlKDEuMSkgdHJhbnNsYXRlKC0yNTYsLTI1NikiPg0KICAgICAgPHJlY3QgeD0iMjMwIiB5PSIxMDAiIHdpZHRoPSI1MiIgaGVpZ2h0PSIzMTIiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSJibGFjayIvPg0KICAgICAgPHJlY3QgeD0iMTgwIiB5PSI4MCIgd2lkdGg9IjE1MiIgaGVpZ2h0PSIzNiIgcng9IjgiIHJ5PSI4IiBmaWxsPSJibGFjayIvPg0KICAgICAgPHJlY3QgeD0iMTgwIiB5PSIzOTYiIHdpZHRoPSIxNTIiIGhlaWdodD0iMzYiIHJ4PSI4IiByeT0iOCIgZmlsbD0iYmxhY2siLz4NCiAgICA8L2c%2BDQogIDwvbWFzaz4NCiAgPHJlY3QgeD0iOCIgeT0iOCIgd2lkdGg9IjQ5NiIgaGVpZ2h0PSI0OTYiIHJ4PSI2NCIgcnk9IjY0IiBmaWxsPSIjMUU4OEZGIiBtYXNrPSJ1cmwoI2N1cnNvck1hc2spIi8%2BDQo8L3N2Zz4NCg%3D%3D&name=1&owner=1&stargazers=1&theme=Auto)
+
 <p align="center">
   <strong>喜欢这个项目？请给它一个 ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
 </p>
@@ -56,7 +58,7 @@
 > [!Tip]
 >
 > - 如果这里无法正常显示，[可前往官网查看](https://inputtip.abgox.com/)
-> - [点击查看 Bilibili 中的介绍及教学视频](https://www.bilibili.com/video/BV17veBzkEU9)
+> - [点击查看 Bilibili 中的介绍及教学视频](https://www.bilibili.com/video/BV15oYKz5EQ8)
 
 <video src="https://inputtip.abgox.com/releases/v2/demo.mp4" controls></video>
 

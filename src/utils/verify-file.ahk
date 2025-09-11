@@ -20,11 +20,11 @@ if (A_IsCompiled) {
     if (!FileExist("InputTipSymbol/default/Caps.png")) {
         FileInstall("InputTipSymbol/default/Caps.png", "InputTipSymbol/default/Caps.png", 1)
     }
-    if (!FileExist("InputTipSymbol/default/favicon.png")) {
-        FileInstall("InputTipSymbol/default/favicon.png", "InputTipSymbol/default/favicon.png", 1)
+    if (!FileExist("InputTipSymbol/default/app.png")) {
+        FileInstall("InputTipSymbol/default/app.png", "InputTipSymbol/default/app.png", 1)
     }
-    if (!FileExist("InputTipSymbol/default/favicon-pause.png")) {
-        FileInstall("InputTipSymbol/default/favicon-pause.png", "InputTipSymbol/default/favicon-pause.png", 1)
+    if (!FileExist("InputTipSymbol/default/app-paused.png")) {
+        FileInstall("InputTipSymbol/default/app-paused.png", "InputTipSymbol/default/app-paused.png", 1)
     }
 
     if (!FileExist("InputTipCursor/default/CN/AppStarting.ani")) {
@@ -170,9 +170,9 @@ if (A_IsCompiled) {
         "InputTipSymbol/default/CN.png",
         "InputTipSymbol/default/EN.png",
         "InputTipSymbol/default/Caps.png",
-        "InputTipSymbol/default/favicon.png",
-        "InputTipSymbol/default/favicon-pause.png",
-        "img/favicon.ico",
+        "InputTipSymbol/default/app.png",
+        "InputTipSymbol/default/app-paused.png",
+        "img/app.ico",
         ; 启动脚本
         "../InputTip.bat",
         ; 脚本文件
@@ -223,7 +223,7 @@ if (A_IsCompiled) {
     }
     if (missFileList.Length) {
         try {
-            icon := A_IsPaused ? "InputTipSymbol\default\favicon-pause.png" : "InputTipSymbol\default\favicon.png"
+            icon := A_IsPaused ? "InputTipSymbol\default\app-paused.png" : "InputTipSymbol\default\app.png"
             TraySetIcon(icon, , 1)
         }
 

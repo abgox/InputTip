@@ -160,11 +160,11 @@ setTrayIcon(path) {
         TraySetIcon(path, , 1)
     } catch {
         if (A_IsPaused) {
-            path := "InputTipSymbol\default\favicon-pause.png"
+            path := "InputTipSymbol\default\app-paused.png"
             global iconPaused := path
             writeIni("iconPaused", path)
         } else {
-            path := "InputTipSymbol\default\favicon.png"
+            path := "InputTipSymbol\default\app.png"
             global iconRunning := path
             writeIni("iconRunning", path)
         }

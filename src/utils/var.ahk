@@ -5,7 +5,7 @@ fileLnk := filename ".lnk"
 fileDesc := "InputTip - 输入法状态管理工具"
 JAB_PID := ""
 
-setTrayIcon(readIni("iconRunning", "InputTipSymbol\default\favicon.png"))
+setTrayIcon(readIni("iconRunning", "InputTipSymbol\default\app.png"))
 
 try {
     keyCount := A_Args[1]
@@ -94,8 +94,8 @@ symbolShowMode := readIni("symbolShowMode", 1)
 delay := readIni("delay", 20)
 
 ; 托盘菜单图标
-iconRunning := readIni("iconRunning", "InputTipSymbol\default\favicon.png")
-iconPaused := readIni("iconPaused", "InputTipSymbol\default\favicon-pause.png")
+iconRunning := readIni("iconRunning", "InputTipSymbol\default\app.png")
+iconPaused := readIni("iconPaused", "InputTipSymbol\default\app-paused.png")
 
 ; 开机自启动
 isStartUp := readIni("isStartUp", 0)

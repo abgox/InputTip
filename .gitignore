@@ -1,7 +1,4 @@
 src/*.exe
-src/InputTipCursor
-src/InputTipSymbol
-src/InputTip.ini
 test/
 todo/
 

@@ -19,6 +19,23 @@ fontList.InsertAt(1, "Microsoft YaHei")
 
 makeTrayMenu() {
     A_TrayMenu.Delete()
+    A_TrayMenu.Add("使用指南", fn_guide)
+    fn_guide(*) {
+        createTipGui([{
+            opt: "",
+            text: "对于还不熟悉 InputTip 的朋友，这里有几个建议:"
+        }, {
+            opt: "",
+            text: '1. 使用前先看看视频教程: <a href="https://www.bilibili.com/video/BV15oYKz5EQ8">InputTip 使用教程 - Bilibili</a>',
+        }, {
+            opt: "",
+            text: '2. 可以再看看 <a href="https://inputtip.abgox.com">官网</a>、<a href="https://inputtip.abgox.com/faq">常见问题</a>，源代码仓库 <a href="https://github.com/abgox/InputTip">Github</a>、<a href="https://gitee.com/abgox/InputTip">Gitee</a>'
+        }, {
+            opt: "",
+            text: '3. 如果有其他问题，可以在【关于】中找到相关渠道进行反馈'
+        }], "InputTip - 使用指南").Show()
+    }
+    A_TrayMenu.Add()
     A_TrayMenu.Add("开机自启动", fn_startup)
     if (isStartUp) {
         A_TrayMenu.Check("开机自启动")

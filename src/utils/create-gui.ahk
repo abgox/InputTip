@@ -111,19 +111,16 @@ createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
         g := createGuiOpt(title)
 
         for v in Tips {
-            g.AddLink(v.opt, v.text).Focus()
+            g.AddLink(v.opt, v.text)
         }
 
         if (info.i) {
             return g
         }
-        w := info.w
 
-        btn := g.AddButton("xs w" w, btnText)
-        btn.OnEvent("Click", e_close)
-        e_close(*) {
-            g.Destroy()
-        }
+        btn := g.AddButton("xs w" info.w, btnText)
+        btn.Focus()
+        btn.OnEvent("Click", (*) => g.Destroy())
         return g
     }
     return createUniqueGui(tipGui)

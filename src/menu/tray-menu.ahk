@@ -138,8 +138,8 @@ fn_update_user(uname, *) {
     global userName := uname
     createUniqueGui(updateUserGui).Show()
     updateUserGui(info) {
-        g := createGuiOpt("InputTip - 设置用户信息")
-        tab := g.AddTab3("-Wrap", ["设置用户信息", "关于"])
+        g := createGuiOpt("InputTip - 设置用户名")
+        tab := g.AddTab3("-Wrap", ["设置用户名", "关于"])
         tab.UseTab(1)
         g.AddText("Section cRed", gui_help_tip)
 

@@ -186,8 +186,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
 
-                        y := g.AddButton("xs w" bw / 2, "确认更新")
-                        y.OnEvent("Click", e_yes)
+                        g.AddButton("xs w" bw / 2, "确认更新").OnEvent("Click", e_yes)
                         e_yes(*) {
                             fn_close()
                             if (!updateNewVersion()) {
@@ -210,8 +209,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                                     w := info.w
                                     bw := w - g.MarginX * 2
 
-                                    y := g.AddButton("xs w" bw, "我知道了")
-                                    y.OnEvent("Click", yes)
+                                    g.AddButton("xs w" bw, "我知道了").OnEvent("Click", yes)
                                     g.OnEvent("Close", yes)
                                     yes(*) {
                                         g.Destroy()
@@ -303,9 +301,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                         g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
                         g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
 
-
-                        y := g.AddButton("w" w / 2, "确认更新")
-                        y.OnEvent("Click", e_yes)
+                        g.AddButton("w" w / 2, "确认更新").OnEvent("Click", e_yes)
                         e_yes(*) {
                             fn_close()
                             getRepoCode(newVersion, 0)
@@ -524,12 +520,7 @@ getRepoCode(newVersion, silent := silentUpdate) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            y := g.AddButton("xs w" bw, "我知道了")
-            y.OnEvent("Click", yes)
-            g.OnEvent("Close", yes)
-            yes(*) {
-                g.Destroy()
-            }
+            g.AddButton("xs w" bw, "我知道了").OnEvent("Click", (*) => g.Destroy())
             return g
         }
     }
@@ -727,11 +718,9 @@ checkUpdateDone() {
         doneGui(info) {
             g := Gui("AlwaysOnTop", "InputTip - 版本更新完成")
             g.SetFont("s14", "Microsoft YaHei")
-            g.AddText(, "版本更新完成，当前版本: ")
+            g.AddText(, "InputTip 版本更新完成，当前版本:")
             g.AddText("yp cRed", currentVersion)
-            g.AddText("xs", "-------------------------------------------")
-            g.AddText("xs", "建议查看更新日志，了解最新变化")
-            g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+            g.AddText("xs", gui_width_line).Focus()
 
             if (info.i) {
                 return g
@@ -739,9 +728,17 @@ checkUpdateDone() {
             w := info.w
             bw := w - g.MarginX * 2
 
-            y := g.AddButton("xs w" bw, "我知道了")
+            try {
+                logContent := FileRead(A_Temp "\abgox.InputTip-CHANGELOG.md", "UTF-8")
+                g.AddEdit("xs ReadOnly cGray VScroll r9 w" bw, SubStr(logContent, InStr(logContent, "#")))
+            } catch {
+                g.AddText("xs cGray", "版本日志加载失败，你可以通过以下链接查看在线的版本更新日志")
+            }
+            g.AddLink("xs", '项目仓库地址:   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Gitee</a>')
+            g.AddLink("xs", '版本更新日志:   <a href="https://inputtip.abgox.com/v2/changelog">官网</a>   <a href="https://github.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Github</a>   <a href="https://gitee.com/abgox/InputTip/blob/main/src/CHANGELOG.md">Gitee</a>')
+
+            g.AddButton("xs w" bw, "我知道了").OnEvent("Click", yes)
             g.OnEvent("Close", yes)
-            y.OnEvent("Click", yes)
             yes(*) {
                 g.Destroy()
                 handlePostUpdate()

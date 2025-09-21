@@ -1,27 +1,27 @@
 ﻿param(
-    # 未处理的鼠标样式目录
-    $dir,
+    # 待处理的鼠标样式目录
+    [string]$dir,
     # 处理后的鼠标样式目录
-    $out = "out"
+    [string]$out = "out"
 )
 
 $cursorNameMap = @{
     AppStarting = @("Work")
-    Arrow       = @("Pointer")
-    Cross       = @("")
-    Hand        = @("Link")
-    Help        = @("")
-    IBeam       = @("Text")
-    No          = @("Unavailable")
+    Arrow       = @("Pointer", "Normal")
+    Cross       = @("Crosshair", "Precision")
+    Hand        = @("Link", "HandPointer", "PointingHand")
+    Help        = @("Question", "QuestionArrow")
+    IBeam       = @("Text", "Input")
+    No          = @("Unavailable", "NotAllowed", "Forbidden")
     Pen         = @("Handwriting")
-    Person      = @("")
-    Pin         = @("")
-    SizeAll     = @("Move")
-    SizeNESW    = @("Dgn2")
-    SizeNS      = @("Vert")
-    SizeNWSE    = @("Dgn1")
-    SizeWE      = @("Horz")
-    UpArrow     = @("Alternate")
+    Person      = @("People")
+    Pin         = @("Place")
+    SizeAll     = @("Move", "AllScroll")
+    SizeNESW    = @("Dgn2", "Diagonal2")
+    SizeNS      = @("Vert", "Vertical")
+    SizeNWSE    = @("Dgn1", "Diagonal1")
+    SizeWE      = @("Horz", "Horizontal")
+    UpArrow     = @("Alternate", "Up")
     Wait        = @("Busy")
 }
 

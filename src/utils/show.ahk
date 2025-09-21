@@ -38,8 +38,8 @@ while 1 {
                     }
                 }
 
-                ; 等待窗口完成激活，防止切换状态冲突，导致状态切换失败
-                WinWaitActive(exe_title " ahk_exe " exe_name, , 15)
+                ; 等待窗口完成聚焦，防止切换状态冲突，导致状态切换失败
+                WinWaitActive(exe_title " ahk_exe " exe_name, , 5)
 
                 lastSymbol := ""
                 lastCursor := ""

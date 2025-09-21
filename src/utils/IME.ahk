@@ -201,7 +201,7 @@ isCN() {
  * switch_CN()
  */
 switch_CN(pressKey := "", *) {
-    ; 当按下 shift + 任意键，取消强制切换
+    ; 当按下 shift + 任意键，取消切换
     if (pressKey && InStr(hotkey_CN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
@@ -226,7 +226,7 @@ switch_CN(pressKey := "", *) {
  * switch_EN()
  */
 switch_EN(pressKey := "", *) {
-    ; 当按下 shift + 任意键，取消强制切换
+    ; 当按下 shift + 任意键，取消切换
     if (pressKey && InStr(hotkey_EN, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }
@@ -251,7 +251,7 @@ switch_EN(pressKey := "", *) {
  * switch_Caps()
  */
 switch_Caps(pressKey := "", *) {
-    ; 当按下 shift + 任意键，取消强制切换
+    ; 当按下 shift + 任意键，取消切换
     if (pressKey && InStr(hotkey_Caps, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
         return
     }

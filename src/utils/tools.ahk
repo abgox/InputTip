@@ -95,7 +95,7 @@ getScreenInfo() {
 }
 
 /**
- * 激活的窗口在哪个屏幕
+ * 聚焦的窗口在哪个屏幕
  */
 isWhichScreen(screenList) {
     try {

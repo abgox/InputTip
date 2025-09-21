@@ -5,7 +5,7 @@ fn_bw_list(*) {
     bwListGui(info) {
         g := createGuiOpt("InputTip - 设置符号的黑/白名单")
 
-        tab := g.AddTab3("-Wrap", ["符号的黑白名单", "关于"])
+        tab := g.AddTab3("-Wrap", ["符号的黑/白名单", "关于"])
         tab.UseTab(1)
         g.AddText("Section cRed", gui_help_tip)
 

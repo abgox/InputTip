@@ -7,7 +7,6 @@
  * @example
  * setHotKeyGui([{
  * config: "hotkey_Pause", ; 要写入的配置项
- * preTip: "设置快捷键", ; 快捷键功能描述前缀，可省略
  * tip: "暂停/运行" ; 快捷键功能描述
  * }], "软件暂停/运行")
  */
@@ -51,14 +50,7 @@ setHotKeyGui(keyConfigList, label := "") {
         }
 
         for v in keyConfigList {
-            try {
-                g.AddText("xs", v.preTip)
-                g.AddText("yp cRed", v.tip)
-            } catch {
-                g.AddText("xs cRed", v.tip)
-            }
-
-            g.AddText("yp", ":")
+            g.AddText("xs", v.tip ":")
 
             _ := gc.%v.config% := g.AddDropDownList("yp r9", keyList)
             _._config := v.config
@@ -98,13 +90,7 @@ setHotKeyGui(keyConfigList, label := "") {
         g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
 
         for v in keyConfigList {
-            try {
-                g.AddText("xs", v.preTip)
-                g.AddText("yp cRed", v.tip)
-            } catch {
-                g.AddText("xs cRed", v.tip)
-            }
-            g.AddText("yp", ":")
+            g.AddText("xs", v.tip ":")
             value := readIni(v.config, '')
             _ := gc.%v.config "2"% := g.AddHotkey("yp", StrReplace(value, "#", ""))
             _._config := v.config
@@ -138,13 +124,7 @@ setHotKeyGui(keyConfigList, label := "") {
         g.AddText("xs", '3.  这里会回显它们的设置，建议先使用它们，然后回到此处适当修改')
         g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.abgox.com/faq/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
         for v in keyConfigList {
-            try {
-                g.AddText("xs", v.preTip)
-                g.AddText("yp cRed", v.tip)
-            } catch {
-                g.AddText("xs cRed", v.tip)
-            }
-            g.AddText("yp", ":")
+            g.AddText("xs", v.tip ":")
             _ := gc.%v.config "3"% := g.AddEdit("yp")
             _._config := v.config
             _._with := v.config "_win"

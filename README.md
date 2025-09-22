@@ -202,7 +202,7 @@
   - `InputTipCursor` (如果没有修改，可以忽略)
   - `InputTipSymbol` (如果没有修改，可以忽略)
 
-- 如果使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 下的 `InputTip-zip` 或 `InputTip`
+- 如果使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 中的 `InputTip-zip` 或 `InputTip`
   - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
   - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们，除非卸载时携带 `-p` 或 `--purge` 参数
 - 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)
@@ -223,7 +223,7 @@
 - 或者，在 `plugins` 目录中新建 `.ahk` 文件，然后在 `InputTip.plugin.ahk` 中 `#Include` 它
 - `plugins` 目录的特点:
   - 在 `plugins` 目录中的文件不会因为版本更新而被覆盖
-  - 如果你使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 下的 `abgox.InputTip-zip`，`plugins` 目录会被 `persist`
+  - 如果你使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 中的 `abgox.InputTip-zip`，`plugins` 目录会被 `persist`
     - 因此，也可以通过 [Scoop](https://scoop.sh/) 更新，而不会覆盖 `plugins` 目录中的文件
 
 ### 关于状态提示方案
@@ -279,7 +279,7 @@
 
 > [!Warning]
 >
-> - 如果不使用 [符号方案](#符号方案)，或者使用 `在鼠标附近显示符号`，无需步骤 1 和 2
+> - 如果不使用 [符号方案](#符号方案)，或者正在使用 `在鼠标附近显示符号`，无需步骤 1 和 2
 
 1. 安装 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
 
@@ -312,7 +312,7 @@
      jabswitch -enable
      ```
 
-3. `托盘菜单` => `更多设置` => `JAB/JetBrains IDE 支持`
+3. `托盘菜单` => `其他设置` => `JAB/JetBrains IDE 支持`
 
 4. `托盘菜单` => `光标获取模式`，设置 JetBrains IDE 的光标获取模式为 `JAB`
 

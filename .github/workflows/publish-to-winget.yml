@@ -19,20 +19,23 @@ jobs:
           SSH_CONFIG: ${{ secrets.SSH_CONFIG }}
           SSH_ID_RSA_GITHUB: ${{ secrets.SSH_ID_RSA_GITHUB }}
         run: |
-          # Create secure directory
-          $sshDir = "$HOME\.ssh"
+          $sshDir = "$env:UserProfile\.ssh"
           New-Item -Path $sshDir -ItemType Directory -Force
-          attrib +h $sshDir
 
           # Write key files
-          $env:SSH_CONFIG | Out-File "$sshDir\config" -Encoding utf8NoBOM
-          $env:SSH_ID_RSA_GITHUB | Out-File "$sshDir\id_rsa_github" -Encoding utf8NoBOM
+          $env:SSH_CONFIG | Out-File "$sshDir\config" -Encoding utf8NoBOM -NoNewline
+          $env:SSH_ID_RSA_GITHUB | Out-File "$sshDir\id_rsa_github" -Encoding utf8NoBOM -NoNewline
+          $env:SSH_ID_RSA_GITEE | Out-File "$sshDir\id_rsa_gitee" -Encoding utf8NoBOM -NoNewline
 
-          # Set strict permissions
-          icacls "$sshDir\id_rsa_github" /inheritance:r "$($env:USERNAME):(F)"
-
-          # Add host fingerprints to known_hosts
-          ssh-keyscan github.com >> "$sshDir\known_hosts"
+          try {
+              ssh-keyscan github.com gitee.com 2>$null | Out-File "$sshDir\known_hosts" -Encoding utf8NoBOM
+              if (-not (Test-Path "$sshDir\known_hosts") -or (Get-Content "$sshDir\known_hosts" -Raw).Trim().Length -eq 0) {
+                  throw "ssh-keyscan failed"
+              }
+          } catch {
+              Write-Host "::error::Failed to generate known_hosts, disabling host key verification..." -ForegroundColor Red
+              git config --global core.sshCommand "ssh -o StrictHostKeyChecking=no"
+          }
 
       - name: Configure Git
         shell: pwsh
@@ -43,10 +46,9 @@ jobs:
       - name: Clone from GitHub and Create PR branch
         shell: pwsh
         run: |
-          $temp_dir = "temp_$(Get-Date -Format 'yyyyMMddHHmmss')"
-          git clone --depth 1 "git@github.com:abgox/InputTip.git"
-          git clone --depth 1 "git@github.com:abgox/winget-pkgs.git" $temp_dir
-          cd $temp_dir
+          git clone --depth 1 "git@github.com:abgox/InputTip.git" InputTip
+          git clone --depth 1 "git@github.com:abgox/winget-pkgs.git" winget-pkgs
+          cd winget-pkgs
           $info = ..\InputTip\scripts\create-winget-manifest.ps1 "manifests\a\abgox\InputTip"
           $new_branch = $info.new_branch
           git checkout -b $new_branch

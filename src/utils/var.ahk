@@ -80,7 +80,7 @@ ShowNearCursor := StrSplit(readIniSection("ShowNearCursor"), "`n")
 ; 符号显示在鼠标附近时的特殊偏移量 x
 showCursorPos_x := readIni("showCursorPos_x", 0)
 ; 符号显示在鼠标附近时的特殊偏移量 y
-showCursorPos_y := readIni("showCursorPos_y", -20)
+showCursorPos_y := readIni("showCursorPos_y", 30)
 
 ; 当鼠标悬停在符号上时，符号是否需要隐藏
 hoverHide := readIni("hoverHide", 1)

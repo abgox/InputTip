@@ -2,7 +2,7 @@
 
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
 
-dirList := ["plugins", "InputTipIcon", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/oreo-red", "InputTipCursor/default/oreo-blue", "InputTipCursor/default/oreo-green"]
+dirList := ["plugins", "InputTipIcon", "InputTipIcon/default", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/oreo-red", "InputTipCursor/default/oreo-blue", "InputTipCursor/default/oreo-green"]
 
 for d in dirList {
     if (!DirExist(d)) {

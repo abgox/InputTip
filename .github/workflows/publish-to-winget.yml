@@ -25,10 +25,9 @@ jobs:
           # Write key files
           $env:SSH_CONFIG | Out-File "$sshDir\config" -Encoding utf8NoBOM -NoNewline
           $env:SSH_ID_RSA_GITHUB | Out-File "$sshDir\id_rsa_github" -Encoding utf8NoBOM -NoNewline
-          $env:SSH_ID_RSA_GITEE | Out-File "$sshDir\id_rsa_gitee" -Encoding utf8NoBOM -NoNewline
 
           try {
-              ssh-keyscan github.com gitee.com 2>$null | Out-File "$sshDir\known_hosts" -Encoding utf8NoBOM
+              ssh-keyscan github.com 2>$null | Out-File "$sshDir\known_hosts" -Encoding utf8NoBOM
               if (-not (Test-Path "$sshDir\known_hosts") -or (Get-Content "$sshDir\known_hosts" -Raw).Trim().Length -eq 0) {
                   throw "ssh-keyscan failed"
               }

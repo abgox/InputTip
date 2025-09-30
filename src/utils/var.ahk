@@ -231,11 +231,17 @@ updateCursor() {
 
     _ := {}
 
+    colorMap := Map(
+        "CN", "red",
+        "EN", "blue",
+        "Caps", "green",
+    )
+
     for state in ["CN", "EN", "Caps"] {
-        dir := readIni(state "_cursor", "InputTipCursor\default\" state)
+        dir := readIni(state "_cursor", "InputTipCursor\default\oreo-" colorMap[state])
         if (!DirExist(dir)) {
-            writeIni(state "_cursor", "InputTipCursor\default\" state)
-            dir := "InputTipCursor\default\" state
+            writeIni(state "_cursor", "InputTipCursor\default\oreo-" colorMap[state])
+            dir := "InputTipCursor\default\oreo-" colorMap[state]
         }
         _.%state% := dir
 

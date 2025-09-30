@@ -566,15 +566,14 @@ fn_white_list(*) {
  * @returns {Array} 目录路径列表
  */
 getCursorDir() {
-    dirList := ":"
-    defaultList := ":InputTipCursor\default\Caps:InputTipCursor\default\EN:InputTipCursor\default\CN:"
+    dirList := ":InputTipCursor\default\oreo-red:InputTipCursor\default\oreo-blue:InputTipCursor\default\oreo-green:"
     loopDir("InputTipCursor")
     loopDir(path) {
         Loop Files path "\*", "DR" {
             if (A_LoopFileAttrib ~= "D") {
                 loopDir A_LoopFilePath
                 if (!hasChildDir(A_LoopFilePath)) {
-                    if (!InStr(dirList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
+                    if (!InStr(dirList, ":" A_LoopFilePath ":")) {
                         dirList .= A_LoopFilePath ":"
                     }
                 }
@@ -582,10 +581,6 @@ getCursorDir() {
         }
     }
     dirList := StrSplit(SubStr(dirList, 2, StrLen(dirList) - 2), ":")
-
-    for v in StrSplit(SubStr(defaultList, 2, StrLen(defaultList) - 2), ":") {
-        dirList.InsertAt(1, v)
-    }
     return dirList
 }
 

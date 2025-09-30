@@ -2,7 +2,7 @@
 
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
 
-dirList := ["plugins", "InputTipIcon", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/CN", "InputTipCursor/default/EN", "InputTipCursor/default/Caps"]
+dirList := ["plugins", "InputTipIcon", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/oreo-red", "InputTipCursor/default/oreo-blue", "InputTipCursor/default/oreo-green"]
 
 for d in dirList {
     if (!DirExist(d)) {
@@ -28,142 +28,142 @@ if (A_IsCompiled) {
         FileInstall("InputTipSymbol/default/triangle-green.png", "InputTipSymbol/default/triangle-green.png", 1)
     }
 
-    if (!FileExist("InputTipCursor/default/CN/AppStarting.ani")) {
-        FileInstall("InputTipCursor/default/CN/AppStarting.ani", "InputTipCursor/default/CN/AppStarting.ani", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/AppStarting.ani")) {
+        FileInstall("InputTipCursor/default/oreo-red/AppStarting.ani", "InputTipCursor/default/oreo-red/AppStarting.ani", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/Arrow.cur")) {
-        FileInstall("InputTipCursor/default/CN/Arrow.cur", "InputTipCursor/default/CN/Arrow.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/Arrow.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/Arrow.cur", "InputTipCursor/default/oreo-red/Arrow.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/Cross.cur")) {
-        FileInstall("InputTipCursor/default/CN/Cross.cur", "InputTipCursor/default/CN/Cross.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/Cross.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/Cross.cur", "InputTipCursor/default/oreo-red/Cross.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/Hand.cur")) {
-        FileInstall("InputTipCursor/default/CN/Hand.cur", "InputTipCursor/default/CN/Hand.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/Hand.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/Hand.cur", "InputTipCursor/default/oreo-red/Hand.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/Help.cur")) {
-        FileInstall("InputTipCursor/default/CN/Help.cur", "InputTipCursor/default/CN/Help.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/Help.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/Help.cur", "InputTipCursor/default/oreo-red/Help.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/IBeam.cur")) {
-        FileInstall("InputTipCursor/default/CN/IBeam.cur", "InputTipCursor/default/CN/IBeam.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/IBeam.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/IBeam.cur", "InputTipCursor/default/oreo-red/IBeam.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/No.cur")) {
-        FileInstall("InputTipCursor/default/CN/No.cur", "InputTipCursor/default/CN/No.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/No.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/No.cur", "InputTipCursor/default/oreo-red/No.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/Pen.cur")) {
-        FileInstall("InputTipCursor/default/CN/Pen.cur", "InputTipCursor/default/CN/Pen.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/Pen.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/Pen.cur", "InputTipCursor/default/oreo-red/Pen.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/SizeAll.cur")) {
-        FileInstall("InputTipCursor/default/CN/SizeAll.cur", "InputTipCursor/default/CN/SizeAll.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/SizeAll.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/SizeAll.cur", "InputTipCursor/default/oreo-red/SizeAll.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/SizeNESW.cur")) {
-        FileInstall("InputTipCursor/default/CN/SizeNESW.cur", "InputTipCursor/default/CN/SizeNESW.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/SizeNESW.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/SizeNESW.cur", "InputTipCursor/default/oreo-red/SizeNESW.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/SizeNS.cur")) {
-        FileInstall("InputTipCursor/default/CN/SizeNS.cur", "InputTipCursor/default/CN/SizeNS.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/SizeNS.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/SizeNS.cur", "InputTipCursor/default/oreo-red/SizeNS.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/SizeNWSE.cur")) {
-        FileInstall("InputTipCursor/default/CN/SizeNWSE.cur", "InputTipCursor/default/CN/SizeNWSE.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/SizeNWSE.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/SizeNWSE.cur", "InputTipCursor/default/oreo-red/SizeNWSE.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/SizeWE.cur")) {
-        FileInstall("InputTipCursor/default/CN/SizeWE.cur", "InputTipCursor/default/CN/SizeWE.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/SizeWE.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/SizeWE.cur", "InputTipCursor/default/oreo-red/SizeWE.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/UpArrow.cur")) {
-        FileInstall("InputTipCursor/default/CN/UpArrow.cur", "InputTipCursor/default/CN/UpArrow.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/UpArrow.cur")) {
+        FileInstall("InputTipCursor/default/oreo-red/UpArrow.cur", "InputTipCursor/default/oreo-red/UpArrow.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/CN/Wait.ani")) {
-        FileInstall("InputTipCursor/default/CN/Wait.ani", "InputTipCursor/default/CN/Wait.ani", 1)
-    }
-
-    if (!FileExist("InputTipCursor/default/EN/AppStarting.ani")) {
-        FileInstall("InputTipCursor/default/EN/AppStarting.ani", "InputTipCursor/default/EN/AppStarting.ani", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/Arrow.cur")) {
-        FileInstall("InputTipCursor/default/EN/Arrow.cur", "InputTipCursor/default/EN/Arrow.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/Cross.cur")) {
-        FileInstall("InputTipCursor/default/EN/Cross.cur", "InputTipCursor/default/EN/Cross.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/Hand.cur")) {
-        FileInstall("InputTipCursor/default/EN/Hand.cur", "InputTipCursor/default/EN/Hand.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/Help.cur")) {
-        FileInstall("InputTipCursor/default/EN/Help.cur", "InputTipCursor/default/EN/Help.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/IBeam.cur")) {
-        FileInstall("InputTipCursor/default/EN/IBeam.cur", "InputTipCursor/default/EN/IBeam.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/No.cur")) {
-        FileInstall("InputTipCursor/default/EN/No.cur", "InputTipCursor/default/EN/No.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/Pen.cur")) {
-        FileInstall("InputTipCursor/default/EN/Pen.cur", "InputTipCursor/default/EN/Pen.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/SizeAll.cur")) {
-        FileInstall("InputTipCursor/default/EN/SizeAll.cur", "InputTipCursor/default/EN/SizeAll.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/SizeNESW.cur")) {
-        FileInstall("InputTipCursor/default/EN/SizeNESW.cur", "InputTipCursor/default/EN/SizeNESW.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/SizeNS.cur")) {
-        FileInstall("InputTipCursor/default/EN/SizeNS.cur", "InputTipCursor/default/EN/SizeNS.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/SizeNWSE.cur")) {
-        FileInstall("InputTipCursor/default/EN/SizeNWSE.cur", "InputTipCursor/default/EN/SizeNWSE.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/SizeWE.cur")) {
-        FileInstall("InputTipCursor/default/EN/SizeWE.cur", "InputTipCursor/default/EN/SizeWE.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/UpArrow.cur")) {
-        FileInstall("InputTipCursor/default/EN/UpArrow.cur", "InputTipCursor/default/EN/UpArrow.cur", 1)
-    }
-    if (!FileExist("InputTipCursor/default/EN/Wait.ani")) {
-        FileInstall("InputTipCursor/default/EN/Wait.ani", "InputTipCursor/default/EN/Wait.ani", 1)
+    if (!FileExist("InputTipCursor/default/oreo-red/Wait.ani")) {
+        FileInstall("InputTipCursor/default/oreo-red/Wait.ani", "InputTipCursor/default/oreo-red/Wait.ani", 1)
     }
 
-    if (!FileExist("InputTipCursor/default/Caps/AppStarting.ani")) {
-        FileInstall("InputTipCursor/default/Caps/AppStarting.ani", "InputTipCursor/default/Caps/AppStarting.ani", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/AppStarting.ani")) {
+        FileInstall("InputTipCursor/default/oreo-blue/AppStarting.ani", "InputTipCursor/default/oreo-blue/AppStarting.ani", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/Arrow.cur")) {
-        FileInstall("InputTipCursor/default/Caps/Arrow.cur", "InputTipCursor/default/Caps/Arrow.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/Arrow.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/Arrow.cur", "InputTipCursor/default/oreo-blue/Arrow.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/Cross.cur")) {
-        FileInstall("InputTipCursor/default/Caps/Cross.cur", "InputTipCursor/default/Caps/Cross.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/Cross.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/Cross.cur", "InputTipCursor/default/oreo-blue/Cross.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/Hand.cur")) {
-        FileInstall("InputTipCursor/default/Caps/Hand.cur", "InputTipCursor/default/Caps/Hand.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/Hand.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/Hand.cur", "InputTipCursor/default/oreo-blue/Hand.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/Help.cur")) {
-        FileInstall("InputTipCursor/default/Caps/Help.cur", "InputTipCursor/default/Caps/Help.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/Help.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/Help.cur", "InputTipCursor/default/oreo-blue/Help.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/IBeam.cur")) {
-        FileInstall("InputTipCursor/default/Caps/IBeam.cur", "InputTipCursor/default/Caps/IBeam.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/IBeam.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/IBeam.cur", "InputTipCursor/default/oreo-blue/IBeam.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/No.cur")) {
-        FileInstall("InputTipCursor/default/Caps/No.cur", "InputTipCursor/default/Caps/No.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/No.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/No.cur", "InputTipCursor/default/oreo-blue/No.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/Pen.cur")) {
-        FileInstall("InputTipCursor/default/Caps/Pen.cur", "InputTipCursor/default/Caps/Pen.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/Pen.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/Pen.cur", "InputTipCursor/default/oreo-blue/Pen.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/SizeAll.cur")) {
-        FileInstall("InputTipCursor/default/Caps/SizeAll.cur", "InputTipCursor/default/Caps/SizeAll.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/SizeAll.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/SizeAll.cur", "InputTipCursor/default/oreo-blue/SizeAll.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/SizeNESW.cur")) {
-        FileInstall("InputTipCursor/default/Caps/SizeNESW.cur", "InputTipCursor/default/Caps/SizeNESW.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/SizeNESW.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/SizeNESW.cur", "InputTipCursor/default/oreo-blue/SizeNESW.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/SizeNS.cur")) {
-        FileInstall("InputTipCursor/default/Caps/SizeNS.cur", "InputTipCursor/default/Caps/SizeNS.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/SizeNS.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/SizeNS.cur", "InputTipCursor/default/oreo-blue/SizeNS.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/SizeNWSE.cur")) {
-        FileInstall("InputTipCursor/default/Caps/SizeNWSE.cur", "InputTipCursor/default/Caps/SizeNWSE.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/SizeNWSE.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/SizeNWSE.cur", "InputTipCursor/default/oreo-blue/SizeNWSE.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/SizeWE.cur")) {
-        FileInstall("InputTipCursor/default/Caps/SizeWE.cur", "InputTipCursor/default/Caps/SizeWE.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/SizeWE.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/SizeWE.cur", "InputTipCursor/default/oreo-blue/SizeWE.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/UpArrow.cur")) {
-        FileInstall("InputTipCursor/default/Caps/UpArrow.cur", "InputTipCursor/default/Caps/UpArrow.cur", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/UpArrow.cur")) {
+        FileInstall("InputTipCursor/default/oreo-blue/UpArrow.cur", "InputTipCursor/default/oreo-blue/UpArrow.cur", 1)
     }
-    if (!FileExist("InputTipCursor/default/Caps/Wait.ani")) {
-        FileInstall("InputTipCursor/default/Caps/Wait.ani", "InputTipCursor/default/Caps/Wait.ani", 1)
+    if (!FileExist("InputTipCursor/default/oreo-blue/Wait.ani")) {
+        FileInstall("InputTipCursor/default/oreo-blue/Wait.ani", "InputTipCursor/default/oreo-blue/Wait.ani", 1)
+    }
+
+    if (!FileExist("InputTipCursor/default/oreo-green/AppStarting.ani")) {
+        FileInstall("InputTipCursor/default/oreo-green/AppStarting.ani", "InputTipCursor/default/oreo-green/AppStarting.ani", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/Arrow.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/Arrow.cur", "InputTipCursor/default/oreo-green/Arrow.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/Cross.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/Cross.cur", "InputTipCursor/default/oreo-green/Cross.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/Hand.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/Hand.cur", "InputTipCursor/default/oreo-green/Hand.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/Help.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/Help.cur", "InputTipCursor/default/oreo-green/Help.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/IBeam.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/IBeam.cur", "InputTipCursor/default/oreo-green/IBeam.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/No.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/No.cur", "InputTipCursor/default/oreo-green/No.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/Pen.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/Pen.cur", "InputTipCursor/default/oreo-green/Pen.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/SizeAll.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/SizeAll.cur", "InputTipCursor/default/oreo-green/SizeAll.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/SizeNESW.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/SizeNESW.cur", "InputTipCursor/default/oreo-green/SizeNESW.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/SizeNS.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/SizeNS.cur", "InputTipCursor/default/oreo-green/SizeNS.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/SizeNWSE.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/SizeNWSE.cur", "InputTipCursor/default/oreo-green/SizeNWSE.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/SizeWE.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/SizeWE.cur", "InputTipCursor/default/oreo-green/SizeWE.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/UpArrow.cur")) {
+        FileInstall("InputTipCursor/default/oreo-green/UpArrow.cur", "InputTipCursor/default/oreo-green/UpArrow.cur", 1)
+    }
+    if (!FileExist("InputTipCursor/default/oreo-green/Wait.ani")) {
+        FileInstall("InputTipCursor/default/oreo-green/Wait.ani", "InputTipCursor/default/oreo-green/Wait.ani", 1)
     }
 } else {
     fileList := [
@@ -215,9 +215,15 @@ if (A_IsCompiled) {
     styleList := [
         "AppStarting.ani", "Arrow.cur", "Cross.cur", "Hand.cur", "Help.cur", "IBeam.cur", "No.cur", "Pen.cur", "SizeAll.cur", "SizeNESW.cur", "SizeNS.cur", "SizeNWSE.cur", "SizeWE.cur", "UpArrow.cur", "Wait.ani"
     ]
+    colorMap := Map(
+        "CN", "red",
+        "EN", "blue",
+        "Caps", "green",
+    )
+
     for v in ["CN", "EN", "Caps"] {
         for s in styleList {
-            p := "InputTipCursor/default/" v "/" s
+            p := "InputTipCursor/default/oreo-" colorMap[v] "/" s
             if (!FileExist(p)) {
                 missFileList.Push(p)
             }

@@ -71,7 +71,7 @@ changeCursor := readIni("changeCursor", 0)
 */
 symbolType := readIni("symbolType", 1)
 ; 符号的垂直偏移量的参考原点
-symbolOffsetBase := readIni("symbolOffsetBase", 0)
+symbolOffsetBase := readIni("symbolOffsetBase", 1)
 
 ; 是否在所有窗口中，符号都显示在鼠标附近
 showCursorPos := readIni("showCursorPos", 0)
@@ -338,9 +338,9 @@ updateSymbol(configName := "", configValue := "") {
             }
             ; 偏移量
             _ := "pic_offset_x" state
-            symbolConfig.%_% := readIni(_, -30)
+            symbolConfig.%_% := readIni(_, -27)
             _ := "pic_offset_y" state
-            symbolConfig.%_% := readIni(_, -40)
+            symbolConfig.%_% := readIni(_, 0)
             ; 宽高
             _ := "pic_symbol_width" state
             symbolConfig.%_% := readIni(_, 15)
@@ -355,9 +355,9 @@ updateSymbol(configName := "", configValue := "") {
             }
             ; 偏移量
             _ := "offset_x" state
-            symbolConfig.%_% := readIni(_, 10)
+            symbolConfig.%_% := readIni(_, 0)
             _ := "offset_y" state
-            symbolConfig.%_% := readIni(_, -30)
+            symbolConfig.%_% := readIni(_, 10)
             ; 透明度
             _ := "transparent" state
             symbolConfig.%_% := readIni(_, 222)
@@ -397,7 +397,7 @@ updateSymbol(configName := "", configValue := "") {
             _ := "textSymbol_offset_x" state
             symbolConfig.%_% := readIni(_, 0)
             _ := "textSymbol_offset_y" state
-            symbolConfig.%_% := readIni(_, -45)
+            symbolConfig.%_% := readIni(_, 10)
             ; 透明度
             _ := "textSymbol_transparent" state
             symbolConfig.%_% := readIni(_, 222)

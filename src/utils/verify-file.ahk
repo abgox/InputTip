@@ -2,7 +2,7 @@
 
 baseUrl := ["https://gitee.com/abgox/InputTip/raw/main/", "https://github.com/abgox/InputTip/raw/main/"]
 
-dirList := ["plugins", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/CN", "InputTipCursor/default/EN", "InputTipCursor/default/Caps"]
+dirList := ["plugins", "InputTipIcon", "InputTipSymbol", "InputTipSymbol/default", "InputTipCursor", "InputTipCursor/default", "InputTipCursor/default/CN", "InputTipCursor/default/EN", "InputTipCursor/default/Caps"]
 
 for d in dirList {
     if (!DirExist(d)) {
@@ -11,6 +11,13 @@ for d in dirList {
 }
 
 if (A_IsCompiled) {
+    if (!FileExist("InputTipIcon/default/app.png")) {
+        FileInstall("InputTipIcon/default/app.png", "InputTipIcon/default/app.png", 1)
+    }
+    if (!FileExist("InputTipIcon/default/app-paused.png")) {
+        FileInstall("InputTipIcon/default/app-paused.png", "InputTipIcon/default/app-paused.png", 1)
+    }
+
     if (!FileExist("InputTipSymbol/default/CN.png")) {
         FileInstall("InputTipSymbol/default/CN.png", "InputTipSymbol/default/CN.png", 1)
     }
@@ -19,12 +26,6 @@ if (A_IsCompiled) {
     }
     if (!FileExist("InputTipSymbol/default/Caps.png")) {
         FileInstall("InputTipSymbol/default/Caps.png", "InputTipSymbol/default/Caps.png", 1)
-    }
-    if (!FileExist("InputTipSymbol/default/app.png")) {
-        FileInstall("InputTipSymbol/default/app.png", "InputTipSymbol/default/app.png", 1)
-    }
-    if (!FileExist("InputTipSymbol/default/app-paused.png")) {
-        FileInstall("InputTipSymbol/default/app-paused.png", "InputTipSymbol/default/app-paused.png", 1)
     }
 
     if (!FileExist("InputTipCursor/default/CN/AppStarting.ani")) {
@@ -166,13 +167,14 @@ if (A_IsCompiled) {
     }
 } else {
     fileList := [
+        ; 图标
+        "InputTipIcon/default/app.ico",
+        "InputTipIcon/default/app.png",
+        "InputTipIcon/default/app-paused.png",
         ; 图片
         "InputTipSymbol/default/CN.png",
         "InputTipSymbol/default/EN.png",
         "InputTipSymbol/default/Caps.png",
-        "InputTipSymbol/default/app.png",
-        "InputTipSymbol/default/app-paused.png",
-        "img/app.ico",
         ; 启动脚本
         "../InputTip.bat",
         ; 脚本文件
@@ -223,7 +225,7 @@ if (A_IsCompiled) {
     }
     if (missFileList.Length) {
         try {
-            icon := A_IsPaused ? "InputTipSymbol\default\app-paused.png" : "InputTipSymbol\default\app.png"
+            icon := A_IsPaused ? "InputTipIcon\default\app-paused.png" : "InputTipIcon\default\app.png"
             TraySetIcon(icon, , 1)
         }
 

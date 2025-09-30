@@ -183,8 +183,9 @@ fn_symbol_pic(*) {
 
         picList := StrSplit(symbolPaths, ":")
         if (picList.Length = 0) {
-            picList := getPicList()
+            picList := getPicList("InputTipSymbol", ":InputTipSymbol\default\CN.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\Caps.png:")
         }
+        picList.InsertAt(1, '')
 
         g.AddText("xs", line)
         createGuiOpt("").AddText(, "中文状态").GetPos(, , &__w)

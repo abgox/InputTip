@@ -152,19 +152,19 @@ compareVersion(new, old) {
 }
 
 ; 设置托盘图标
-setTrayIcon(path) {
+setTrayIcon(path, isPaused := A_IsPaused) {
     if isJAB
         return
 
     try {
         TraySetIcon(path, , 1)
     } catch {
-        if (A_IsPaused) {
-            path := "InputTipSymbol\default\app-paused.png"
+        if (isPaused) {
+            path := "InputTipIcon\default\app-paused.png"
             global iconPaused := path
             writeIni("iconPaused", path)
         } else {
-            path := "InputTipSymbol\default\app.png"
+            path := "InputTipIcon\default\app.png"
             global iconRunning := path
             writeIni("iconRunning", path)
         }

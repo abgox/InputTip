@@ -2,7 +2,7 @@
 
 #Requires AutoHotkey v2.0
 ;@AHK2Exe-SetLanguage 0x0804
-;@Ahk2Exe-SetMainIcon img/app.ico
+;@Ahk2Exe-SetMainIcon InputTipIcon/default/app.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
 #SingleInstance Force
 #Warn All, Off

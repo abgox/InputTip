@@ -590,31 +590,22 @@ getCursorDir() {
 }
 
 /**
- * 解析图片符号文件夹目录，并生成路径列表
- * @param {String} defaultList 默认列表，会放在最前面
- * @param {String} disableList 禁用列表，不会显示在列表中
+ * 解析图片目录，并生成路径列表
+ * @param {String} picDir 图片目录
+ * @param {String} topList 顶部列表，会在最前面
  * @returns {Array} 路径列表
+ * @example
+ * getPicList("InputTipIcon", ":InputTipIcon\default\app.png:InputTipIcon\default\app-paused.png:")
  */
-getPicList(defaultList := "", disableList := "") {
-    picList := ":"
-    if (!defaultList) {
-        defaultList := ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"
-    }
-    if (!disableList) {
-        disableList := ":InputTipSymbol\default\app.png:InputTipSymbol\default\app-paused.png:"
-    }
-    Loop Files "InputTipSymbol\*", "R" {
-        if (A_LoopFileExt = "png" && !InStr(disableList, ":" A_LoopFilePath ":") && !InStr(picList, ":" A_LoopFilePath ":") && !InStr(defaultList, ":" A_LoopFilePath ":")) {
+getPicList(picDir, topList := "") {
+    picList := topList ? topList : ":"
+    Loop Files picDir "\*", "R" {
+        if (A_LoopFileExt = "png" && !InStr(picList, ":" A_LoopFilePath ":")) {
             picList .= A_LoopFilePath ":"
         }
     }
 
     picList := StrSplit(SubStr(picList, 2, StrLen(picList) - 2), ":")
-
-    for v in StrSplit(SubStr(defaultList, 2, StrLen(defaultList) - 2), ":") {
-        picList.InsertAt(1, v)
-    }
-    picList.InsertAt(1, '')
     return picList
 }
 
@@ -637,7 +628,7 @@ pauseApp(*) {
     updateTip(!A_IsPaused)
     if (A_IsPaused) {
         A_TrayMenu.Uncheck("暂停/运行")
-        setTrayIcon(iconRunning)
+        setTrayIcon(iconRunning, 0)
         reloadSymbol()
         reloadCursor()
         if (enableJABSupport) {
@@ -645,7 +636,7 @@ pauseApp(*) {
         }
     } else {
         A_TrayMenu.Check("暂停/运行")
-        setTrayIcon(iconPaused)
+        setTrayIcon(iconPaused, 1)
         hideSymbol()
         if (enableJABSupport) {
             killJAB(0)

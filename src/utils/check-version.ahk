@@ -538,6 +538,17 @@ checkUpdateDone() {
 
         writeIni("init", 1, "Installer")
 
+        if (InStr(SubStr(readIni("iconRunning", "InputTipIcon\default\app.png"), 1, 15), "InputTipSymbol\")) {
+            writeIni("iconRunning", "InputTipIcon\default\app.png")
+            global iconRunning := "InputTipIcon\default\app.png"
+        }
+
+        if (InStr(SubStr(readIni("iconPaused", "InputTipIcon\default\app-paused.png"), 1, 15), "InputTipSymbol\")) {
+            writeIni("iconPaused", "InputTipIcon\default\app-paused.png")
+            global iconPaused := "InputTipIcon\default\app-paused.png"
+        }
+
+
         for v in ["CN", "EN", "Caps"] {
             try {
                 _ := StrSplit(IniRead("InputTip.ini", "Config-v2", "app_" v), ":")

@@ -26,7 +26,7 @@ isJAB := 0
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
 } else {
-    favicon := A_ScriptDir "\img\app.ico"
+    favicon := A_ScriptDir "\InputTipIcon\default\app.ico"
     if (runCodeWithAdmin && !A_IsAdmin) {
         try {
             Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
@@ -121,8 +121,8 @@ cursorDir := readIni("cursorDir", "")
 
 SetTimer(getPathList, -1)
 getPathList() {
-    _symbolPaths := arrJoin(getPicList(), ":")
-    _iconPaths := arrJoin(getPicList(":InputTipSymbol\default\app.png:InputTipSymbol\default\app-paused.png:", ":InputTipSymbol\default\Caps.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\CN.png:"), ":")
+    _symbolPaths := arrJoin(getPicList("InputTipSymbol", ":InputTipSymbol\default\CN.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\Caps.png:"), ":")
+    _iconPaths := arrJoin(getPicList("InputTipIcon", ":InputTipIcon\default\app.png:InputTipIcon\default\app-paused.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
     if (symbolPaths != _symbolPaths) {
         global symbolPaths := _symbolPaths

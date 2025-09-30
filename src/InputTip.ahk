@@ -121,7 +121,7 @@ cursorDir := readIni("cursorDir", "")
 
 SetTimer(getPathList, -1)
 getPathList() {
-    _symbolPaths := arrJoin(getPicList("InputTipSymbol", ":InputTipSymbol\default\CN.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\Caps.png:"), ":")
+    _symbolPaths := arrJoin(getPicList("InputTipSymbol", ":InputTipSymbol\default\triangle-red.png:InputTipSymbol\default\triangle-blue.png:InputTipSymbol\default\triangle-green.png:"), ":")
     _iconPaths := arrJoin(getPicList("InputTipIcon", ":InputTipIcon\default\app.png:InputTipIcon\default\app-paused.png:"), ":")
     _cursorDir := arrJoin(getCursorDir(), ":")
     if (symbolPaths != _symbolPaths) {

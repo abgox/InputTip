@@ -183,7 +183,7 @@ fn_symbol_pic(*) {
 
         picList := StrSplit(symbolPaths, ":")
         if (picList.Length = 0) {
-            picList := getPicList("InputTipSymbol", ":InputTipSymbol\default\CN.png:InputTipSymbol\default\EN.png:InputTipSymbol\default\Caps.png:")
+            picList := getPicList("InputTipSymbol", ":InputTipSymbol\default\triangle-red.png:InputTipSymbol\default\triangle-blue.png:InputTipSymbol\default\triangle-green.png:")
         }
         picList.InsertAt(1, '')
 

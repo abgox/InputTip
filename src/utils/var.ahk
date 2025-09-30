@@ -309,17 +309,16 @@ updateSymbol(configName := "", configValue := "") {
             enableIsolateConfigText: readIni("enableIsolateConfigText", 0),
         }
 
-        infoCN := {
+        info := {
+            ; CN
             CN_color: "red",
             CN_Text: "中",
             textSymbol_CN_color: "red",
-        }
-        infoEN := {
+            ; EN
             EN_color: "blue",
             EN_Text: "英",
             textSymbol_EN_color: "blue",
-        }
-        infoCaps := {
+            ; Caps
             Caps_color: "green",
             Caps_Text: "大",
             textSymbol_Caps_color: "green",
@@ -329,13 +328,7 @@ updateSymbol(configName := "", configValue := "") {
             ; * 图片符号相关配置
             ; 文件路径
             if (state) {
-                defaultPath := "InputTipSymbol\default\" state ".png"
-                picPath := readIni(state "_pic", defaultPath)
-                if (picPath && (!RegExMatch(picPath, ".*\.png$") || !FileExist(picPath))) {
-                    writeIni(state "_pic", defaultPath)
-                    picPath := defaultPath
-                }
-                symbolConfig.%state "_pic"% := picPath
+                symbolConfig.%state "_pic"% := readIni(state "_pic", "")
             }
             ; 偏移量
             _ := "pic_offset_x" state
@@ -352,7 +345,7 @@ updateSymbol(configName := "", configValue := "") {
             ; 背景颜色
             if (state) {
                 _ := state "_color"
-                symbolConfig.%_% := StrReplace(readIni(_, %"info" state%.%_%), '#', '')
+                symbolConfig.%_% := StrReplace(readIni(_, info.%_%), '#', '')
             }
             ; 偏移量
             _ := "offset_x" state
@@ -375,12 +368,12 @@ updateSymbol(configName := "", configValue := "") {
             ; 文本字符
             if (state) {
                 _ := state "_Text"
-                symbolConfig.%_% := readIni(_, %"info" state%.%_%)
+                symbolConfig.%_% := readIni(_, info.%_%)
             }
             ; 背景颜色
             if (state) {
                 _ := "textSymbol_" state "_color"
-                symbolConfig.%_% := StrReplace(readIni(_, %"info" state%.%_%), '#', '')
+                symbolConfig.%_% := StrReplace(readIni(_, info.%_%), '#', '')
             }
             ; 字体
             _ := "font_family" state

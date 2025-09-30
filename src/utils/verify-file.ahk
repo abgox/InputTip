@@ -18,14 +18,14 @@ if (A_IsCompiled) {
         FileInstall("InputTipIcon/default/app-paused.png", "InputTipIcon/default/app-paused.png", 1)
     }
 
-    if (!FileExist("InputTipSymbol/default/CN.png")) {
-        FileInstall("InputTipSymbol/default/CN.png", "InputTipSymbol/default/CN.png", 1)
+    if (!FileExist("InputTipSymbol/default/triangle-red.png")) {
+        FileInstall("InputTipSymbol/default/triangle-red.png", "InputTipSymbol/default/triangle-red.png", 1)
     }
-    if (!FileExist("InputTipSymbol/default/EN.png")) {
-        FileInstall("InputTipSymbol/default/EN.png", "InputTipSymbol/default/EN.png", 1)
+    if (!FileExist("InputTipSymbol/default/triangle-blue.png")) {
+        FileInstall("InputTipSymbol/default/triangle-blue.png", "InputTipSymbol/default/triangle-blue.png", 1)
     }
-    if (!FileExist("InputTipSymbol/default/Caps.png")) {
-        FileInstall("InputTipSymbol/default/Caps.png", "InputTipSymbol/default/Caps.png", 1)
+    if (!FileExist("InputTipSymbol/default/triangle-green.png")) {
+        FileInstall("InputTipSymbol/default/triangle-green.png", "InputTipSymbol/default/triangle-green.png", 1)
     }
 
     if (!FileExist("InputTipCursor/default/CN/AppStarting.ani")) {
@@ -172,9 +172,9 @@ if (A_IsCompiled) {
         "InputTipIcon/default/app.png",
         "InputTipIcon/default/app-paused.png",
         ; 图片
-        "InputTipSymbol/default/CN.png",
-        "InputTipSymbol/default/EN.png",
-        "InputTipSymbol/default/Caps.png",
+        "InputTipSymbol/default/triangle-red.png",
+        "InputTipSymbol/default/triangle-blue.png",
+        "InputTipSymbol/default/triangle-green.png",
         ; 启动脚本
         "../InputTip.bat",
         ; 脚本文件

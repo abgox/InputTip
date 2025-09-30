@@ -47,7 +47,7 @@ License: AGPL-3.0-only
 LicenseUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://github.com/abgox/InputTip/blob/main/LICENSE
-ShortDescription: "An input method state manager tool: real-time tips(cursor style, symbol display) + auto-switch state per window + hotkey to switch state."
+ShortDescription: "An input method state management tool: real-time tip(mouse scheme/symbol scheme) + state switching (window trigger/hotkey trigger)"
 Tags:
   - autohotkey
   - cursor
@@ -90,7 +90,7 @@ License: AGPL-3.0-only
 LicenseUrl: https://gitee.com/abgox/InputTip/blob/main/LICENSE
 Copyright: Copyright (c) 2023-present abgox
 CopyrightUrl: https://gitee.com/abgox/InputTip/blob/main/LICENSE
-ShortDescription: "一个输入法状态管理工具: 实时提示(鼠标样式、符号显示) + 窗口自动切换状态 + 快捷键切换状态。"
+ShortDescription: "一个输入法状态管理工具: 实时提示(鼠标方案/符号方案) + 状态切换(窗口触发/热键触发)"
 Tags:
   - autohotkey
   - 光标

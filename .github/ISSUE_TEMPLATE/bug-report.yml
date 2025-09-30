@@ -9,6 +9,8 @@ body:
     attributes:
       label: 你应该确保已经完成了下面这些事情。
       options:
+        - label: 你正在使用 InputTip 最新版本。
+          required: true
         - label: 你已经阅读了项目的 README 文件。
           required: true
         - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue。
@@ -24,10 +26,10 @@ body:
       description: |
         - 在软件的托盘菜单中，点击 **关于** 进行查看。
         - 如果不是最新版本，请先更新到最新版本。
-        - exe 版本可能落后，请使用 zip 版本。
-        - 如果问题依然存在，再提交 issue。
+        - exe 版本可能落后，请直接使用 zip 版本。
+        - 更新后如果问题依然存在，再提交 issue。
         - 不要使用 **最新版本** 这样的描述，必须是具体的版本号。
-      placeholder: v2025.08.22
+      placeholder: v2025.10.01
     validations:
       required: true
   - type: dropdown

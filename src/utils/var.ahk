@@ -334,7 +334,7 @@ updateSymbol(configName := "", configValue := "") {
             ; * 图片符号相关配置
             ; 文件路径
             if (state) {
-                symbolConfig.%state "_pic"% := readIni(state "_pic", "")
+                symbolConfig.%state "_pic"% := readIni(state "_pic", "InputTipSymbol\default\triangle-" info.%state "_color"% ".png")
             }
             ; 偏移量
             _ := "pic_offset_x" state

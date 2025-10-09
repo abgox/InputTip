@@ -517,7 +517,8 @@ loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
         return
     }
     showConfig := "NA "
-    ; 在 JAB 程序中获取到的 bottom 有误，因此始终使用 top
+    ; JAB 程序通过 GetCaretPosFromJAB 获取到的 W 和 H 非常不稳定
+    ; 还是继续使用 top，根据实际情况再调整特殊偏移量
     if (InStr(modeList.JAB, exe_str)) {
         offsetY := top
     } else {

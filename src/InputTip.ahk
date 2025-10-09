@@ -165,16 +165,28 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         try {
             offset := app_offset_screen.%s.num%
             left += offset.x
-            top += offset.y
+            if (symbolOffsetBase) {
+                bottom += offset.y
+            } else {
+                top += offset.y
+            }
         }
         try {
             offset := app_offset.%exe_name exe_title%.%s.num%
             left += offset.x
-            top += offset.y
+            if (symbolOffsetBase) {
+                bottom += offset.y
+            } else {
+                top += offset.y
+            }
         } catch {
             try {
                 left += app_offset.%exe_name%.%s.num%.x
-                top += app_offset.%exe_name%.%s.num%.y
+                if (symbolOffsetBase) {
+                    bottom += app_offset.%exe_name%.%s.num%.y
+                } else {
+                    top += app_offset.%exe_name%.%s.num%.y
+                }
             }
         }
         return res && left

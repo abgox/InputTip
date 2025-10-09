@@ -25,17 +25,17 @@
 
 ---
 
-![socialify](https://abgox.com/github-socialify-InputTip.svg)
+![github-socialify](https://abgox.com/github-socialify-InputTip.svg)
 
 <p align="center">
-  <strong>喜欢这个项目？请给它一个 ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
+  <strong>喜欢这个项目？请给它一个 Star ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
 </p>
 
 > [!Tip]
 >
 > - InputTip 使用 [AutoHotkey(AHK)](https://github.com/AutoHotkey/AutoHotkey) 语言编写
 >   - [InputTip 可能被误判为游戏外挂，exe 版本可能被误判为病毒程序](https://inputtip.abgox.com/faq/about-virus)
->   - [因此，只推荐使用 zip 版本](https://inputtip.abgox.com/faq/zip-vs-exe)
+>   - [只推荐使用 zip 版本，除非你有不得不使用 exe 版本的理由](https://inputtip.abgox.com/faq/zip-vs-exe)
 > - InputTip 只适用于 **Windows** 系统: **Win10** 以上可用，以下未知
 > - `托盘菜单` 指的是鼠标右键点击任务栏托盘区域的 InputTip 后显示的菜单
 
@@ -46,6 +46,7 @@
   - [多种状态提示方案](#关于状态提示方案)
     - [鼠标方案](#鼠标方案): 使用多套鼠标光标样式，根据输入法状态加载不同的鼠标光标样式
     - [符号方案](#符号方案): 根据输入法状态在输入光标附近显示不同的 **符号**
+      - 还有一个折中方案: `在鼠标附近显示符号`
   - 切换不同窗口时，自动切换到指定的输入法状态
     - 支持 `标题级` 的匹配
   - 设置按键切换到指定的输入法状态
@@ -60,7 +61,7 @@
 > - 如果这里无法正常显示，[可前往官网查看](https://inputtip.abgox.com/)
 > - [点击查看 Bilibili 中的介绍及教学视频](https://www.bilibili.com/video/BV15oYKz5EQ8)
 
-<video src="https://inputtip.abgox.com/releases/v2/demo.mp4" controls></video>
+<video src="https://inputtip.abgox.com/releases/v2/demo.mp4" controls autoplay loop muted></video>
 
 ### 新的变化
 
@@ -163,7 +164,7 @@
 
 1. 取消 `开机自启动`: `托盘菜单` => `开机自启动`
 2. 退出: `托盘菜单` => `退出`
-3. 删除下方的 [目录结构及数据](#目录结构及数据) 中展示的相关目录即可
+3. 删除 [目录结构及数据](#目录结构及数据) 中展示的相关目录即可
 
 ### 目录结构及数据
 

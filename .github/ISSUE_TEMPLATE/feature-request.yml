@@ -1,7 +1,7 @@
 name: 💡 功能请求
 description: 请求一个新功能或功能增强
 title: "[Request]: "
-labels: ["feature"]
+labels: ["enhancement"]
 assignees: [abgox]
 body:
   - type: textarea

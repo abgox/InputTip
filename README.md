@@ -28,7 +28,7 @@
 ![github-socialify](https://abgox.com/github-socialify-InputTip.svg)
 
 <p align="center">
-  <strong>喜欢这个项目？请给它一个 Star ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
+  <strong>喜欢这个项目？请给它 Star ⭐️ 或 <a href="https://abgox.com/donate">赞赏 💰</a></strong>
 </p>
 
 > [!Tip]
@@ -105,7 +105,7 @@
 
   - 添加 [abyss](https://abyss.abgox.com) bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
-  - 安装 `InputTip-zip`
+  - 安装 `abgox.InputTip-zip`
 
     ```shell
     scoop install abyss/abgox.InputTip-zip
@@ -124,7 +124,7 @@
 
   - 添加 [abyss](https://abyss.abgox.com) bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
-  - 安装 `InputTip`
+  - 安装 `abgox.InputTip`
 
     ```shell
     scoop install abyss/abgox.InputTip
@@ -142,7 +142,7 @@
 
    - [Scoop](https://scoop.sh/): 运行安装后创建的 `InputTip` 快捷方式或命令即可
    - [WinGet](https://learn.microsoft.com/windows/package-manager/winget/): 运行 `InputTip` 命令即可
-   - 如果是手动下载的
+   - 手动下载
 
      - zip 版本: 运行 `InputTip.bat`
      - exe 版本: 运行 `InputTip.exe`
@@ -207,7 +207,7 @@
   - `InputTipSymbol` (如果没有修改，可以忽略)
   - `InputTipIcon` (如果没有修改，可以忽略)
 
-- 如果使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 中的 `InputTip-zip` 或 `InputTip`
+- 如果使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 中的 `abgox.InputTip-zip` 或 `abgox.InputTip`
   - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
   - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们，除非卸载时携带 `-p` 或 `--purge` 参数
 - 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)

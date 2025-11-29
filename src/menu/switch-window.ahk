@@ -183,8 +183,11 @@ fn_switch_window(*) {
                             LV.Modify(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                         } else {
                             if (action == "edit") {
-                                LV.Delete(RowNumber)
-                                gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                                try {
+                                    IniDelete("InputTip.ini", "App-" from, itemValue.id)
+                                    LV.Delete(RowNumber)
+                                    gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                                }
                             }
                             state := stateTextMap.%itemValue.status%
                             writeIni(itemValue.id, value, "App-" state, "InputTip.ini")

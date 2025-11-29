@@ -803,7 +803,7 @@ killJAB(wait := 1, delete := 0) {
  */
 createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 0, needStartUp := 0, *) {
     if (A_IsAdmin) {
-        cmd := 'powershell -NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' path '\"`'" '
+        cmd := '-NoProfile -Command $action = New-ScheduledTaskAction -Execute "`'\"' path '\"`'" '
         if (args.Length) {
             cmd .= '-Argument ' "'"
             for v in args {
@@ -819,10 +819,15 @@ createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 
         }
         cmd .= 'Register-ScheduledTask -TaskName ' taskName ' -InputObject $task -Force;'
         try {
-            isWait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
+            isWait ? RunWait('powershell ' cmd, , "Hide") : Run('powershell ' cmd, , "Hide")
             return 1
         } catch {
-            return 0
+            try {
+                isWait ? RunWait('pwsh ' cmd, , "Hide") : Run('pwsh ' cmd, , "Hide")
+                return 1
+            } catch {
+                return 0
+            }
         }
     }
     return 0

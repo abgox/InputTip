@@ -21,13 +21,13 @@ fn_ohter_config(*) {
         g.AddButton("yp w" bw / 2, "JAB/JetBrains IDE 支持 【" (enableJABSupport ? "启用" : "禁用") "中】").OnEvent("Click", e_enableJABSupport)
         e_enableJABSupport(item, *) {
             global enableJABSupport := !enableJABSupport
-            writeIni("enableJABSupport", enableJABSupport)
 
             if (enableJABSupport) {
-                item.Text := "JAB/JetBrains IDE 支持【启用中】"
                 if (runJAB()) {
                     return
                 }
+                writeIni("enableJABSupport", enableJABSupport)
+                item.Text := "JAB/JetBrains IDE 支持【启用中】"
                 createUniqueGui(JABGui).Show()
                 JABGui(info) {
                     g := createGuiOpt("InputTip - 启用 JAB/JetBrains IDE 支持")
@@ -57,6 +57,7 @@ fn_ohter_config(*) {
                 killAppTimer() {
                     try {
                         killJAB(1, A_IsCompiled || A_IsAdmin)
+                        writeIni("enableJABSupport", enableJABSupport)
                     }
                 }
             }

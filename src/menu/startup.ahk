@@ -66,18 +66,18 @@ fn_startup(item, *) {
             btn.OnEvent("Click", e_useTask)
             e_useTask(*) {
                 if (A_IsCompiled) {
-                    flag := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0], , , 1)
+                    done := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0], , , 1)
                 } else {
-                    flag := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0], , , 1)
+                    done := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0], , , 1)
                 }
 
-                if (flag) {
+                if (done) {
                     fn_update_user(A_UserName)
                     isStartUp := 1
                     ; FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
                     fn_handle()
                 } else {
-                    fn_err_msg("添加任务计划程序失败!")
+                    fn_err_msg("添加任务计划程序失败!`n请检查系统中是否存在 powershell.exe 或 pwsh.exe")
                 }
             }
             g.AddButton("xs w" bw btnOpt, "注册表" pad).OnEvent("Click", e_useReg)

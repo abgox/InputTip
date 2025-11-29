@@ -31,6 +31,9 @@ while 1 {
             hasWindowChange := lastWindow != exe_name ":" exe_title
 
             if (hasWindowChange) {
+                if (validateMatch(exe_name, exe_title, app_AutoExit)) {
+                    fn_exit()
+                }
                 if (symbolType) {
                     if (!showCursorPos && !WinActive("ahk_class AutoHotkeyGUI") && (validateMatch(exe_name, exe_title, app_HideSymbol) || !validateMatch(exe_name, exe_title, app_ShowSymbol))) {
                         hideSymbol()

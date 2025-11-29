@@ -119,12 +119,18 @@ stateMap := {
     1: "中文状态",
     EN: "英文状态",
     0: "英文状态",
-    Caps: "大写锁定"
+    Caps: "大写锁定",
+    Run: "运行",
+    Pause: "暂停",
+    Exit: "退出"
 }
 stateTextMap := {
     中文状态: "CN",
     英文状态: "EN",
-    大写锁定: "Caps"
+    大写锁定: "Caps",
+    运行: "Run",
+    暂停: "Pause",
+    退出: "Exit"
 }
 
 left := 0, top := 0, right := 0, bottom := 0
@@ -216,8 +222,11 @@ for v in cursorInfo {
     }
 }
 
+app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
+app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
+app_AutoExit := StrSplit(readIniSection("App-Auto-Exit"), "`n")
+updateAutoSwitchList()
 
-updateList()
 updateAppOffset()
 updateCursorMode()
 updateCursor()
@@ -606,21 +615,6 @@ hideSymbol() {
         }
     }
     global lastSymbol := ""
-}
-
-; 更新符号的黑白名单和自动切换列表
-updateList() {
-    global
-
-    restartJAB()
-
-    ; 应用列表: 符号的黑名单
-    app_HideSymbol := StrSplit(readIniSection("App-HideSymbol"), "`n")
-
-    ; 应用列表: 符号的白名单
-    app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
-
-    updateAutoSwitchList()
 }
 
 ; 更新自动切换列表

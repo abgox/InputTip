@@ -8,6 +8,7 @@
 #Include "*i symbol-pos.ahk"
 #Include "*i app-offset.ahk"
 #Include "*i switch-window.ahk"
+#Include "*i auto-exit.ahk"
 #Include "*i about.ahk"
 
 #Include "*i scheme-cursor.ahk"

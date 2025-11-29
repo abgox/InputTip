@@ -112,10 +112,6 @@ makeTrayMenu() {
 
     A_TrayMenu.Add()
     A_TrayMenu.Add("退出", fn_exit)
-
-    if (enableJABSupport) {
-        runJAB()
-    }
 }
 
 fn_exit(*) {
@@ -627,9 +623,7 @@ pauseApp(*) {
         setTrayIcon(iconRunning, 0)
         reloadSymbol()
         reloadCursor()
-        if (enableJABSupport) {
-            runJAB()
-        }
+        restartJAB()
     } else {
         A_TrayMenu.Check("暂停/运行")
         setTrayIcon(iconPaused, 1)

@@ -305,7 +305,7 @@ if (A_IsCompiled) {
             g.SetFont("s12", "Microsoft YaHei")
             g.AddText("cRed", "可能因为网络等其他原因，文件没有正常恢复，请手动处理")
             g.AddLink("cGray", '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载')
-            g.AddButton("xs w" _w, "我知道了").OnEvent("Click", (*) => ExitApp())
+            g.AddButton("xs w" _w, "我知道了").OnEvent("Click", (*) => (ExitApp()))
             g.Show()
 
             while (1) {

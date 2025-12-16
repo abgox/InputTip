@@ -224,7 +224,7 @@ fn_switch_window(*) {
                 _ := g.AddButton("xs w" w / 2, "快捷添加")
                 _._LV := LV
                 _._type := v
-                _.OnEvent("Click", (item, *) => fn_add(item._LV, item._type))
+                _.OnEvent("Click", (item, *) => (fn_add(item._LV, item._type)))
 
                 _ := g.AddButton("yp w" w / 2, "手动添加")
                 _._LV := LV

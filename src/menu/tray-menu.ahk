@@ -71,12 +71,6 @@ makeTrayMenu() {
     A_TrayMenu.Add("暂停/运行", pauseApp)
     A_TrayMenu.Default := "暂停/运行"
     A_TrayMenu.ClickCount := 1
-    A_TrayMenu.Add("暂停/运行快捷键", (*) => (
-        setHotKeyGui([{
-            config: "hotkey_Pause",
-            tip: "暂停/运行"
-        }], "软件暂停/运行")
-    ))
     A_TrayMenu.Add()
     A_TrayMenu.Add("输入法相关", fn_input_mode)
     A_TrayMenu.Add("状态切换快捷键", (*) => (

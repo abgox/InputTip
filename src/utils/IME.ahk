@@ -206,6 +206,9 @@ switch_CN(pressKey := "", *) {
         return
     }
     if (GetKeyState("CapsLock", "T")) {
+        if (keepCapsLock) {
+            return
+        }
         SendInput("{CapsLock}")
     }
     Sleep(50)
@@ -231,6 +234,9 @@ switch_EN(pressKey := "", *) {
         return
     }
     if (GetKeyState("CapsLock", "T")) {
+        if (keepCapsLock) {
+            return
+        }
         SendInput("{CapsLock}")
     }
     Sleep(50)

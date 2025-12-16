@@ -8,7 +8,8 @@ hasWindowChange := 1
 
 lastInputState := ""
 inputStateChanged := 0
-while 1 {
+
+loop {
     Sleep(delay)
     ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {

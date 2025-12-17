@@ -1,4 +1,5 @@
 src/*.exe
+src/InputTip.ini
 test/
 todo/
 

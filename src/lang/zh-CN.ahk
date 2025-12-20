@@ -103,7 +103,15 @@ global langStrings_zhCN := {
         restart: "重启",
         exit: "退出",
         admin_cancel_tip1: "【管理员权限】无法直接降权至【用户权限】",
-        admin_cancel_tip2: "如果想要立即生效，你需要手动退出并重新启动 InputTip"
+        admin_cancel_tip2: "如果想要立即生效，你需要手动退出并重新启动 InputTip",
+        set_username: "设置用户名",
+        set_username_title: "设置用户名",
+        current_username: "当前的用户名: ",
+        username_check_tip: "请自行检查，确保用户名无误后，点击右上角的 × 直接关闭此窗口即可",
+        username_about: "1. 简要说明`n   - 这个菜单用来设置用户名信息`n   - 如果是域用户，在填写时还需要添加域，参考以下格式`n      - DOMAIN\\Username`n      - Username@domain.com`n   - 如果用户名信息有误，以下功能可能会失效`n      - 【开机自启动】中的 【任务计划程序】`n      - 【其他设置】中的【JAB/JetBrains IDE 支持】",
+        window_info_title: "获取窗口信息",
+        tip_template_default: "【%appState%】InputTip - 输入法状态管理器",
+        key_count_template_default: "%\n%【统计中】启动以来, 有效的按键输入次数: %keyCount%"
     },
     
     ; About dialog

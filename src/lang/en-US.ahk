@@ -103,7 +103,15 @@ global langStrings_enUS := {
         restart: "Restart",
         exit: "Exit",
         admin_cancel_tip1: "[Administrator privileges] cannot be directly demoted to [User privileges]",
-        admin_cancel_tip2: "To take effect immediately, you need to manually exit and restart InputTip"
+        admin_cancel_tip2: "To take effect immediately, you need to manually exit and restart InputTip",
+        set_username: "Set Username",
+        set_username_title: "Set Username",
+        current_username: "Current username: ",
+        username_check_tip: "Please verify the username is correct, then click X in the top right to close",
+        username_about: "1. Overview`n   - This menu sets the username`n   - For domain users, add the domain, e.g.:`n      - DOMAIN\\Username`n      - Username@domain.com`n   - If username is wrong, these features may fail:`n      - [Auto-start] via [Task Scheduler]`n      - [JAB/JetBrains IDE Support] in [Other Settings]",
+        window_info_title: "Get Window Info",
+        tip_template_default: "[%appState%] InputTip - Input Method Status Manager",
+        key_count_template_default: "%\n%[Counting] Since startup, valid key presses: %keyCount%"
     },
     
     ; About dialog

@@ -16,6 +16,7 @@ isJAB := 0
 #Include "*i utils/tools.ahk"
 #Include "*i utils/create-gui.ahk"
 #Include "*i utils/ini.ahk"
+#Include "*i utils/lang.ahk"
 #Include "*i utils/IME.ahk"
 #Include "*i utils/app-list.ahk"
 #Include "*i utils/hotkey-gui.ahk"

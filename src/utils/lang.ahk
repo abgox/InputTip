@@ -54,7 +54,19 @@ lang(key, fallback := "") {
  */
 setLang(langCode) {
     global currentLang := langCode
+    global trayTipTemplate, keyCountTemplate
     writeIni("language", langCode)
+    ; Refresh tray tip template with new language
+    trayTipTemplate := lang("tray.tip_template_default")
+    keyCountTemplate := lang("tray.key_count_template_default")
+    ; Update the actual tray icon tooltip
+    try {
+        updateTip()
+    }
+    ; Rebuild tray menu with new language
+    try {
+        makeTrayMenu()
+    }
 }
 
 /**

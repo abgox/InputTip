@@ -3,3 +3,4 @@ test/
 todo/
 
 src/utils/app-update/target/*
+src/InputTip.ini

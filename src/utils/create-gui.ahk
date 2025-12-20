@@ -106,7 +106,13 @@ createGuiOpt(title, fontOption := fontOpt, guiOption := "") {
  * @param {String} btnText 按钮文本
  * @returns {Gui} 返回 Gui 对象
  */
-createTipGui(Tips, title := "InputTip - 提示", btnText := "我知道了") {
+createTipGui(Tips, title := "", btnText := "") {
+    if (title = "") {
+        title := lang("common.tip_title")
+    }
+    if (btnText = "") {
+        btnText := lang("common.i_understand")
+    }
     tipGui(info) {
         g := createGuiOpt(title)
 

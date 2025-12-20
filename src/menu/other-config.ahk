@@ -3,10 +3,10 @@
 fn_ohter_config(*) {
     createUniqueGui(ohterConfigGui).Show()
     ohterConfigGui(info) {
-        g := createGuiOpt("InputTip - 其他设置")
-        tab := g.AddTab3("-Wrap", ["其他设置", "其他设置2", "关于"])
+        g := createGuiOpt("InputTip - " lang("other_config.title"))
+        tab := g.AddTab3("-Wrap", [lang("other_config.tab1"), lang("other_config.tab2"), lang("common.about")])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang("gui.help_tip"))
 
         if (info.i) {
             g.AddText(, gui_width_line)
@@ -17,17 +17,17 @@ fn_ohter_config(*) {
         line := gui_width_line "-------"
         g.AddText("xs", line)
 
-        g.AddButton("xs w" bw / 2, "更新检查").OnEvent("Click", fn_check_update)
-        g.AddButton("yp w" bw / 2, "指定窗口自动退出").OnEvent("Click", fn_auto_exit)
-        g.AddButton("xs w" bw / 2, "打开软件目录").OnEvent("Click", (*) => (Run("explorer.exe /select," A_ScriptFullPath)))
-        g.AddButton("yp w" bw / 2, "设置用户名").OnEvent("Click", (*) => (fn_update_user(userName)))
-        g.AddButton("xs w" bw / 2, "暂停/运行快捷键").OnEvent("Click", (*) => (
+        g.AddButton("xs w" bw / 2, lang("other_config.check_update")).OnEvent("Click", fn_check_update)
+        g.AddButton("yp w" bw / 2, lang("other_config.auto_exit_btn")).OnEvent("Click", fn_auto_exit)
+        g.AddButton("xs w" bw / 2, lang("other_config.open_dir")).OnEvent("Click", (*) => (Run("explorer.exe /select," A_ScriptFullPath)))
+        g.AddButton("yp w" bw / 2, lang("other_config.set_username")).OnEvent("Click", (*) => (fn_update_user(userName)))
+        g.AddButton("xs w" bw / 2, lang("other_config.pause_hotkey")).OnEvent("Click", (*) => (
             setHotKeyGui([{
                 config: "hotkey_Pause",
-                tip: "暂停/运行"
-            }], "软件暂停/运行")
+                tip: lang("tray.pause_run")
+            }], lang("other_config.pause_hotkey"))
         ))
-        g.AddButton("yp w" bw / 2, "JAB/JetBrains IDE 支持 【" (enableJABSupport ? "启用" : "禁用") "中】").OnEvent("Click", e_enableJABSupport)
+        g.AddButton("yp w" bw / 2, lang("other_config.jab_support") (enableJABSupport ? lang("other_config.jab_enabled") : lang("other_config.jab_disabled")) lang("other_config.jab_status")).OnEvent("Click", e_enableJABSupport)
         e_enableJABSupport(item, *) {
             global enableJABSupport := !enableJABSupport
 
@@ -36,11 +36,11 @@ fn_ohter_config(*) {
                     return
                 }
                 writeIni("enableJABSupport", enableJABSupport)
-                item.Text := "JAB/JetBrains IDE 支持【启用中】"
+                item.Text := lang("other_config.jab_enabling")
                 createUniqueGui(JABGui).Show()
                 JABGui(info) {
                     g := createGuiOpt("InputTip - 启用 JAB/JetBrains IDE 支持")
-                    g.AddText(, "已经成功启用了 JAB/JetBrains IDE 支持，你还需要进行以下操作步骤:           ")
+                    g.AddText(, lang("other_config.jab_enable_success"))
 
                     if (info.i) {
                         return g
@@ -48,12 +48,12 @@ fn_ohter_config(*) {
                     w := info.w
                     bw := w - g.MarginX * 2
 
-                    g.AddEdit("xs -VScroll ReadOnly cGray w" w, "1. 启用 Java Access Bridge (如果不需要在输入光标处显示符号，忽略此步骤)`n2. 点击下方的或【托盘菜单】中的【光标获取模式】`n3. 设置 JetBrains IDE 或其他 JAB 应用进程的光标获取模式为【JAB】`n4. 如果未生效，请重启 InputTip`n5. 如果仍未生效，请重启正在运行的 JetBrains IDE 或其他 JAB 应用`n6. 如果仍未生效，请重启系统`n7. 有多块屏幕时，副屏幕上可能有坐标偏差，需要通过【特殊偏移量】调整")
-                    g.AddText("cRed", "部分 JDK/JRE 中的 Java Access Bridge 无效，推荐使用 Microsoft OpenJDK 21").Focus()
-                    g.AddLink(, '详细操作步骤，请查看:   <a href="https://inputtip.abgox.com/faq/use-inputtip-in-jetbrains">官网</a>   <a href="https://github.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Github</a>   <a href="https://gitee.com/abgox/InputTip#如何在-jetbrains-系列-ide-中使用-inputtip">Gitee</a>')
-                    g.AddButton("xs w" w, "【光标获取模式】").OnEvent("Click", fn_cursor_mode)
-                    g.AddButton("xs w" w, "【特殊偏移量】").OnEvent("Click", fn_app_offset)
-                    y := g.AddButton("xs w" w, "我知道了")
+                    g.AddEdit("xs -VScroll ReadOnly cGray w" w, lang("other_config.jab_steps"))
+                    g.AddText("cRed", lang("other_config.jab_jdk_tip")).Focus()
+                    g.AddLink(, lang("other_config.jab_link"))
+                    g.AddButton("xs w" w, lang("other_config.btn_cursor_mode")).OnEvent("Click", fn_cursor_mode)
+                    g.AddButton("xs w" w, lang("other_config.btn_app_offset")).OnEvent("Click", fn_app_offset)
+                    y := g.AddButton("xs w" w, lang("common.i_understand"))
                     y.OnEvent("Click", e_close)
                     e_close(*) {
                         g.Destroy()
@@ -61,7 +61,7 @@ fn_ohter_config(*) {
                     return g
                 }
             } else {
-                item.Text := "JAB/JetBrains IDE 支持【禁用中】"
+                item.Text := lang("other_config.jab_disabling")
                 SetTimer(killAppTimer, -1)
                 killAppTimer() {
                     try {
@@ -74,9 +74,9 @@ fn_ohter_config(*) {
 
         g.AddText("xs", line)
 
-        g.AddText("xs", "自定义软件托盘图标")
+        g.AddText("xs", lang("other_config.custom_tray_icon"))
         iconList := StrSplit(iconPaths, ":")
-        g.AddText("xs cRed", "运行中: ").GetPos(, , &_w)
+        g.AddText("xs cRed", lang("other_config.running")).GetPos(, , &_w)
         _ := g.AddDropDownList("yp r9 w" bw - _w, iconList)
         _.Text := iconRunning
         _.OnEvent("Change", e_iconRunning)
@@ -88,7 +88,7 @@ fn_ohter_config(*) {
                 setTrayIcon(value)
             }
         }
-        g.AddText("xs cRed", "暂停中: ")
+        g.AddText("xs cRed", lang("other_config.paused"))
         _ := g.AddDropDownList("yp r9 w" bw - _w, iconList)
         _.Text := iconPaused
         _.OnEvent("Change", e_iconPaused)
@@ -100,17 +100,34 @@ fn_ohter_config(*) {
                 setTrayIcon(value)
             }
         }
-        g.AddButton("xs w" bw / 2, "打开图标目录").OnEvent("Click", (*) => (Run("explorer.exe InputTipIcon")))
-        g.AddButton("yp w" bw / 2, "刷新下拉列表").OnEvent("Click", (*) => (
+        g.AddButton("xs w" bw / 2, lang("other_config.open_icon_dir")).OnEvent("Click", (*) => (Run("explorer.exe InputTipIcon")))
+        g.AddButton("yp w" bw / 2, lang("other_config.refresh_list")).OnEvent("Click", (*) => (
             getPathList(),
             fn_ohter_config()
         ))
 
         tab.UseTab(2)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang("gui.help_tip"))
         g.AddText("xs", line)
 
-        g.AddText("Section", "1. 配置菜单字体大小:")
+        g.AddText("Section", lang("other_config.language") ": ")
+        langOptions := ["English (en-US)", "中文 (zh-CN)"]
+        _ := g.AddDropDownList("yp w" bw / 2, langOptions)
+        _.Value := getLang() = "zh-CN" ? 2 : 1
+        _.OnEvent("Change", e_change_lang)
+        e_change_lang(item, *) {
+            langCode := item.value = 2 ? "zh-CN" : "en-US"
+            setLang(langCode)
+            createTipGui([{
+                opt: "",
+                text: langCode = "zh-CN" ? lang("other_config.lang_changed_cn") : lang("other_config.lang_changed_en")
+            }, {
+                opt: "cRed",
+                text: langCode = "zh-CN" ? lang("other_config.restart_tip_cn") : lang("other_config.restart_tip_en")
+            }], "InputTip - " lang("other_config.lang_settings")).Show()
+        }
+
+        g.AddText("Section xs", "1. " lang("other_config.tab1") " - Font Size:")
         _ := g.AddEdit("yp Number Limit2")
         _.Value := readIni("gui_font_size", "12")
         _.OnEvent("Change", e_change_gui_fs)
@@ -128,7 +145,7 @@ fn_ohter_config(*) {
             db("gui_font_size", value)
         }
 
-        g.AddText("xs", "2. 轮询响应间隔时间:")
+        g.AddText("xs", lang("other_config.poll_interval_label"))
         _ := g.AddEdit("yp Number Limit2")
         _.Value := delay
         _.OnEvent("Change", e_delay)
@@ -151,8 +168,8 @@ fn_ohter_config(*) {
             db("delay", value)
         }
 
-        g.AddText("Section xs", "3. 按键输入次数统计:")
-        _ := g.AddDropDownList("yp AltSubmit", ["【否】关闭", "【是】开启"])
+        g.AddText("Section xs", lang("other_config.key_count"))
+        _ := g.AddDropDownList("yp AltSubmit", [lang("other_config.key_count_off"), lang("other_config.key_count_on")])
         _.Value := enableKeyCount + 1
         _.OnEvent("Change", fn_keyCount)
         fn_keyCount(item, *) {
@@ -162,7 +179,7 @@ fn_ohter_config(*) {
             updateTip()
         }
 
-        g.AddText("Section xs", "4. 鼠标悬停在【托盘图标】上时的文字模板")
+        g.AddText("Section xs", lang("other_config.tray_tip_template"))
         _ := g.AddEdit("w" bw)
         _.Value := trayTipTemplate
         _.OnEvent("Change", e_trayTemplate)
@@ -177,7 +194,7 @@ fn_ohter_config(*) {
 
             db("trayTipTemplate", value)
         }
-        g.AddText("Section xs", "5. 按键输入次数统计的文字模板")
+        g.AddText("Section xs", lang("other_config.key_count_template"))
         _ := g.AddEdit("w" bw)
         _.Value := keyCountTemplate
         _.OnEvent("Change", e_countTemplate)
@@ -191,10 +208,10 @@ fn_ohter_config(*) {
 
             db("keyCountTemplate", value)
         }
-        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, '这里有一些模板变量，它们在 4 和 5 中都可用:`n%\n% (换行)，%keyCount% (按键次数)，%appState% (软件运行状态)')
+        g.AddEdit("xs ReadOnly cGray -VScroll w" bw, lang("other_config.template_vars"))
         tab.UseTab(3)
-        g.AddEdit("Section r15 ReadOnly w" bw, "1. 按钮 —— 更新检查`n   - 点击后，会打开版本更新相关的配置菜单`n`n2. 按钮 —— JAB/JetBrains IDE 支持`n   - 如果你正在使用 JetBrains IDE，请双击启用它，并根据窗口提示完成所有步骤`n   - 完成后，InputTip 才能在 JetBrains IDE 中获取到输入光标位置并显示符号`n`n3. 按钮 —— 打开软件目录`n   - 点击后，会自动打开软件所在的运行目录`n`n4. 按钮 —— 设置用户名`n   - InputTip 需要用到你的用户名来确保【开机自启动】等功能正常运行`n   - 首次初始化时会自动获取用户名并保存到配置文件中，之后可通过此按钮修改`n   - 对于域用户，自动获取的用户名缺少域前缀，需要手动添加`n`n5. 配置 —— 自定义软件托盘图标`n   - 只需将 png 图片添加到图片目录中，然后在下拉列表中选择它即可实现自定义`n`n6. 按钮 —— 打开图标目录`n   - 点击它后，会自动打开图标目录，你可以将自己喜欢的图标添加到这里`n   - 然后通过【自定义软件托盘图标】进行设置`n`n7. 按钮 —— 刷新下拉列表`n   - 当你将 png 图片添加到图片目录后，可能需要通过点击它刷新下拉列表`n`n8. 配置 —— 配置菜单字体大小`n   - 可以通过设置字体大小来优化配置菜单在不同屏幕上的显示效果`n   - 取值范围: 5-30，建议 12-20 之间`n`n9. 配置 —— 轮询响应间隔时间`n   - 每隔 x 毫秒，InputTip 就会更新符号的位置/状态、输入法状态、鼠标样式等`n   - 这里的 x 就是轮询响应间隔时间，单位：毫秒，默认为 20`n   - 建议 50 以内，因为轮询间隔越短，依赖轮询的部分功能的稳定性越好`n`n10. 配置 —— 按键输入次数统计`n   - 开启后，InputTip 会记录你的按键输入次数`n   - 然后通过写入下方的文字模板中进行显示`n   - 注意: 只有当上一次按键和当前按键不同时，才会记为一次有效按键`n`n11. 配置 —— 鼠标悬停在【托盘图标】上时的文字模板`n   - 鼠标悬停在【托盘图标】上时，会根据此处设置的文字模板进行显示`n   - 变量: %\n% (换行)，%keyCount% (按键次数)，%appState% (软件运行状态)`n`n12. 配置 —— 按键输入次数统计的文字模板`n   - 开启【按键输入次数统计】后，此处的文字模板会被添加到鼠标悬停的提示中`n   - 变量: %\n% (换行)，%keyCount% (按键次数)，%appState% (软件运行状态)")
-        g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/faq/use-inputtip-in-jetbrains">在 JetBrains 系列 IDE 中使用 InputTip</a>')
+        g.AddEdit("Section r15 ReadOnly w" bw, lang("about_text.other_config"))
+        g.AddLink(, lang("about_text.related_links") '<a href="https://inputtip.abgox.com/faq/use-inputtip-in-jetbrains">JetBrains IDE</a>')
 
         g.OnEvent("Close", e_close)
         e_close(*) {

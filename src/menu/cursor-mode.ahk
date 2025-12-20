@@ -5,10 +5,10 @@ fn_cursor_mode(*) {
     showGui(deep := 0) {
         createUniqueGui(modeGui).Show()
         modeGui(info) {
-            g := createGuiOpt("InputTip - 光标获取模式")
-            tab := g.AddTab3("-Wrap", ["光标获取模式", "关于"])
+            g := createGuiOpt("InputTip - " lang("cursor_mode.title"))
+            tab := g.AddTab3("-Wrap", [lang("cursor_mode.title"), lang("common.about")])
             tab.UseTab(1)
-            g.AddText("Section cRed", gui_help_tip)
+            g.AddText("Section cRed", lang("gui.help_tip"))
 
             if (info.i) {
                 g.AddText(, gui_width_line)
@@ -19,7 +19,7 @@ fn_cursor_mode(*) {
 
 
             LV := "LV_" A_Now
-            gc.%LV% := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, ["进程名称", "光标获取模式", "创建时间"])
+            gc.%LV% := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, [lang("common.process_name"), lang("cursor_mode.title"), lang("common.create_time")])
 
             gc.%LV%.Opt("-Redraw")
             valueArr := StrSplit(readIniSection("InputCursorMode"), "`n")
@@ -38,14 +38,14 @@ fn_cursor_mode(*) {
 
             gc.%LV%.OnEvent("DoubleClick", handleClick)
             gc.%LV%._LV := LV
-            _ := g.AddButton("xs w" w / 2, "快捷添加")
+            _ := g.AddButton("xs w" w / 2, lang("common.quick_add"))
             _.OnEvent("Click", e_add)
             _._LV := LV
             e_add(item, *) {
                 fn_add(item._LV)
             }
 
-            _ := g.AddButton("yp w" w / 2, "手动添加")
+            _ := g.AddButton("yp w" w / 2, lang("common.manual_add"))
             _.OnEvent("Click", e_add_manually)
             _._LV := LV
             e_add_manually(item, *) {
@@ -83,12 +83,12 @@ fn_cursor_mode(*) {
                 needAddWhiteList := 1
 
                 if (action == "edit") {
-                    actionText := "编辑"
+                    actionText := lang("common.edit")
                 } else {
-                    actionText := "添加"
+                    actionText := lang("common.add")
                 }
 
-                label := "正在" actionText "应用的光标获取模式"
+                label := (action == "add" ? lang("gui.adding_rule") : lang("gui.editing_rule")) " - " lang("cursor_mode.title")
 
                 g := createGuiOpt("InputTip - " label)
 
@@ -100,19 +100,19 @@ fn_cursor_mode(*) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit") {
-                    g.AddText("cRed", "是否添加到【符号的白名单】中: ")
-                    _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
+                    g.AddText("cRed", lang("gui.add_to_whitelist"))
+                    _ := g.AddDropDownList("yp", [lang("gui.add_to_whitelist_no"), lang("gui.add_to_whitelist_yes")])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)
                     e_change(item, *) {
                         needAddWhiteList := item.value - 1
                     }
-                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将以【进程级】自动添加")
+                    g.AddText("xs cGray", lang("gui.add_to_whitelist_tip"))
                 }
 
                 scaleWidth := bw / 1.6
 
-                g.AddText(, "1. 应用进程名称: ")
+                g.AddText(, lang("cursor_mode.process_name_label"))
                 _ := g.AddEdit("yp w" scaleWidth, "")
                 _.Text := itemValue.exe_name
                 _.OnEvent("Change", e_changeName)
@@ -121,7 +121,7 @@ fn_cursor_mode(*) {
                     itemValue.exe_name := v
                 }
 
-                g.AddText("xs", "2. 光标获取模式: ")
+                g.AddText("xs", lang("cursor_mode.mode_label"))
                 _ := g.AddDropDownList("yp w" scaleWidth, modeNameList)
                 _.Text := itemValue.mode
                 _.OnEvent("Change", e_changeLevel)
@@ -130,12 +130,12 @@ fn_cursor_mode(*) {
                     itemValue.mode := v
                 }
 
-                g.AddButton("xs w" bw / 1.2, "完成" actionText).OnEvent("Click", e_set)
+                g.AddButton("xs w" bw / 1.2, (action == "add" ? lang("common.complete_add") : lang("common.complete_edit"))).OnEvent("Click", e_set)
                 e_set(*) {
                     fn_set(action, 0)
                 }
                 if (action == "edit") {
-                    g.AddButton("xs w" bw / 1.2, "删除它").OnEvent("Click", e_delete)
+                    g.AddButton("xs w" bw / 1.2, lang("common.delete_it")).OnEvent("Click", e_delete)
                     e_delete(*) {
                         fn_set(action, 1)
                     }
@@ -173,7 +173,7 @@ fn_cursor_mode(*) {
 
             fn_add(parentLV) {
                 args := {
-                    title: "快捷添加",
+                    title: lang("common.quick_add"),
                     configName: "",
                     LV: parentLV,
                 }
@@ -203,8 +203,8 @@ fn_cursor_mode(*) {
                 }
             }
             tab.UseTab(2)
-            g.AddEdit("ReadOnly VScroll r13 w" w, "1. 简要说明`n   - 这个菜单用来设置【光标获取模式】的匹配规则`n   - 下方是对应的规则列表`n   - 双击列表中的任意一行，进行编辑或删除`n   - 如果需要添加，请查看下方按钮相关的使用说明`n`n2. 规则列表 —— 进程名称`n   - 应用窗口实际的进程名称`n`n3. 规则列表 —— 光标获取模式`n   - 包括【HOOK】【UIA】【MSAA】【JAB】等等`n   - 不用在意这些模式是啥，哪个能用，就用哪个即可`n   - 如果想了解详细的相关内容，可以查看下方相关链接`n`n4. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n5. 按钮 —— 添加应用的光标获取模式`n   - 点击它，可以添加一条新的规则`n   - 这条规则用来指定某个应用进程使用什么光标获取模式`n   - 它会弹出一个新的菜单页面，会显示当前正在运行的【应用进程列表】`n   - 你可以双击【应用进程列表】中的任意一行进行快速添加`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】`n`n6. 光标获取模式 —— JAB`n   - 在所有的光标获取模式中，【JAB】是特殊的`n   - 它仅用于需要使用 Java Access Bridge 的进程，比如 JetBrains IDE`n   - 它需要配合【其他设置】中的【JAB/JetBrains IDE 支持】一起使用`n   - 详情参考【JAB/JetBrains IDE 支持】的使用说明")
-            g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/faq/cursor-mode">光标获取模式</a>   <a href="https://inputtip.abgox.com/faq/use-inputtip-in-jetbrains">如何在 JetBrains 系列 IDE 中使用 InputTip</a>')
+            g.AddEdit("ReadOnly VScroll r13 w" w, lang("about_text.cursor_mode"))
+            g.AddLink(, lang("about_text.related_links") '<a href="https://inputtip.abgox.com/faq/cursor-mode">Cursor Detection Mode</a>   <a href="https://inputtip.abgox.com/faq/use-inputtip-in-jetbrains">Using InputTip in JetBrains IDE</a>')
             g.OnEvent("Close", fn_close)
             fn_close(*) {
                 g.Destroy()

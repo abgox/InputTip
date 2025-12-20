@@ -13,13 +13,13 @@
 setHotKeyGui(keyConfigList, label := "") {
     createUniqueGui(hotKeyGui).Show()
     hotKeyGui(info) {
-        g := createGuiOpt("InputTip - 设置快捷键" (label ? " —— " label : ""))
-        tab := g.AddTab3("-Wrap", ["设置单键", "设置组合快捷键", "手动输入快捷键"])
+        g := createGuiOpt("InputTip - " lang("hotkey.title") (label ? " —— " label : ""))
+        tab := g.AddTab3("-Wrap", [lang("hotkey.tab_single"), lang("hotkey.tab_combo"), lang("hotkey.tab_manual")])
         tab.UseTab(1)
-        g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
-        g.AddText("xs", "2.  LShift 指的是左边的 Shift 键，RShift 指的是右边的 Shift 键，其他按键以此类推")
-        g.AddText("xs", "3.  使用单键作为快捷键不会覆盖原本的按键功能，因为是在按键抬起时才会触发")
+        g.AddText("Section", lang("hotkey.tip1_1"))
+        g.AddText("yp cRed", lang("hotkey.tip1_2"))
+        g.AddText("xs", lang("hotkey.tip2"))
+        g.AddText("xs", lang("hotkey.tip3"))
 
         if (info.i) {
             return g
@@ -29,10 +29,10 @@ setHotKeyGui(keyConfigList, label := "") {
 
         line := gui_width_line "--"
 
-        g.AddLink("xs", '4.  如果要移除快捷键，请选择【无】。<a href="https://inputtip.abgox.com/faq/single-key-list">点击查看完整的按键名称对应表</a>`n' line)
+        g.AddLink("xs", lang("hotkey.tip4_link") '`n' line)
 
         keyList := []
-        keyList.Push(["无", "Esc", "Shift", "LShift", "RShift", "Ctrl", "LCtrl", "RCtrl", "Alt", "LAlt", "RAlt"]*)
+        keyList.Push([lang("hotkey.none"), "Esc", "Shift", "LShift", "RShift", "Ctrl", "LCtrl", "RCtrl", "Alt", "LAlt", "RAlt"]*)
         keyList.Push(["MButton", "LButton", "RButton"]*)
         keyList.Push(["Space", "Tab", "Enter", "Backspace", "Delete", "Insert", "Home", "End", "PgUp", "PgDn", "Up", "Down", "Left", "Right"]*)
 
@@ -65,15 +65,15 @@ setHotKeyGui(keyConfigList, label := "") {
                         _.Value := 1
                     }
                 } catch {
-                    _.Text := "无"
+                    _.Text := lang("hotkey.none")
                 }
             } else {
-                _.Text := "无"
+                _.Text := lang("hotkey.none")
             }
         }
         e_change_hotkey(item, *) {
             ; 同步修改到【设置组合快捷键】和【手动输入快捷键】
-            if (item.Text = "无") {
+            if (item.Text = lang("hotkey.none")) {
                 key := ""
             } else {
                 key := "~" item.Text " Up"
@@ -83,11 +83,11 @@ setHotKeyGui(keyConfigList, label := "") {
             gc.%item._with%.Value := 0
         }
         tab.UseTab(2)
-        g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
-        g.AddText("xs", "2.  直接按下快捷键即可设置，除非快捷键被占用，需要使用【手动输入快捷键】")
-        g.AddText("xs", "3.  使用 Backspace(退格键) 或 Delete(删除键) 可以清除快捷键")
-        g.AddText("xs", "4.  通过勾选右边的 Win 键来表示快捷键中需要加入 Win 修饰键`n" line)
+        g.AddText("Section", lang("hotkey.tip1_1"))
+        g.AddText("yp cRed", lang("hotkey.tip1_2"))
+        g.AddText("xs", lang("hotkey.tip_combo2"))
+        g.AddText("xs", lang("hotkey.tip_combo3"))
+        g.AddText("xs", lang("hotkey.tip_combo4") '`n' line)
 
         for v in keyConfigList {
             g.AddText("xs", v.tip ":")
@@ -96,14 +96,14 @@ setHotKeyGui(keyConfigList, label := "") {
             _._config := v.config
             _._with := v.config "_win"
             _.OnEvent("Change", e_change_hotkey1)
-            gc.%_._with% := g.AddCheckbox("yp", "Win 键")
+            gc.%_._with% := g.AddCheckbox("yp", lang("hotkey.win_key"))
             gc.%_._with%._config := v.config
             gc.%_._with%.OnEvent("Click", e_win_key)
             gc.%_._with%.Value := InStr(value, "#") ? 1 : 0
         }
         e_change_hotkey1(item, *) {
             ; 同步修改到【设置单键】和【手动输入快捷键】
-            gc.%item._config%.Text := "无"
+            gc.%item._config%.Text := lang("hotkey.none")
             v := item.value
             if (gc.%item._with%.Value) {
                 v := "#" v
@@ -112,17 +112,17 @@ setHotKeyGui(keyConfigList, label := "") {
         }
         e_win_key(item, *) {
             ; 同步修改到【设置单键】和【手动输入快捷键】
-            gc.%item._config%.Text := "无"
+            gc.%item._config%.Text := lang("hotkey.none")
             v := gc.%item._config "2"%.Value
             gc.%item._config "3"%.Value := item.value ? "#" v : v
         }
         tab.UseTab(3)
-        g.AddText("Section", "1.")
-        g.AddText("yp cRed", "快捷键设置不会实时生效，需要点击下方的【确定】后生效")
-        g.AddText("xs", "2.")
-        g.AddText("yp cRed", "优先使用【设置单键】或【设置组合快捷键】设置，除非因为快捷键占用无法设置")
-        g.AddText("xs", '3.  这里会回显它们的设置，建议先使用它们，然后回到此处适当修改')
-        g.AddLink("xs", '4.  你需要首先查看 <a href="https://inputtip.abgox.com/faq/enter-shortcuts-manually">如何手动输入快捷键</a>`n' line)
+        g.AddText("Section", lang("hotkey.tip1_1"))
+        g.AddText("yp cRed", lang("hotkey.tip1_2"))
+        g.AddText("xs", lang("hotkey.tip_manual2"))
+        g.AddText("yp cRed", lang("hotkey.tip_manual2_red"))
+        g.AddText("xs", lang("hotkey.tip_manual3"))
+        g.AddLink("xs", lang("hotkey.tip_manual4_link") '`n' line)
         for v in keyConfigList {
             g.AddText("xs", v.tip ":")
             _ := gc.%v.config "3"% := g.AddEdit("yp")
@@ -138,11 +138,11 @@ setHotKeyGui(keyConfigList, label := "") {
                 try {
                     gc.%item._config%.Text := Trim(StrReplace(StrReplace(item.value, "~", ""), "Up", ""))
                 } catch {
-                    gc.%item._config%.Text := "无"
+                    gc.%item._config%.Text := lang("hotkey.none")
                 }
                 gc.%item._config "2"%.Value := ""
             } else {
-                gc.%item._config%.Text := "无"
+                gc.%item._config%.Text := lang("hotkey.none")
                 ; 当输入的快捷键符合组合快捷键时，同步修改
                 try {
                     gc.%item._config "2"%.Value := StrReplace(item.value, "#", "")
@@ -152,7 +152,7 @@ setHotKeyGui(keyConfigList, label := "") {
             }
         }
         tab.UseTab(0)
-        g.AddButton("Section w" bw, "确定").OnEvent("Click", e_yes)
+        g.AddButton("Section w" bw, lang("hotkey.confirm")).OnEvent("Click", e_yes)
         e_yes(*) {
             for v in keyConfigList {
                 key := gc.%v.config "3"%.Value

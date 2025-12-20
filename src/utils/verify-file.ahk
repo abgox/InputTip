@@ -305,7 +305,7 @@ if (A_IsCompiled) {
             g.SetFont("s12", "Microsoft YaHei")
             g.AddText("cRed", "可能因为网络等其他原因，文件没有正常恢复，请手动处理")
             g.AddLink("cGray", '你可以前往 <a href="https://inputtip.abgox.com">官网</a>   <a href="https://github.com/abgox/InputTip">Github</a>   <a href="https://gitee.com/abgox/InputTip">Github</a> 手动下载')
-            g.AddButton("xs w" _w, "我知道了").OnEvent("Click", (*) => (ExitApp()))
+            g.AddButton("xs w" _w, lang("common.i_understand")).OnEvent("Click", (*) => (ExitApp()))
             g.Show()
 
             while (1) {
@@ -352,13 +352,12 @@ checkIni() {
         writeIni("init", 1, "Installer")
 
         fz := "s14"
-        createGui(confirmGui).Show()
-        confirmGui(info) {
-            g := Gui(, "InputTip - 初始化引导")
+        ; First show language selection
+        createGui(langSelectGui).Show()
+        langSelectGui(info) {
+            g := Gui(, "InputTip - Language / 语言")
             g.SetFont(fz, "Microsoft YaHei")
-            g.AddText(, "你是否希望 InputTip 使用【鼠标方案】?")
-            g.AddText("xs cRed", "InputTip 会同时使用三套不同的鼠标样式`n然后根据不同输入法状态加载对应的鼠标样式")
-            g.AddLink(, '详情参考【鼠标方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标方案">Gitee</a>').Focus()
+            g.AddText(, "Please select your language / 请选择你的语言")
 
             if (info.i) {
                 return g
@@ -366,47 +365,17 @@ checkIni() {
             w := info.w
             bw := w - g.MarginX * 2
 
-            g.AddButton("xs cRed w" bw, "【是】").OnEvent("Click", e_yes)
-            e_yes(*) {
+            g.AddButton("xs w" bw, "English").OnEvent("Click", e_en)
+            e_en(*) {
                 g.Destroy()
-                createGui(yesGui).Show()
-                yesGui(info) {
-                    g := Gui()
-                    g.SetFont(fz, "Microsoft YaHei")
-                    g.AddText(, "你真的确定要使用【鼠标方案】吗？")
-                    g.AddText("cRed", "如果误点了【是】，恢复鼠标样式需要以下步骤: `n  1. 点击【托盘菜单】中的【状态提示 - 鼠标方案】`n  2. 将【加载鼠标样式】更改为【否】")
-                    g.AddLink(, '详情参考【鼠标方案】:  <a href="https://inputtip.abgox.com/v2/#鼠标方案">官网</a>   <a href="https://github.com/abgox/InputTip#鼠标方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#鼠标方案">Gitee</a>')
-
-                    if (info.i) {
-                        return g
-                    }
-                    w := info.w
-                    bw := w - g.MarginX * 2
-
-                    g.AddButton("xs cRed w" bw, "【是】").OnEvent("Click", e_yes)
-                    e_yes(*) {
-                        g.Destroy()
-                        writeIni("changeCursor", 1)
-                        global changeCursor := 1
-                        showSymbol()
-                    }
-                    g.AddButton("w" bw, "【否】").OnEvent("Click", e_no)
-                    e_no(*) {
-                        g.Destroy()
-                        writeIni("changeCursor", 0)
-                        global changeCursor := 0
-                        showSymbol()
-                    }
-                    return g
-                }
+                setLang("en-US")
+                showCursorGuide()
             }
-            _ := g.AddButton("w" bw, "【否】")
-            _.OnEvent("Click", e_no)
-            e_no(*) {
+            g.AddButton("w" bw, "简体中文").OnEvent("Click", e_cn)
+            e_cn(*) {
                 g.Destroy()
-                writeIni("changeCursor", 0)
-                global changeCursor := 0
-                showSymbol()
+                setLang("zh-CN")
+                showCursorGuide()
             }
             g.OnEvent("Close", e_exit)
             e_exit(*) {
@@ -417,14 +386,15 @@ checkIni() {
             }
             return g
         }
-        showSymbol() {
+
+        showCursorGuide() {
             createGui(confirmGui).Show()
             confirmGui(info) {
-                g := Gui(, "InputTip - 初始化引导")
+                g := Gui(, lang("init_guide.title"))
                 g.SetFont(fz, "Microsoft YaHei")
-                g.AddText(, "你是否希望 InputTip 使用【符号方案】?")
-                g.AddText("xs cRed", "InputTip 会尝试获取输入光标位置，在其附近显示符号")
-                g.AddLink(, '详情参考【符号方案】:  <a href="https://inputtip.abgox.com/v2/#符号方案">官网</a>   <a href="https://github.com/abgox/InputTip#符号方案">Github</a>   <a href="https://gitee.com/abgox/InputTip#符号方案">Gitee</a>')
+                g.AddText(, lang("init_guide.cursor_question"))
+                g.AddText("xs cRed", lang("init_guide.cursor_desc"))
+                g.AddLink(, lang("init_guide.cursor_link")).Focus()
 
                 if (info.i) {
                     return g
@@ -432,14 +402,82 @@ checkIni() {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                g.AddButton("xs cRed w" bw, "【是】").OnEvent("Click", e_yes)
+                g.AddButton("xs cRed w" bw, lang("init_guide.btn_yes")).OnEvent("Click", e_yes)
+                e_yes(*) {
+                    g.Destroy()
+                    createGui(yesGui).Show()
+                    yesGui(info) {
+                        g := Gui()
+                        g.SetFont(fz, "Microsoft YaHei")
+                        g.AddText(, lang("init_guide.cursor_confirm"))
+                        g.AddText("cRed", lang("init_guide.cursor_warning"))
+                        g.AddLink(, lang("init_guide.cursor_link"))
+
+                        if (info.i) {
+                            return g
+                        }
+                        w := info.w
+                        bw := w - g.MarginX * 2
+
+                        g.AddButton("xs cRed w" bw, lang("init_guide.btn_yes")).OnEvent("Click", e_yes)
+                        e_yes(*) {
+                            g.Destroy()
+                            writeIni("changeCursor", 1)
+                            global changeCursor := 1
+                            showSymbol()
+                        }
+                        g.AddButton("w" bw, lang("init_guide.btn_no")).OnEvent("Click", e_no)
+                        e_no(*) {
+                            g.Destroy()
+                            writeIni("changeCursor", 0)
+                            global changeCursor := 0
+                            showSymbol()
+                        }
+                        return g
+                    }
+                }
+                _ := g.AddButton("w" bw, lang("init_guide.btn_no"))
+                _.OnEvent("Click", e_no)
+                e_no(*) {
+                    g.Destroy()
+                    writeIni("changeCursor", 0)
+                    global changeCursor := 0
+                    showSymbol()
+                }
+                g.OnEvent("Close", e_exit)
+                e_exit(*) {
+                    try {
+                        IniDelete("InputTip.ini", "Installer", "init")
+                    }
+                    ExitApp()
+                }
+                return g
+            }
+        }
+
+        showSymbol() {
+            createGui(confirmGui).Show()
+            confirmGui(info) {
+                g := Gui(, lang("init_guide.title"))
+                g.SetFont(fz, "Microsoft YaHei")
+                g.AddText(, lang("init_guide.symbol_question"))
+                g.AddText("xs cRed", lang("init_guide.symbol_desc"))
+                g.AddLink(, lang("init_guide.symbol_link"))
+
+                if (info.i) {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                g.AddButton("xs cRed w" bw, lang("init_guide.btn_yes")).OnEvent("Click", e_yes)
                 e_yes(*) {
                     g.Destroy()
                     writeIni("symbolType", 1)
                     global symbolType := 1
                     initWhiteList()
                 }
-                _ := g.AddButton("w" bw, "【否】")
+                _ := g.AddButton("w" bw, lang("init_guide.btn_no"))
                 _.OnEvent("Click", e_no)
                 e_no(*) {
                     g.Destroy()
@@ -460,11 +498,11 @@ checkIni() {
         initWhiteList() {
             createGui(listTipGui).Show()
             listTipGui(info) {
-                g := Gui(, "InputTip - 初始化引导")
+                g := Gui(, lang("init_guide.title"))
                 g.SetFont(fz, "Microsoft YaHei")
-                g.AddText("cRed", "对于【符号方案】，InputTip 使用强制的白名单机制`n只有添加到【符号的白名单】中的应用进程窗口才会尝试显示符号")
-                g.AddLink(, '详情参考: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">关于符号方案中的名单机制</a>')
-                g.AddText(, "建议立即添加常用的应用进程窗口到【符号的白名单】中")
+                g.AddText("cRed", lang("init_guide.whitelist_desc"))
+                g.AddLink(, lang("init_guide.whitelist_link"))
+                g.AddText(, lang("init_guide.whitelist_suggest"))
 
                 if (info.i) {
                     return g
@@ -472,13 +510,13 @@ checkIni() {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                _c := g.AddButton("w" bw, "【是】现在去添加")
+                _c := g.AddButton("w" bw, lang("init_guide.btn_add_now"))
                 _c.OnEvent("Click", add_white_list)
                 add_white_list(*) {
                     close()
                     fn_white_list()
                 }
-                _ := g.AddButton("w" bw, "【否】暂时不添加")
+                _ := g.AddButton("w" bw, lang("init_guide.btn_add_later"))
                 _.OnEvent("Click", close)
                 close(*) {
                     g.Destroy()

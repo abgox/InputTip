@@ -20,32 +20,32 @@ fontList.InsertAt(1, "Microsoft YaHei")
 
 makeTrayMenu() {
     A_TrayMenu.Delete()
-    A_TrayMenu.Add("使用指南", fn_guide)
+    A_TrayMenu.Add(lang("tray.guide"), fn_guide)
     fn_guide(*) {
         createTipGui([{
             opt: "",
-            text: "对于还不熟悉 InputTip 的朋友，这里有几个建议:"
+            text: lang("tray.guide_intro")
         }, {
             opt: "",
-            text: '1. 使用前先看看视频教程: <a href="https://www.bilibili.com/video/BV15oYKz5EQ8">InputTip 使用教程 - Bilibili</a>',
+            text: lang("tray.guide_tip1"),
         }, {
             opt: "",
-            text: '2. 可以再看看 <a href="https://inputtip.abgox.com">官网</a>、<a href="https://inputtip.abgox.com/faq">常见问题</a>，源代码仓库 <a href="https://github.com/abgox/InputTip">Github</a>、<a href="https://gitee.com/abgox/InputTip">Gitee</a>'
+            text: lang("tray.guide_tip2")
         }, {
             opt: "",
-            text: '3. 如果有其他问题，可以在【关于】中找到相关渠道进行反馈'
-        }], "InputTip - 使用指南").Show()
+            text: lang("tray.guide_tip3")
+        }], lang("tray.guide_title")).Show()
     }
     A_TrayMenu.Add()
-    A_TrayMenu.Add("开机自启动", fn_startup)
+    A_TrayMenu.Add(lang("tray.startup"), fn_startup)
     if (isStartUp) {
-        A_TrayMenu.Check("开机自启动")
+        A_TrayMenu.Check(lang("tray.startup"))
     }
 
     if (!A_IsCompiled) {
-        A_TrayMenu.Add("以管理员权限启动", fn_admin_mode)
+        A_TrayMenu.Add(lang("tray.admin_mode"), fn_admin_mode)
         fn_admin_mode(*) {
-            A_TrayMenu.ToggleCheck("以管理员权限启动")
+            A_TrayMenu.ToggleCheck(lang("tray.admin_mode"))
             global runCodeWithAdmin := !runCodeWithAdmin
             writeIni("runCodeWithAdmin", runCodeWithAdmin)
             if (runCodeWithAdmin) {
@@ -53,59 +53,59 @@ makeTrayMenu() {
             } else {
                 createTipGui([{
                     opt: "cRed",
-                    text: "【管理员权限】无法直接降权至【用户权限】",
+                    text: lang("tray.admin_cancel_tip1"),
                 }, {
                     opt: "cRed",
-                    text: "如果想要立即生效，你需要手动退出并重新启动 InputTip"
-                }], "InputTip - 取消以管理员权限启动").Show()
+                    text: lang("tray.admin_cancel_tip2")
+                }], "InputTip - " lang("tray.admin_mode")).Show()
             }
         }
         if (runCodeWithAdmin) {
-            A_TrayMenu.Check("以管理员权限启动")
+            A_TrayMenu.Check(lang("tray.admin_mode"))
         }
     }
 
-    A_TrayMenu.Add("创建快捷方式到桌面", fn_create_shortcut)
+    A_TrayMenu.Add(lang("tray.create_shortcut"), fn_create_shortcut)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add("暂停/运行", pauseApp)
-    A_TrayMenu.Default := "暂停/运行"
+    A_TrayMenu.Add(lang("tray.pause_run"), pauseApp)
+    A_TrayMenu.Default := lang("tray.pause_run")
     A_TrayMenu.ClickCount := 1
     A_TrayMenu.Add()
-    A_TrayMenu.Add("输入法相关", fn_input_mode)
-    A_TrayMenu.Add("状态切换快捷键", (*) => (
+    A_TrayMenu.Add(lang("tray.input_method"), fn_input_mode)
+    A_TrayMenu.Add(lang("tray.hotkey_switch"), (*) => (
         setHotKeyGui([{
             config: "hotkey_CN",
-            tip: "中文状态"
+            tip: lang("state.CN")
         }, {
             config: "hotkey_EN",
-            tip: "英文状态"
+            tip: lang("state.EN")
         }, {
             config: "hotkey_Caps",
-            tip: "大写锁定"
-        }], "输入法状态切换")
+            tip: lang("state.Caps")
+        }], lang("tray.hotkey_switch"))
     ))
-    A_TrayMenu.Add("指定窗口自动切换状态", fn_switch_window)
+    A_TrayMenu.Add(lang("tray.auto_switch"), fn_switch_window)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add("状态提示 - 鼠标方案", fn_scheme_cursor)
-    A_TrayMenu.Add("状态提示 - 符号方案", fn_scheme_symbol)
-    A_TrayMenu.Add("在鼠标附近显示符号", fn_symbol_pos)
+    A_TrayMenu.Add(lang("tray.cursor_scheme"), fn_scheme_cursor)
+    A_TrayMenu.Add(lang("tray.symbol_scheme"), fn_scheme_symbol)
+    A_TrayMenu.Add(lang("tray.symbol_near_cursor"), fn_symbol_pos)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("符号的黑/白名单", fn_bw_list)
-    A_TrayMenu.Add("获取窗口信息", fn_process_info)
+    A_TrayMenu.Add(lang("tray.bw_list"), fn_bw_list)
+    A_TrayMenu.Add(lang("tray.window_info"), fn_process_info)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("光标获取模式", fn_cursor_mode)
-    A_TrayMenu.Add("特殊偏移量", fn_app_offset)
+    A_TrayMenu.Add(lang("tray.cursor_mode"), fn_cursor_mode)
+    A_TrayMenu.Add(lang("tray.special_offset"), fn_app_offset)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add("其他设置", fn_ohter_config)
+    A_TrayMenu.Add(lang("tray.other_settings"), fn_ohter_config)
     A_TrayMenu.Add()
-    A_TrayMenu.Add("关于", fn_about)
-    A_TrayMenu.Add("重启", fn_restart)
+    A_TrayMenu.Add(lang("tray.about"), fn_about)
+    A_TrayMenu.Add(lang("tray.restart"), fn_restart)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add("退出", fn_exit)
+    A_TrayMenu.Add(lang("tray.exit"), fn_exit)
 }
 
 fn_exit(*) {
@@ -142,10 +142,10 @@ fn_update_user(uname, *) {
     global userName := uname
     createUniqueGui(updateUserGui).Show()
     updateUserGui(info) {
-        g := createGuiOpt("InputTip - 设置用户名")
-        tab := g.AddTab3("-Wrap", ["设置用户名", "关于"])
+        g := createGuiOpt("InputTip - " lang("tray.set_username_title"))
+        tab := g.AddTab3("-Wrap", [lang("tray.set_username_title"), lang("common.about")])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang("gui.help_tip"))
 
         if (info.i) {
             return g
@@ -155,7 +155,7 @@ fn_update_user(uname, *) {
 
         g.AddText(, "-------------------------------------------------------------------------")
 
-        g.AddText(, "当前的用户名: ")
+        g.AddText(, lang("tray.current_username"))
         _ := g.AddEdit("yp")
         _._config := "userName"
         _.Value := uname
@@ -164,10 +164,10 @@ fn_update_user(uname, *) {
             global userName := item.value
         }
 
-        g.AddText("xs ReadOnly cGray", "请自行检查，确保用户名无误后，点击右上角的 × 直接关闭此窗口即可").Focus()
+        g.AddText("xs ReadOnly cGray", lang("tray.username_check_tip")).Focus()
 
         tab.UseTab(2)
-        g.AddEdit("ReadOnly r6 w" bw, "1. 简要说明`n   - 这个菜单用来设置用户名信息`n   - 如果是域用户，在填写时还需要添加域，参考以下格式`n      - DOMAIN\Username`n      - Username@domain.com`n   - 如果用户名信息有误，以下功能可能会失效`n      - 【开机自启动】中的 【任务计划程序】`n      - 【其他设置】中的【JAB/JetBrains IDE 支持】")
+        g.AddEdit("ReadOnly r6 w" bw, lang("tray.username_about"))
 
         g.OnEvent("Close", e_close)
         e_close(*) {
@@ -196,7 +196,7 @@ fn_update_user(uname, *) {
 fn_process_info(*) {
     createUniqueGui(processInfoGui).Show()
     processInfoGui(info) {
-        g := createGuiOpt("InputTip - 获取窗口信息", , "AlwaysOnTop")
+        g := createGuiOpt("InputTip - " lang("tray.window_info_title"), , "AlwaysOnTop")
 
         if (info.i) {
             g.AddText(, gui_width_line)
@@ -206,27 +206,27 @@ fn_process_info(*) {
         bw := w - g.MarginX * 2
         line := gui_width_line "-"
 
-        g.AddText("cRed Center w" bw, "实时获取当前聚焦的窗口进程信息: 窗口进程名称 + 窗口标题 + 窗口进程路径").Focus()
+        g.AddText("cRed Center w" bw, lang("gui.realtime_info")).Focus()
         g.AddText(, line)
 
         createGuiOpt("").AddText(, " ").GetPos(, , &__w)
-        gc._window_info := g.AddButton("xs w" bw, "点击获取")
+        gc._window_info := g.AddButton("xs w" bw, lang("gui.click_get"))
         gc._window_info.OnEvent("Click", e_window_info)
-        g.AddText("xs cRed", "名称: ").GetPos(, , &_w)
+        g.AddText("xs cRed", lang("gui.current_name")).GetPos(, , &_w)
         _width := bw - _w - g.MarginX + __w
         gc.app_name := g.AddEdit("yp ReadOnly -VScroll w" _width)
-        g.AddText("xs cRed", "标题: ").GetPos(, , &_w)
+        g.AddText("xs cRed", lang("gui.current_title")).GetPos(, , &_w)
         gc.app_title := g.AddEdit("yp ReadOnly -VScroll w" _width)
-        g.AddText("xs cRed", "路径: ").GetPos(, , &_w)
+        g.AddText("xs cRed", lang("gui.current_path")).GetPos(, , &_w)
         gc.app_path := g.AddEdit("yp ReadOnly -VScroll w" _width)
         e_window_info(*) {
             if (gc.timer2) {
                 gc.timer2 := 0
-                gc._window_info.Text := "点击获取"
+                gc._window_info.Text := lang("gui.click_get")
                 return
             }
             gc.timer2 := 1
-            gc._window_info.Text := "停止获取"
+            gc._window_info.Text := lang("gui.stop_get")
             SetTimer(statusTimer, 25)
             statusTimer() {
                 static first := "", last := ""
@@ -280,9 +280,9 @@ fn_common(args, cb_updateVar) {
         createUniqueGui(commonGui).Show()
         commonGui(info) {
             g := createGuiOpt("InputTip - " args.title)
-            tab := g.AddTab3("-Wrap", [args.tab, "关于"])
+            tab := g.AddTab3("-Wrap", [args.tab, lang("common.about")])
             tab.UseTab(1)
-            g.AddLink("Section cRed", gui_help_tip)
+            g.AddLink("Section cRed", lang("gui.help_tip"))
 
             if (info.i) {
                 g.AddText(, gui_width_line)
@@ -293,7 +293,7 @@ fn_common(args, cb_updateVar) {
 
             LV := "LV_" A_Now
 
-            gc.%LV% := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
+            gc.%LV% := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, [lang("common.process_name"), lang("common.match_scope"), lang("common.match_mode"), lang("common.match_title"), lang("common.create_time")])
 
             gc.%LV%.Opt("-Redraw")
             valueArr := StrSplit(readIniSection(args.config), "`n")
@@ -310,9 +310,9 @@ fn_common(args, cb_updateVar) {
                         title := part[4]
                     }
 
-                    tipGlobal := isGlobal ? "进程级" : "标题级"
+                    tipGlobal := isGlobal ? lang("common.process_level") : lang("common.title_level")
 
-                    tipRegex := isRegex ? "正则" : "相等"
+                    tipRegex := isRegex ? lang("common.regex") : lang("common.equal")
                     gc.%LV%.Add(, name, tipGlobal, tipRegex, title, kv[1])
                 } else {
                     IniDelete("InputTip.ini", args.config, kv[1])
@@ -324,7 +324,7 @@ fn_common(args, cb_updateVar) {
             gc.%LV%.OnEvent("DoubleClick", handleClick)
             gc.%LV%._LV := LV
             gc.%LV%._config := args.config
-            _ := g.AddButton("xs w" w / 2, "快捷添加")
+            _ := g.AddButton("xs w" w / 2, lang("common.quick_add"))
             _.OnEvent("Click", e_add)
             _._LV := LV
             _._config := args.config
@@ -337,7 +337,7 @@ fn_common(args, cb_updateVar) {
                 }
             }
 
-            _ := g.AddButton("yp w" w / 2, "手动添加")
+            _ := g.AddButton("yp w" w / 2, lang("common.manual_add"))
             _.OnEvent("Click", e_add_manually)
             _._LV := LV
             _._config := args.config
@@ -345,8 +345,8 @@ fn_common(args, cb_updateVar) {
             e_add_manually(item, *) {
                 itemValue := {
                     exe_name: "",
-                    tipGlobal: "进程级",
-                    tipRegex: "相等",
+                    tipGlobal: lang("common.process_level"),
+                    tipRegex: lang("common.equal"),
                     title: "",
                     id: returnId(),
                     configName: item._config
@@ -380,16 +380,16 @@ fn_common(args, cb_updateVar) {
             }
 
             fn_edit(LV, RowNumber, action, itemValue) {
-                ; 是否自动添加到符号的白名单中
+                ; Auto add to symbol whitelist
                 needAddWhiteList := 1
 
                 if (action == "edit") {
-                    actionText := "编辑"
+                    actionText := lang("common.edit")
                 } else {
-                    actionText := "添加"
+                    actionText := lang("common.add")
                 }
 
-                label := "正在" actionText "规则"
+                label := action == "edit" ? lang("gui.editing_rule") : lang("gui.adding_rule")
 
                 g := createGuiOpt("InputTip - " label)
 
@@ -401,19 +401,19 @@ fn_common(args, cb_updateVar) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit" && itemValue.configName != "App-ShowSymbol") {
-                    g.AddText("cRed", "是否添加到【符号的白名单】中: ")
-                    _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
+                    g.AddText("cRed", lang("gui.add_to_whitelist"))
+                    _ := g.AddDropDownList("yp", [lang("gui.add_to_whitelist_no"), lang("gui.add_to_whitelist_yes")])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)
                     e_change(item, *) {
                         needAddWhiteList := item.value - 1
                     }
-                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将以【进程级】自动添加")
+                    g.AddText("xs cGray", lang("gui.add_to_whitelist_tip"))
                 }
 
                 scaleWidth := bw / 1.5
 
-                g.AddText(, "1. 进程名称: ")
+                g.AddText(, lang("gui.process_name_label"))
                 _ := g.AddEdit("yp w" scaleWidth, "")
                 _.Text := itemValue.exe_name
                 _.OnEvent("Change", e_changeName)
@@ -422,8 +422,8 @@ fn_common(args, cb_updateVar) {
                     itemValue.exe_name := v
                 }
 
-                g.AddText("xs", "2. 匹配范围: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
+                g.AddText("xs", lang("gui.match_scope_label"))
+                _ := g.AddDropDownList("yp w" scaleWidth, [lang("common.process_level"), lang("common.title_level")])
                 _.Text := itemValue.tipGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
@@ -431,9 +431,9 @@ fn_common(args, cb_updateVar) {
                     itemValue.tipGlobal := v
                 }
 
-                g.AddText("xs cGray", "【匹配模式】和【匹配标题】仅在【匹配范围】为【标题级】时有效")
-                g.AddText("xs", "3. 匹配模式: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["相等", "正则"])
+                g.AddText("xs cGray", lang("gui.match_scope_tip"))
+                g.AddText("xs", lang("gui.match_mode_label"))
+                _ := g.AddDropDownList("yp w" scaleWidth, [lang("common.equal"), lang("common.regex")])
                 _.Text := itemValue.tipRegex
                 _.OnEvent("Change", e_changeMatch)
                 e_changeMatch(item, *) {
@@ -441,7 +441,7 @@ fn_common(args, cb_updateVar) {
                     itemValue.tipRegex := v
                 }
 
-                g.AddText("xs", "4. 匹配标题: ")
+                g.AddText("xs", lang("gui.match_title_label"))
                 _ := g.AddEdit("yp w" scaleWidth)
                 _.Text := itemValue.title
                 _.OnEvent("Change", e_changeTitle)
@@ -450,12 +450,12 @@ fn_common(args, cb_updateVar) {
                     itemValue.title := v
                 }
 
-                g.AddButton("xs w" bw / 1.2, "完成" actionText).OnEvent("Click", e_set)
+                g.AddButton("xs w" bw / 1.2, lang("common.complete_" action)).OnEvent("Click", e_set)
                 e_set(*) {
                     fn_set(action, 0)
                 }
                 if (action == "edit") {
-                    g.AddButton("xs w" bw / 1.2, "删除它").OnEvent("Click", e_delete)
+                    g.AddButton("xs w" bw / 1.2, lang("common.delete_it")).OnEvent("Click", e_delete)
                     e_delete(*) {
                         fn_set(action, 1)
                     }
@@ -470,10 +470,10 @@ fn_common(args, cb_updateVar) {
                             LV.Delete(RowNumber)
                         }
                     } else {
-                        isGlobal := itemValue.tipGlobal == "进程级" ? 1 : 0
-                        isRegex := itemValue.tipRegex == "正则" ? 1 : 0
+                        isGlobal := itemValue.tipGlobal == lang("common.process_level") ? 1 : 0
+                        isRegex := itemValue.tipRegex == lang("common.regex") ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
-                        ; 没有进行移动
+                        ; Save the rule
                         writeIni(itemValue.id, value, itemValue.configName, "InputTip.ini")
                         if (action == "edit") {
                             LV.Modify(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
@@ -495,7 +495,7 @@ fn_common(args, cb_updateVar) {
 
             fn_add(parentLV, configName, parentTitle) {
                 args := {
-                    title: parentTitle " - 快捷添加",
+                    title: parentTitle " - " lang("common.quick_add"),
                     configName: configName,
                     LV: parentLV,
                 }
@@ -507,8 +507,8 @@ fn_common(args, cb_updateVar) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        tipGlobal: "进程级",
-                        tipRegex: "相等",
+                        tipGlobal: lang("common.process_level"),
+                        tipRegex: lang("common.equal"),
                         title: windowInfo.title,
                         id: windowInfo.id,
                         configName: args.parentArgs.configName
@@ -521,8 +521,8 @@ fn_common(args, cb_updateVar) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        tipGlobal: "进程级",
-                        tipRegex: "相等",
+                        tipGlobal: lang("common.process_level"),
+                        tipRegex: lang("common.equal"),
                         title: windowInfo.title,
                         id: windowInfo.id,
                         configName: args.parentArgs.configName
@@ -531,8 +531,8 @@ fn_common(args, cb_updateVar) {
                 }
             }
             tab.UseTab(2)
-            g.AddEdit("Section r13 w" w, "1. 简要说明`n   - 这个菜单用来配置【" args.tab "】的匹配规则`n   - 下方是对应的规则列表`n   - 双击列表中的任意一行，进行编辑或删除`n   - 如果需要添加，请查看下方按钮相关的使用说明`n`n2. 规则列表 —— 进程名称`n   - 应用窗口实际的进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【进程级】或【标题级】`n   - 【进程级】: 只要在这个进程中时，就会触发`n   - 【标题级】: 只有在这个进程中，且标题匹配成功时，才会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发`n   - 【正则】: 使用正则表达式匹配标题，匹配成功才会触发`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式，与【匹配模式】相对应`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取窗口信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 快捷添加`n   - 点击它，可以添加一条新的规则`n   - 它会弹出一个新的菜单页面，会显示当前正在运行的【应用进程列表】`n   - 你可以双击【应用进程列表】中的任意一行进行快速添加`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】`n`n9. 按钮 —— 手动添加`n   - 点击它，可以添加一条新的规则`n   - 它会直接弹出添加窗口，你需要手动填写进程名称、标题等信息")
-            g.AddLink(, args.link)
+            g.AddEdit("ReadOnly VScroll r12 w" w, lang("about_text.fn_common"))
+            g.AddLink(, lang("about_text.related_links") '<a href="https://inputtip.abgox.com/faq/special-list">Lists</a>')
             return g
         }
     }
@@ -541,10 +541,10 @@ fn_common(args, cb_updateVar) {
 
 fn_white_list(*) {
     fn_common({
-        title: "设置符号的白名单",
-        tab: "符号的白名单",
+        title: lang("bw_list.set_white_list"),
+        tab: lang("bw_list.white_list"),
         config: "App-ShowSymbol",
-        link: '相关链接: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">符号的名单机制</a>'
+        link: 'Related links: <a href="https://inputtip.abgox.com/faq/symbol-list-mechanism">Symbol List Mechanism</a>'
     }, fn)
     fn() {
         global app_ShowSymbol := StrSplit(readIniSection("App-ShowSymbol"), "`n")
@@ -613,13 +613,13 @@ getFontList() {
 pauseApp(*) {
     updateTip(!A_IsPaused)
     if (A_IsPaused) {
-        A_TrayMenu.Uncheck("暂停/运行")
+        A_TrayMenu.Uncheck(lang("tray.pause_run"))
         setTrayIcon(iconRunning, 0)
         reloadSymbol()
         reloadCursor()
         restartJAB()
     } else {
-        A_TrayMenu.Check("暂停/运行")
+        A_TrayMenu.Check(lang("tray.pause_run"))
         setTrayIcon(iconPaused, 1)
         hideSymbol()
         if (enableJABSupport) {
@@ -752,7 +752,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
         processListGui(info) {
             showGui(deep := 0) {
                 g := createGuiOpt("InputTip - " args.title)
-                tab := g.AddTab3("-Wrap", ["应用进程列表", "关于"])
+                tab := g.AddTab3("-Wrap", [lang("process_list.tab_list"), lang("common.about")])
                 tab.UseTab(1)
 
                 if (info.i) {
@@ -762,9 +762,9 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                g.AddText("Section cRed", gui_help_tip)
+                g.AddText("Section cRed", lang("gui.help_tip"))
 
-                gc.LV_processList := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "来源", "窗口标题", "文件路径"])
+                gc.LV_processList := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, [lang("gui.lv_name"), lang("gui.lv_source"), lang("gui.lv_title"), lang("gui.lv_path")])
 
                 gc.LV_processList.OnEvent("DoubleClick", e_click_add)
                 e_click_add(LV, RowNumber, *) {
@@ -791,7 +791,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                         exe_name := ProcessGetName(WinGetPID("ahk_id " v))
                         if (!InStr(res, ":" exe_name ":")) {
                             res .= exe_name ":"
-                            gc.LV_processList.Add(, exe_name, "系统", WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
+                            gc.LV_processList.Add(, exe_name, lang("process_list.source_system"), WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
                         }
                     }
                 }
@@ -803,7 +803,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                             name := part[1]
                             if (!InStr(res, ":" name ":") && Trim(name)) {
                                 res .= exe_name ":"
-                                gc.LV_processList.Add(, name, "白名单")
+                                gc.LV_processList.Add(, name, lang("process_list.source_whitelist"))
                             }
                         }
                     }
@@ -811,7 +811,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                 gc.LV_processList.Opt("+Redraw")
                 DetectHiddenWindows 1
                 autoHdrLV(gc.LV_processList)
-                g.AddButton("Section w" bw / 2, "刷新此界面").OnEvent("Click", e_fresh)
+                g.AddButton("Section w" bw / 2, lang("process_list.refresh_list")).OnEvent("Click", e_fresh)
                 e_fresh(*) {
                     g.Destroy()
                     showGui(deep).Show()
@@ -832,20 +832,20 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                 ; }
 
                 if (deep) {
-                    g.AddButton("yp w" bw / 2, "显示更少进程").OnEvent("Click", e_less_window)
+                    g.AddButton("yp w" bw / 2, lang("process_list.show_less")).OnEvent("Click", e_less_window)
                     e_less_window(*) {
                         g.Destroy()
                         showGui(0).Show()
                     }
                 } else {
-                    g.AddButton("yp w" bw / 2, "显示更多进程").OnEvent("Click", e_more_window)
+                    g.AddButton("yp w" bw / 2, lang("process_list.show_more")).OnEvent("Click", e_more_window)
                     e_more_window(*) {
                         g.Destroy()
                         showGui(1).Show()
                     }
                 }
                 tab.UseTab(2)
-                g.AddEdit("ReadOnly VScroll r12 w" w, "1. 简要说明`n   - 这个菜单中显示的是所有正在运行的【应用进程列表】`n   - 整个列表根据【进程名称】的首字母进行排序`n   - 双击列表中的任意一行，即可添加对应的这个应用进程`n`n2. 应用进程列表 —— 进程名称`n   - 应用程序实际运行的进程名称`n   - 如果不清楚是哪个应用的进程，可能需要通过【窗口标题】、【文件路径】来判断`n   - 或者使用第 6 点的技巧`n`n3. 应用进程列表 —— 来源`n   - 【系统】表明这个进程是从系统中获取的，它正在运行`n   - 【白名单】表明这个进程是存在于白名单中的，为了方便操作，被添加到列表中`n`n4. 应用进程列表 —— 窗口标题`n   - 这个应用进程所显示的窗口的标题`n   - 你可能需要通过它来判断这是哪一个应用的进程`n`n5. 应用进程列表 —— 文件路径`n   - 这个应用进程的可执行文件的所在路径`n   - 你可能需要通过它来判断这是哪一个应用的进程`n`n6. 技巧 —— 获取当前窗口的实时的相关进程信息`n   - 你可以使用【托盘菜单】中的【获取窗口信息】`n   - 它会实时获取当前聚焦的窗口的【进程名称】【窗口标题】【进程路径】`n`n7. 按钮 —— 刷新此界面`n   - 因为列表中显示的是当前正在运行的应用进程`n   - 如果你是先打开这个配置菜单，再打开对应的应用，它不会显示在这里`n   - 你需要重新打开这个配置菜单，或者点击这个按钮进行刷新`n`n8. 按钮 —— 显示更多进程`n   - 默认情况下，【应用进程列表】中显示的是前台应用进程，就是有窗口的应用进程`n   - 你可以点击它来显示更多的进程，比如后台进程`n`n9. 按钮 —— 显示更少进程`n   - 当你点击【显示更多进程】按钮后，会出现这个按钮`n   - 点击它又会重新显示前台应用进程")
+                g.AddEdit("ReadOnly VScroll r12 w" w, lang("about_text.process_list"))
                 return g
             }
             return showGui()

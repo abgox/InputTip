@@ -5,8 +5,8 @@ fn_switch_window(*) {
     showGui(deep := 0) {
         createUniqueGui(switchWindowGui).Show()
         switchWindowGui(info) {
-            g := createGuiOpt("InputTip - 指定窗口自动切换输入法状态")
-            tab := g.AddTab3("-Wrap", ["中文状态", "英文状态", "大写锁定", "关于"])
+            g := createGuiOpt("InputTip - " lang("switch_window.title"))
+            tab := g.AddTab3("-Wrap", [lang("state.CN"), lang("state.EN"), lang("state.Caps"), lang("common.about")])
             tab.UseTab(1)
 
             if (info.i) {
@@ -32,16 +32,16 @@ fn_switch_window(*) {
                             title := part[4]
                         }
 
-                        tipGlobal := isGlobal ? "进程级" : "标题级"
+                        tipGlobal := isGlobal ? lang("common.process_level") : lang("common.title_level")
 
-                        tipRegex := isRegex ? "正则" : "相等"
+                        tipRegex := isRegex ? lang("common.regex") : lang("common.equal")
                         gc.%"LV_" state%.Add(, name, tipGlobal, tipRegex, title, kv[1])
                     } else {
                         IniDelete("InputTip.ini", "App-" state, kv[1])
                     }
                 }
                 gc.%"LV_" state%.Opt("+Redraw")
-                gc.%state "_title"%.Text := "( " gc.%"LV_" state%.GetCount() " 个 )"
+                gc.%state "_title"%.Text := lang("switch_window.count_prefix") gc.%"LV_" state%.GetCount() lang("switch_window.count_suffix")
                 autoHdrLV(gc.%"LV_" state%)
             }
 
@@ -61,7 +61,7 @@ fn_switch_window(*) {
 
                 itemValue := {
                     exe_name: LV.GetText(RowNumber, 1),
-                    status: stateMap.%from%,
+                    status: getStateName(from),
                     tipGlobal: LV.GetText(RowNumber, 2),
                     tipRegex: LV.GetText(RowNumber, 3),
                     title: LV.GetText(RowNumber, 4),
@@ -78,12 +78,12 @@ fn_switch_window(*) {
                 needAddWhiteList := 1
 
                 if (action == "edit") {
-                    actionText := "编辑"
+                    actionText := lang("common.edit")
                 } else {
-                    actionText := "添加"
+                    actionText := lang("common.add")
                 }
 
-                label := "正在" actionText "一条自动切换规则"
+                label := actionText " " lang("switch_window.title")
 
                 g := createGuiOpt("InputTip - " label)
 
@@ -95,19 +95,18 @@ fn_switch_window(*) {
                 bw := w - g.MarginX * 2
 
                 if (action != "edit") {
-                    g.AddText("cRed", "是否添加到【符号的白名单】中: ")
-                    _ := g.AddDropDownList("yp", ["【否】不添加", "【是】自动添加"])
+                    g.AddText("cRed", lang("gui.add_to_whitelist"))
+                    _ := g.AddDropDownList("yp", [lang("gui.add_to_whitelist_no"), lang("gui.add_to_whitelist_yes")])
                     _.Value := needAddWhiteList + 1
                     _.OnEvent("Change", e_change)
                     e_change(item, *) {
                         needAddWhiteList := item.value - 1
                     }
-                    g.AddText("xs cGray", "如果选择【是】，且它在白名单中不存在，将以【进程级】自动添加")
+                    g.AddText("xs cGray", lang("gui.add_to_whitelist_tip"))
                 }
 
                 scaleWidth := bw / 1.5
-
-                g.AddText(, "1. 进程名称: ")
+                g.AddText(, lang("gui.process_name_label"))
                 _ := g.AddEdit("yp w" scaleWidth, "")
                 _.Text := itemValue.exe_name
                 _.OnEvent("Change", e_changeName)
@@ -116,8 +115,8 @@ fn_switch_window(*) {
                     itemValue.exe_name := v
                 }
 
-                g.AddText("xs", "2. 状态切换: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["中文状态", "英文状态", "大写锁定"])
+                g.AddText("xs", lang("switch_window.status_switch"))
+                _ := g.AddDropDownList("yp w" scaleWidth, [lang("state.CN"), lang("state.EN"), lang("state.Caps")])
                 _.Text := itemValue.status
                 _.OnEvent("Change", e_changeState)
                 e_changeState(item, *) {
@@ -125,8 +124,8 @@ fn_switch_window(*) {
                     itemValue.status := v
                 }
 
-                g.AddText("xs", "3. 匹配范围: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["进程级", "标题级"])
+                g.AddText("xs", lang("gui.match_scope_label"))
+                _ := g.AddDropDownList("yp w" scaleWidth, [lang("common.process_level"), lang("common.title_level")])
                 _.Text := itemValue.tipGlobal
                 _.OnEvent("Change", e_changeLevel)
                 e_changeLevel(item, *) {
@@ -134,9 +133,9 @@ fn_switch_window(*) {
                     itemValue.tipGlobal := v
                 }
 
-                g.AddText("xs cGray", "【匹配模式】和【匹配标题】仅在【匹配范围】为【标题级】时有效")
-                g.AddText("xs", "4. 匹配模式: ")
-                _ := g.AddDropDownList("yp w" scaleWidth, ["相等", "正则"])
+                g.AddText("xs cGray", lang("gui.match_scope_tip"))
+                g.AddText("xs", lang("gui.match_mode_label"))
+                _ := g.AddDropDownList("yp w" scaleWidth, [lang("common.equal"), lang("common.regex")])
                 _.Text := itemValue.tipRegex
                 _.OnEvent("Change", e_changeMatch)
                 e_changeMatch(item, *) {
@@ -144,7 +143,7 @@ fn_switch_window(*) {
                     itemValue.tipRegex := v
                 }
 
-                g.AddText("xs", "5. 匹配标题: ")
+                g.AddText("xs", lang("gui.match_title_label"))
                 _ := g.AddEdit("yp w" scaleWidth)
                 _.Text := itemValue.title
                 _.OnEvent("Change", e_changeTitle)
@@ -153,12 +152,12 @@ fn_switch_window(*) {
                     itemValue.title := v
                 }
 
-                g.AddButton("xs w" bw / 1.2, "完成" actionText).OnEvent("Click", e_set)
+                g.AddButton("xs w" bw / 1.2, (action == "add" ? lang("switch_window.complete_add") : lang("switch_window.complete_edit"))).OnEvent("Click", e_set)
                 e_set(*) {
                     fn_set(action, 0)
                 }
                 if (action == "edit") {
-                    g.AddButton("xs w" bw / 1.2, "删除它").OnEvent("Click", e_delete)
+                    g.AddButton("xs w" bw / 1.2, lang("switch_window.delete_it")).OnEvent("Click", e_delete)
                     e_delete(*) {
                         fn_set(action, 1)
                     }
@@ -171,11 +170,11 @@ fn_switch_window(*) {
                         try {
                             IniDelete("InputTip.ini", "App-" from, itemValue.id)
                             LV.Delete(RowNumber)
-                            gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                            gc.%from "_title"%.Text := lang("switch_window.count_prefix") gc.%"LV_" from%.GetCount() lang("switch_window.count_suffix")
                         }
                     } else {
-                        isGlobal := itemValue.tipGlobal == "进程级" ? 1 : 0
-                        isRegex := itemValue.tipRegex == "正则" ? 1 : 0
+                        isGlobal := itemValue.tipGlobal == lang("common.process_level") ? 1 : 0
+                        isRegex := itemValue.tipRegex == lang("common.regex") ? 1 : 0
                         value := itemValue.exe_name ":" isGlobal ":" isRegex ":" itemValue.title
                         ; 没有进行移动
                         if (itemValue.status == from) {
@@ -186,13 +185,13 @@ fn_switch_window(*) {
                                 try {
                                     IniDelete("InputTip.ini", "App-" from, itemValue.id)
                                     LV.Delete(RowNumber)
-                                    gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
+                                    gc.%from "_title"%.Text := lang("switch_window.count_prefix") gc.%"LV_" from%.GetCount() lang("switch_window.count_suffix")
                                 }
                             }
-                            state := stateTextMap.%itemValue.status%
+                            state := stateTextMap[itemValue.status]
                             writeIni(itemValue.id, value, "App-" state, "InputTip.ini")
                             gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
-                            gc.%state "_title"%.Text := "( " gc.%"LV_" state%.GetCount() " 个 )"
+                            gc.%state "_title"%.Text := lang("switch_window.count_prefix") gc.%"LV_" state%.GetCount() lang("switch_window.count_suffix")
                         }
                         if (needAddWhiteList) {
                             updateWhiteList(itemValue.exe_name)
@@ -208,25 +207,25 @@ fn_switch_window(*) {
 
 
             for i, v in ["CN", "EN", "Caps"] {
-                g.AddText("Section cRed", gui_help_tip)
-                g.AddText("Section", "需要自动切换到")
-                g.AddText("yp cRed", stateMap.%v%)
-                g.AddText("yp", "的应用窗口")
-                gc.%v "_title"% := g.AddText("yp cRed w" bw / 3, "( 0 个 )")
+                g.AddText("Section cRed", lang("gui.help_tip"))
+                g.AddText("Section", lang("switch_window.need_switch_to"))
+                g.AddText("yp cRed", getStateName(v))
+                g.AddText("yp", lang("switch_window.app_window"))
+                gc.%v "_title"% := g.AddText("yp cRed w" bw / 3, lang("switch_window.count_prefix") "0" lang("switch_window.count_suffix"))
 
                 LV := "LV_" v
-                gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "匹配范围", "匹配模式", "匹配标题", "创建时间"])
+                gc.%LV% := g.AddListView("xs -LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, [lang("switch_window.lv_process"), lang("switch_window.lv_scope"), lang("switch_window.lv_mode"), lang("switch_window.lv_title"), lang("switch_window.lv_time")])
                 addItem(v)
                 autoHdrLV(gc.%LV%)
                 gc.%LV%.OnEvent("DoubleClick", fn_dbClick)
                 gc.%LV%._type := v
 
-                _ := g.AddButton("xs w" w / 2, "快捷添加")
+                _ := g.AddButton("xs w" w / 2, lang("switch_window.quick_add"))
                 _._LV := LV
                 _._type := v
                 _.OnEvent("Click", (item, *) => (fn_add(item._LV, item._type)))
 
-                _ := g.AddButton("yp w" w / 2, "手动添加")
+                _ := g.AddButton("yp w" w / 2, lang("switch_window.manual_add"))
                 _._LV := LV
                 _._type := v
                 _.OnEvent("Click", fn_add_manually)
@@ -236,9 +235,9 @@ fn_switch_window(*) {
             fn_add_manually(item, *) {
                 itemValue := {
                     exe_name: "",
-                    status: stateMap.%item._type%,
-                    tipGlobal: "进程级",
-                    tipRegex: "相等",
+                    status: getStateName(item._type),
+                    tipGlobal: lang("common.process_level"),
+                    tipRegex: lang("common.equal"),
                     title: "",
                     id: returnId()
                 }
@@ -247,7 +246,7 @@ fn_switch_window(*) {
 
             fn_add(LV, state) {
                 args := {
-                    title: "快捷添加",
+                    title: lang("switch_window.quick_add"),
                     state: state,
                     configName: "",
                     LV: LV
@@ -262,9 +261,9 @@ fn_switch_window(*) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        status: stateMap.%state%,
-                        tipGlobal: "进程级",
-                        tipRegex: "相等",
+                        status: getStateName(state),
+                        tipGlobal: lang("common.process_level"),
+                        tipRegex: lang("common.equal"),
                         title: windowInfo.title,
                         id: windowInfo.id,
                     }
@@ -278,9 +277,9 @@ fn_switch_window(*) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        status: stateMap.%state%,
-                        tipGlobal: "进程级",
-                        tipRegex: "相等",
+                        status: getStateName(state),
+                        tipGlobal: lang("common.process_level"),
+                        tipRegex: lang("common.equal"),
                         title: windowInfo.title,
                         id: windowInfo.id,
                     }
@@ -288,8 +287,8 @@ fn_switch_window(*) {
                 }
             }
 
-            g.AddEdit("ReadOnly VScroll r12 w" w, "1. 简要说明`n   - 这个菜单用来设置【指定窗口自动切换状态】的匹配规则`n   - 上方是三个 Tab 标签页: 【中文状态】【英文状态】【大写锁定】`n   - 下方是对应的规则列表`n   - 双击列表中的任意一行，进行编辑或删除`n   - 如果需要添加，请查看下方按钮相关的使用说明`n`n2. 规则列表 —— 进程名称`n   - 应用窗口实际的进程名称`n`n3. 规则列表 —— 匹配范围`n   - 【进程级】或【标题级】，它控制自动切换的时机`n   - 【进程级】: 只有从一个进程切换到另一个进程时，才会触发`n   - 【标题级】: 只要窗口标题发生变化，且匹配成功，就会触发`n`n4. 规则列表 —— 匹配模式`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 【相等】或【正则】，它控制标题匹配的模式`n   - 【相等】: 只有窗口标题和指定的标题完全一致，才会触发自动切换`n   - 【正则】: 使用正则表达式匹配标题，匹配成功则触发自动切换`n`n5. 规则列表 —— 匹配标题`n   - 只有当匹配范围为【标题级】时，才会生效`n   - 指定一个标题或者正则表达式，与【匹配模式】相对应，匹配成功则触发自动切换`n   - 如果不知道当前窗口的相关信息(进程/标题等)，可以通过以下方式获取`n      - 【托盘菜单】=>【获取窗口信息】`n`n6. 规则列表 —— 创建时间`n   - 它是每条规则的创建时间`n`n7. 规则列表 —— 操作`n   - 双击列表中的任意一行，进行编辑或删除`n`n8. 按钮 —— 快捷添加`n   - 点击它，可以添加一条新的规则`n   - 它会弹出一个新的菜单页面，会显示当前正在运行的【应用进程列表】`n   - 你可以双击【应用进程列表】中的任意一行进行快速添加`n   - 详细的使用说明请参考弹出的菜单页面中的【关于】`n`n9. 按钮 —— 手动添加`n   - 点击它，可以添加一条新的规则`n   - 它会直接弹出添加窗口，你需要手动填写进程名称、标题等信息`n`n10. 自动切换生效需要满足的前提条件`n   - 前提条件: `n       - 当 InputTip 执行自动切换时，此时的输入法可以正常切换状态`n       - 大写锁定除外，因为它是通过模拟输入【CapsLock】按键实现，不受其他影响`n`n   - 以【微软输入法】为例`n   - 和常规输入法不同，只有当聚焦到输入框时，它才能正常切换输入法状态`n   - 但是，当 InputTip 执行自动切换时，可能并没有聚焦到输入框，自动切换就会失效`n`n   - 再以【美式键盘 ENG】为例`n   - 它只有英文状态和大写锁定，所以只有英文状态的和大写锁定的自动切换有效")
-            g.AddLink(, '相关链接: <a href="https://inputtip.abgox.com/faq/switch-state">指定窗口自动切换状态</a>')
+            g.AddEdit("ReadOnly VScroll r12 w" w, lang("about_text.switch_window"))
+            g.AddLink(, lang("about_text.related_links") '<a href="https://inputtip.abgox.com/faq/switch-state">Auto Switch IME Status by Window</a>')
 
             g.OnEvent("Close", fn_close)
             fn_close(*) {

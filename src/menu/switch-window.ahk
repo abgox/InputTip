@@ -61,7 +61,7 @@ fn_switch_window(*) {
 
                 itemValue := {
                     exe_name: LV.GetText(RowNumber, 1),
-                    status: stateMap.%from%,
+                    status: stateMap.Get(from),
                     tipGlobal: LV.GetText(RowNumber, 2),
                     tipRegex: LV.GetText(RowNumber, 3),
                     title: LV.GetText(RowNumber, 4),
@@ -189,7 +189,7 @@ fn_switch_window(*) {
                                     gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
                                 }
                             }
-                            state := stateTextMap.%itemValue.status%
+                            state := stateTextMap.Get(itemValue.status)
                             writeIni(itemValue.id, value, "App-" state, "InputTip.ini")
                             gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                             gc.%state "_title"%.Text := "( " gc.%"LV_" state%.GetCount() " 个 )"
@@ -208,9 +208,9 @@ fn_switch_window(*) {
 
 
             for i, v in ["CN", "EN", "Caps"] {
-                g.AddText("Section cRed", gui_help_tip)
+                g.AddText("Section cRed", lang('gui.help_tip'))
                 g.AddText("Section", "需要自动切换到")
-                g.AddText("yp cRed", stateMap.%v%)
+                g.AddText("yp cRed", stateMap.Get(v))
                 g.AddText("yp", "的应用窗口")
                 gc.%v "_title"% := g.AddText("yp cRed w" bw / 3, "( 0 个 )")
 
@@ -236,7 +236,7 @@ fn_switch_window(*) {
             fn_add_manually(item, *) {
                 itemValue := {
                     exe_name: "",
-                    status: stateMap.%item._type%,
+                    status: stateMap.Get(item._type),
                     tipGlobal: "进程级",
                     tipRegex: "相等",
                     title: "",
@@ -262,7 +262,7 @@ fn_switch_window(*) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        status: stateMap.%state%,
+                        status: stateMap.Get(state),
                         tipGlobal: "进程级",
                         tipRegex: "相等",
                         title: windowInfo.title,
@@ -278,7 +278,7 @@ fn_switch_window(*) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        status: stateMap.%state%,
+                        status: stateMap.Get(state),
                         tipGlobal: "进程级",
                         tipRegex: "相等",
                         title: windowInfo.title,

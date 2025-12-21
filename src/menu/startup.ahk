@@ -41,7 +41,7 @@ fn_startup(item, *) {
             g := createGuiOpt("InputTip - 设置开机自启动")
             tab := g.AddTab3("-Wrap", ["设置开机自启动", "关于"])
             tab.UseTab(1)
-            g.AddText("Section cRed", gui_help_tip)
+            g.AddText("Section cRed", lang('gui.help_tip'))
 
             if (info.i) {
                 return g
@@ -74,7 +74,7 @@ fn_startup(item, *) {
                 if (done) {
                     fn_update_user(A_UserName)
                     isStartUp := 1
-                    ; FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
+                    ; FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Startup "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", pad(lang('app_desc')), favicon, , , 7)
                     fn_handle()
                 } else {
                     fn_err_msg("添加任务计划程序失败!`n请检查系统中是否存在 powershell.exe 或 pwsh.exe")
@@ -96,9 +96,9 @@ fn_startup(item, *) {
             e_useLnk(*) {
                 isStartUp := 2
                 if (A_IsCompiled) {
-                    FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , fileDesc, favicon, , , 7)
+                    FileCreateShortcut(A_ScriptFullPath, A_Startup "\" fileLnk, , , pad(lang('app_desc')), favicon, , , 7)
                 } else {
-                    FileCreateShortcut(A_AhkPath, A_Startup "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
+                    FileCreateShortcut(A_AhkPath, A_Startup "\" fileLnk, , '"' A_ScriptFullPath '"', pad(lang('app_desc')), favicon, , , 7)
                 }
                 fn_handle()
             }

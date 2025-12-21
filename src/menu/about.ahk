@@ -5,9 +5,9 @@ fn_about(*) {
     aboutGui(info) {
         g := createGuiOpt("InputTip - " versionType " 版本 - " (A_IsAdmin ? "以管理员权限启动" : "以当前用户权限启动"))
 
-        g.AddText("Center w" info.w, "InputTip - 一个输入法状态管理工具")
+        g.AddText("Center w" info.w, pad(lang('app_desc')))
         g.SetFont("s" readIni("gui_font_size", "12") / 1.2)
-        g.AddText("Center w" info.w, "实时提示(鼠标方案/符号方案) + 状态切换(窗口触发/热键触发)")
+        g.AddText("Center w" info.w, lang('app_sub_desc'))
         g.SetFont(fontOpt*)
 
         tab := g.AddTab3("-Wrap", ["关于项目", "赞赏支持", "参考项目"])

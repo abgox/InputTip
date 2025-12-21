@@ -6,7 +6,7 @@ fn_scheme_cursor(*) {
         g := createGuiOpt("InputTip - 状态提示 - 鼠标方案")
         tab := g.AddTab3("-Wrap", ["鼠标方案", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             g.AddText(, gui_width_line)
@@ -57,7 +57,7 @@ fn_scheme_cursor(*) {
             dirList := getCursorDir()
         }
         for i, v in ["CN", "EN", "Caps"] {
-            g.AddText("xs", stateMap.%v% ":")
+            g.AddText("xs", stateMap.Get(v) ":")
             _ := g.AddDropDownList("yp r9 w" bw - __w - g.MarginX, dirList)
             _._config := v "_cursor"
             _.OnEvent("Change", e_cursor_dir)

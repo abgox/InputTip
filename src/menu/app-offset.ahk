@@ -16,7 +16,7 @@ fn_app_offset(*) {
             g := createGuiOpt("InputTip - " args.title)
             tab := g.AddTab3("-Wrap", [args.tab, "关于"])
             tab.UseTab(1)
-            g.AddLink("Section cRed", gui_help_tip)
+            g.AddLink("Section cRed", lang('gui.help_tip'))
 
             if (info.i) {
                 g.AddText(, gui_width_line)

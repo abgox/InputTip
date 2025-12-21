@@ -6,7 +6,7 @@ fn_ohter_config(*) {
         g := createGuiOpt("InputTip - 其他设置")
         tab := g.AddTab3("-Wrap", ["其他设置", "其他设置2", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             g.AddText(, gui_width_line)
@@ -107,10 +107,45 @@ fn_ohter_config(*) {
         ))
 
         tab.UseTab(2)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
         g.AddText("xs", line)
 
-        g.AddText("Section", "1. 配置菜单字体大小:")
+        g.AddText("Section xs", "1. " lang("other_config.language") ": ")
+        selectIndex := 1
+        langsText := []
+        for i, v in langList {
+            if (v[1] == currentLang) {
+                selectIndex := i
+            }
+            langsText.Push(v[2])
+        }
+        _ := g.AddDropDownList("yp", langsText)
+        _.Text := langsText[selectIndex]
+        _.OnEvent("Change", e_change_lang)
+        e_change_lang(item, *) {
+            setLang(langList[item.Value][1])
+            createUniqueGui(setLangGui).Show()
+            setLangGui(info) {
+                g := createGuiOpt("InputTip - " lang("other_config.lang_settings"))
+                g.AddText(, lang("other_config.lang_changed"))
+
+                if (info.i) {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                y := g.AddButton("xs w" w, lang("common.i_understand"))
+                y.OnEvent("Click", e_close)
+                g.OnEvent("Close", e_close)
+                e_close(*) {
+                    fn_restart()
+                }
+                return g
+            }
+        }
+
+        g.AddText("Section xs", "2. 配置菜单字体大小:")
         _ := g.AddEdit("yp Number Limit2")
         _.Value := readIni("gui_font_size", "12")
         _.OnEvent("Change", e_change_gui_fs)

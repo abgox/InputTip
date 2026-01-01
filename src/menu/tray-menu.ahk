@@ -649,7 +649,7 @@ runJAB() {
         return
     if (A_IsCompiled) {
         try {
-            if (compareVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
+            if (VerCompare(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe")) != 0) {
                 FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
             }
         } catch {

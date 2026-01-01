@@ -30,7 +30,7 @@ checkVersion(currentVersion, callback, urls := [
                 if (req.status == 200) {
                     newVersion := Trim(StrReplace(StrReplace(StrReplace(req.responseText, "`r", ""), "`n", ""), "v", ""))
                     if (newVersion ~= "^[\d\.]+$") {
-                        if (compareVersion(newVersion, currentVersion) > 0) {
+                        if (VerCompare(newVersion, currentVersion) > 0) {
                             try {
                                 callback(newVersion, url)
                             }
@@ -73,7 +73,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
             if (A_IsCompiled) {
                 checkVersion(currentVersion, updateConfirm)
                 updateConfirm(newVersion, url) {
-                    if (gc.w.updateGui || compareVersion(newVersion, currentVersion) <= 0) {
+                    if (gc.w.updateGui || VerCompare(newVersion, currentVersion) <= 0) {
                         return
                     }
 
@@ -112,7 +112,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                                 out := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-new-version.exe"
                                 Download(v, out)
                                 ; 尝试获取版本号，成功获取则表示下载没有问题
-                                done := compareVersion(FileGetVersion(out), currentVersion) > 0
+                                done := VerCompare(FileGetVersion(out), currentVersion) > 0
                                 break
                             }
                         }
@@ -250,7 +250,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := silentUpdate) {
                     "https://github.com/abgox/InputTip/raw/main/src/version-zip.txt"
                 ])
                 updatePrompt(newVersion, url) {
-                    if (gc.w.updateGui || compareVersion(newVersion, currentVersion) <= 0) {
+                    if (gc.w.updateGui || VerCompare(newVersion, currentVersion) <= 0) {
                         return
                     }
                     if (silent) {
@@ -534,7 +534,7 @@ checkUpdateDone() {
     oldVersion := readIni(versionKey, currentVersion, "UserInfo")
     flagFile := A_AppData "/.abgox-InputTip-update-version-done.txt"
     flagFile2 := A_ScriptDir "/InputTipSymbol/default/abgox-InputTip-update-version-done.txt"
-    if (compareVersion(currentVersion, oldVersion) > 0 || FileExist(flagFile) || FileExist(flagFile2)) {
+    if (VerCompare(currentVersion, oldVersion) > 0 || FileExist(flagFile) || FileExist(flagFile2)) {
 
         writeIni("init", 1, "Installer")
 

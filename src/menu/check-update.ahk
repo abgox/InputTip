@@ -9,7 +9,7 @@ fn_check_update(*) {
         line := "-------------------------------------------------------------------------"
         tab := g.AddTab3("-Wrap", ["更新检查", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             return g

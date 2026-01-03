@@ -7,11 +7,11 @@ fn_bw_list(*) {
 
         tab := g.AddTab3("-Wrap", ["符号的黑/白名单", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
 
         if (info.i) {
-            g.AddText(, gui_help_tip)
+            g.AddText(, lang('gui.help_tip'))
             return g
         }
         w := info.w

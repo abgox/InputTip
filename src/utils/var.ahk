@@ -2,7 +2,6 @@
 
 filename := SubStr(A_ScriptName, 1, StrLen(A_ScriptName) - 4)
 fileLnk := filename ".lnk"
-fileDesc := "InputTip - 输入法状态管理工具"
 JAB_PID := ""
 
 setTrayIcon(readIni("iconRunning", "InputTipIcon\default\app.png"))
@@ -118,24 +117,24 @@ hotkey_Pause := readIni('hotkey_Pause', '')
 ; 快捷键: 实时显示状态码和切换码
 hotkey_ShowCode := readIni('hotkey_ShowCode', '')
 
-stateMap := {
-    CN: "中文状态",
-    1: "中文状态",
-    EN: "英文状态",
-    0: "英文状态",
-    Caps: "大写锁定",
-    Run: "运行",
-    Pause: "暂停",
-    Exit: "退出"
-}
-stateTextMap := {
-    中文状态: "CN",
-    英文状态: "EN",
-    大写锁定: "Caps",
-    运行: "Run",
-    暂停: "Pause",
-    退出: "Exit"
-}
+stateMap := Map(
+    'CN', lang("state.CN"),
+    1, lang("state.CN"),
+    'EN', lang("state.EN"),
+    0, lang("state.EN"),
+    'Caps', lang("state.Caps"),
+    'Run', lang("state.Run"),
+    'Pause', lang("state.Pause"),
+    'Exit', lang("state.Exit"),
+)
+stateTextMap := Map(
+    lang("state.CN"), "CN",
+    lang("state.EN"), "EN",
+    lang("state.Caps"), "Caps",
+    lang("state.Run"), "Run",
+    lang("state.Pause"), "Pause",
+    lang("state.Exit"), "Exit",
+)
 
 left := 0, top := 0, right := 0, bottom := 0
 lastWindow := "", lastSymbol := "", lastCursor := ""
@@ -152,8 +151,6 @@ isWait := 0
 
 ; 配置菜单默认的宽度参考线
 gui_width_line := "------------------------------------------------------------------------------------"
-
-gui_help_tip := "你首先应该点击上方的【关于】或相关文档查看此菜单的使用说明"
 
 canShowSymbol := 0
 

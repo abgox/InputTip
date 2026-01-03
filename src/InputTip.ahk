@@ -4,6 +4,8 @@
 
 #Include utils/verify-file.ahk
 
+#Include "*i utils/lang.ahk"
+
 #Include "*i utils/options.ahk"
 
 ;@AHK2Exe-SetName InputTip
@@ -74,16 +76,16 @@ if (hotkey_ShowCode) {
 }
 
 enableKeyCount := readIni("enableKeyCount", 0)
-trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
-keyCountTemplate := readIni("keyCountTemplate", "%\n%【统计中】启动以来, 有效的按键输入次数: %keyCount%")
-A_IconTip := StrReplace(trayTipTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
+trayTipTemplate := readIni("trayTipTemplate", lang("tray.tip_template"))
+keyCountTemplate := readIni("keyCountTemplate", lang("tray.keyCount_template"))
+A_IconTip := StrReplace(trayTipTemplate, "%appState%", A_IsPaused ? lang("state.Paused") : lang("state.Running"))
 
 updateTip()
 
 updateTip(flag := "") {
     if (enableKeyCount) {
         if (flag != "") {
-            tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", flag ? "暂停" : "运行")
+            tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", flag ? lang("state.Paused") : lang("state.Running"))
             tip := StrReplace(tip, "%keyCount%", keyCount)
             tip := StrReplace(tip, "%\n%", "`n")
             A_IconTip := tip
@@ -101,7 +103,7 @@ updateTip(flag := "") {
             if (A_PriorKey != last) {
                 keyCount++
                 last := A_PriorKey
-                tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
+                tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", A_IsPaused ? lang("state.Paused") : lang("state.Running"))
                 tip := StrReplace(tip, "%keyCount%", keyCount)
                 tip := StrReplace(tip, "%\n%", "`n")
                 A_IconTip := tip
@@ -109,7 +111,7 @@ updateTip(flag := "") {
         }
     } else {
         s := flag != "" ? flag : A_IsPaused
-        tip := StrReplace(trayTipTemplate, "%appState%", s ? "暂停" : "运行")
+        tip := StrReplace(trayTipTemplate, "%appState%", s ? lang("state.Paused") : lang("state.Running"))
         tip := StrReplace(tip, "%\n%", "`n")
         A_IconTip := tip
     }

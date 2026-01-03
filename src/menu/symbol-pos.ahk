@@ -6,7 +6,7 @@ fn_symbol_pos(*) {
         g := createGuiOpt("InputTip - 设置符号应该显示在鼠标附近的应用")
         tab := g.AddTab3("-Wrap", ["在鼠标附近显示符号", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             return g

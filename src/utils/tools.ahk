@@ -165,3 +165,18 @@ revertCursor(cursorInfo) {
         }
     }
 }
+
+; 为窗口标题添加前缀
+pad(text, prefix := "InputTip - ") {
+    return prefix text
+}
+
+; 替换字符串中的变量
+replaceVar(text, vars := []) {
+    index := 1
+    for v in vars {
+        text := StrReplace(text, "%" index "%", v)
+        index++
+    }
+    return text
+}

@@ -42,16 +42,16 @@
 ## 介绍
 
 - 一个输入法状态管理工具: 实时提示(鼠标方案/符号方案) + 状态切换(窗口触发/热键触发)
-
   - [多种状态提示方案](#关于状态提示方案)
     - [鼠标方案](#鼠标方案): 使用多套鼠标光标样式，根据输入法状态加载不同的鼠标光标样式
     - [符号方案](#符号方案): 根据输入法状态在输入光标附近显示不同的 **符号**
     - 折中方案: `在鼠标附近显示符号`
-  - 切换不同窗口时，自动切换到指定的输入法状态(`进程级` 和 `标题级` 窗口匹配)
+  - 切换不同窗口时，自动切换到指定的输入法状态(支持 `进程级` 和 `标题级` 窗口匹配)
   - 设置按键切换到指定的输入法状态，参考 [状态切换](#关于状态切换)
   - 详细便捷的配置菜单
     - 所有的配置变动，都只应该在 `托盘菜单` 中进行
-    - 不要手动修改 `InputTip.ini` 文件
+    - 它会校验配置的值，以确保能够正常运行
+    - 因此，不要手动修改 `InputTip.ini` 文件
 
 ## 演示
 
@@ -69,9 +69,7 @@
 ## 常见问题
 
 - 如果有使用问题，请先确保当前使用的 InputTip 是最新版本
-
   - 如果是 [zip 版本](#zip-版本):
-
     - `托盘菜单` => `其他设置` => `更新检查` => `与源代码仓库同步`
     - 同步完成后，检查问题是否仍然存在
 
@@ -100,8 +98,7 @@
 - 下载仓库的最新代码压缩包 `InputTip-main.zip`
 - 在仓库的 Releases (发行版) 中下载 `InputTip.zip`
 - [前往官网下载 InputTip.zip](https://inputtip.abgox.com/download)
-- 使用 [Scoop](https://scoop.sh/)
-
+- 使用 [Scoop](https://scoop.sh/) (如果无法访问，使用 [scoop-installer-mirrors](https://gitee.com/scoop-installer-mirrors))
   - 添加 [abyss](https://abyss.abgox.com) bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
   - 安装 `abgox.InputTip-zip`
@@ -119,8 +116,7 @@
 
 - 在仓库的 Releases (发行版) 中下载 `InputTip.exe`
 
-- 使用 [Scoop](https://scoop.sh/)
-
+- 使用 [Scoop](https://scoop.sh/) (如果无法访问，使用 [scoop-installer-mirrors](https://gitee.com/scoop-installer-mirrors))
   - 添加 [abyss](https://abyss.abgox.com) bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
   - 安装 `abgox.InputTip`
@@ -138,18 +134,15 @@
 ## 使用
 
 1. 完成 [安装](#安装) 后，运行对应文件即可
-
    - [Scoop](https://scoop.sh/): 运行安装后创建的 `InputTip` 快捷方式或命令即可
    - [WinGet](https://learn.microsoft.com/windows/package-manager/winget/): 运行 `InputTip` 命令即可
    - 手动下载
-
      - zip 版本: 运行 `InputTip.bat`
      - exe 版本: 运行 `InputTip.exe`
 
 2. 鼠标左键单击 `托盘图标` 可以快速切换运行状态: `运行中` | `暂停中`
 3. 设置开机自启动: `托盘菜单` => `开机自启动`
 4. 设置 `配置菜单的字体大小`
-
    - 你可以设置字体大小来优化配置菜单在不同屏幕上的显示效果
    - `托盘菜单` => `其他设置` => `配置菜单字体大小`
 
@@ -183,7 +176,6 @@
   ```
 
 - exe 版本
-
   - exe 版本是一个单文件程序，运行后会创建相关目录和文件
   - 建议新建一个目录，将 `InputTip.exe` 放入其中再运行
 
@@ -199,16 +191,15 @@
 
 ---
 
-- 如果你需要备份 InputTip 的数据以便于后续使用，请备份它们
-
+- 你可以备份 InputTip 的数据以便于后续使用
   - `InputTip.ini`
   - `InputTipCursor` (如果没有修改，可以忽略)
   - `InputTipSymbol` (如果没有修改，可以忽略)
   - `InputTipIcon` (如果没有修改，可以忽略)
 
-- 如果使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 中的 `abgox.InputTip-zip` 或 `abgox.InputTip`
-  - 它会将这些数据文件或文件夹保存在 [Scoop](https://scoop.sh/) 的 persist 目录中
-  - 可以正常通过 [Scoop](https://scoop.sh/) 更新、卸载，不会删除它们，除非卸载时携带 `-p` 或 `--purge` 参数
+- 如果使用 Scoop 安装 [abyss](https://abyss.abgox.com) 中的 `abgox.InputTip-zip` 或 `abgox.InputTip`
+  - 它会将这些数据文件或文件夹保存在 Scoop 的 persist 目录中
+  - 可以正常通过 Scoop 更新、卸载，不会删除它们，除非卸载时携带 `-p` 或 `--purge` 参数
 - 如果使用 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 安装 [abgox.InputTip](https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/abgox/InputTip)
   - 这些数据文件或文件夹会保存在 `$env:LocalAppData\Microsoft\WinGet\Packages\abgox.InputTip_Microsoft.Winget.Source_8wekyb3d8bbwe` 中
   - 可以正常通过 [WinGet](https://learn.microsoft.com/windows/package-manager/winget/) 更新、卸载，不会删除这些数据文件和文件夹
@@ -227,8 +218,8 @@
 - 或者，在 `plugins` 目录中新建 `.ahk` 文件，然后在 `InputTip.plugin.ahk` 中使用 `#Include`
 - `plugins` 目录的特点:
   - 在 `plugins` 目录中的文件不会因为版本更新而被覆盖
-  - 如果你使用 [Scoop](https://scoop.sh/) 安装 [abyss](https://abyss.abgox.com) 中的 `abgox.InputTip-zip`，`plugins` 目录会被 `persist`
-  - 因此，也可以通过 [Scoop](https://scoop.sh/) 更新，而不会覆盖 `plugins` 目录中的文件
+  - 如果你使用 Scoop 安装 [abyss](https://abyss.abgox.com) 中的 `abgox.InputTip-zip`，`plugins` 目录会被 `persist`
+  - 因此，也可以通过 Scoop 更新，而不会覆盖 `plugins` 目录中的文件
 
 ## 关于状态提示方案
 
@@ -245,7 +236,6 @@
 - 根据输入法状态显示不同的符号
 
 - 它有两种显示位置
-
   - 在鼠标附近显示: `托盘菜单` => `在鼠标附近显示符号`
   - 在输入光标附近显示: `托盘菜单` => `符号的黑/白名单`
 
@@ -292,9 +282,7 @@
 > 如果不使用 [符号方案](#符号方案)，或者正在使用 `在鼠标附近显示符号`，无需步骤 1 和 2
 
 1. 安装 [Microsoft OpenJDK 21](https://learn.microsoft.com/java/openjdk/download#openjdk-21)
-
-   - 使用 [Scoop](https://scoop.sh/)
-
+   - 使用 [Scoop](https://scoop.sh/) (如果无法访问，使用 [scoop-installer-mirrors](https://gitee.com/scoop-installer-mirrors))
      - 添加 [abyss](https://abyss.abgox.com) bucket ([Github](https://github.com/abgox/abyss) 或 [Gitee](https://gitee.com/abgox/abyss))
 
      - 安装 `Microsoft.OpenJDK.21`
@@ -310,7 +298,6 @@
      ```
 
 2. 启用 `Java Access Bridge`
-
    - 如果以下命令不存在，请检查 **步骤 1**
    - 如果以下命令不能正常运行，请检查环境变量是否配置正确
 
@@ -402,7 +389,6 @@
 > - 设置: `托盘菜单` => `输入法相关`
 
 - `通用`
-
   - [微信输入法](https://z.weixin.qq.com/)
   - [搜狗输入法](https://shurufa.sogou.com/)，[搜狗五笔输入法](https://wubi.sogou.com/)
   - [QQ 输入法](https://qq.pinyin.cn/)
@@ -411,7 +397,6 @@
   - 美式键盘 ENG
   - [冰凌输入法](https://icesofts.com/)
   - [手心输入法](https://www.xinshuru.com/): 使用 `Shift` 切换中英文状态无法正常识别，需要参照下方的使用方式
-
     - 首先，确保输入法状态正确
       - 通过 `Shift` 将输入法状态切换为中文，然后不再使用 `Shift` 切换状态(此时可以在手心输入法设置中关闭 `Shift` 切换功能)
       - 后续只能使用 `Ctrl + Space` 进行中英文状态切换，否则状态识别有误
@@ -432,13 +417,11 @@
   - ...
 
 - `自定义`
-
   - 一个万能的模式，根据规则列表依次匹配，需要根据实际情况添加一条或多条规则
   - 详情参考: [输入法状态的识别模式 —— 自定义](https://inputtip.abgox.com/faq/custom-input-mode)
   - 可以通过 `输入法相关` => `自定义` 使用以下已知可用的规则配置:
 
     > `默认状态` 选择 `英文状态`
-
     - [小狼毫 (Rime)](https://rime.im/download/)
 
       | 顺序 | 状态码规则 | 切换码规则 | 输入法状态 |

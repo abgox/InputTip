@@ -9,7 +9,7 @@ fn_input_mode(*) {
         gc.modeList := ["【自定义】", "【通用】"]
         tab := g.AddTab3("-Wrap", ["基础配置", "自定义", "关于自定义", "关于切换输入法状态"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             g.AddText(, gui_width_line)

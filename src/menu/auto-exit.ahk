@@ -61,7 +61,7 @@ fn_auto_exit(*) {
 
                 itemValue := {
                     exe_name: LV.GetText(RowNumber, 1),
-                    status: stateMap.%from%,
+                    status: stateMap.Get(from),
                     tipGlobal: LV.GetText(RowNumber, 2),
                     tipRegex: LV.GetText(RowNumber, 3),
                     title: LV.GetText(RowNumber, 4),
@@ -80,7 +80,7 @@ fn_auto_exit(*) {
                     actionText := "添加"
                 }
 
-                label := "正在" actionText "一条自动" stateMap.%from% "规则"
+                label := "正在" actionText "一条自动" stateMap.Get(from) "规则"
 
                 g := createGuiOpt("InputTip - " label)
 
@@ -173,7 +173,7 @@ fn_auto_exit(*) {
                                 LV.Delete(RowNumber)
                                 gc.%from "_title"%.Text := "( " gc.%"LV_" from%.GetCount() " 个 )"
                             }
-                            state := stateTextMap.%itemValue.status%
+                            state := stateTextMap.Get(itemValue.status)
                             writeIni(itemValue.id, value, "App-Auto-" state, "InputTip.ini")
                             gc.%"LV_" state%.Insert(RowNumber, , itemValue.exe_name, itemValue.tipGlobal, itemValue.tipRegex, itemValue.title, itemValue.id)
                             gc.%state "_title"%.Text := "( " gc.%"LV_" state%.GetCount() " 个 )"
@@ -188,8 +188,8 @@ fn_auto_exit(*) {
             }
 
             for i, v in ["Exit"] {
-                g.AddText("Section cRed", gui_help_tip)
-                g.AddText("Section", "需要自动" stateMap.%v% " InputTip")
+                g.AddText("Section cRed", lang('gui.help_tip'))
+                g.AddText("Section", "需要自动" stateMap.Get(v) " InputTip")
                 g.AddText("yp", "的应用窗口")
                 gc.%v "_title"% := g.AddText("yp cRed w" bw / 3, "( 0 个 )")
 
@@ -215,7 +215,7 @@ fn_auto_exit(*) {
             fn_add_manually(item, *) {
                 itemValue := {
                     exe_name: "",
-                    status: stateMap.%item._type%,
+                    status: stateMap.Get(item._type),
                     tipGlobal: "进程级",
                     tipRegex: "相等",
                     title: "",
@@ -241,7 +241,7 @@ fn_auto_exit(*) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        status: stateMap.%state%,
+                        status: stateMap.Get(state),
                         tipGlobal: "进程级",
                         tipRegex: "相等",
                         title: windowInfo.title,
@@ -257,7 +257,7 @@ fn_auto_exit(*) {
 
                     itemValue := {
                         exe_name: windowInfo.exe_name,
-                        status: stateMap.%state%,
+                        status: stateMap.Get(state),
                         tipGlobal: "进程级",
                         tipRegex: "相等",
                         title: windowInfo.title,

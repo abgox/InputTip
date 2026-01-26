@@ -128,12 +128,12 @@ fn_restart(*) {
 
 fn_create_shortcut(*) {
     if (isStartUp = 1) {
-        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", fileDesc, favicon, , , 7)
+        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", A_Desktop "\" fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", pad(lang('app_desc')), favicon, , , 7)
     } else {
         if (A_IsCompiled) {
-            FileCreateShortcut(A_ScriptFullPath, A_Desktop "\" fileLnk, , , fileDesc, favicon, , , 7)
+            FileCreateShortcut(A_ScriptFullPath, A_Desktop "\" fileLnk, , , pad(lang('app_desc')), favicon, , , 7)
         } else {
-            FileCreateShortcut(A_AhkPath, A_Desktop "\" fileLnk, , '"' A_ScriptFullPath '"', fileDesc, favicon, , , 7)
+            FileCreateShortcut(A_AhkPath, A_Desktop "\" fileLnk, , '"' A_ScriptFullPath '"', pad(lang('app_desc')), favicon, , , 7)
         }
     }
 }
@@ -145,7 +145,7 @@ fn_update_user(uname, *) {
         g := createGuiOpt("InputTip - 设置用户名")
         tab := g.AddTab3("-Wrap", ["设置用户名", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             return g
@@ -282,7 +282,7 @@ fn_common(args, cb_updateVar) {
             g := createGuiOpt("InputTip - " args.title)
             tab := g.AddTab3("-Wrap", [args.tab, "关于"])
             tab.UseTab(1)
-            g.AddLink("Section cRed", gui_help_tip)
+            g.AddLink("Section cRed", lang('gui.help_tip'))
 
             if (info.i) {
                 g.AddText(, gui_width_line)
@@ -762,7 +762,7 @@ createProcessListGui(args, cb_addClick, cb_addManual := "") {
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                g.AddText("Section cRed", gui_help_tip)
+                g.AddText("Section cRed", lang('gui.help_tip'))
 
                 gc.LV_processList := g.AddListView("-LV0x10 -Multi r7 NoSortHdr Sort Grid w" w, ["进程名称", "来源", "窗口标题", "文件路径"])
 

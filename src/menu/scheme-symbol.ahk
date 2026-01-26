@@ -6,7 +6,7 @@ fn_scheme_symbol(*) {
         g := createGuiOpt("InputTip - 符号方案")
         tab := g.AddTab3("-Wrap", ["符号方案", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             g.AddText(, gui_width_line)
@@ -126,7 +126,7 @@ fn_symbol_pic(*) {
         g := createGuiOpt("InputTip - 符号方案 - 图片符号")
         tab := g.AddTab3("-Wrap", ["基础配置", "独立配置", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
 
         if (info.i) {
@@ -194,7 +194,7 @@ fn_symbol_pic(*) {
         gc._focusSymbolPic.OnEvent("LoseFocus", fn_clear)
 
         for v in ["CN", "EN", "Caps"] {
-            g.AddText("xs", stateMap.%v% ":")
+            g.AddText("xs", stateMap.Get(v) ":")
             _ := g.AddDropDownList("yp r9 w" bw - __w - g.MarginX, picList)
             _._config := v "_pic"
             _.OnEvent("Change", e_pic_path)
@@ -234,7 +234,7 @@ fn_symbol_pic(*) {
 
         g.AddText("xs", line)
         for state in ["CN", "EN", "Caps"] {
-            g.AddText("xs cRed", stateMap.%state%)
+            g.AddText("xs cRed", stateMap.Get(state))
             g.AddText("yp", ":")
             for v in symbolPicConfig {
                 config := v.config state
@@ -260,7 +260,7 @@ fn_symbol_block(*) {
         g := createGuiOpt("InputTip - 符号方案 - 方块符号")
         tab := g.AddTab3("-Wrap", ["基础配置", "独立配置", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
 
         if (info.i) {
@@ -380,7 +380,7 @@ fn_symbol_block(*) {
         _._focus.OnEvent("LoseFocus", fn_clear)
 
         tab.UseTab(2)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
         g.AddText("xs", line)
 
         g.AddText("xs", "是否启用")
@@ -437,7 +437,7 @@ fn_symbol_block(*) {
                 tab := g.AddTab3("-Wrap", ["中文状态", "英文状态", "大写锁定"])
                 for i, state in ["CN", "EN", "Caps"] {
                     tab.UseTab(i)
-                    g.AddText("Section cRed", stateMap.%state%)
+                    g.AddText("Section cRed", stateMap.Get(state))
                     g.AddText("yp", "时的独立配置:`n")
 
                     ; 颜色
@@ -488,7 +488,7 @@ fn_symbol_text(*) {
         g := createGuiOpt("InputTip - 符号方案 - 文本符号")
         tab := g.AddTab3("-Wrap", ["基础配置", "独立配置", "关于"])
         tab.UseTab(1)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
 
         if (info.i) {
             g.AddText(, gui_width_line)
@@ -641,7 +641,7 @@ fn_symbol_text(*) {
         _._focus.OnEvent("LoseFocus", fn_clear)
 
         tab.UseTab(2)
-        g.AddText("Section cRed", gui_help_tip)
+        g.AddText("Section cRed", lang('gui.help_tip'))
         g.AddText("xs", line)
 
         g.AddText("xs", "是否启用")
@@ -708,7 +708,7 @@ fn_symbol_text(*) {
                 tab := g.AddTab3("-Wrap", ["中文状态", "英文状态", "大写锁定"])
                 for i, state in ["CN", "EN", "Caps"] {
                     tab.UseTab(i)
-                    g.AddText("Section cRed", stateMap.%state%)
+                    g.AddText("Section cRed", stateMap.Get(state))
                     g.AddText("yp", "时的独立配置:`n")
 
 

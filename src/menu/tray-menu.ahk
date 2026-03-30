@@ -719,6 +719,11 @@ showCode(*) {
             return
         }
 
+        if (__InputTip_IsWindowDisabled()) {
+            ToolTip()
+            return
+        }
+
         info := IME.CheckInputMode()
         ToolTip("状态码: " info.statusMode "`n切换码: " info.conversionMode)
     }

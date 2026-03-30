@@ -8,6 +8,7 @@ hasWindowChange := 1
 
 lastInputState := ""
 inputStateChanged := 0
+lastWindowDisabled := 0
 
 loop {
     Sleep(delay)
@@ -19,6 +20,25 @@ loop {
             exe_name := ProcessGetName(WinGetPID("A"))
             exe_title := WinGetTitle("A")
             exe_str := ":" exe_name ":"
+
+            if (__InputTip_IsWindowDisabled()) {
+                if (!lastWindowDisabled) {
+                    hideSymbol()
+                    if (changeCursor) {
+                        revertCursor(cursorInfo)
+                    }
+                    lastSymbol := ""
+                    lastCursor := ""
+                    lastWindow := ""
+                }
+                lastWindowDisabled := 1
+                continue
+            }
+
+            if (lastWindowDisabled) {
+                lastWindowDisabled := 0
+                hasWindowChange := 1
+            }
 
             if (symbolType && needSkip(exe_str)) {
                 hideSymbol()

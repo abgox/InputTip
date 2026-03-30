@@ -49,27 +49,27 @@ checkUpdate(1)
 
 if (hotkey_CN) {
     try {
-        Hotkey(hotkey_CN, switch_CN)
+        Hotkey(hotkey_CN, __InputTip_switch_CN)
     }
 }
 if (hotkey_EN) {
     try {
-        Hotkey(hotkey_EN, switch_EN)
+        Hotkey(hotkey_EN, __InputTip_switch_EN)
     }
 }
 if (hotkey_Caps) {
     try {
-        Hotkey(hotkey_Caps, switch_Caps)
+        Hotkey(hotkey_Caps, __InputTip_switch_Caps)
     }
 }
 if (hotkey_Pause) {
     try {
-        Hotkey(hotkey_Pause, pauseApp)
+        Hotkey(hotkey_Pause, __InputTip_pauseApp)
     }
 }
 if (hotkey_ShowCode) {
     try {
-        Hotkey(hotkey_ShowCode, showCode)
+        Hotkey(hotkey_ShowCode, __InputTip_showCode)
     }
 }
 
@@ -140,6 +140,58 @@ getPathList() {
 
 makeTrayMenu() ; 生成托盘菜单
 
+global IT_WINDOW_DISABLE_FLAG := A_ScriptDir "\plugins\window_disable.flag"
+global IT_WINDOW_DISABLED := false
+
+SetTimer(__InputTip_SyncWindowDisableState, 100)
+
+__InputTip_SyncWindowDisableState() {
+    global IT_WINDOW_DISABLE_FLAG
+    global IT_WINDOW_DISABLED
+
+    IT_WINDOW_DISABLED := !!FileExist(IT_WINDOW_DISABLE_FLAG)
+}
+
+__InputTip_IsWindowDisabled() {
+    global IT_WINDOW_DISABLED
+    return IT_WINDOW_DISABLED
+}
+
+__InputTip_switch_CN(*) {
+    if (__InputTip_IsWindowDisabled()) {
+        return
+    }
+    switch_CN()
+}
+
+__InputTip_switch_EN(*) {
+    if (__InputTip_IsWindowDisabled()) {
+        return
+    }
+    switch_EN()
+}
+
+__InputTip_switch_Caps(*) {
+    if (__InputTip_IsWindowDisabled()) {
+        return
+    }
+    switch_Caps()
+}
+
+__InputTip_pauseApp(*) {
+    if (__InputTip_IsWindowDisabled()) {
+        return
+    }
+    pauseApp()
+}
+
+__InputTip_showCode(*) {
+    if (__InputTip_IsWindowDisabled()) {
+        return
+    }
+    showCode()
+}
+
 
 /**
  * 跳过 JAB/JetBrains IDE 程序，交由 InputTip.JAB 处理
@@ -147,10 +199,18 @@ makeTrayMenu() ; 生成托盘菜单
  * @returns {1 | 0} 是否需要跳过
  */
 needSkip(exe_str) {
+    if (__InputTip_IsWindowDisabled()) {
+        return 1
+    }
     return !showCursorPos && InStr(modeList.JAB, exe_str)
 }
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
+    if (__InputTip_IsWindowDisabled()) {
+        left := 0, top := 0, right := 0, bottom := 0
+        return 0
+    }
+
     res := 0
 
     try {

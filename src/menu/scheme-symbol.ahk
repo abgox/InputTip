@@ -79,13 +79,6 @@ fn_scheme_symbol(*) {
             db("hideSymbolDelay", value)
         }
 
-        g.addText("xs", "鼠标悬停时隐藏:")
-        g.AddDropDownList("yp AltSubmit Choose" hoverHide + 1 " w" bw / 2, ["【否】悬停在符号上时，符号保持显示", "【是】悬停在符号上时，符号自动隐藏"]).OnEvent("Change", e_symbol_hover_hide)
-        e_symbol_hover_hide(item, *) {
-            global hoverHide := item.value - 1
-            writeIni("hoverHide", hoverHide)
-        }
-
         g.AddText("xs", line)
 
         g.AddText("xs", "偏移量参考原点:")

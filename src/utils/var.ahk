@@ -80,9 +80,6 @@ showCursorPos_x := readIni("showCursorPos_x", 0)
 ; 符号显示在鼠标附近时的特殊偏移量 y
 showCursorPos_y := readIni("showCursorPos_y", 30)
 
-; 当鼠标悬停在符号上时，符号是否需要隐藏
-hoverHide := readIni("hoverHide", 1)
-
 ; 在多少毫秒后隐藏符号，0 表示永不隐藏
 hideSymbolDelay := readIni("hideSymbolDelay", 0)
 
@@ -427,7 +424,7 @@ updateSymbol(configName := "", configValue := "") {
             for state in ["CN", "EN", "Caps"] {
                 pic_path := symbolConfig.%state "_pic"%
                 if (pic_path) {
-                    _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound", "abgox-InputTip-Symbol-Window")
+                    _ := symbolGui.%state% := Gui("-Caption AlwaysOnTop ToolWindow LastFound E0x20", "abgox-InputTip-Symbol-Window")
                     _.BackColor := "000000"
                     WinSetTransColor("000000", _)
 
@@ -511,16 +508,14 @@ updateSymbol(configName := "", configValue := "") {
 }
 ; 加载符号
 loadSymbol(state, left, top, right, bottom, isShowCursorPos := 0) {
-    global lastSymbol, isOverSymbol
+    global lastSymbol
     static old_left := 0, old_top := 0
 
     if (!isShowCursorPos) {
         if (left = old_left && top = old_top) {
-            if (state = lastSymbol || isOverSymbol) {
+            if (state = lastSymbol) {
                 return
             }
-        } else {
-            isOverSymbol := 0
         }
     }
     old_top := top

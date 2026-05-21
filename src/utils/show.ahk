@@ -2,8 +2,6 @@
 
 updateDelay()
 
-; 鼠标悬停在符号上
-isOverSymbol := 0
 hasWindowChange := 1
 
 lastInputState := ""
@@ -62,14 +60,6 @@ loop {
         } catch {
             hideSymbol()
             needShow := 0
-        }
-
-        if (symbolType && hoverHide) {
-            if (isMouseOver("abgox-InputTip-Symbol-Window")) {
-                hideSymbol()
-                isOverSymbol := 1
-                continue
-            }
         }
 
         if (GetKeyState("CapsLock", "T")) {

@@ -1,6 +1,7 @@
-src/*.exe
-src/InputTip.ini
-test/
-todo/
-
+data
+temp
+*.exe
+*.new
+test
+todo
 src/utils/app-update/target/*

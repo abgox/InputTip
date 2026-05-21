@@ -1,30 +1,27 @@
 ; InputTip
 
-#Warn All, Off
-
-#Include utils/options.ahk
+#Include core\manifest.ahk
 
 #NoTrayIcon
 ;@AHK2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
-;@AHK2Exe-SetDescription InputTip.JAB - 一个输入法状态管理工具(提示/切换)
 
 isJAB := 1
 
-#Include utils/tools.ahk
-#Include utils/create-gui.ahk
-#Include utils/ini.ahk
-#Include utils/IME.ahk
-#Include utils/app-list.ahk
-#Include utils/var.ahk
+#Include core\gui.ahk
+#Include core\i18n.ahk
+#Include core\ini.ahk
+#Include core\ime.ahk
+#Include core\var.ahk
+#Include core\symbol.ahk
 
 /**
  * 跳过非 JAB/JetBrains IDE 程序，交由 InputTip 处理
- * @param exe_str 进程字符串，如 ":webstorm64.exe:"
- * @returns {1 | 0} 是否需要跳过
+ * @param exeName 进程字符串，如 "webstorm64.exe"
+ * @returns {1|0} 是否需要跳过
  */
-needSkip(exe_str) {
-    return showCursorPos || !InStr(modeList.JAB, exe_str)
+needSkip(exeName) {
+    return var.symbolNearCursorActive || !var.modeList.JAB.Has(exeName)
 }
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
@@ -34,38 +31,36 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         left := 0, top := 0, right := 0, bottom := 0
         return 0
     }
-
-    s := isWhichScreen(screenList)
+    s := isWhichScreen(var.screenList)
     if (s.num) {
         try {
-            offset := app_offset_screen.%s.num%
+            offset := var.screenSymbolOffset.%s.num%
             left += offset.x
             top += offset.y
         }
         try {
-            offset := app_offset.%exe_name exe_title%.%s.num%
+            offset := var.windowSymbolOffset.%exeName exeTitle%.%s.num%
             left += offset.x
             top += offset.y
         } catch {
             try {
-                left += app_offset.%exe_name%.%s.num%.x
-                top += app_offset.%exe_name%.%s.num%.y
+                left += var.windowSymbolOffset.%exeName%.%s.num%.x
+                top += var.windowSymbolOffset.%exeName%.%s.num%.y
             }
         }
         return left
     }
-
     return 0
 }
 
 /**
  * Gets the position of the caret with UIA, Acc or CaretGetPos.
- * @link https://www.reddit.com/r/AutoHotkey/comments/ysuawq/get_the_caret_location_in_any_program/
- * @link https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439
  * @param X Value is set to the screen X-coordinate of the caret
  * @param Y Value is set to the screen Y-coordinate of the caret
  * @param W Value is set to the width of the caret
  * @param H Value is set to the height of the caret
+ * @link https://www.reddit.com/r/AutoHotkey/comments/ysuawq/get_the_caret_location_in_any_program/
+ * @link https://www.autohotkey.com/boards/viewtopic.php?t=130941#p576439
  */
 GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
     static JAB := InitJAB() ; Source: https://github.com/Elgin1/Java-Access-Bridge-for-AHK
@@ -86,9 +81,9 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
             return
     }
     InitJAB() {
-        ret := {}, ret.firstRun := 1, ret.module := A_PtrSize = 8 ? "WindowsAccessBridge-64.dll" : "WindowsAccessBridge-32.dll", ret.acType := "Int64"
+        ret := {}, ret.firstRun := 1, ret.module := A_PtrSize == 8 ? "WindowsAccessBridge-64.dll" : "WindowsAccessBridge-32.dll", ret.acType := "Int64"
         ret.DefineProp("__Delete", { call: (this) => DllCall("FreeLibrary", "ptr", this) })
-        if !(ret.ptr := DllCall("LoadLibrary", "Str", ret.module, "ptr")) && A_PtrSize = 4 {
+        if !(ret.ptr := DllCall("LoadLibrary", "Str", ret.module, "ptr")) && A_PtrSize == 4 {
             ; try legacy, available only for 32-bit
             ret.acType := "Int", ret.module := "WindowsAccessBridge.dll", ret.ptr := DllCall("LoadLibrary", "Str", ret.module, "ptr")
         }
@@ -99,4 +94,4 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
     }
 }
 
-#Include utils/show.ahk
+#Include core\core.ahk

@@ -15,7 +15,7 @@ body:
           required: true
         - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue。
           required: true
-        - label: 你已经查看了 [一些常见的使用问题](https://inputtip.abgox.com/faq/), 其中没有你遇到的问题。
+        - label: 你已经查看了 [文档](https://inputtip.abgox.com/docs/), 其中没有你遇到的问题。
           required: true
         - label: 你已经观看了 [InputTip 使用教程](https://www.bilibili.com/video/BV15oYKz5EQ8), 仍未解决你的问题。
           required: true
@@ -38,7 +38,7 @@ body:
       label: 你正在使用哪种类型的安装包?
       description: |
         - 如果你正在使用 exe 版本，建议切换到 zip 版本。
-        - [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/faq/zip-vs-exe)
+        - [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/docs/zip-vs-exe)
       options:
         - zip
         - exe

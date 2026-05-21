@@ -1,195 +1,84 @@
 ; InputTip
 
-#Warn All, Off
-
-#Include utils/verify-file.ahk
-
-#Include "*i utils/options.ahk"
-
 ;@AHK2Exe-SetName InputTip
 ;@Ahk2Exe-SetOrigFilename InputTip.ahk
 ;@Ahk2Exe-UpdateManifest 1
-;@AHK2Exe-SetDescription InputTip - 一个输入法状态管理工具(提示/切换)
 
-isJAB := 0
+#Include core\init.ahk
 
-#Include "*i utils/tools.ahk"
-#Include "*i utils/create-gui.ahk"
-#Include "*i utils/ini.ahk"
-#Include "*i utils/IME.ahk"
-#Include "*i utils/app-list.ahk"
-#Include "*i utils/hotkey-gui.ahk"
-#Include "*i menu/tray-menu.ahk"
-#Include "*i utils/var.ahk"
-#Include "*i utils/check-version.ahk"
-
-if (A_IsCompiled) {
-    favicon := A_ScriptFullPath
-} else {
-    favicon := A_ScriptDir "\InputTipIcon\default\app.ico"
-    if (runCodeWithAdmin && !A_IsAdmin) {
-        try {
-            Run '*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount
-        } catch {
-            createTipGui([{
-                opt: "cRed",
-                text: "以管理员权限启动 InputTip 失败",
-            }], "InputTip - 错误").Show()
-            writeIni("runCodeWithAdmin", 0)
-            global runCodeWithAdmin := 0
-        }
-    }
-}
+setTrayIcon(var.iconRunning)
 
 checkIni()
 
 checkUpdate(1)
 
-if (hotkey_CN) {
-    try {
-        Hotkey(hotkey_CN, switch_CN)
+for state in var.stateList {
+    if (var.hotkey%state%) {
+        try Hotkey(var.hotkey%state%, bindState(state))
     }
 }
-if (hotkey_EN) {
-    try {
-        Hotkey(hotkey_EN, switch_EN)
-    }
-}
-if (hotkey_Caps) {
-    try {
-        Hotkey(hotkey_Caps, switch_Caps)
-    }
-}
-if (hotkey_Pause) {
-    try {
-        Hotkey(hotkey_Pause, pauseApp)
-    }
-}
-if (hotkey_ShowCode) {
-    try {
-        Hotkey(hotkey_ShowCode, showCode)
-    }
+bindState(state) {
+    return (key, *) => switchState(state, key)
 }
 
-enableKeyCount := readIni("enableKeyCount", 0)
-trayTipTemplate := readIni("trayTipTemplate", "【%appState%中】" fileDesc)
-keyCountTemplate := readIni("keyCountTemplate", "%\n%【统计中】启动以来, 有效的按键输入次数: %keyCount%")
-A_IconTip := StrReplace(trayTipTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
-
-updateTip()
-
-updateTip(flag := "") {
-    if (enableKeyCount) {
-        if (flag != "") {
-            tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", flag ? "暂停" : "运行")
-            tip := StrReplace(tip, "%keyCount%", keyCount)
-            tip := StrReplace(tip, "%\n%", "`n")
-            A_IconTip := tip
-            return
-        }
-        SetTimer(countTimer, 50)
-        countTimer() {
-            static last := ""
-            global keyCount
-            if (!enableKeyCount) {
-                SetTimer(, 0)
-                last := ""
-                return
-            }
-            if (A_PriorKey != last) {
-                keyCount++
-                last := A_PriorKey
-                tip := StrReplace(trayTipTemplate keyCountTemplate, "%appState%", A_IsPaused ? "暂停" : "运行")
-                tip := StrReplace(tip, "%keyCount%", keyCount)
-                tip := StrReplace(tip, "%\n%", "`n")
-                A_IconTip := tip
-            }
-        }
-    } else {
-        s := flag != "" ? flag : A_IsPaused
-        tip := StrReplace(trayTipTemplate, "%appState%", s ? "暂停" : "运行")
-        tip := StrReplace(tip, "%\n%", "`n")
-        A_IconTip := tip
-    }
+if (var.hotkeyShowCode) {
+    try Hotkey(var.hotkeyShowCode, showCode)
 }
 
-symbolPaths := readIni("symbolPaths", "")
-iconPaths := readIni("iconPaths", "")
-cursorDir := readIni("cursorDir", "")
+makeTrayMenu()
+updateTrayTip()
 
-SetTimer(getPathList, -1)
-getPathList() {
-    _symbolPaths := arrJoin(getPicList("InputTipSymbol", ":InputTipSymbol\default\triangle-red.png:InputTipSymbol\default\triangle-blue.png:InputTipSymbol\default\triangle-green.png:"), ":")
-    _iconPaths := arrJoin(getPicList("InputTipIcon", ":InputTipIcon\default\app.png:InputTipIcon\default\app-paused.png:"), ":")
-    _cursorDir := arrJoin(getCursorDir(), ":")
-    if (symbolPaths != _symbolPaths) {
-        global symbolPaths := _symbolPaths
-        writeIni("symbolPaths", _symbolPaths)
-    }
-    if (iconPaths != _iconPaths) {
-        global iconPaths := _iconPaths
-        writeIni("iconPaths", _iconPaths)
-    }
-    if (cursorDir != _cursorDir) {
-        global cursorDir := _cursorDir
-        writeIni("cursorDir", _cursorDir)
-    }
+if (var.symbolJABActive) {
+    runJAB()
 }
-
-makeTrayMenu() ; 生成托盘菜单
-
 
 /**
  * 跳过 JAB/JetBrains IDE 程序，交由 InputTip.JAB 处理
- * @param exe_str 进程字符串，如 ":webstorm64.exe:"
- * @returns {1 | 0} 是否需要跳过
+ * @param exeName 进程字符串，如 "webstorm64.exe"
+ * @returns {1|0} 是否需要跳过
  */
-needSkip(exe_str) {
-    return !showCursorPos && InStr(modeList.JAB, exe_str)
+needSkip(exeName) {
+    return !var.symbolNearCursorActive && var.modeList.JAB.Has(exeName)
 }
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
-    res := 0
-
     try {
         res := GetCaretPosEx(&left, &top, &right, &bottom)
     } catch {
         left := 0, top := 0, right := 0, bottom := 0
         return 0
     }
-
-    s := isWhichScreen(screenList)
+    s := isWhichScreen(var.screenList)
     if (s.num) {
         try {
-            offset := app_offset_screen.%s.num%
+            offset := var.screenSymbolOffset.%s.num%
             left += offset.x
-            if (symbolOffsetBase) {
+            if (var.symbolOffsetBaseY == "below") {
                 bottom += offset.y
             } else {
                 top += offset.y
             }
         }
         try {
-            offset := app_offset.%exe_name exe_title%.%s.num%
+            offset := var.windowSymbolOffset.%exeName exeTitle%.%s.num%
             left += offset.x
-            if (symbolOffsetBase) {
+            if (var.symbolOffsetBaseY == "below") {
                 bottom += offset.y
             } else {
                 top += offset.y
             }
         } catch {
             try {
-                left += app_offset.%exe_name%.%s.num%.x
-                if (symbolOffsetBase) {
-                    bottom += app_offset.%exe_name%.%s.num%.y
+                left += var.windowSymbolOffset.%exeName%.%s.num%.x
+                if (var.symbolOffsetBaseY == "below") {
+                    bottom += var.windowSymbolOffset.%exeName%.%s.num%.y
                 } else {
-                    top += app_offset.%exe_name%.%s.num%.y
+                    top += var.windowSymbolOffset.%exeName%.%s.num%.y
                 }
             }
         }
         return res && left
     }
-
     return 0
 }
 
@@ -198,33 +87,32 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
-    try {
-        DllCall("SetThreadDpiAwarenessContext", "ptr", -2, "ptr")
-    }
+    try DllCall("SetThreadDpiAwarenessContext", "ptr", -2, "ptr")
+
     hwnd := getHwnd()
 
-    if (InStr(modeList.HOOK, exe_str)) {
+    if (var.modeList.HOOK.Has(exeName)) {
         return getCaretPosFromHook(0)
     }
-    else if (InStr(modeList.UIA, exe_str)) {
+    else if (var.modeList.UIA.Has(exeName)) {
         return getCaretPosFromUIA()
     }
-    else if (InStr(modeList.GUI_UIA, exe_str)) {
+    else if (var.modeList.GUI_UIA.Has(exeName)) {
         if (getCaretPosFromGui(&hwnd := 0)) {
             return 1
         }
         return getCaretPosFromUIA()
     }
-    else if (InStr(modeList.MSAA, exe_str)) {
+    else if (var.modeList.MSAA.Has(exeName)) {
         return getCaretPosFromMSAA()
     }
-    else if (InStr(modeList.Hook_DLL, exe_str)) {
+    else if (var.modeList.Hook_DLL.Has(exeName)) {
         return getCaretPosFromHook(1)
     }
-    else if (InStr(modeList.WPF, exe_str)) {
+    else if (var.modeList.WPF.Has(exeName)) {
         return getCaretPosFromWpfCaret()
     }
-    else if (InStr(modeList.ACC, exe_str)) {
+    else if (var.modeList.ACC.Has(exeName)) {
         return getCaretPosFromACC()
     }
     else {
@@ -234,8 +122,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         if (getCaretPosFromHook(0)) {
             return 1
         }
-        functions := [getCaretPosFromMSAA, getCaretPosFromUIA]
-        for fn in functions {
+        for fn in [getCaretPosFromMSAA, getCaretPosFromUIA] {
             if (fn()) {
                 return 1
             }
@@ -410,17 +297,14 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         return false
     }
 
-    getCaretPosFromHook(flag) {
+    getCaretPosFromHook(updateCaret) {
         static WM_GET_CARET_POS := DllCall("RegisterWindowMessageW", "str", "WM_GET_CARET_POS", "uint")
         if !tid := DllCall("GetWindowThreadProcessId", "ptr", hwnd, "ptr*", &pid := 0, "uint")
             return false
-        if (flag) {
-            ; ! 有兼容性问题的 dll 调用，部分应用会因为它触发意外错误
-            ; ! 如: 崩溃，自动复制/输入/删除/等
+        if (updateCaret) {
             ; Update caret position
-            try {
-                SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
-            }
+            ; There may be problems with 32-bit programs
+            try SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
         }
         ; PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ
         if !hProcess := DllCall("OpenProcess", "uint", 1082, "int", false, "uint", pid, "ptr")
@@ -554,7 +438,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             idObject := 0xFFFFFFF8 ; OBJID_CARET
             if DllCall("oleacc\AccessibleObjectFromWindow", "ptr", WinExist("A"), "uint", idObject &= 0xFFFFFFFF
                 , "ptr", -16 + NumPut("int64", idObject == 0xFFFFFFF0 ? 0x46000000000000C0 : 0x719B3800AA000C81, NumPut("int64", idObject == 0xFFFFFFF0 ? 0x0000000000020400 : 0x11CF3C3D618736E0, IID := Buffer(16)))
-                , "ptr*", oAcc := ComValue(9, 0)) = 0 {
+                , "ptr*", oAcc := ComValue(9, 0)) == 0 {
                 x := Buffer(4), y := Buffer(4), w := Buffer(4), h := Buffer(4)
                 oAcc.accLocation(ComValue(0x4003, x.ptr, 1), ComValue(0x4003, y.ptr, 1), ComValue(0x4003, w.ptr, 1), ComValue(0x4003, h.ptr, 1), 0)
                 left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int"), right := NumGet(w, 0, "int"), bottom := NumGet(h, 0, "int")
@@ -602,7 +486,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     }
 }
 
-
 ; 强制显示托盘菜单图标
 SetTimer(showIconTimer, 10000)
 showIconTimer() {
@@ -616,6 +499,6 @@ showIconTimer() {
     A_IconHidden := 0
 }
 
-#Include "*i plugins/InputTip.plugin.ahk"
+#Include "*i data\plugin\InputTip.plugin.ahk"
 
-#Include "*i utils/show.ahk"
+#Include "*i core\core.ahk"

@@ -52,6 +52,8 @@ createGui(callback) {
  * - 回调函数接受形参 `info`
  *    - `info.x`,`info.y`,`info.w`,`info.h`: 最终计算得到的窗口坐标和宽高。
  *    - 当执行隐藏显示时，`info.i` 为 `1`，否则为 `0`
+ * @param {0 | 1 | 2 | 3} cornerPreference 圆角样式 (1=直角，2=圆角，3=小圆角)
+ * @param {1 | 0} useImmersiveDarkMode 是否使用深色模式
  * @returns {Gui} 返回 Gui 对象
  * @example
  * createUniqueGui(helloGui).Show()
@@ -69,9 +71,24 @@ createGui(callback) {
  *     return g
  * }
  */
-createUniqueGui(callback) {
+createUniqueGui(callback, cornerPreference := 0, useImmersiveDarkMode := 0) {
     static w := Map()
     g := createGui(callback)
+    try {
+        if (useImmersiveDarkMode) {
+            ; 深色模式标题栏（DWMWA_USE_IMMERSIVE_DARK_MODE = 20）
+            ; 让窗口标题栏跟随深色模式，未来可能扩展到子控件
+            DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 20, "Int*", useImmersiveDarkMode, "Int", 4)
+        }
+        if (cornerPreference) {
+            ; 圆角样式（DWMWA_WINDOW_CORNER_PREFERENCE = 33）
+            ;
+            DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 33, "Int*", cornerPreference, "Int", 4)
+        }
+        ; 背景材质（DWMWA_SYSTEMBACKDROP_TYPE = 38，仅 Win11 22H2+）
+        ; 2=Mica  3=Acrylic  4=Mica Alt
+        ; DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 38, "Int*", 3, "Int", 4)
+    }
     g.GetPos(, , &width, &height)
     ; 基本确保唯一性
     id := g.Title "_" width "_" height

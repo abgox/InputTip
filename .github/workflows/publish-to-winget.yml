@@ -17,15 +17,30 @@ jobs:
           git config --global user.name ${{ vars.USER_NAME }}
           git config --global user.email ${{ vars.USER_EMAIL }}
 
-      - name: Clone from GitHub and Create PR branch
+      - name: Clone from GitHub and Create PR
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git clone --depth 1 https://${{ secrets.PAT_TOKEN }}@github.com/abgox/InputTip.git InputTip
           git clone --depth 1 https://${{ secrets.PAT_TOKEN }}@github.com/abgox/winget-pkgs.git winget-pkgs
           cd winget-pkgs
-          $info = ..\InputTip\scripts\create-winget-manifest.ps1 "manifests\a\abgox\InputTip"
+
+          $info = ..\InputTip\scripts\create-winget-manifest.ps1
+
           $new_branch = $info.new_branch
+          $commit_msg = $info.commit_msg
+          $pr_title   = $info.pr_title
+          $pr_body    = $info.pr_body
+
           git checkout -b $new_branch
           git add .
-          git commit -m $info.commit_msg
+          git commit -m $commit_msg
           git push origin $new_branch
+
+          gh pr create `
+            --title "$pr_title" `
+            --body "$pr_body" `
+            --head "abgox:$new_branch" `
+            --base "master" `
+            --repo "microsoft/winget-pkgs"

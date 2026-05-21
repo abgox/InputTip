@@ -85,15 +85,7 @@ loop {
 
         loadCursor(currentState)
 
-        if (symbolShowMode == 1) {
-            ShowSymbolEx(currentState)
-        } else {
-            inputStateChanged := currentState != lastInputState
-            lastInputState := currentState
-            if (inputStateChanged || GetKeyState("LButton", "P")) {
-                ShowSymbolEx(currentState)
-            }
-        }
+        ShowSymbolEx(currentState)
 
         if (exportState) {
             if (currentState != lastExportState) {

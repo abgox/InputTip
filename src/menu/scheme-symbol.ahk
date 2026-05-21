@@ -55,13 +55,6 @@ fn_scheme_symbol(*) {
 
         g.AddText("xs", line)
 
-        g.addText("xs", "符号的显示模式:")
-        g.AddDropDownList("yp AltSubmit Choose" symbolShowMode " w" bw / 2, [" 实时状态显示", " 切换状态显示"]).OnEvent("Change", e_symbol_mode)
-        e_symbol_mode(item, *) {
-            value := item.value
-            global symbolShowMode := value
-            writeIni("symbolShowMode", value)
-        }
 
         g.AddText("xs", "符号的延时隐藏:")
         _ := g.AddEdit("yp Number w" bw / 2)

@@ -169,12 +169,12 @@ showSymbol(state, left, top, right, bottom, nearCursor := 0) {
                 x += var.symbolNearCursorOffsetX
                 y += var.symbolNearCursorOffsetY
             }
-            showGui(var.%"symbolTextGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1, var.%'symbolTextTransparent' state%)
+            showGui(var.%"symbolTextGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1, var.symbolTextTransparent)
     }
 
     lastSymbol := state
 }
-; 重载符号
+
 reloadSymbol() {
     if (var.symbolType) {
         canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
@@ -184,7 +184,7 @@ reloadSymbol() {
         }
     }
 }
-; 隐藏符号
+
 hideSymbol(all := 1) {
     for type in ["Picture", "Shape", "Text"] {
         for v in var.stateList {
@@ -244,7 +244,7 @@ e_symbol(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
         g := createGuiOpt(i18n("symbol"))
-        tab := g.AddTab3("-Wrap", [i18n("basicConfig"), i18n("symbolNearCursor")])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("symbolNearCursor")])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/symbol"))
@@ -271,11 +271,7 @@ e_symbol(*) {
 
         renderRadioGroup(g, "symbolOffsetBaseY", [[".above", "above"], [".below", "below"]])
 
-        renderRadioGroup(g, "symbolJABActive", [
-            ["yes", 1],
-            ["no", 0]
-        ])
-
+        renderRadioGroup(g, "symbolJABActive", [["yes", 1], ["no", 0]])
         g.AddLink("yp", getHelpLink("tip/symbol/use-inputtip-in-jetbrains"))
 
         renderEditGroup(g, "symbolHideDelay", "Number Limit5")
@@ -375,10 +371,10 @@ symbolPictureConfig(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
         g := createGuiOpt(i18n("symbolPicture"))
-        tab := g.AddTab3("-Wrap", [i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("symbol/picture"))
+        g.AddLink("Section", getDocsLink("tip/symbol/picture"))
 
         if (info.i) {
             g.AddText(, line80)
@@ -387,8 +383,8 @@ symbolPictureConfig(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        ; g.AddText("yp w20")
-        ; gc.previewSymbolPicture := g.AddEdit("yp cGray", i18n("symbol.preview"))
+        g.AddText("yp w20")
+        gc.previewSymbolPicture := g.AddEdit("yp cGray", i18n("symbol.preview"))
 
         picList := getSymbolPicturePath()
         picList.InsertAt(1, "")
@@ -399,14 +395,15 @@ symbolPictureConfig(*) {
             if (i == 4) {
                 addBtn()
                 tab.UseTab(2)
-                g.AddLink("Section", getDocsLink("symbol/picture"))
+                g.AddLink("Section", getDocsLink("tip/symbol/picture"))
             }
-            renderGroupBox(g, "state." state, "xs", "h130 w" bw)
-            renderEditLabel(g, "symbolPictureOffsetX", editOpt)
-            renderEditLabel(g, "symbolPictureOffsetY", editOpt, , "yp")
-            renderEditLabel(g, "symbolPictureWidth", "Number Limit3" editOpt, , "yp")
-            renderEditLabel(g, "symbolPictureHeight", "Number Limit3" editOpt, , "yp")
-            renderDropDownList(g, "symbolPicturePath" state, picList, , "w" bw - 40)
+            renderGroupBox(g, "state." state, "xs", "h120 w" bw)
+            renderEditLabel(g, "symbolPictureOffsetX" state, editOpt, "symbolPictureOffsetX")
+            renderEditLabel(g, "symbolPictureOffsetY" state, editOpt, "symbolPictureOffsetY", "yp")
+            renderEditLabel(g, "symbolPictureWidth" state, "Number Limit3" editOpt, "symbolPictureWidth", "yp")
+            renderEditLabel(g, "symbolPictureHeight" state, "Number Limit3" editOpt, "symbolPictureHeight", "yp")
+            renderDropDownList(g, "symbolPicturePath" state, picList, "xs+20 yp+40", "w" bw - 40, (*) => gc.previewSymbolPicture.Focus())
+
             if (i > 4) {
                 addBtn()
             }
@@ -425,14 +422,14 @@ symbolShapeConfig(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
         g := createGuiOpt(i18n("symbolShape"))
-        tab := g.AddTab3("-Wrap", [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("symbol/shape"))
+        g.AddLink("Section", getDocsLink("tip/symbol/shape"))
 
 
         if (info.i) {
-            g.AddText(, line60)
+            g.AddText(, line70)
             return g
         }
         g.w := w := info.w
@@ -465,18 +462,18 @@ symbolShapeConfig(*) {
         for i, state in var.stateList {
             if (Mod(i - 1, 3) == 0) {
                 tab.UseTab(((i - 1) // 3) + 2)
-                g.AddLink("Section", getDocsLink("tip/shape"))
+                g.AddLink("Section", getDocsLink("tip/symbol/shape"))
             }
             g.SetFont("Bold")
             g.AddGroupBox("xs h130 w" bw, i18n("state." state))
             g.SetFont("Norm")
 
-            renderEditLabel(g, "symbolShapeOffsetX", editOpt)
-            renderEditLabel(g, "symbolShapeWidth", "Number Limit3" editOpt, , "yp")
+            renderEditLabel(g, "symbolShapeOffsetX" state, editOpt, "symbolShapeOffsetX")
+            renderEditLabel(g, "symbolShapeWidth" state, "Number Limit3" editOpt, "symbolShapeWidth", "yp")
             renderColorPicker(g, "symbolShapeColor" state, "symbolShapeColor")
-            renderEditLabel(g, "symbolShapeOffsetY", editOpt, , "yp")
-            renderEditLabel(g, "symbolShapeHeight", "Number Limit3" editOpt, , "yp")
-            renderEditLabel(g, "symbolShapeTransparent", "Number Limit3" editOpt, , "yp")
+            renderEditLabel(g, "symbolShapeOffsetY" state, editOpt, "symbolShapeOffsetY", "xs+20 yp+35")
+            renderEditLabel(g, "symbolShapeHeight" state, "Number Limit3" editOpt, "symbolShapeHeight", "yp")
+            renderEditLabel(g, "symbolShapeTransparent" state, "Number Limit3" editOpt, "symbolShapeTransparent", "yp")
         }
 
         return g
@@ -487,10 +484,10 @@ symbolTextConfig(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
         g := createGuiOpt(i18n("symbolText"))
-        tab := g.AddTab3("-Wrap", [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("symbol/text"))
+        g.AddLink("Section", getDocsLink("tip/symbol/text"))
 
         if (info.i) {
             g.AddText(, line70)
@@ -531,17 +528,17 @@ symbolTextConfig(*) {
         for i, state in var.stateList {
             if (Mod(i - 1, 3) == 0) {
                 tab.UseTab(((i - 1) // 3) + 2)
-                g.AddLink("Section", getDocsLink("tip/shape"))
+                g.AddLink("Section", getDocsLink("tip/symbol/shape"))
             }
             g.SetFont("Bold")
             g.AddGroupBox("xs h130 w" bw, i18n("state." state))
             g.SetFont("Norm")
 
-            renderEditLabel(g, "symbolTextContent", editOpt)
-            renderEditLabel(g, "symbolTextOffsetX", editOpt, , "yp")
+            renderEditLabel(g, "symbolTextContent" state, editOpt, "symbolTextContent")
+            renderEditLabel(g, "symbolTextOffsetX" state, editOpt, "symbolTextOffsetX", "yp")
             renderColorPicker(g, "symbolTextColor" state, "symbolTextColor")
-            renderEditLabel(g, "symbolTextSize", "Number Limit2" editOpt, , "yp")
-            renderEditLabel(g, "symbolTextOffsetY", editOpt, , "yp")
+            renderEditLabel(g, "symbolTextSize" state, "Number Limit2" editOpt, "symbolTextSize", "xs+20 yp+35")
+            renderEditLabel(g, "symbolTextOffsetY" state, editOpt, "symbolTextOffsetY", "yp")
             renderColorPicker(g, "symbolTextBgColor" state, "symbolTextBgColor")
         }
 
@@ -559,7 +556,7 @@ e_screenOffsetBase(*) {
         for v in var.screenList {
             pages.push(i18n("offset.screen") " " v.num)
         }
-        tab := g.AddTab3("xs -Wrap", pages)
+        tab := renderTab(g, pages)
 
         for v in var.screenList {
             tab.UseTab(v.num)

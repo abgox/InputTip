@@ -228,7 +228,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
         w := info.w
         bw := w - g.MarginX * 2
 
-        tab := g.AddTab3("-Wrap", tabList)
+        tab := renderTab(g, tabList)
         loseFocusOnTab(tab)
         tab.UseTab(1)
 
@@ -418,7 +418,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     for v in var.screenList {
                         pages.push(i18n("offset.screen") " " v.num)
                     }
-                    tab := g.AddTab3("xs -Wrap w" bw, pages)
+                    tab := renderTab(g, pages, "w" bw)
                     loseFocusOnTab(tab)
                     key := itemValue.range == i18n("match.process") ? app : app itemValue.title
 
@@ -798,7 +798,7 @@ createProcessListGui(args, cb_addClick) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            tab := g.AddTab3("-Wrap", [i18n("processList.label")])
+            tab := renderTab(g, [i18n("processList.label")])
             loseFocusOnTab(tab)
             tab.UseTab(1)
             g.AddLink("Section", getDocsLink("menu/process-list"))

@@ -268,7 +268,7 @@ showHotKeyGui(keyConfigList, label := "") {
         }
         w := info.w
 
-        tab := g.AddTab3("-Wrap w" w, [i18n("hotkey.single"), i18n("hotkey.combine"), i18n("hotkey.manual")])
+        tab := renderTab(g, [i18n("hotkey.single"), i18n("hotkey.combine"), i18n("hotkey.manual")], "w" w)
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("switch/hotkey"))

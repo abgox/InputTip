@@ -161,7 +161,7 @@ langStrings.Set("en-US", Map(
     "edgeStyle.static", "Static Edge",
     "overlayShowOnWindowChange", "Reshow Overlay on Window Change",
     "overlayHideDelay", "Hide Delay",
-    "overlayBasePosition", ["Position", " Position"],
+    "overlayBasePosition", ["Position", "Position"],
     "overlayBasePosition.center", "Center",
     "overlayBasePosition.top", "Top",
     "overlayBasePosition.bottom", "Bottom",

@@ -4,8 +4,7 @@ e_inputMethod(*) {
     showGui(createUniqueGui(inputModeGui))
     inputModeGui(info) {
         g := createGuiOpt(i18n("inputMethod"))
-
-        tab := g.AddTab3("-Wrap", i18n("inputMethod.tab", 1))
+        tab := renderTab(g, i18n("inputMethod.tab", 1))
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("input-method"))

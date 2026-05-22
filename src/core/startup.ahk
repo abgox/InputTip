@@ -25,7 +25,7 @@ e_startup(item, *) {
             w := info.w
             ; bw := w - g.MarginX * 2
 
-            tab := g.AddTab3("-Wrap", [i18n("startup")])
+            tab := renderTab(g, [i18n("startup")])
             loseFocusOnTab(tab)
             tab.UseTab(1)
 

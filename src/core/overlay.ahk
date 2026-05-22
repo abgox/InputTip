@@ -63,7 +63,7 @@ showOverlay(state) {
                 x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
                 y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
         }
-        showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1, var.%"overlayTransparent" state%)
+        showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1, var.overlayTransparent)
         i--
     }
 
@@ -77,8 +77,8 @@ updateOverlay() {
     for state in var.stateList {
         text := var.%"overlayText" state%
         textFont := var.overlayTextFont
-        textSize := var.%"overlayTextSize" state%
-        textWeight := var.%"overlayTextWeight" state%
+        textSize := var.overlayTextSize
+        textWeight := var.overlayTextWeight
         textColor := var.%"overlayTextColor" state%
         bgColor := var.%"overlayBgColor" state%
 
@@ -113,62 +113,55 @@ e_overlay(*) {
         g := createGuiOpt(i18n("overlay"))
 
         if (info.i) {
-            g.AddText(, line80)
+            g.AddText(, line70)
             return g
         }
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        tab := g.AddTab3("-Wrap", [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("basicConfig") 2, i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/overlay"))
 
-        renderRadioGroupList(g, [
-            ["overlayActive",
-                [
-                    ["yes", 1],
-                    ["no", 0]
-                ]
-            ],
-            ["overlayCornerPreference",
-                [
-                    ["none", 0],
-                    ["cornerPreference.sharp", 1],
-                    ["cornerPreference.round", 2],
-                    ["cornerPreference.roundSmall", 3]
-                ]
-            ],
-            ["overlayEdgeStyle",
-                [
-                    ["none", 0],
-                    ["edgeStyle.modal", 1],
-                    ["edgeStyle.client", 2],
-                    ["edgeStyle.static", 3]
-                ]
-            ],
+        renderRadioGroup(g, "overlayActive",
             [
-                "overlayAnimation",
-                [
-                    ["none", 0],
-                    ["animation.fade", 1],
-                    ["animation.slide", 2],
-                    ["animation.scale", 3]
-                ]
-            ],
-            ["overlayShowOnWindowChange",
-                [
-                    ["yes", 1],
-                    ["no", 0]
-                ]
-            ]
-        ])
+                ["yes", 1],
+                ["no", 0]
+            ])
 
-        renderGroupBox(g, "overlayHideDelay", "xs h70 w" bw)
-        renderEdit(g, "overlayHideDelay", "xs+20 yp+30 Number Limit5 w" bw - 40)
+        renderEditGroup(g, "overlayHideDelay", "Number Limit5")
+        renderRadioGroup(g, "overlayAnimation",
+            [
+                ["none", 0],
+                ["animation.fade", 1],
+                ["animation.slide", 2],
+                ["animation.scale", 3]
+            ])
 
-        renderFontGroup(g, "overlayTextFont")
+        renderRadioGroup(g, "overlayCornerPreference",
+            [
+                ["none", 0],
+                ["cornerPreference.sharp", 1],
+                ["cornerPreference.round", 2],
+                ["cornerPreference.roundSmall", 3]
+            ])
+        renderRadioGroup(g, "overlayEdgeStyle",
+            [
+                ["none", 0],
+                ["edgeStyle.modal", 1],
+                ["edgeStyle.client", 2],
+                ["edgeStyle.static", 3]
+            ])
 
+        tab.UseTab(2)
+        g.AddLink("Section", getDocsLink("tip/overlay"))
+
+        renderRadioGroup(g, "overlayShowOnWindowChange", [["yes", 1], ["no", 0]])
+        renderDropDownListGroup(g, "overlayTextFont", fontList)
+        renderEditGroup(g, "overlayTextSize", "Number Limit2")
+        renderEditGroup(g, "overlayTextWeight", "Number Limit3")
+        renderEditGroup(g, "overlayTransparent", "Number Limit3")
 
         posTextMap := Map()  ; text -> value
         posValueMap := Map() ; value -> text
@@ -184,41 +177,27 @@ e_overlay(*) {
 
         for i, v in var.stateList {
             if (Mod(i - 1, 3) == 0) {
-                tab.UseTab(((i - 1) // 3) + 2)
+                tab.UseTab(((i - 1) // 3) + 3)
                 g.AddLink("Section", getDocsLink("tip/overlay"))
             }
 
             g.SetFont("Bold")
-            g.AddGroupBox("xs h160 w" bw, i18n("state." v))
+            g.AddGroupBox("xs h120 w" bw, i18n("state." v))
             g.SetFont("Norm")
 
-            renderText(g, "overlayText", "xs+20 yp+40")
-            renderEdit(g, "overlayText" v, "yp" editOpt)
+            renderEditLabel(g, "overlayText" v, editOpt, "overlayText")
+            renderEditLabel(g, "overlayOffsetX" v, editOpt, "overlayOffsetX", "yp")
+            renderColorPicker(g, "overlayTextColor" v, "overlayTextColor")
 
-            renderText(g, "overlayOffsetX", "yp")
-            renderEdit(g, "overlayOffsetX" v, "yp" editOpt)
-
-            g.AddText("yp", i18n("overlayBasePosition"))
+            g.AddText("xs+20 yp+40", i18n("overlayBasePosition"))
             _ := g.AddDropDownList("yp w" bw / 6, posList)
             try _.Text := posValueMap.Get(var.%"overlayBasePosition" v%)
             _.state := v
-            _.OnEvent("Change", (i, *) => changeConfig("overlayBasePosition" i.state, posTextMap.Get(i.Text)))
+            _.OnEvent("Change", (i, *) => changeConfig("overlayBasePosition" i.state, posTextMap.Get(i.Text), 1))
 
-            renderText(g, "overlayTextSize", "xs+20 yp+40")
-            renderEdit(g, "overlayTextSize" v, "yp Number Limit2" editOpt)
+            renderEditLabel(g, "overlayOffsetY" v, editOpt, "overlayOffsetY", "yp")
+            renderColorPicker(g, "overlayBgColor" v, "overlayBgColor")
 
-            renderText(g, "overlayOffsetY", "yp")
-            renderEdit(g, "overlayOffsetY" v, "yp" editOpt)
-
-            renderColorPicker(g, "overlayTextColor", v)
-
-            renderText(g, "overlayTextWeight", "xs+20 yp+40")
-            renderEdit(g, "overlayTextWeight" v, "yp Number Limit3" editOpt)
-
-            renderText(g, "overlayTransparent", "yp")
-            renderEdit(g, "overlayTransparent" v, "yp Number Limit3" editOpt)
-
-            renderColorPicker(g, "overlayBgColor", v)
         }
         return g
     }

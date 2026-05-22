@@ -120,7 +120,7 @@ e_cursor(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        tab := g.AddTab3("-Wrap", [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/cursor"))

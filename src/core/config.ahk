@@ -66,12 +66,13 @@ changeConfig(key, value, debounce := 1, callback := (key, value) => restartJAB()
 
     var.%key% := value
 
-    if (debounce) {
-        writeIniDebounced(key, value, callback(key, value))
-    } else {
-        writeIni(key, value)
-        callback(key, value)
-    }
+    ; TODO
+    ; if (debounce) {
+    ;     writeIniDebounced(key, value, callback(key, value))
+    ; } else {
+    writeIni(key, value)
+    try callback(key, value)
+    ; }
 
     if InStr(key, "cursor") {
         if var.cursorActive {

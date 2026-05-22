@@ -28,14 +28,11 @@ makeTrayMenu() {
     }
 
     if (!A_IsCompiled) {
-        A_TrayMenu.Add(i18n("runCodeWithAdmin"), fn_admin_mode)
-        fn_admin_mode(*) {
-            A_TrayMenu.ToggleCheck(i18n("runCodeWithAdmin"))
-            changeConfig("runCodeWithAdmin", !var.runCodeWithAdmin)
-            if (var.runCodeWithAdmin) {
-                fn_restart()
-            }
-        }
+        A_TrayMenu.Add(i18n("runCodeWithAdmin"), (*) => (
+            A_TrayMenu.ToggleCheck(i18n("runCodeWithAdmin")),
+            changeConfig("runCodeWithAdmin", !var.runCodeWithAdmin, 0),
+            var.runCodeWithAdmin ? fn_restart() : 0
+        ))
         if (A_IsAdmin && var.runCodeWithAdmin) {
             A_TrayMenu.Check(i18n("runCodeWithAdmin"))
         }

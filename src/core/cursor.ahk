@@ -34,7 +34,7 @@ updateCursor() {
                     loopDir := cursorDir "\" dir
                 } else {
                     var.%"cursorPath" state% := path
-                    writeIniDebounced("cursorPath" state, path)
+                    writeIni("cursorPath" state, path)
                     loopDir := defaultCursorDir "\" path
                 }
             }

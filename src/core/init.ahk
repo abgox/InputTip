@@ -337,10 +337,11 @@ if A_IsCompiled {
 }
 
 updateAppOffset()
+updateScreenOffset()
 updateCursorMode()
 
 updateAppOffset() {
-    for v in StrSplit(readIniSection("Window.Symbol.Offset"), "`n") {
+    for v in var.windowSymbolOffset {
         kv := StrSplit(v, "=", , 2)
         part := StrSplit(kv[2], ":", , 5)
         if (part.Length >= 2) {
@@ -355,29 +356,33 @@ updateAppOffset() {
                 title := part[5]
             }
             key := isGlobal ? name : name title
-            var.windowSymbolOffset.%key% := {}
+            var.windowSymbolOffsetVal.%key% := {}
             for v in StrSplit(offset, "|") {
                 if (v) {
                     p := StrSplit(v, "/")
                     try {
-                        var.windowSymbolOffset.%key%.%p[1]% := { x: p[2], y: p[3] }
+                        var.windowSymbolOffsetVal.%key%.%p[1]% := { x: p[2], y: p[3] }
                     } catch {
-                        var.windowSymbolOffset.%key%.%p[1]% := { x: 0, y: 0 }
+                        var.windowSymbolOffsetVal.%key%.%p[1]% := { x: 0, y: 0 }
                     }
                 }
             }
         }
     }
-    for v in StrSplit(readIniSection("Screen.Symbol.Offset"), "`n") {
+}
+
+updateScreenOffset() {
+    for v in var.screenSymbolOffset {
         kv := StrSplit(v, "=")
         part := StrSplit(kv[2], "/")
         try {
-            var.screenSymbolOffset.%kv[1]% := { x: part[1], y: part[2] }
+            var.screenSymbolOffsetVal.%kv[1]% := { x: part[1], y: part[2] }
         } catch {
-            var.screenSymbolOffset.%kv[1]% := { x: 0, y: 0 }
+            var.screenSymbolOffsetVal.%kv[1]% := { x: 0, y: 0 }
         }
     }
 }
+
 updateCursorMode() {
     modeList := {}
     for v in var.modeNameList {

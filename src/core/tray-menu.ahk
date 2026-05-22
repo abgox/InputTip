@@ -234,8 +234,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
 
         addItem(config) {
             listView.%config%.Opt("-Redraw")
-            valueArr := var.%StrReplace(config, '.', '')%
-            for v in valueArr {
+            for v in StrSplit(readIniSection(config), "`n") {
                 try {
                     kv := StrSplit(v, "=", , 2)
                     part := StrSplit(RegExReplace(kv[2], ":$", ""), ":", , column.Count - 1)
@@ -409,7 +408,9 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
             }
 
             num := column.Get("offset", 0)
+            btnLayout := "xs"
             if (num) {
+                btnLayout := "Section"
                 sectionList[num.gui] := fn_offset
                 fn_offset() {
                     app := itemValue.exe
@@ -423,9 +424,9 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     key := itemValue.range == i18n("match.process") ? app : app itemValue.title
 
                     try {
-                        var.windowSymbolOffset.%key%
+                        var.windowSymbolOffsetVal.%key%
                     } catch {
-                        var.windowSymbolOffset.%key% := {}
+                        var.windowSymbolOffsetVal.%key% := {}
                     }
 
                     for v in var.screenList {
@@ -437,13 +438,13 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
 
                         if (action == "edit") {
                             try {
-                                x := var.windowSymbolOffset.%key%.%v.num%.x
-                                y := var.windowSymbolOffset.%key%.%v.num%.y
+                                x := var.windowSymbolOffsetVal.%key%.%v.num%.x
+                                y := var.windowSymbolOffsetVal.%key%.%v.num%.y
                             } catch {
-                                var.windowSymbolOffset.%key%.%v.num% := { x: 0, y: 0 }
+                                var.windowSymbolOffsetVal.%key%.%v.num% := { x: 0, y: 0 }
                             }
                         } else {
-                            var.windowSymbolOffset.%key%.%v.num% := { x: 0, y: 0 }
+                            var.windowSymbolOffsetVal.%key%.%v.num% := { x: 0, y: 0 }
                         }
 
                         g.SetFont("Bold")
@@ -465,7 +466,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     e_changeOffset(num, pos, itemValue, item, *) {
                         key := itemValue.range == i18n("match.process") ? app : app itemValue.title
                         try {
-                            var.windowSymbolOffset.%key%.%num%.%pos% := returnNumber(item.value)
+                            var.windowSymbolOffsetVal.%key%.%num%.%pos% := returnNumber(item.value)
                         } catch {
                             return
                         }
@@ -475,8 +476,8 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                         }
 
                         itemValue.offset := ""
-                        for v in var.windowSymbolOffset.%key%.OwnProps() {
-                            itemValue.offset .= "|" v "/" var.windowSymbolOffset.%key%.%v%.x "/" var.windowSymbolOffset.%key%.%v%.y
+                        for v in var.windowSymbolOffsetVal.%key%.OwnProps() {
+                            itemValue.offset .= "|" v "/" var.windowSymbolOffsetVal.%key%.%v%.x "/" var.windowSymbolOffsetVal.%key%.%v%.y
                         }
                         itemValue.offset := SubStr(itemValue.offset, 2)
                     }
@@ -501,8 +502,9 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     v()
                 }
             }
+            tab.UseTab(0)
 
-            g.AddButton("xs w" bw, i18n("ok")).OnEvent("Click", (*) => fn_set(action, 0, 0))
+            g.AddButton(btnLayout " w" bw, i18n("ok")).OnEvent("Click", (*) => fn_set(action, 0, 0))
             ; if (action != "edit" && config != "Window.Symbol.Show") {
             ;     g.AddButton("xs w" bw, i18n("okAndAddWhitelist")).OnEvent("Click", (*) => fn_set(action, 0, 1))
             ; }

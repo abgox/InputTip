@@ -155,9 +155,14 @@ changeSectionConfig(key, value, section, delete := 0) {
     if delete {
         try IniDelete(configFile, section, key)
     } else {
-        writeIniDebounced(key, value, (key, value, section) => (
-            var.%StrReplace(section, ".", "")% := StrSplit(readIniSection(section), "`n"),
-            restartJAB()
-        ), section)
+        writeIni(key, value, section)
+        var.%StrReplace(section, ".", "")% := StrSplit(readIniSection(section), "`n")
+        switch section {
+            case "Window.Symbol.Offset":
+                updateAppOffset()
+            case "Screen.Symbol.Offset":
+                updateScreenOffset()
+        }
+        restartJAB()
     }
 }

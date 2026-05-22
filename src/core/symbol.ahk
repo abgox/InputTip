@@ -563,10 +563,10 @@ e_screenOffsetBase(*) {
             g.AddText("Section", i18n("offset.coordinate") "(X,Y): " i18n("offset.topLeft") "(" v.left ", " v.top "), " i18n("offset.bottomRight") "(" v.right ", " v.bottom ")")
 
             try {
-                x := var.screenSymbolOffset.%v.num%.x
-                y := var.screenSymbolOffset.%v.num%.y
+                x := var.screenSymbolOffsetVal.%v.num%.x
+                y := var.screenSymbolOffsetVal.%v.num%.y
             } catch {
-                var.screenSymbolOffset.%v.num% := { x: 0, y: 0 }
+                var.screenSymbolOffsetVal.%v.num% := { x: 0, y: 0 }
                 x := 0, y := 0
             }
 
@@ -596,13 +596,14 @@ e_screenOffsetBase(*) {
 
                 value := returnNumber(item.value)
                 if (pos == "x") {
-                    val := value "/" var.screenSymbolOffset.%num%.y
+                    val := value "/" var.screenSymbolOffsetVal.%num%.y
                 } else {
-                    val := var.screenSymbolOffset.%num%.x "/" value
+                    val := var.screenSymbolOffsetVal.%num%.x "/" value
                 }
 
                 writeIniDebounced(num, val, (*) => (
-                    updateAppOffset(),
+                    updateScreenOffset(),
+                    reloadSymbol(),
                     restartJAB()
                 ), "Screen.Symbol.Offset")
             }

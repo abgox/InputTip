@@ -35,18 +35,18 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     s := isWhichScreen(var.screenList)
     if (s.num) {
         try {
-            offset := var.screenSymbolOffset.%s.num%
+            offset := var.screenSymbolOffsetVal.%s.num%
             left += offset.x
             top += offset.y
         }
         try {
-            offset := var.windowSymbolOffset.%exeName exeTitle%.%s.num%
+            offset := var.windowSymbolOffsetVal.%exeName exeTitle%.%s.num%
             left += offset.x
             top += offset.y
         } catch {
             try {
-                left += var.windowSymbolOffset.%exeName%.%s.num%.x
-                top += var.windowSymbolOffset.%exeName%.%s.num%.y
+                left += var.windowSymbolOffsetVal.%exeName%.%s.num%.x
+                top += var.windowSymbolOffsetVal.%exeName%.%s.num%.y
             }
         }
         return left

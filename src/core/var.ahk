@@ -61,8 +61,8 @@ var := {
     fileLnk: "InputTip.lnk",
     screenNum: SysGet(80),
     screenList: getScreenInfo(),
-    screenSymbolOffset: {},
-    windowSymbolOffset: {},
+    windowSymbolOffsetVal: {},
+    screenSymbolOffsetVal: {},
     startupHKEY: "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
     startupRegName: "abgox.InputTip",
     ; 光标捕获模式
@@ -152,6 +152,8 @@ var := {
     symbolNearCursorOffsetY: readIni("symbolNearCursorOffsetY", 30),
     ; 在多少毫秒后隐藏符号，0 表示永不隐藏
     symbolHideDelay: readIni("symbolHideDelay", 0),
+    windowSymbolOffset: StrSplit(readIniSection("Window.Symbol.Offset"), "`n"),
+    screenSymbolOffset: StrSplit(readIniSection("Screen.Symbol.Offset"), "`n"),
     menuAnimation: readIni("menuAnimation", 1),
     ; 轮询响应间隔
     pollInterval: readIni("pollInterval", 20),

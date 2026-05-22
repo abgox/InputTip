@@ -41,17 +41,17 @@ onMenuLoop(wParam, lParam, msg, hwnd) {
     }
 }
 
-;@AHK2Exe-SetVersion 3.0.0
+;@AHK2Exe-SetVersion 3.1.0
 
 if (A_IsCompiled) {
     ; exe 版本
-    currentVersion := "3.0.0"
+    currentVersion := "3.1.0"
 
     versionType := "exe"
     versionKey := "version"
 } else {
     ; zip 版本
-    currentVersion := "3.0.0"
+    currentVersion := "3.1.0"
 
     versionType := "zip"
     versionKey := "version-zip"

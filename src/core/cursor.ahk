@@ -33,7 +33,8 @@ updateCursor() {
                 if DirExist(cursorDir "\" dir) {
                     loopDir := cursorDir "\" dir
                 } else {
-                    changeConfig("cursorPath" state, path)
+                    var.%"cursorPath" state% := path
+                    writeIniDebounced("cursorPath" state, path)
                     loopDir := defaultCursorDir "\" path
                 }
             }

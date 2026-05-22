@@ -60,6 +60,30 @@ for d in dirList {
 
 oldConfigFile := A_ScriptDir "/InputTip.ini"
 if FileExist(oldConfigFile) {
+    copyDirs := [{
+        old: A_ScriptDir "/InputTipCursor",
+        new: cursorDir
+    }, {
+        old: A_ScriptDir "/InputTipSymbol",
+        new: symbolDir
+    }, {
+        old: A_ScriptDir "/InputTipIcon",
+        new: iconDir
+    }, {
+        old: A_ScriptDir "/plugins",
+        new: pluginDir
+    }]
+    for d in copyDirs {
+        if DirExist(d.old) {
+            try {
+                DirCopy(d.old, d.new, 1)
+                DirDelete(d.old, 1)
+            }
+            dd := d.new '/default'
+            if DirExist(dd)
+                try DirDelete(dd, 1)
+        }
+    }
     migrateConfig(configFile, oldConfigFile)
     try FileDelete(A_ScriptDir "/InputTip.ini")
 }
@@ -490,17 +514,26 @@ checkIni() {
 }
 
 migrateConfig(newFile, oldFile) {
+    colorMap := Map(
+        "ffffff", "0xFFFFFF"
+    )
+    for v in var.stateList {
+        colorMap.Set(var.stateVal.%v%.colorText, var.stateVal.%v%.color)
+    }
     _migrateConfig(newKey := "", oldKey := "", newSection := "Settings", oldSection := "Config-v2", valueMap := Map()) {
         if (newKey) {
             try {
                 oldVal := IniRead(oldFile, oldSection, oldKey)
                 switch oldKey {
                     case "iconRunning", "iconPaused":
-                        newVal := StrReplace(oldVal, "InputTipIcon\", "")
+                        newVal := StrReplace(oldVal, "InputTipIcon\default", "default-")
+                        newVal := StrReplace(newVal, "InputTipIcon\", "data\icon\")
                     case "CN_cursor", "EN_cursor", "Caps_cursor":
-                        newVal := StrReplace(oldVal, "InputTipCursor\", "")
+                        newVal := StrReplace(oldVal, "InputTipCursor\default\oreo-", "default-")
+                        newVal := StrReplace(newVal, "InputTipCursor\", "data\cursor\")
                     case "CN_pic", "EN_pic", "Caps_pic":
-                        newVal := StrReplace(oldVal, "InputTipSymbol\", "")
+                        newVal := StrReplace(oldVal, "InputTipSymbol\default\triangle-", "default-triangle-")
+                        newVal := StrReplace(newVal, "InputTipSymbol\", "data\symbol\")
                     default:
                         if (valueMap.Count) {
                             newVal := valueMap.Get(oldVal)
@@ -508,6 +541,9 @@ migrateConfig(newFile, oldFile) {
                             newVal := oldVal
                         }
                 }
+                if InStr(oldKey, "color") && colorMap.Has(oldVal)
+                    newVal := colorMap.Get(oldVal)
+
                 IniWrite(newVal, newFile, newSection, newKey)
             }
         } else {
@@ -586,13 +622,13 @@ migrateConfig(newFile, oldFile) {
         migrateConfigList.Push(["symbolShapeColor" v, v "_color"])
         migrateConfigList.Push(["symbolTextContent" v, v "_Text"])
         items := {
-            Picture: [
+            Pic: [
                 ["symbolPictureOffsetX", "pic_offset_x"],
                 ["symbolPictureOffsetY", "pic_offset_y"],
                 ["symbolPictureWidth", "pic_symbol_width"],
                 ["symbolPictureHeight", "pic_symbol_height"]
             ],
-            Shape: [
+            Block: [
                 ["symbolShapeOffsetX", "offset_x"],
                 ["symbolShapeOffsetY", "offset_y"],
                 ["symbolShapeWidth", "symbol_width"],
@@ -612,17 +648,15 @@ migrateConfig(newFile, oldFile) {
                 ["symbolTextEdgeStyle", "textSymbol_border_type"]
             ]
         }
-        for t in ["Picture", "Shape", "Text"] {
+        for t in ["Pic", "Block", "Text"] {
             isolate := 0
             try isolate := IniRead(oldFile, "Config-v2", "enableIsolateConfig" t)
             for i in items.%t% {
-                if (isolate) {
+                if isolate
                     i[1] := i[1] v
-                }
                 migrateConfigList.Push(i)
             }
         }
-
         migrateConfigList.Push(["symbolTextBgColor" v, "textSymbol_" v "_color"])
     }
     for v in migrateConfigList {

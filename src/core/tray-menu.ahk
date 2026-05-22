@@ -215,7 +215,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
     "time", { config: 5, gui: 5 },
 ), addBtn := (g, width, config, e_add, e_addManually) => (
     w := " w" width / 2 - g.MarginX / 4,
-    g.AddButton("xs" w, i18n("addQuickly")).OnEvent("Click", e_add.Bind(config))
+    g.AddButton("xs" w, i18n("addQuickly")).OnEvent("Click", e_add.Bind(config)),
     g.AddButton("yp" w, i18n("addManually")).OnEvent("Click", e_addManually.Bind(config))
 )) {
     ; 列表菜单

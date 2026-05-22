@@ -51,7 +51,7 @@ normalizeConfig(key, value) {
 }
 
 changeConfig(key, value, callback := (key, value) => restartJAB()) {
-    if (value == "") {
+    if value == "" {
         ; 允许空值的配置
         allowNullVal := InStr(key, "hotkey") || InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "symbolPicturePath")
         if !allowNullVal
@@ -59,42 +59,41 @@ changeConfig(key, value, callback := (key, value) => restartJAB()) {
     }
     oldVal := ""
     try oldVal := var.%key%
-    if (value == oldVal) {
+    if value == oldVal
         return
-    }
 
     value := normalizeConfig(key, value)
 
     var.%key% := value
     writeIni(key, value)
 
-    if (InStr(key, "cursor")) {
-        if (var.cursorActive) {
+    if InStr(key, "cursor") {
+        if var.cursorActive {
             updateCursor()
             loadCursor(currentState, 1)
         } else {
             revertCursor()
         }
-    } else if (InStr(key, "overlay")) {
-        if (var.overlayActive) {
+    } else if InStr(key, "overlay") {
+        if var.overlayActive {
             updateOverlay()
             showOverlay(currentState)
         } else {
             hideOverlay()
         }
-    } else if (InStr(key, "symbol")) {
+    } else if InStr(key, "symbol") {
         global lastWindow := ""
         global lastSymbol := ""
 
-        if (InStr(key, "symbolPicture")) {
+        if InStr(key, "symbolPicture") {
             symType := "Picture"
-        } else if (InStr(key, "symbolText")) {
+        } else if InStr(key, "symbolText") {
             symType := "Text"
         } else {
             symType := "Shape"
         }
 
-        if (var.symbolType) {
+        if var.symbolType {
             updateSymbol()
             if key == "symbolOffsetBaseY" || key == "symbolType" {
                 gc.previewSymbol.Focus()
@@ -117,11 +116,11 @@ changeConfig(key, value, callback := (key, value) => restartJAB()) {
             hideSymbol()
         }
 
-        if (InStr(key, "HideDelay")) {
+        if InStr(key, "HideDelay") {
             updateSymbolDelay()
         }
-        if (InStr(key, "JAB")) {
-            if (var.symbolJABActive) {
+        if InStr(key, "JAB") {
+            if var.symbolJABActive {
                 runJAB()
             } else {
                 SetTimer(killAppTimer, -1)
@@ -149,7 +148,7 @@ changeConfig(key, value, callback := (key, value) => restartJAB()) {
 }
 
 changeSectionConfig(key, value, section, delete := 0) {
-    if (delete) {
+    if delete {
         try IniDelete(configFile, section, key)
     } else {
         writeIni(key, value, section)

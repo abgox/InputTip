@@ -16,15 +16,9 @@ e_updateCheck(*) {
         renderEdit(g, "updateCheckInterval", "xs+20 yp+30 Number Limit4 w" bw - 40)
         renderRadioGroup(g, "silentUpdate", [["yes", 1], ["no", 0]])
         if (A_IsCompiled) {
-            g.AddButton("xs w" bw, i18n("checkUpdateNow")).OnEvent("Click", (*) => (
-                g.Destroy()
-                checkUpdate(1, 1, 1, 0)
-            ))
+            g.AddButton("xs w" bw, i18n("checkUpdateNow")).OnEvent("Click", (*) => (g.Destroy(), checkUpdate(1, 1, 1, 0)))
         } else {
-            g.AddButton("xs w" bw, i18n("updateNow")).OnEvent("Click", (*) => (
-                g.Destroy()
-                getRepoCode(0, 0)
-            ))
+            g.AddButton("xs w" bw, i18n("updateNow")).OnEvent("Click", (*) => (g.Destroy(), getRepoCode(0, 0)))
         }
         return g
     }
@@ -241,10 +235,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
 
                             showLog(g)
 
-                            g.AddButton("xs w" w, i18n("update.confirm")).OnEvent("Click", (*) => (
-                                fn_close()
-                                getRepoCode(newVersion, 0)
-                            ))
+                            g.AddButton("xs w" w, i18n("update.confirm")).OnEvent("Click", (*) => (fn_close(), getRepoCode(newVersion, 0)))
                             g.AddButton("xs w" w, i18n("update.cancel")).OnEvent("Click", fn_close)
                             g.OnEvent("Close", fn_close)
                             fn_close(*) {

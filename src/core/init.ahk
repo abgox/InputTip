@@ -499,10 +499,7 @@ checkIni() {
 
                 g.AddButton("xs cRed w" bw, i18n("goToRepo")).OnEvent("Click", (*) => Run("https://github.com/abgox/InputTip"))
                 g.AddButton("w" bw, i18n("goToDonate")).OnEvent("Click", (*) => Run("https://www.abgox.com/donate"))
-                g.OnEvent("Close", (*) => (
-                    g.Destroy()
-                    done()
-                ))
+                g.OnEvent("Close", (*) => (g.Destroy(), done()))
                 return g
             }
         }

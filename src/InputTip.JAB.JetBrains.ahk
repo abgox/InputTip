@@ -8,6 +8,7 @@
 
 isJAB := 1
 
+#Include core\utils.ahk
 #Include core\gui.ahk
 #Include core\i18n.ahk
 #Include core\ini.ahk

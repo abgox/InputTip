@@ -139,7 +139,7 @@ e_inputMethod(*) {
                     _.Value := 3
                 }
                 _.OnEvent("Change", (i, *) => (
-                    ruleInfo.stateRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : ""
+                    ruleInfo.stateRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "",
                     _gc.stateNum.value := ""
                 ))
 
@@ -152,7 +152,7 @@ e_inputMethod(*) {
                     _.Value := ruleInfo.conversionRule
                 }
                 _.OnEvent("Change", (i, *) => (
-                    ruleInfo.conversionRule := i.value
+                    ruleInfo.conversionRule := i.value,
                     _gc.conversionRule.value := 0
                 ))
 
@@ -169,7 +169,7 @@ e_inputMethod(*) {
                     _.Value := 3
                 }
                 _.OnEvent("Change", (i, *) => (
-                    ruleInfo.conversionRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : ""
+                    ruleInfo.conversionRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "",
                     _gc.conversionNum.value := ""
                 ))
 

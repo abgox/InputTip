@@ -251,7 +251,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     }
                     num := column.Get("range", 0)
                     if (num) {
-                        cols[num.gui] := part[num.config] ? i18n("match.process") : i18n("match.title")
+                        cols[num.gui] := part[num.config] ? i18n("match.process") : i18n("match.titleLevel")
                     }
                     num := column.Get("mode", 0)
                     if (num) {
@@ -346,7 +346,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     g.SetFont("Bold")
                     g.AddGroupBox("xs h70 w" bw, i18n("match.range"))
                     g.SetFont("Norm")
-                    _ := g.AddDropDownList(opt, [i18n("match.process"), i18n("match.title")])
+                    _ := g.AddDropDownList(opt, [i18n("match.process"), i18n("match.titleLevel")])
                     try {
                         _.Text := itemValue.range
                     } catch {

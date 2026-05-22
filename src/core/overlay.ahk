@@ -13,14 +13,17 @@ hideOverlay() {
 }
 
 showOverlay(state) {
+    hideOverlay()
+
+    if var.%"overlayText" state% == ""
+        return
+
     hideDelay := var.overlayHideDelay
     if (hideDelay == "") {
         hideDelay := 0
     }
     Ypos := var.%"overlayOffsetY" state%
     Xpos := var.%"overlayOffsetX" state%
-
-    hideOverlay()
 
     i := var.screenNum
     while (i > 0) {

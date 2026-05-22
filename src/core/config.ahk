@@ -53,7 +53,7 @@ normalizeConfig(key, value) {
 changeConfig(key, value, debounce := 1, callback := (key, value) => restartJAB()) {
     if value == "" {
         ; 允许空值的配置
-        allowNullVal := InStr(key, "hotkey") || InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "symbolPicturePath")
+        allowNullVal := InStr(key, "hotkey") || InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "symbolPicturePath") || InStr(key, "overlayText") || InStr(key, "symbolText")
         if !allowNullVal
             return
     }

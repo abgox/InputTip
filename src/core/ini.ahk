@@ -17,11 +17,17 @@ readIniSection(section, default := "", path := configFile) {
     try {
         return IniRead(path, section)
     } catch {
-        writeIniSection(default, section, path)
+        try IniWrite(default, path, section)
         return default
     }
 }
 
-writeIniSection(value, section, path := configFile) {
-    try IniWrite(value, path, section)
+writeIniDebounced(key, value, callback := "", section := "Settings", path := configFile) {
+    _writeIniDebounced(key, value, section, path, callback)
 }
+
+_writeIniDebounced := debounce(
+    (key, value, section, path, callback := "") => (
+        writeIni(key, value, section, path),
+        callback ? callback(key, value, section) : 0
+    ), 500)

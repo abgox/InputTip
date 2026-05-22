@@ -194,7 +194,7 @@ e_inputMethod(*) {
                             var.inputMethodDetectionRules[RowNumber] := sm "*" cm "*" state
                         }
                     }
-                    changeConfig("inputMethodDetectionRule", arrJoin(var.inputMethodDetectionRules, ":"), (*) => reloadLV(LV))
+                    changeConfig("inputMethodDetectionRule", arrJoin(var.inputMethodDetectionRules, ":"), , (*) => reloadLV(LV))
                 }
                 if (!add) {
                     g.AddButton("xs w" bw, i18n("deleteRule")).OnEvent("Click", e_del)
@@ -203,7 +203,7 @@ e_inputMethod(*) {
                         LV.Delete(RowNumber)
                         autoHdrLV(LV)
                         var.inputMethodDetectionRules.RemoveAt(RowNumber)
-                        changeConfig("inputMethodDetectionRule", arrJoin(var.inputMethodDetectionRules, ":"), (*) => reloadLV(LV))
+                        changeConfig("inputMethodDetectionRule", arrJoin(var.inputMethodDetectionRules, ":"), , (*) => reloadLV(LV))
                     }
                 }
 

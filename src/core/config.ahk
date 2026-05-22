@@ -50,7 +50,7 @@ normalizeConfig(key, value) {
     return value
 }
 
-changeConfig(key, value, callback := (key, value) => restartJAB()) {
+changeConfig(key, value, debounce := 1, callback := (key, value) => restartJAB()) {
     if value == "" {
         ; 允许空值的配置
         allowNullVal := InStr(key, "hotkey") || InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "symbolPicturePath")
@@ -65,7 +65,13 @@ changeConfig(key, value, callback := (key, value) => restartJAB()) {
     value := normalizeConfig(key, value)
 
     var.%key% := value
-    writeIni(key, value)
+
+    if (debounce) {
+        writeIniDebounced(key, value, callback(key, value))
+    } else {
+        writeIni(key, value)
+        callback(key, value)
+    }
 
     if InStr(key, "cursor") {
         if var.cursorActive {
@@ -143,17 +149,15 @@ changeConfig(key, value, callback := (key, value) => restartJAB()) {
             updateTrayTip()
         default:
     }
-
-    callback(key, value)
 }
 
 changeSectionConfig(key, value, section, delete := 0) {
     if delete {
         try IniDelete(configFile, section, key)
     } else {
-        writeIni(key, value, section)
+        writeIniDebounced(key, value, (key, value, section) => (
+            var.%StrReplace(section, ".", "")% := StrSplit(readIniSection(section), "`n"),
+            restartJAB()
+        ), section)
     }
-    k := StrReplace(section, ".", "")
-    var.%k% := StrSplit(readIniSection(section), "`n")
-    restartJAB()
 }

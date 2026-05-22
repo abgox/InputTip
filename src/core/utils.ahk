@@ -1,5 +1,20 @@
 ; InputTip
 
+/**
+ * 防抖函数
+ * @param {Func} fn 要执行的函数
+ * @param {Number} delay 延迟时间(ms)
+ * @returns {Func} 函数
+ */
+debounce(fn, delay := 1000) {
+    state := { params: [], timer: 0 }
+    return (args*) => (
+        state.params := args,
+        state.timer ? SetTimer(state.timer, 0) : 0,
+        state.timer := SetTimer((*) => fn.Call(state.params*), -delay)
+    )
+}
+
 arrJoin(arr, separator := "") {
     res := ""
     for i, v in arr {

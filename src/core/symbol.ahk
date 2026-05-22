@@ -654,9 +654,10 @@ e_screenOffsetBase(*) {
                     val := var.screenSymbolOffset.%num%.x "/" value
                 }
 
-                writeIni(num, val, "Screen.Symbol.Offset")
-                updateAppOffset()
-                restartJAB()
+                writeIniDebounced(num, val, (*) => (
+                    updateAppOffset(),
+                    restartJAB()
+                ), "Screen.Symbol.Offset")
             }
         }
 

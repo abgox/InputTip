@@ -172,8 +172,7 @@ e_windowInfo(*) {
  */
 updateWhiteList(app) {
     exist := 0
-
-    for v in StrSplit(readIniSection("Window.Symbol.Show"), "`n") {
+    for v in var.WindowSymbolShow {
         kv := StrSplit(v, "=", , 2)
         part := StrSplit(kv[2], ":", , 3)
         try {
@@ -189,9 +188,7 @@ updateWhiteList(app) {
         }
     }
     if (!exist) {
-        writeIni(returnTime(), app ":1", "Window.Symbol.Show")
-
-        var.WindowSymbolShow := StrSplit(readIniSection("Window.Symbol.Show"), "`n")
+        writeIniDebounced(returnTime(), app ":1", (key, value, section) => var.WindowSymbolShow := StrSplit(readIniSection(section), "`n"), "Window.Symbol.Show")
     }
 }
 
@@ -237,7 +234,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
 
         addItem(config) {
             listView.%config%.Opt("-Redraw")
-            valueArr := StrSplit(readIniSection(config), "`n")
+            valueArr := var.%StrReplace(config, '.', '')%
             for v in valueArr {
                 try {
                     kv := StrSplit(v, "=", , 2)

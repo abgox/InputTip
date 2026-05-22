@@ -1,43 +1,52 @@
 ; InputTip
 
 normalizeConfig(key, value) {
-    if (InStr(key, "color")) {
-        if (!RegExMatch(value, "i)^0x[0-9a-f]{6}$"))
+    static isChanging := 0
+    if isChanging
+        return value
+
+    if InStr(key, "color") {
+        if !RegExMatch(value, "i)^0x[0-9a-f]{6}$")
             value := "0xffffff"
-    } else if (InStr(key, "size")) {
+        switch value {
+            case 'red':
+                value := "0xFF0000"
+            case 'blue':
+                value := "0x0000FF"
+            case 'green':
+                value := "0x00FF00"
+        }
+    } else if InStr(key, "size") {
         value := Abs(returnNumber(value))
-        if (value < 8 || value > 200)
+        if value < 8 || value > 200
             value := 16
-    } else if (InStr(key, "weight")) {
+    } else if InStr(key, "weight") {
         value := Abs(returnNumber(value))
         value := Round(value / 100) * 100
-        if (value < 100 || value > 900)
+        if value < 100 || value > 900
             value := 400
-    } else if (InStr(key, "offset") && !InStr(key, "symbolOffsetBaseY")) {
+    } else if InStr(key, "offset") && !InStr(key, "symbolOffsetBaseY") {
         value := returnNumber(value)
-        if (value == "")
-            value := 0
-    } else if (InStr(key, "transparent")) {
-        value := returnNumber(value)
-        if (value > 255)
+    } else if InStr(key, "transparent") {
+        value := Abs(returnNumber(value))
+        if value > 255
             value := 255
-        if (value < 0)
-            value := 0
-    } else if (InStr(key, "Width") || InStr(key, "Height")) {
+    } else if InStr(key, "Width") || InStr(key, "Height") {
         value := Abs(returnNumber(value))
-        if (value < 1)
+        if value < 1
             value := 1
-    } else if (InStr(key, "HideDelay") || InStr(key, "DetectionTimeout") || key == "updateCheckInterval") {
+    } else if InStr(key, "HideDelay") || InStr(key, "DetectionTimeout") || key == "updateCheckInterval" {
         value := Abs(returnNumber(value))
-        if (value < 0)
+        if value < 0
             value := 0
-    } else if (key == "pollInterval") {
+    } else if key == "pollInterval" {
         value := Abs(returnNumber(value))
-        if (value < 1)
+        if value < 1
             value := 1
         if value > 99
             value := 99
     }
+    isChanging := 0
     return value
 }
 

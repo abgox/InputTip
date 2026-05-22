@@ -336,40 +336,8 @@ if A_IsCompiled {
     }
 }
 
-updateAppOffset()
 updateScreenOffset()
 updateCursorMode()
-
-updateAppOffset() {
-    for v in StrSplit(readIniSection("Window.Symbol.Offset"), "`n") {
-        kv := StrSplit(v, "=", , 2)
-        part := StrSplit(kv[2], ":", , 5)
-        if (part.Length >= 2) {
-            name := part[1]
-            isGlobal := part[2]
-            isRegex := ""
-            title := ""
-            offset := ""
-            if (part.Length == 5) {
-                isRegex := part[3]
-                offset := part[4]
-                title := part[5]
-            }
-            key := isGlobal ? name : name title
-            windowSymbolOffset.%key% := {}
-            for v in StrSplit(offset, "|") {
-                if (v) {
-                    p := StrSplit(v, "/")
-                    try {
-                        windowSymbolOffset.%key%.%p[1]% := { x: p[2], y: p[3] }
-                    } catch {
-                        windowSymbolOffset.%key%.%p[1]% := { x: 0, y: 0 }
-                    }
-                }
-            }
-        }
-    }
-}
 
 updateScreenOffset() {
     for v in StrSplit(readIniSection("Screen.Symbol.Offset"), "`n") {

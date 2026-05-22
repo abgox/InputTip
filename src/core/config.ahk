@@ -159,7 +159,7 @@ changeSectionConfig(key, value, section, delete := 0) {
         restartJAB()
         switch section {
             case "Window.Symbol.Offset":
-                updateAppOffset()
+                global windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))
             case "Screen.Symbol.Offset":
                 updateScreenOffset()
             case "Window.Symbol.CursorCapture":

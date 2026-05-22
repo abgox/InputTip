@@ -413,38 +413,35 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                 btnLayout := "Section"
                 sectionList[num.gui] := fn_offset
                 fn_offset() {
-                    app := itemValue.exe
-
                     pages := []
                     for v in var.screenList {
                         pages.push(i18n("offset.screen") " " v.num)
                     }
                     tab := renderTab(g, pages, "w" bw)
                     loseFocusOnTab(tab)
-                    key := itemValue.range == i18n("match.process") ? app : app itemValue.title
 
-                    try {
-                        windowSymbolOffset.%key%
-                    } catch {
-                        windowSymbolOffset.%key% := {}
+                    offsetMap := Map()
+                    if (action == "edit") {
+                        for o in StrSplit(itemValue.offset, "|") {
+                            if (o == "")
+                                continue
+                            p := StrSplit(o, "/")
+                            try offsetMap.Set(p[1], { x: p[2], y: p[3] })
+                        }
                     }
 
                     for v in var.screenList {
                         tab.UseTab(v.num)
+                        n := String(v.num)
 
                         g.AddText("Section", i18n("offset.coordinate") "(X,Y): " i18n("offset.topLeft") "(" v.left ", " v.top "), " i18n("offset.bottomRight") "(" v.right ", " v.bottom ")")
 
                         x := 0, y := 0
-
-                        if (action == "edit") {
-                            try {
-                                x := windowSymbolOffset.%key%.%v.num%.x
-                                y := windowSymbolOffset.%key%.%v.num%.y
-                            } catch {
-                                windowSymbolOffset.%key%.%v.num% := { x: 0, y: 0 }
-                            }
+                        if offsetMap.Has(n) {
+                            x := offsetMap.Get(n).x
+                            y := offsetMap.Get(n).y
                         } else {
-                            windowSymbolOffset.%key%.%v.num% := { x: 0, y: 0 }
+                            offsetMap.Set(n, { x: 0, y: 0 })
                         }
 
                         g.SetFont("Bold")
@@ -452,32 +449,29 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                         g.SetFont("Norm")
                         _ := g.AddEdit("yp")
                         _.Value := x
-                        _.OnEvent("Change", e_changeOffset.Bind(v.num, "x", itemValue))
-                        _.OnEvent("LoseFocus", e_changeOffset.Bind(v.num, "x", itemValue))
+                        _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
+                        _.OnEvent("LoseFocus", e_changeOffset.Bind(n, "x"))
 
                         g.SetFont("Bold")
                         g.AddText("xs", i18n("offset.offset_y"))
                         g.SetFont("Norm")
                         _ := g.AddEdit("yp")
                         _.Value := y
-                        _.OnEvent("Change", e_changeOffset.Bind(v.num, "y", itemValue))
-                        _.OnEvent("LoseFocus", e_changeOffset.Bind(v.num, "y", itemValue))
+                        _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
+                        _.OnEvent("LoseFocus", e_changeOffset.Bind(n, "y"))
                     }
-                    e_changeOffset(num, pos, itemValue, item, *) {
-                        key := itemValue.range == i18n("match.process") ? app : app itemValue.title
-                        try {
-                            windowSymbolOffset.%key%.%num%.%pos% := returnNumber(item.value)
-                        } catch {
-                            return
-                        }
 
-                        if (item.Focused) {
+                    e_changeOffset(n, pos, item, *) {
+                        if !offsetMap.Has(n)
+                            offsetMap.Set(n, { x: 0, y: 0 })
+                        offsetMap.Get(n).%pos% := returnNumber(item.value)
+
+                        if (item.Focused)
                             return
-                        }
 
                         itemValue.offset := ""
-                        for v in windowSymbolOffset.%key%.OwnProps() {
-                            itemValue.offset .= "|" v "/" windowSymbolOffset.%key%.%v%.x "/" windowSymbolOffset.%key%.%v%.y
+                        for k, v in offsetMap {
+                            itemValue.offset .= "|" k "/" v.x "/" v.y
                         }
                         itemValue.offset := SubStr(itemValue.offset, 2)
                     }

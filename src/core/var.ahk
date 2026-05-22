@@ -219,7 +219,7 @@ for v in [
     var.%StrReplace(v, ".", "")% := parseMatchRules(StrSplit(readIniSection(v), "`n"))
 }
 
-windowSymbolOffset := {}
+windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))
 screenSymbolOffset := {}
 
 currentState := "", lastInputState := "", lastExportState := ""
@@ -279,4 +279,72 @@ getDocsLink(section, label := prefix section, prefix := "inputtip.abgox.com/docs
 }
 getHelpLink(link) {
     return getDocsLink(link, i18n("howToUse"))
+}
+
+/**
+ * 预处理窗口偏移规则
+ * @param {Array} configValue 原始配置数组
+ * @returns {Map} 以进程名为键的规则 Map
+ */
+parseOffsetRules(configValue) {
+    rules := Map()
+    for v in configValue {
+        if (v == "")
+            continue
+        kv := StrSplit(v, "=", , 2)
+        if kv.Length < 2
+            continue
+        part := StrSplit(kv[2], ":", , 5)
+        if part.Length < 2
+            continue
+        name := part[1]
+        if (name == "")
+            continue
+        offsetMap := Map()
+        if part.Length >= 4 {
+            for o in StrSplit(part[4], "|") {
+                if (o == "")
+                    continue
+                p := StrSplit(o, "/")
+                try {
+                    offsetMap.Set(p[1], { x: p[2], y: p[3] })
+                } catch {
+                    offsetMap.Set(p[1], { x: 0, y: 0 })
+                }
+            }
+        }
+        rule := {
+            isByProcess: part[2] == "1" ? 1 : 0,
+            isRegex: part.Length >= 5 ? part[3] : "",
+            offset: offsetMap,
+            title: part.Length >= 5 ? RTrim(part[5], ":") : ""
+        }
+        if !rules.Has(name)
+            rules.Set(name, [])
+        rules.Get(name).Push(rule)
+    }
+    return rules
+}
+
+/**
+ * 匹配窗口偏移规则
+ * @param {String} exeName 程序名
+ * @param {String} exeTitle 程序标题
+ * @param {Map} rules 预处理后的规则 Map
+ * @returns {Object|0} 命中的规则或 0
+ */
+matchOffsetRule(exeName, exeTitle, rules) {
+    if !rules.Has(exeName)
+        return 0
+    byProcess := 0
+    for rule in rules.Get(exeName) {
+        if (rule.isByProcess) {
+            byProcess := rule
+            continue
+        }
+        isMatch := rule.isRegex ? RegExMatch(exeTitle, rule.title) : exeTitle == rule.title
+        if (isMatch)
+            return rule
+    }
+    return byProcess
 }

@@ -59,22 +59,15 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
                 top += offset.y
             }
         }
-        try {
-            offset := windowSymbolOffset.%exeName exeTitle%.%s.num%
+        rule := matchOffsetRule(exeName, exeTitle, windowSymbolOffset)
+        num := String(s.num)
+        if (rule && rule.offset.Has(num)) {
+            offset := rule.offset.Get(num)
             left += offset.x
             if (var.symbolOffsetBaseY == "below") {
                 bottom += offset.y
             } else {
                 top += offset.y
-            }
-        } catch {
-            try {
-                left += windowSymbolOffset.%exeName%.%s.num%.x
-                if (var.symbolOffsetBaseY == "below") {
-                    bottom += windowSymbolOffset.%exeName%.%s.num%.y
-                } else {
-                    top += windowSymbolOffset.%exeName%.%s.num%.y
-                }
             }
         }
         return res && left

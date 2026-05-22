@@ -37,7 +37,6 @@ updateSymbol() {
                     if (transparent > 255) {
                         transparent := 255
                     }
-                    WinSetTransparent(transparent, _.Hwnd)
                     try _.BackColor := color
                     _.Opt("-LastFound")
                     switch var.symbolShapeEdgeStyle {
@@ -59,16 +58,11 @@ updateSymbol() {
                 textWeight := var.symbolTextWeight
                 textColor := var.%"symbolTextColor" state%
                 bgColor := var.%"symbolTextBgColor" state%
-                transparent := var.symbolTextTransparent
                 if (text) {
                     var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.symbolTextCornerPreference)
                     _.MarginX := 0, _.MarginY := 0
                     try _.SetFont("s" textSize " c" textColor " w" textWeight, textFont)
                     _.AddText(, text)
-                    if (transparent > 255) {
-                        transparent := 255
-                    }
-                    WinSetTransparent(transparent, _.Hwnd)
                     try _.BackColor := bgColor
                     switch var.symbolTextEdgeStyle {
                         case 1: _.Opt("-LastFound +e0x00000001")
@@ -167,7 +161,7 @@ showSymbol(state, left, top, right, bottom, nearCursor := 0) {
                 x += var.symbolNearCursorOffsetX
                 y += var.symbolNearCursorOffsetY
             }
-            showGui(var.%"symbolShapeGui" state%, "NA w" w " h" h " x" left + x " y" y + offsetY, 0, 1)
+            showGui(var.%"symbolShapeGui" state%, "NA w" w " h" h " x" left + x " y" y + offsetY, 0, 1, var.%'symbolShapeTransparent' state%)
         case 3:
             x := var.%"symbolTextOffsetX" state%
             y := var.%"symbolTextOffsetY" state%
@@ -175,7 +169,7 @@ showSymbol(state, left, top, right, bottom, nearCursor := 0) {
                 x += var.symbolNearCursorOffsetX
                 y += var.symbolNearCursorOffsetY
             }
-            showGui(var.%"symbolTextGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1)
+            showGui(var.%"symbolTextGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1, var.%'symbolTextTransparent' state%)
     }
 
     lastSymbol := state

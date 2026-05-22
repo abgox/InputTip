@@ -124,22 +124,12 @@ createErrorTipGui(Tips, title := "") {
  * @param {String} options 显示时的选项
  * @param {"fade"|"slide"|"scale"} animation 显示动画效果
  * @param {1|0} hideOnTrayMenu 显示托盘菜单时是否隐藏
+ * @param {Number} transparency 透明度值
  */
-showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0) {
+showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, transparency := "") {
     if (hideOnTrayMenu) {
         hideOnTrayGui.Push(g)
     }
-    dpiScale := A_ScreenDPI / 96
-    primary := {}
-    for v in var.screenList {
-        if (v.num == v.main) {
-            primary := v
-            break
-        }
-    }
-    screenW := Integer((primary.right - primary.left) / dpiScale)
-    screenH := Integer((primary.bottom - primary.top) / dpiScale)
-
     getXY(options, screenW, screenH, origW, origH) {
         x := ""
         y := ""
@@ -155,101 +145,115 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0) {
         }
     }
 
-    switch animation {
-        case 1, "fade":
-            try WinSetTransparent(0, g.Hwnd)
-            try g.Show(options)
-            step := 0
-            total := 12
-            SetTimer(fade, 8)
-            fade() {
-                try {
-                    step++
-                    t := step / total
-                    alpha := Integer(255 * (t ** 0.5))
-                    try WinSetTransparent(Min(alpha, 255), g.Hwnd)
-                    if (step >= total) {
-                        SetTimer(fade, 0)
-                        try WinSetTransparent("Off", g.Hwnd)
-                    }
-                } catch {
-                    SetTimer(fade, 0)
-                    try WinSetTransparent("Off", g.Hwnd)
-                }
+    try {
+        hwnd := g.Hwnd
+        dpiScale := A_ScreenDPI / 96
+        primary := {}
+        for v in var.screenList {
+            if (v.num == v.main) {
+                primary := v
+                break
             }
-        case 2, "slide":
-            try g.Show("Hide " options)
-            try g.GetPos(, , &origW, &origH)
-            pos := getXY(options, screenW, screenH, origW, origH)
-            origX := pos.x
-            origY := pos.y
-            offsetY := 15
-            try g.Move(origX, origY + offsetY)
-            try WinSetTransparent(0, g.Hwnd)
-            try g.Show(options)
-            step := 0
-            total := 20
-            SetTimer(slide, 8)
-            slide() {
-                try {
-                    step++
-                    t := step / total
-                    eased := 1 - (1 - t) ** 3
-                    alpha := Integer(255 * eased)
-                    curY := Integer(origY + offsetY * (1 - eased))
-                    try WinSetTransparent(Min(alpha, 255), g.Hwnd)
-                    try g.Move(origX, curY)
-                    if (step >= total) {
+        }
+        screenW := Integer((primary.right - primary.left) / dpiScale)
+        screenH := Integer((primary.bottom - primary.top) / dpiScale)
+
+        switch animation {
+            case 1, "fade":
+                targetAlpha := transparency != "" ? transparency : 255
+                applyTransparency(hwnd, 0)
+                try g.Show(options)
+                step := 0
+                total := 12
+                SetTimer(fade, 8)
+                fade() {
+                    try {
+                        step++
+                        t := step / total
+                        alpha := Integer(targetAlpha * (t ** 0.5))
+                        applyTransparency(hwnd, Min(alpha, targetAlpha))
+                        if (step >= total) {
+                            SetTimer(fade, 0)
+                            if (transparency == "") {
+                                WinSetTransparent("Off", hwnd)
+                            } else {
+                                applyTransparency(hwnd, transparency)
+                            }
+                        }
+                    } catch {
+                        SetTimer(fade, 0)
+                        applyTransparency(hwnd, transparency)
+                    }
+                }
+            case 2, "slide":
+                try g.Show("Hide " options)
+                try g.GetPos(, , &origW, &origH)
+                pos := getXY(options, screenW, screenH, origW, origH)
+                origX := pos.x
+                origY := pos.y
+                offsetY := 15
+                try g.Move(origX, origY + offsetY)
+                applyTransparency(hwnd, transparency)
+                try g.Show(options)
+                step := 0
+                total := 20
+                SetTimer(slide, 8)
+                slide() {
+                    try {
+                        step++
+                        t := step / total
+                        eased := 1 - (1 - t) ** 3
+                        curY := Integer(origY + offsetY * (1 - eased))
+                        try g.Move(origX, curY)
+                        if (step >= total) {
+                            SetTimer(slide, 0)
+                            try g.Move(origX, origY)
+                        }
+                    } catch {
                         SetTimer(slide, 0)
                         try g.Move(origX, origY)
-                        try WinSetTransparent("Off", g.Hwnd)
                     }
-                } catch {
-                    SetTimer(slide, 0)
-                    try g.Move(origX, origY)
-                    try WinSetTransparent("Off", g.Hwnd)
                 }
-            }
-        case 3, "scale":
-            try g.Show("Hide " options)
-            try g.GetPos(, , &origW, &origH)
-            pos := getXY(options, screenW, screenH, origW, origH)
-            origX := pos.x
-            origY := pos.y
-            try g.Move(origX, origY)
-            try WinSetTransparent(0, g.Hwnd)
-            try g.Show(options)
-            step := 0
-            total := 20
-            SetTimer(scale, 8)
-            scale() {
-                try {
-                    step++
-                    t := step / total
-                    eased := 1 - (1 - t) ** 3
-                    alpha := Integer(255 * eased)
-                    w := Integer(origW * (0.9 + 0.1 * eased))
-                    h := Integer(origH * (0.9 + 0.1 * eased))
-                    x := Integer(origX + (origW - w) / 2)
-                    y := Integer(origY + (origH - h) / 2)
-                    try g.Move(x, y, w, h)
-                    try WinSetTransparent(Min(alpha, 255), g.Hwnd)
-                    if (step >= total) {
+            case 3, "scale":
+                try g.Show("Hide " options)
+                try g.GetPos(, , &origW, &origH)
+                pos := getXY(options, screenW, screenH, origW, origH)
+                origX := pos.x
+                origY := pos.y
+                try g.Move(origX, origY)
+                applyTransparency(hwnd, transparency)
+                try g.Show(options)
+                step := 0
+                total := 20
+                SetTimer(scale, 8)
+                scale() {
+                    try {
+                        step++
+                        t := step / total
+                        eased := 1 - (1 - t) ** 3
+                        w := Integer(origW * (0.9 + 0.1 * eased))
+                        h := Integer(origH * (0.9 + 0.1 * eased))
+                        x := Integer(origX + (origW - w) / 2)
+                        y := Integer(origY + (origH - h) / 2)
+                        try g.Move(x, y, w, h)
+                        if (step >= total) {
+                            SetTimer(scale, 0)
+                            try g.Move(origX, origY, origW, origH)
+                        }
+                    } catch {
                         SetTimer(scale, 0)
                         try g.Move(origX, origY, origW, origH)
-                        try WinSetTransparent("Off", g.Hwnd)
                     }
-                } catch {
-                    SetTimer(scale, 0)
-                    try g.Move(origX, origY, origW, origH)
-                    try WinSetTransparent("Off", g.Hwnd)
                 }
-            }
-        default:
-            try g.Show(options)
+            default:
+                applyTransparency(hwnd, transparency)
+                try g.Show(options)
+        }
+    } catch {
+        try applyTransparency(g.Hwnd, transparency)
+        try g.Show(options)
     }
 }
-
 
 showHotKeyGui(keyConfigList, label := "") {
     showGui(createUniqueGui(hotKeyGui))

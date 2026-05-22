@@ -72,6 +72,12 @@ loseFocusOnTab(tab) {
     try tab.OnEvent("Change", (ctrl, *) => ControlFocus(ctrl.Hwnd, ctrl.Gui.Hwnd))
 }
 
+applyTransparency(hwnd, transparency := "Off") {
+    if transparency == ''
+        return
+    try WinSetTransparent(transparency, hwnd)
+}
+
 /**
  * 创建/更新任务计划程序
  * @param {String} path 要执行的应用程序

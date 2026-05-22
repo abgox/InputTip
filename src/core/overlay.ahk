@@ -60,7 +60,7 @@ showOverlay(state) {
                 x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
                 y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
         }
-        showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1)
+        showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1, var.%"overlayTransparent" state%)
         i--
     }
 
@@ -78,7 +78,6 @@ updateOverlay() {
         textWeight := var.%"overlayTextWeight" state%
         textColor := var.%"overlayTextColor" state%
         bgColor := var.%"overlayBgColor" state%
-        transparent := var.%"overlayTransparent" state%
 
         i := var.screenNum
         while (i > 0) {
@@ -91,10 +90,6 @@ updateOverlay() {
                 if (info.i) {
                     return g
                 }
-                if (transparent > 255) {
-                    transparent := 255
-                }
-                WinSetTransparent(transparent, g.Hwnd)
                 switch var.overlayEdgeStyle {
                     case 1: g.Opt("-LastFound +e0x00000001")
                     case 2: g.Opt("-LastFound +e0x00000200")

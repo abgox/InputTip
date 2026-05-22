@@ -30,8 +30,8 @@ e_inputMethod(*) {
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("input-method/state-detection-mode"))
 
-        renderText(g, "inputMethodBaseState", "xs")
-        renderDropDownList(g, "inputMethodBaseState", ["state.EN", "state.CN"], "yp")
+        renderText(g, "inputMethodBaseState", "xs", "")
+        renderDropDownList(g, "inputMethodBaseState", ["state.EN", "state.CN"], "yp", "w" bw / 3)
 
         columns := [
             i18n("inputMethodDetectionMode.matchOrder"), i18n("inputMethodDetectionMode.stateCodeRule"), i18n("inputMethodDetectionMode.conversionCodeRule"), i18n("inputMethodDetectionMode.imeState")

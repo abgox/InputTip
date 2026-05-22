@@ -35,22 +35,20 @@ e_moreSettings(*) {
             ],
         ])
 
-        renderGroupBox(g, "pollInterval", "xs h70 w" bw)
-        renderEdit(g, "pollInterval", "xs+20 yp+30 Number limit2")
-
+        renderEditGroup(g, "pollInterval", "Number limit2")
         renderRadioGroup(g, "enableCustomTrayTip", [
             ["yes", 1, customStatsTemplate.Bind("trayTipTemplate")],
             ["no", 0]
         ])
         g.AddText("yp w20")
-        renderText(g, "configureViaDoubleClick", "yp cGray")
+        renderText(g, "configureViaDoubleClick", "yp", "cGray")
 
         renderRadioGroup(g, "enableKeyStats", [
             ["yes", 1, customStatsTemplate.Bind("keyStatsTemplate")],
             ["no", 0]
         ])
         g.AddText("yp w20")
-        renderText(g, "configureViaDoubleClick", "yp cGray")
+        renderText(g, "configureViaDoubleClick", "yp", "cGray")
 
         customStatsTemplate(key, *) {
             showGui(createUniqueGui(customStatsTemplateGui))
@@ -65,8 +63,7 @@ e_moreSettings(*) {
 
                 g.AddLink("Section", getDocsLink("more-settings"))
 
-                renderGroupBox(g, key, "xs h70 w" bw)
-                renderEdit(g, key, "xs+20 yp+30 w" bw - 40)
+                renderEditGroup(g, key, "")
 
                 g.SetFont("Bold")
                 g.AddGroupBox("xs h90 w" g.bw, i18n("templateVar"))
@@ -122,11 +119,8 @@ e_moreSettings(*) {
 
             g.AddLink("Section", getDocsLink("more-settings"))
             iconList := getPicList(iconDir, ["default-app.png", "default-app-paused.png"])
-            renderGroupBox(g, "iconRunning", "xs h70 w" bw)
-            renderDropDownList(g, "iconRunning", iconList, "xs+20 yp+30 w" bw - 40)
-
-            renderGroupBox(g, "iconPaused", "xs h70 w" bw)
-            renderDropDownList(g, "iconPaused", iconList, "xs+20 yp+30 w" bw - 40)
+            renderDropDownListGroup(g, "iconRunning", iconList)
+            renderDropDownListGroup(g, "iconPaused", iconList)
 
             g.AddButton("xs w" bw, i18n("icon.open")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data\icon"))
             return g

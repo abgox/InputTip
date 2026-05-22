@@ -142,8 +142,7 @@ e_cursor(*) {
             } else {
                 opt := "xs"
             }
-            renderGroupBox(g, "state." state, opt " h70 w" bw)
-            renderDropDownList(g, "cursorPath" state, list, "xs+20 yp+30 w" bw - 40)
+            renderDropDownListGroup(g, "state." state, list, "cursorPath" state, opt)
         }
         return g
     }

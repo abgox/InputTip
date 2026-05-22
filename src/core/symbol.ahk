@@ -267,7 +267,7 @@ e_symbol(*) {
         ])
 
         g.AddText("yp w20")
-        renderText(g, "configureViaDoubleClick", "yp cGray")
+        renderText(g, "configureViaDoubleClick", "yp", "cGray")
 
         renderRadioGroup(g, "symbolOffsetBaseY", [[".above", "above"], [".below", "below"]])
 
@@ -278,8 +278,7 @@ e_symbol(*) {
 
         g.AddLink("yp", getHelpLink("tip/symbol/use-inputtip-in-jetbrains"))
 
-        renderGroupBox(g, "symbolHideDelay", "xs h70 w" bw)
-        renderEdit(g, "symbolHideDelay", "xs+20 yp+30 Number Limit5 w" bw - 40)
+        renderEditGroup(g, "symbolHideDelay", "Number Limit5")
 
         _w := bw / 4 - g.MarginX / 2
         g.AddButton("xs w" _w, i18n("symbol.whitelist")).OnEvent("Click", (*) =>
@@ -350,21 +349,10 @@ e_symbol(*) {
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/symbol/show-it-near-cursor"))
 
-        renderRadioGroup(g, "symbolNearCursorActive", [
-            ["yes", 1],
-            ["no", 0]
-        ])
-
-        renderRadioGroup(g, "symbolNearCursorWindow", [
-            [".specify", "specify"],
-            [".all", "all"]
-        ])
-
-        renderGroupBox(g, "symbolNearCursorOffsetX", "xs h70 w" bw)
-        renderEdit(g, "symbolNearCursorOffsetX", "xs+20 yp+30 w" bw - 40)
-
-        renderGroupBox(g, "symbolNearCursorOffsetY", "xs h70 w" bw)
-        renderEdit(g, "symbolNearCursorOffsetY", "xs+20 yp+30 w" bw - 40)
+        renderRadioGroup(g, "symbolNearCursorActive", [["yes", 1], ["no", 0]])
+        renderRadioGroup(g, "symbolNearCursorWindow", [[".specify", "specify"], [".all", "all"]])
+        renderEditGroup(g, "symbolNearCursorOffsetX", "")
+        renderEditGroup(g, "symbolNearCursorOffsetY", "")
 
         g.AddButton("xs w" bw, i18n("symbolNearCursor.window")).OnEvent("Click", set_app_list)
         set_app_list(*) {
@@ -405,7 +393,7 @@ symbolPictureConfig(*) {
         picList := getSymbolPicturePath()
         picList.InsertAt(1, "")
 
-        editW := " w" bw / 8
+        editOpt := " w" bw / 8
 
         for i, state in var.stateList {
             if (i == 4) {
@@ -413,21 +401,12 @@ symbolPictureConfig(*) {
                 tab.UseTab(2)
                 g.AddLink("Section", getDocsLink("symbol/picture"))
             }
-            renderGroupBox(g, "state." state, "xs h130 w" bw)
-
-            renderText(g, "symbolPictureOffsetX", "xs+20 yp+40")
-            renderEdit(g, "symbolPictureOffsetX" state, "yp" editW)
-
-            renderText(g, "symbolPictureOffsetY", "yp")
-            renderEdit(g, "symbolPictureOffsetY" state, "yp" editW)
-
-            renderText(g, "symbolPictureWidth", "yp")
-            renderEdit(g, "symbolPictureWidth" state, "yp Number Limit3" editW)
-
-            renderText(g, "symbolPictureHeight", "yp")
-            renderEdit(g, "symbolPictureHeight" state, "yp Number Limit3" editW)
-
-            renderDropDownList(g, "symbolPicturePath" state, picList, "xs+20 yp+40 w" bw - 40)
+            renderGroupBox(g, "state." state, "xs", "h130 w" bw)
+            renderEditLabel(g, "symbolPictureOffsetX", editOpt)
+            renderEditLabel(g, "symbolPictureOffsetY", editOpt, , "yp")
+            renderEditLabel(g, "symbolPictureWidth", "Number Limit3" editOpt, , "yp")
+            renderEditLabel(g, "symbolPictureHeight", "Number Limit3" editOpt, , "yp")
+            renderDropDownList(g, "symbolPicturePath" state, picList, , "w" bw - 40)
             if (i > 4) {
                 addBtn()
             }
@@ -481,7 +460,7 @@ symbolShapeConfig(*) {
             ]
         ])
 
-        editW := " w" bw / 6
+        editOpt := " w" bw / 6
 
         for i, state in var.stateList {
             if (Mod(i - 1, 3) == 0) {
@@ -492,23 +471,12 @@ symbolShapeConfig(*) {
             g.AddGroupBox("xs h130 w" bw, i18n("state." state))
             g.SetFont("Norm")
 
-
-            renderText(g, "symbolShapeOffsetX", "xs+20 yp+40")
-            renderEdit(g, "symbolShapeOffsetX" state, "yp" editW)
-
-            renderText(g, "symbolShapeWidth", "yp")
-            renderEdit(g, "symbolShapeWidth" state, "yp Number Limit3" editW)
-
-            renderColorPicker(g, "symbolShapeColor", state)
-
-            renderText(g, "symbolShapeOffsetY", "xs+20 yp+40")
-            renderEdit(g, "symbolShapeOffsetY" state, "yp" editW)
-
-            renderText(g, "symbolShapeHeight", "yp")
-            renderEdit(g, "symbolShapeHeight" state, "yp Number Limit3" editW)
-
-            renderText(g, "symbolShapeTransparent", "yp")
-            renderEdit(g, "symbolShapeTransparent" state, "yp Number Limit3" editW)
+            renderEditLabel(g, "symbolShapeOffsetX", editOpt)
+            renderEditLabel(g, "symbolShapeWidth", "Number Limit3" editOpt, , "yp")
+            renderColorPicker(g, "symbolShapeColor" state, "symbolShapeColor")
+            renderEditLabel(g, "symbolShapeOffsetY", editOpt, , "yp")
+            renderEditLabel(g, "symbolShapeHeight", "Number Limit3" editOpt, , "yp")
+            renderEditLabel(g, "symbolShapeTransparent", "Number Limit3" editOpt, , "yp")
         }
 
         return g
@@ -534,13 +502,10 @@ symbolTextConfig(*) {
         g.AddText("yp w20")
         gc.previewSymbolText := g.AddEdit("yp cGray", i18n("symbol.preview"))
 
-        renderFontGroup(g, "symbolTextFont")
+        renderDropDownListGroup(g, "symbolTextFont", fontList)
 
-        renderGroupBox(g, "symbolTextWeight", "xs h70 w" bw)
-        renderEdit(g, "symbolTextWeight", "xs+20 yp+30 Number Limit3 w" bw - 40)
-
-        renderGroupBox(g, "symbolTextTransparent", "xs h70 w" bw)
-        renderEdit(g, "symbolTextTransparent", "xs+20 yp+30 Number Limit3 w" bw - 40)
+        renderEditGroup(g, "symbolTextWeight", "Number Limit3")
+        renderEditGroup(g, "symbolTextTransparent", "Number Limit3")
 
         renderRadioGroupList(g, [
             ["symbolTextCornerPreference",
@@ -561,7 +526,7 @@ symbolTextConfig(*) {
             ]
         ])
 
-        editW := " w" bw / 6
+        editOpt := " w" bw / 6
 
         for i, state in var.stateList {
             if (Mod(i - 1, 3) == 0) {
@@ -572,21 +537,12 @@ symbolTextConfig(*) {
             g.AddGroupBox("xs h130 w" bw, i18n("state." state))
             g.SetFont("Norm")
 
-            renderText(g, "symbolTextContent", "xs+20 yp+40")
-            renderEdit(g, "symbolTextContent" state, "yp" editW)
-
-            renderText(g, "symbolTextOffsetX", "yp")
-            renderEdit(g, "symbolTextOffsetX" state, "yp" editW)
-
-            renderColorPicker(g, "symbolTextColor", state)
-
-            renderText(g, "symbolTextSize", "xs+20 yp+40")
-            renderEdit(g, "symbolTextSize" state, "yp Number Limit2" editW)
-
-            renderText(g, "symbolTextOffsetY", "yp")
-            renderEdit(g, "symbolTextOffsetY" state, "yp" editW)
-
-            renderColorPicker(g, "symbolTextBgColor", state)
+            renderEditLabel(g, "symbolTextContent", editOpt)
+            renderEditLabel(g, "symbolTextOffsetX", editOpt, , "yp")
+            renderColorPicker(g, "symbolTextColor" state, "symbolTextColor")
+            renderEditLabel(g, "symbolTextSize", "Number Limit2" editOpt, , "yp")
+            renderEditLabel(g, "symbolTextOffsetY", editOpt, , "yp")
+            renderColorPicker(g, "symbolTextBgColor" state, "symbolTextBgColor")
         }
 
         return g

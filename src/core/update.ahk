@@ -12,9 +12,9 @@ e_updateCheck(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        renderGroupBox(g, i18n("updateCheckInterval"), "h70 w" bw)
-        renderEdit(g, "updateCheckInterval", "xs+20 yp+30 Number Limit4 w" bw - 40)
+        renderEditGroup(g, "updateCheckInterval", "Number Limit4")
         renderRadioGroup(g, "silentUpdate", [["yes", 1], ["no", 0]])
+
         if (A_IsCompiled) {
             g.AddButton("xs w" bw, i18n("checkUpdateNow")).OnEvent("Click", (*) => (g.Destroy(), checkUpdate(1, 1, 1, 0)))
         } else {

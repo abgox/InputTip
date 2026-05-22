@@ -46,16 +46,12 @@ hasNewVersion(new, old) {
  * @param callback 版本检查完成后的回调函数
  * @param urls 版本号 URL 列表
  */
-checkVersion(currentVersion, callback, urls := [
-    "https://gitee.com/abgox/InputTip/raw/main/src/versions.txt",
-    "https://github.com/abgox/InputTip/raw/main/src/versions.txt"
-    "https://gh-proxy.org/https://github.com/abgox/InputTip/raw/main/src/versions.txt"
-]) {
+checkVersion(currentVersion, callback) {
     check(1)
     check(index) {
-        if (index > urls.Length)
+        if (index > baseUrl.Length)
             return
-        url := urls[index]
+        url := baseUrl[index] "/src/versions.txt"
         try {
             req := ComObject("Msxml2.XMLHTTP")
             req.open("GET", url, true)
@@ -127,7 +123,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
 
                         downloading(*) {
                             g := createGuiOpt(i18n("updateCheck"))
-                            g.AddText("cRed", i18n("update.downloading") " InputTip.exe")
+                            g.AddText("cRed", i18n("update.downloading"))
                             g.AddText(, "--------------------------------------------------")
                             g.AddLink("xs", getLink("inputtip.abgox.com"))
                             g.AddLink("xs", getLink("github.com/abgox/InputTip"))
@@ -269,14 +265,11 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
 getRepoCode(newVersion, silent := var.silentUpdate) {
     ; 是否成功下载 files.ini
     downloadIni := 0
-
     try FileDelete("files.ini")
-    downloadingGui := downloading()
     for u in baseUrl {
         out := "files.ini"
         try {
             Download(u "src/files.ini", out)
-            Sleep(1000)
             try {
                 if (InStr(FileOpen(out, "r").ReadLine(), "InputTip")) {
                     downloadIni := 1
@@ -285,98 +278,21 @@ getRepoCode(newVersion, silent := var.silentUpdate) {
             }
         }
     }
-    downloading(*) {
-        g := createUniqueGui(dlGui)
-        dlGui(info) {
-            g := createGuiOpt(i18n("updateCheck"))
-            g.AddText(, i18n("update.downloading"))
-            if (info.i) {
-                g.AddText(, line60)
-            }
-            tip := g.AddText("xs cRed w" info.w)
-            return g
-        }
-        ; WinSetStyle(-0x80000, g.Hwnd)
-        hMenu := DllCall("GetSystemMenu", "Ptr", g.Hwnd, "Int", 0)
-        DllCall("DeleteMenu", "Ptr", hMenu, "UInt", 0xF060, "UInt", 0)
-
-        if (!silent) {
-            g.Show()
-        }
-        g.OnEvent("Close", downloading)
-        return g
-    }
-
-    downloadingGui.Destroy()
-
     if (downloadIni) {
-        try {
-            files := StrSplit(IniRead("files.ini", "files"), "`n")
-            tip := ""
-            downloadingGui := downloading()
-
-            doneFileList := []
-            fileCount := files.Length
-            for i, kv in files {
-                done := 0
-                p := StrSplit(kv, "=")
-                for u in baseUrl {
-                    tip.Text := i "/" fileCount " : " p[1]
-                    out := p[2] ".new"
-                    if (InStr(out, "/")) {
-                        dir := RegExReplace(out, "/[^/]*$", "")
-                    } else {
-                        dir := ""
-                    }
-                    try {
-                        if (dir) {
-                            if (!DirExist(dir)) {
-                                DirCreate(dir)
-                            }
-                        }
-                        Download(pathToUrl(u p[1]), out)
-                        if (FileExist(out)) {
-                            if (InStr(out, ".ahk")) {
-                                try done := InStr(FileOpen(out, "r").ReadLine(), "InputTip")
-                            } else {
-                                done := 1
-                            }
-                            if (done) {
-                                doneFileList.Push(out)
-                                break
-                            }
-                        }
-                    }
-                }
+        done := showDownloadProcessGui(i18n("update.downloading"), StrSplit(IniRead("files.ini", "files"), "`n"), "updateVersion")
+        if (done) {
+            if (newVersion) {
+                FileAppend(newVersion, flagFile)
             }
-
-            downloadingGui.Destroy()
-
-            if (done) {
-                for v in doneFileList {
-                    FileMove(v, RegExReplace(v, "\.new$", ""), 1)
-                }
-                if (newVersion) {
-                    FileAppend(newVersion, flagFile)
-                }
-                fn_restart()
-            }
-        } catch {
-            done := 0
-            try downloadingGui.Destroy()
+            fn_restart()
         }
     } else {
         done := 0
     }
-
     if (!done) {
-        for v in doneFileList {
-            try FileDelete(v)
-        }
         if (silent) {
             return
         }
-
         showGui(createErrorTipGui(i18n("update.error", 1)))
     }
 }

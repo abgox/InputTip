@@ -5,9 +5,9 @@ JAB_PID := ""
 JABPath := A_ScriptDir "/InputTip.JAB.JetBrains.ahk"
 
 baseUrl := [
-    "https://gitee.com/abgox/InputTip/raw/main/",
-    "https://github.com/abgox/InputTip/raw/main/",
-    "https://gh-proxy.org/https://github.com/abgox/InputTip/raw/main/"
+    "https://raw.giteeusercontent.com/abgox/InputTip/raw/main/",
+    "https://raw.githubusercontent.com/abgox/InputTip/main/",
+    "https://gh-proxy.org/https://raw.githubusercontent.com/abgox/InputTip/main/"
 ]
 
 #Include "*i manifest.ahk"
@@ -279,7 +279,7 @@ if A_IsCompiled {
 
     for v in fileList {
         if (!FileExist(v)) {
-            missFileList.Push(v)
+            missFileList.Push("src/" v "=" v)
         }
     }
     styleList := [
@@ -288,74 +288,23 @@ if A_IsCompiled {
     for state in var.stateList {
         pic := "temp/symbol/default-triangle-" var.stateVal.%state%.colorText ".png"
         if (!FileExist(pic)) {
-            missFileList.Push(pic)
+            missFileList.Push("src/" pic "=" pic)
         }
         for s in styleList {
             p := "temp/cursor/default-" var.stateVal.%state%.colorText "/" s
             if (!FileExist(p)) {
-                missFileList.Push(p)
+                missFileList.Push("src/" p "=" p)
             }
         }
     }
     if (missFileList.Length) {
         try {
-            icon := defaultIconDir "\default-app-"
+            icon := defaultIconDir "\default-app"
             if (A_IsPaused)
-                icon .= "paused"
+                icon .= "-paused"
             TraySetIcon(icon ".png", , 1)
         }
-
-        tipGui(info) {
-            g := createGuiOpt(i18n("missingFile.downloading"))
-            if (info.i) {
-                g.AddText("xs cRed", line60)
-            }
-            g.AddText(, i18n("missingFile.downloading"))
-            g.tip := g.AddText("xs cRed w" info.w)
-            ; WinSetStyle(-0x80000, g.Hwnd)
-            hMenu := DllCall("GetSystemMenu", "Ptr", g.Hwnd, "Int", 0)
-            DllCall("DeleteMenu", "Ptr", hMenu, "UInt", 0xF060, "UInt", 0)
-            return g
-        }
-        downloadingGui := createUniqueGui(tipGui)
-        fileCount := missFileList.Length
-        downloadingGui.tip.Text := 1 "/" fileCount " : " missFileList[1]
-        showGui(downloadingGui)
-        Sleep(1000)
-        done := 1
-        for i, f in missFileList {
-            for u in baseUrl {
-                downloadingGui.tip.Text := i "/" fileCount " : " f
-                dir := RegExReplace(f, "/[^/]*$", "")
-                try {
-                    if (!DirExist(dir)) {
-                        DirCreate(dir)
-                    }
-                    Download(pathToUrl(u "src/" f), f)
-                    break
-                }
-            }
-
-            if (FileExist(f)) {
-                if (InStr(f, ".ahk") || InStr(f, ".bat")) {
-                    try {
-                        if (!InStr(FileOpen(f, "r").ReadLine(), "InputTip")) {
-                            done := 0
-                            FileDelete(f)
-                            break
-                        }
-                    } catch {
-                        done := 0
-                        break
-                    }
-                }
-            } else {
-                done := 0
-                break
-            }
-        }
-        downloadingGui.Destroy()
-
+        done := showDownloadProcessGui("missingFile.downloading", missFileList)
         if (done) {
             Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' 0)
             ExitApp()

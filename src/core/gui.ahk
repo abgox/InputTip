@@ -398,3 +398,101 @@ showHotKeyGui(keyConfigList, label := "") {
         return g
     }
 }
+
+showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
+    tipGui(info) {
+        g := createGuiOpt(i18n(titleKey), , "AlwaysOnTop")
+        if (info.i) {
+            g.AddText(, line60)
+            return g
+        }
+        g.AddText(, i18n(labelKey))
+        g.process := g.AddProgress("xm h9 w" info.w, 1)
+        g.tip := g.AddText("xs cGray w" info.w)
+        ; WinSetStyle(-0x80000, g.Hwnd)
+        hMenu := DllCall("GetSystemMenu", "Ptr", g.Hwnd, "Int", 0)
+        DllCall("DeleteMenu", "Ptr", hMenu, "UInt", 0xF060, "UInt", 0)
+        return g
+    }
+    downloadingGui := createUniqueGui(tipGui)
+    fileCount := downloadList.Length
+    downloadingGui.tip.Text := 1 "/" fileCount " : "
+    showGui(downloadingGui)
+    Sleep(500)
+    done := 1
+    doneFileList := []
+    for i, kv in downloadList {
+        part := StrSplit(kv, "=")
+        from := part[1]
+        to := part[2]
+        out := to ".new"
+        success := 0
+        for u in baseUrl {
+            downloadingGui.process.Value := i / fileCount * 100
+            downloadingGui.tip.Text := i "/" fileCount " : " to
+            if (InStr(out, "/")) {
+                dir := RegExReplace(out, "/[^/]*$", "")
+            } else {
+                dir := ""
+            }
+            try {
+                if (dir) {
+                    if (!DirExist(dir)) {
+                        DirCreate(dir)
+                    }
+                }
+                Download(pathToUrl(u "/" from), out)
+                if (FileExist(out)) {
+                    if (InStr(out, ".ahk") || InStr(out, ".bat")) {
+                        try success := InStr(FileOpen(out, "r").ReadLine(), "InputTip")
+                    } else {
+                        success := 1
+                    }
+                    if (success) {
+                        doneFileList.Push(out)
+                        break
+                    }
+                }
+            }
+        }
+        if (!success) {
+            done := 0
+            break
+        }
+    }
+    downloadingGui.Destroy()
+    if (done) {
+        backupList := []
+        replaceOk := 1
+        for v in doneFileList {
+            target := RegExReplace(v, "\.new$", "")
+            backup := target ".bak"
+            try {
+                if FileExist(target) {
+                    FileCopy(target, backup, 1)
+                    backupList.Push([target, backup])
+                }
+                FileMove(v, target, 1)
+            } catch {
+                replaceOk := 0
+                break
+            }
+        }
+        if (replaceOk) {
+            for item in backupList {
+                backup := item[2]
+                try FileDelete(backup)
+            }
+        } else {
+            for item in backupList {
+                target := item[1]
+                backup := item[2]
+                try FileMove(backup, target, 1)
+            }
+        }
+    } else {
+        for v in doneFileList
+            try FileDelete(v)
+    }
+    return done
+}

@@ -81,51 +81,84 @@ loop {
 }
 
 /**
+ * 预处理匹配规则
+ * @param {Array} configValue 原始配置数组
+ * @returns {Map} 以进程名为键的规则 Map
+ */
+parseMatchRules(configValue) {
+    rules := Map()
+    for v in configValue {
+        if (v == "")
+            continue
+        kv := StrSplit(v, "=", , 2)
+        if kv.Length < 2
+            continue
+        part := StrSplit(kv[2], ":", , 4)
+        if part.Length < 2
+            continue
+        name := part[1]
+        if (name == "")
+            continue
+        rule := {
+            isByProcess: part[2] == "1" ? 1 : 0,
+            isRegex: part.Length >= 4 ? part[3] : "",
+            title: part.Length >= 4 ? RTrim(part[4], ":") : ""
+        }
+        if !rules.Has(name)
+            rules.Set(name, [])
+        rules.Get(name).Push(rule)
+    }
+    return rules
+}
+
+/**
+ * 验证匹配是否成功(通用)
+ * @param {String} exeName 程序名
+ * @param {String} exeTitle 程序标题
+ * @param {Map} rules 预处理后的规则 Map
+ * @returns {1|0}
+ */
+validateMatch(exeName, exeTitle, rules) {
+    if !rules.Has(exeName)
+        return 0
+    byProcess := 0
+    for rule in rules.Get(exeName) {
+        if (rule.isByProcess) {
+            byProcess := 1
+            continue
+        }
+        isMatch := rule.isRegex ? RegExMatch(exeTitle, rule.title) : exeTitle == rule.title
+        if (isMatch)
+            return 1
+    }
+    return byProcess
+}
+
+/**
  * 匹配指定的状态，并返回是否需要切换
  * @param {String} exeName 程序名
  * @param {String} exeTitle 程序标题
  * @returns {"CN"|"EN"|"Caps"|0} 需要切换到的状态或 0
  */
 returnState(exeName, exeTitle) {
-    all := false
-    for val in var.stateList {
-        for v in var.%"WindowAutoSwitch" val% {
-            kv := StrSplit(v, "=", , 2)
-            part := StrSplit(kv[2], ":", , 4)
-            if (part.Length >= 2) {
-                ; 进程名称
-                name := part[1]
-                ; 是否全局的，全局的只有当切换到此窗口时才会触发
-                isGlobal := part[2]
-
-                if (isGlobal) {
-                    if (exeName == name && !InStr(lastWindow, name ":")) {
-                        all := val
-                    }
-                    continue
-                }
-            }
-
-            if (part.Length < 4) {
+    byProcess := 0
+    ; XXX 不支持 JP 和 KR
+    for state in ["CN", "EN", "Caps"] {
+        rules := var.%"WindowAutoSwitch" state%
+        if !rules.Has(exeName)
+            continue
+        for rule in rules.Get(exeName) {
+            if (rule.isByProcess) {
+                if !byProcess
+                    byProcess := state
                 continue
             }
-
-            ; 是否正则匹配
-            isRegex := part[3]
-            ; 标题
-            title := part[4]
-            if (name == exeName) {
-                isMatch := isRegex ? RegExMatch(exeTitle, title) : exeTitle == title
-                if (isMatch) {
-                    return val
-                }
-            }
+            isMatch := rule.isRegex ? RegExMatch(exeTitle, rule.title) : exeTitle == rule.title
+            if (isMatch)
+                return state
         }
     }
-    if (all) {
-        return all
-    }
-    return 0
+    return byProcess
 }
 
 /**
@@ -142,46 +175,4 @@ showBesideCursor(exeName, exeTitle) {
         return 1
     }
     return validateMatch(exeName, exeTitle, var.WindowSymbolNearCursor)
-}
-
-/**
- * 验证匹配是否成功(通用)
- * @param {String} exeName 程序名
- * @param {String} exeTitle 程序标题
- * @returns {1|0}
- */
-validateMatch(exeName, exeTitle, configValue) {
-    for v in configValue {
-        kv := StrSplit(v, "=", , 2)
-        part := StrSplit(kv[2], ":", , 4)
-        if (part.Length >= 2) {
-            ; 进程名称
-            name := part[1]
-            if (exeName == name) {
-                ; 如果是进程级
-                if (part[2]) {
-                    return 1
-                }
-            } else {
-                continue
-            }
-        }
-
-        if (part.Length < 4) {
-            continue
-        }
-
-        if (name == exeName) {
-            ; 是否正则匹配
-            isRegex := part[3]
-            ; 标题
-            title := part[4]
-
-            isMatch := isRegex ? RegExMatch(exeTitle, title) : exeTitle == title
-            if (isMatch) {
-                return 1
-            }
-        }
-    }
-    return 0
 }

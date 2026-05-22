@@ -563,10 +563,10 @@ e_screenOffsetBase(*) {
             g.AddText("Section", i18n("offset.coordinate") "(X,Y): " i18n("offset.topLeft") "(" v.left ", " v.top "), " i18n("offset.bottomRight") "(" v.right ", " v.bottom ")")
 
             try {
-                x := var.screenSymbolOffsetVal.%v.num%.x
-                y := var.screenSymbolOffsetVal.%v.num%.y
+                x := screenSymbolOffset.%v.num%.x
+                y := screenSymbolOffset.%v.num%.y
             } catch {
-                var.screenSymbolOffsetVal.%v.num% := { x: 0, y: 0 }
+                screenSymbolOffset.%v.num% := { x: 0, y: 0 }
                 x := 0, y := 0
             }
 
@@ -596,9 +596,9 @@ e_screenOffsetBase(*) {
 
                 value := returnNumber(item.value)
                 if (pos == "x") {
-                    val := value "/" var.screenSymbolOffsetVal.%num%.y
+                    val := value "/" screenSymbolOffset.%num%.y
                 } else {
-                    val := var.screenSymbolOffsetVal.%num%.x "/" value
+                    val := screenSymbolOffset.%num%.x "/" value
                 }
 
                 writeIniDebounced(num, val, (*) => (

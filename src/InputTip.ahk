@@ -51,7 +51,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     s := isWhichScreen(var.screenList)
     if (s.num) {
         try {
-            offset := var.screenSymbolOffsetVal.%s.num%
+            offset := screenSymbolOffset.%s.num%
             left += offset.x
             if (var.symbolOffsetBaseY == "below") {
                 bottom += offset.y
@@ -60,7 +60,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
             }
         }
         try {
-            offset := var.windowSymbolOffsetVal.%exeName exeTitle%.%s.num%
+            offset := windowSymbolOffset.%exeName exeTitle%.%s.num%
             left += offset.x
             if (var.symbolOffsetBaseY == "below") {
                 bottom += offset.y
@@ -69,11 +69,11 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
             }
         } catch {
             try {
-                left += var.windowSymbolOffsetVal.%exeName%.%s.num%.x
+                left += windowSymbolOffset.%exeName%.%s.num%.x
                 if (var.symbolOffsetBaseY == "below") {
-                    bottom += var.windowSymbolOffsetVal.%exeName%.%s.num%.y
+                    bottom += windowSymbolOffset.%exeName%.%s.num%.y
                 } else {
-                    top += var.windowSymbolOffsetVal.%exeName%.%s.num%.y
+                    top += windowSymbolOffset.%exeName%.%s.num%.y
                 }
             }
         }

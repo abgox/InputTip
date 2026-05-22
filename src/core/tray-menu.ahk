@@ -237,7 +237,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
             for v in StrSplit(readIniSection(config), "`n") {
                 try {
                     kv := StrSplit(v, "=", , 2)
-                    part := StrSplit(RegExReplace(kv[2], ":$", ""), ":", , column.Count - 1)
+                    part := StrSplit(kv[2], ":", , column.Count - 1)
                     cols := []
                     i := 0
                     while (i < column.Count) {
@@ -424,9 +424,9 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     key := itemValue.range == i18n("match.process") ? app : app itemValue.title
 
                     try {
-                        var.windowSymbolOffsetVal.%key%
+                        windowSymbolOffset.%key%
                     } catch {
-                        var.windowSymbolOffsetVal.%key% := {}
+                        windowSymbolOffset.%key% := {}
                     }
 
                     for v in var.screenList {
@@ -438,13 +438,13 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
 
                         if (action == "edit") {
                             try {
-                                x := var.windowSymbolOffsetVal.%key%.%v.num%.x
-                                y := var.windowSymbolOffsetVal.%key%.%v.num%.y
+                                x := windowSymbolOffset.%key%.%v.num%.x
+                                y := windowSymbolOffset.%key%.%v.num%.y
                             } catch {
-                                var.windowSymbolOffsetVal.%key%.%v.num% := { x: 0, y: 0 }
+                                windowSymbolOffset.%key%.%v.num% := { x: 0, y: 0 }
                             }
                         } else {
-                            var.windowSymbolOffsetVal.%key%.%v.num% := { x: 0, y: 0 }
+                            windowSymbolOffset.%key%.%v.num% := { x: 0, y: 0 }
                         }
 
                         g.SetFont("Bold")
@@ -466,7 +466,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     e_changeOffset(num, pos, itemValue, item, *) {
                         key := itemValue.range == i18n("match.process") ? app : app itemValue.title
                         try {
-                            var.windowSymbolOffsetVal.%key%.%num%.%pos% := returnNumber(item.value)
+                            windowSymbolOffset.%key%.%num%.%pos% := returnNumber(item.value)
                         } catch {
                             return
                         }
@@ -476,8 +476,8 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                         }
 
                         itemValue.offset := ""
-                        for v in var.windowSymbolOffsetVal.%key%.OwnProps() {
-                            itemValue.offset .= "|" v "/" var.windowSymbolOffsetVal.%key%.%v%.x "/" var.windowSymbolOffsetVal.%key%.%v%.y
+                        for v in windowSymbolOffset.%key%.OwnProps() {
+                            itemValue.offset .= "|" v "/" windowSymbolOffset.%key%.%v%.x "/" windowSymbolOffset.%key%.%v%.y
                         }
                         itemValue.offset := SubStr(itemValue.offset, 2)
                     }
@@ -548,6 +548,10 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                     num := column.Get("offset", 0)
                     if (num) {
                         value[num.config] := itemValue.offset
+                    }
+
+                    if (value[-1] == "") {
+                        value.Pop()
                     }
                     value := arrJoin(value, ":")
 
@@ -839,15 +843,10 @@ createProcessListGui(args, cb_addClick) {
             }
 
             if (args.configName != "Window.Symbol.Show") {
-                for v in var.WindowSymbolShow {
-                    kv := StrSplit(v, "=", , 2)
-                    part := StrSplit(kv[2], ":", , 2)
-                    try {
-                        name := part[1]
-                        if !seen.Has(name) {
-                            seen.Set(name, 1)
-                            gc.LV_processList.Add(, name, i18n("processList.from.whitelist"))
-                        }
+                for name in var.WindowSymbolShow {
+                    if !seen.Has(name) {
+                        seen.Set(name, 1)
+                        gc.LV_processList.Add(, name, i18n("processList.from.whitelist"))
                     }
                 }
             }

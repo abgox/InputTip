@@ -61,8 +61,6 @@ var := {
     fileLnk: "InputTip.lnk",
     screenNum: SysGet(80),
     screenList: getScreenInfo(),
-    windowSymbolOffsetVal: {},
-    screenSymbolOffsetVal: {},
     startupHKEY: "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
     startupRegName: "abgox.InputTip",
     ; 光标捕获模式
@@ -112,12 +110,6 @@ var := {
     exportStateFile: A_Temp "\abgox.InputTip.State",
     ; 快捷键: 实时显示状态码和转换码
     hotkeyShowCode: readIni("hotkeyShowCode", ""),
-    WindowIgnoreStateSwitch: StrSplit(readIniSection("Window.IgnoreStateSwitch"), "`n"),
-    WindowSymbolHide: StrSplit(readIniSection("Window.Symbol.Hide"), "`n"),
-    WindowSymbolShow: StrSplit(readIniSection("Window.Symbol.Show"), "`n"),
-    WindowAutoExit: StrSplit(readIniSection("Window.AutoExit"), "`n"),
-    ; 需要将符号显示在鼠标附近的窗口列表
-    WindowSymbolNearCursor: StrSplit(readIniSection("Window.Symbol.NearCursor"), "`n"),
     WindowSymbolCursorCapture: StrSplit(readIniSection("Window.Symbol.CursorCapture"), "`n"),
     ; 是否改变鼠标样式
     cursorActive: readIni("cursorActive", 0),
@@ -152,8 +144,6 @@ var := {
     symbolNearCursorOffsetY: readIni("symbolNearCursorOffsetY", 30),
     ; 在多少毫秒后隐藏符号，0 表示永不隐藏
     symbolHideDelay: readIni("symbolHideDelay", 0),
-    windowSymbolOffset: StrSplit(readIniSection("Window.Symbol.Offset"), "`n"),
-    screenSymbolOffset: StrSplit(readIniSection("Screen.Symbol.Offset"), "`n"),
     menuAnimation: readIni("menuAnimation", 1),
     ; 轮询响应间隔
     pollInterval: readIni("pollInterval", 20),
@@ -173,7 +163,6 @@ var.inputMethodDetectionRules := StrSplit(var.inputMethodDetectionRule, ":")
 defaultSymbolMap := Map()
 
 for v in var.stateList {
-    var.%"windowAutoSwitch" v% := StrSplit(readIniSection("Window.AutoSwitch." v), "`n")
     list := [
         ["overlayText", ""],
         ["overlayBgColor", ""],
@@ -217,7 +206,21 @@ for v in var.stateList {
         var.%key v% := readIni(key v, val)
     }
     defaultSymbolMap.Set("default-triangle-" var.stateVal.%v%.colorText ".png", 1)
+
+    ; XXX 不支持 JP 和 KR
+    if v != "JP" && v != "KR"
+        var.%"windowAutoSwitch" v% := parseMatchRules(StrSplit(readIniSection("Window.AutoSwitch." v), "`n"))
 }
+
+for v in [
+    "Window.Symbol.Show", "Window.Symbol.Hide", "Window.Symbol.NearCursor",
+    "Window.AutoExit", "Window.IgnoreStateSwitch"
+] {
+    var.%StrReplace(v, ".", "")% := parseMatchRules(StrSplit(readIniSection(v), "`n"))
+}
+
+windowSymbolOffset := {}
+screenSymbolOffset := {}
 
 currentState := "", lastInputState := "", lastExportState := ""
 hasWindowChange := 1, lastWindow := "", lastSymbol := "", lastCursor := ""

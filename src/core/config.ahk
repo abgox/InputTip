@@ -156,13 +156,16 @@ changeSectionConfig(key, value, section, delete := 0) {
         try IniDelete(configFile, section, key)
     } else {
         writeIni(key, value, section)
-        var.%StrReplace(section, ".", "")% := StrSplit(readIniSection(section), "`n")
+        restartJAB()
         switch section {
             case "Window.Symbol.Offset":
                 updateAppOffset()
             case "Screen.Symbol.Offset":
                 updateScreenOffset()
+            case "Window.Symbol.CursorCapture":
+                updateCursorMode()
+            default:
+                var.%StrReplace(section, ".", "")% := parseMatchRules(StrSplit(readIniSection(section), "`n"))
         }
-        restartJAB()
     }
 }

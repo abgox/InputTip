@@ -56,7 +56,7 @@ class IME {
         }
 
         if (var.inputMethodDetectionMode == "general") {
-            return langMap.Get(opened && (convMode & 3) ? 1 : 0)
+            return langMap.Get(opened && (convMode & 3) ? 1 : 0, "EN")
         }
 
         ; 存储默认状态，如果都不匹配，就返回预先指定的默认状态
@@ -101,7 +101,11 @@ class IME {
             return isMatch
         }
 
-        return langMap.Get(baseState)
+        try {
+            return langMap.Get(Integer(baseState), "EN")
+        } catch {
+            return "EN"
+        }
     }
 
     /**

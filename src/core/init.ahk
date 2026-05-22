@@ -356,7 +356,7 @@ updateCursorMode() {
     for v in var.modeNameList {
         modeList.%v% := Map()
     }
-    for v in var.WindowSymbolCursorCapture {
+    for v in StrSplit(readIniSection("Window.Symbol.CursorCapture"), "`n") {
         kv := StrSplit(v, "=", , 2)
         part := StrSplit(RegExReplace(kv[2], ":$", ""), ":", , 2)
         try modeList.%part[2]%.Set(part[1], 1)

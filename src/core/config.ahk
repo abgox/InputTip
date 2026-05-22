@@ -157,15 +157,15 @@ changeSectionConfig(key, value, section, delete := 0) {
     } else {
         writeIni(key, value, section)
         restartJAB()
-        switch section {
-            case "Window.Symbol.Offset":
-                global windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))
-            case "Screen.Symbol.Offset":
-                updateScreenOffset()
-            case "Window.Symbol.CursorCapture":
-                updateCursorMode()
-            default:
-                var.%StrReplace(section, ".", "")% := parseMatchRules(StrSplit(readIniSection(section), "`n"))
-        }
+    }
+    switch section {
+        case "Window.Symbol.Offset":
+            global windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))
+        case "Screen.Symbol.Offset":
+            updateScreenOffset()
+        case "Window.Symbol.CursorCapture":
+            updateCursorMode()
+        default:
+            var.%StrReplace(section, ".", "")% := parseMatchRules(StrSplit(readIniSection(section), "`n"))
     }
 }

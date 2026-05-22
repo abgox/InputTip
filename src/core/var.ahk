@@ -110,7 +110,6 @@ var := {
     exportStateFile: A_Temp "\abgox.InputTip.State",
     ; 快捷键: 实时显示状态码和转换码
     hotkeyShowCode: readIni("hotkeyShowCode", ""),
-    WindowSymbolCursorCapture: StrSplit(readIniSection("Window.Symbol.CursorCapture"), "`n"),
     ; 是否改变鼠标样式
     cursorActive: readIni("cursorActive", 0),
     ; 是否显示状态浮窗

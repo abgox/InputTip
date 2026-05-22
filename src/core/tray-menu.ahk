@@ -517,10 +517,8 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                 g.Destroy()
 
                 if (delete) {
-                    try {
-                        IniDelete(configFile, config, itemValue.time)
-                        listView.%config%.Delete(RowNumber)
-                    }
+                    changeSectionConfig(itemValue.time, '', config, 1)
+                    try listView.%config%.Delete(RowNumber)
                 } else {
                     value := []
                     i := 0

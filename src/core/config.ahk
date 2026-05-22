@@ -139,15 +139,12 @@ changeConfig(key, value, callback := (key, value) => restartJAB()) {
     callback(key, value)
 }
 
-changeSectionConfig(key, value, section) {
-    vals := Map()
-    for kv in StrSplit(readIniSection(section), "`n") {
-        vals.Set(StrSplit(kv, "=", , 2)[2], 1)
+changeSectionConfig(key, value, section, delete := 0) {
+    if (delete) {
+        try IniDelete(configFile, section, key)
+    } else {
+        writeIni(key, value, section)
     }
-    if (vals.Has(value)) {
-        return
-    }
-    writeIni(key, value, section)
     k := StrReplace(section, ".", "")
     var.%k% := StrSplit(readIniSection(section), "`n")
     restartJAB()

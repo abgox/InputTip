@@ -32,12 +32,11 @@ if (var.symbolJABActive) {
 
 SetTimer(() => checkUpdate(1), -5000)
 
-/**
- * 跳过 JAB/JetBrains IDE 程序，交由 InputTip.JAB 处理
- * @param exeName 进程字符串，如 "webstorm64.exe"
- * @returns {1|0} 是否需要跳过
- */
+; 主进程
 needSkip(exeName) {
+    return 0
+}
+needSkipSymbol(exeName) {
     return !var.symbolNearCursorActive && var.modeList.JAB.Has(exeName)
 }
 

@@ -122,7 +122,7 @@ renderRadio(g, key, textKey, value, layout, dbClickEvent := "") {
     labelText := (SubStr(textKey, 1, 1) == ".") ? i18n(key textKey) : i18n(textKey)
     _ := g.AddRadio(layout " " isChecked, labelText)
     _.val := value
-    _.OnEvent("Click", (ctrl, *) => changeConfig(key, ctrl.val, 1))
+    _.OnEvent("Click", (ctrl, *) => changeConfig(key, ctrl.val))
     if (dbClickEvent) {
         _.OnEvent("DoubleClick", dbClickEvent)
     }

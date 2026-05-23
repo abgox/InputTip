@@ -1,10 +1,57 @@
 ; InputTip
 
+currentState := "", lastInputState := "", lastExportState := ""
+hasWindowChange := 1, lastWindow := "", lastSymbol := "", lastCursor := ""
+exeName := "", exeTitle := "", leaveDelay := var.pollInterval + 500
+canShowSymbol := 0
+
+delayState := {
+    timer: 0,
+    isWait: 0,
+    needHide: 0
+}
+
 updateSymbolDelay()
+
+updateSymbolDelay() {
+    if !var.symbolHideDelay
+        return
+    SetTimer(onDelayTick, 0)
+    SetTimer(onDelayTick, 25)
+}
+
+onDelayTick() {
+    if (var.symbolHideDelay == 0) {
+        SetTimer(onDelayTick, 0)
+        delayState.needHide := 0
+        delayState.isWait := 0
+        return
+    }
+
+    if (GetKeyState("LButton", "P")) {
+        delayState.needHide := 0
+        delayState.isWait := 1
+        SetTimer(() => delayState.isWait := 0, -var.symbolHideDelay)
+    }
+
+    if A_TimeIdleKeyboard <= leaveDelay
+        delayState.timer := 0
+
+    if (!delayState.isWait) {
+        if (A_TimeIdleKeyboard >= var.symbolHideDelay - var.pollInterval
+            || delayState.timer >= var.symbolHideDelay) {
+            delayState.needHide := 1
+            hideSymbol()
+            delayState.timer := 0
+        } else {
+            delayState.needHide := 0
+        }
+    }
+    delayState.timer += 25
+}
 
 loop {
     Sleep(var.pollInterval)
-    ; 正在使用鼠标或有键盘操作
     if (A_TimeIdle < leaveDelay) {
         needShow := var.symbolType
         try {
@@ -19,15 +66,16 @@ loop {
                 continue
             }
 
-            ; 进程有变化(包含标题变化)
             hasWindowChange := lastWindow != exeName ":" exeTitle
 
             if (hasWindowChange) {
-                if (validateMatch(exeName, exeTitle, var.WindowAutoExit)) {
+                if validateMatch(exeName, exeTitle, var.WindowAutoExit)
                     fn_exit()
-                }
                 if (var.symbolType) {
-                    if (!var.symbolNearCursorActive && !WinActive("ahk_class AutoHotkeyGUI") && (validateMatch(exeName, exeTitle, var.WindowSymbolHide) || !validateMatch(exeName, exeTitle, var.WindowSymbolShow))) {
+                    if (needSkipSymbol(exeName)) {
+                        hideSymbol()
+                        needShow := 0
+                    } else if (!var.symbolNearCursorActive && !WinActive("ahk_class AutoHotkeyGUI") && (validateMatch(exeName, exeTitle, var.WindowSymbolHide) || !validateMatch(exeName, exeTitle, var.WindowSymbolShow))) {
                         hideSymbol()
                         needShow := 0
                     }
@@ -38,8 +86,11 @@ loop {
 
                 lastSymbol := ""
                 lastCursor := ""
+                lastWindow := exeName ":" exeTitle
 
-                switchState(returnState(exeName, exeTitle))
+                ; JAB 进程不执行状态切换
+                if !isJAB
+                    switchState(returnState(exeName, exeTitle))
             }
         } catch {
             hideSymbol()
@@ -53,9 +104,10 @@ loop {
             continue
         }
 
-        if (!currentState) {
+        if !currentState
             continue
-        }
+
+        ShowSymbolEx(currentState)
 
         if (!isJAB) {
             loadCursor(currentState)
@@ -65,16 +117,13 @@ loop {
                     lastInputState := currentState
                 }
             }
-        }
-
-        ShowSymbolEx(currentState)
-
-        if (var.exportState) {
-            if (currentState != lastExportState) {
-                f := FileOpen(var.exportStateFile, "w-wd", "UTF-8-RAW")
-                f.Write(currentState)
-                f.Close()
-                lastExportState := currentState
+            if (var.exportState) {
+                if (currentState != lastExportState) {
+                    f := FileOpen(var.exportStateFile, "w-wd", "UTF-8-RAW")
+                    f.Write(currentState)
+                    f.Close()
+                    lastExportState := currentState
+                }
             }
         }
     }

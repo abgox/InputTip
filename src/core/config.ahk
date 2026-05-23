@@ -1,10 +1,6 @@
 ; InputTip
 
 normalizeConfig(key, value) {
-    static isChanging := 0
-    if isChanging
-        return value
-
     if InStr(key, "color") {
         if !RegExMatch(value, "i)^0x[0-9a-f]{6}$")
             value := "0xffffff"
@@ -38,7 +34,6 @@ normalizeConfig(key, value) {
         if value > 99
             value := 99
     }
-    isChanging := 0
     return value
 }
 
@@ -159,8 +154,8 @@ changeSectionConfig(key, value, section, delete := 0) {
         try IniDelete(configFile, section, key)
     } else {
         writeIni(key, value, section)
-        restartJAB()
     }
+    restartJAB()
     switch section {
         case "Window.Symbol.Offset":
             global windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))

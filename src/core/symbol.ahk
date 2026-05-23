@@ -76,19 +76,19 @@ updateSymbol() {
 }
 
 ShowSymbolEx(state) {
-    static lastNeedShow := 0
+    static windowNeedShow := 0
     global canShowSymbol, lastWindow
 
-    if (needHide) {
+    if (delayState.needHide) {
         return
     }
 
     if (hasWindowChange) {
         lastWindow := exeName ":" exeTitle
-        lastNeedShow := needShow
+        windowNeedShow := needShow
     }
 
-    if (lastNeedShow) {
+    if (windowNeedShow) {
         select := showBesideCursor(exeName, exeTitle)
 
         if (select) {
@@ -103,7 +103,6 @@ ShowSymbolEx(state) {
         }
         try {
             canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
-
             WinGetPos(&x, &y, &w, &h, "A")
             if (top < y || top > y + h) {
                 hideSymbol()
@@ -120,6 +119,11 @@ showSymbol(state, left, top, right, bottom, nearCursor := 0) {
     global lastSymbol
     static old_left := 0, old_top := 0
 
+    if (!var.symbolType || !canShowSymbol) {
+        hideSymbol()
+        return
+    }
+
     if (!nearCursor) {
         if (left == old_left && top == old_top) {
             if (state == lastSymbol) {
@@ -127,46 +131,38 @@ showSymbol(state, left, top, right, bottom, nearCursor := 0) {
             }
         }
     }
+
     old_top := top
     old_left := left
 
-    if (!var.symbolType || !canShowSymbol) {
-        hideSymbol()
-        return
-    }
+    cursorDeltaX := 0
+    cursorDeltaY := 0
 
-    if (var.modeList.JAB.Has(exeName)) {
+    if (nearCursor) {
+        offsetY := top
+        cursorDeltaX := var.symbolNearCursorOffsetX
+        cursorDeltaY := var.symbolNearCursorOffsetY
+    } else if (var.modeList.JAB.Has(exeName)) {
         offsetY := top + bottom
     } else {
         offsetY := var.symbolOffsetBaseY == "below" ? bottom : top
     }
+
     hideSymbol(0)
     switch var.symbolType {
         case 1:
-            x := var.%"symbolPictureOffsetX" state%
-            y := var.%"symbolPictureOffsetY" state%
-            if (nearCursor) {
-                x += var.symbolNearCursorOffsetX
-                y += var.symbolNearCursorOffsetY
-            }
+            x := var.%"symbolPictureOffsetX" state% +cursorDeltaX
+            y := var.%"symbolPictureOffsetY" state% +cursorDeltaY
             showGui(var.%"symbolPictureGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1)
         case 2:
-            x := var.%"symbolShapeOffsetX" state%
-            y := var.%"symbolShapeOffsetY" state%
+            x := var.%"symbolShapeOffsetX" state% +cursorDeltaX
+            y := var.%"symbolShapeOffsetY" state% +cursorDeltaY
             w := var.%"symbolShapeWidth" state%
             h := var.%"symbolShapeHeight" state%
-            if (nearCursor) {
-                x += var.symbolNearCursorOffsetX
-                y += var.symbolNearCursorOffsetY
-            }
             showGui(var.%"symbolShapeGui" state%, "NA w" w " h" h " x" left + x " y" y + offsetY, 0, 1, var.%'symbolShapeTransparent' state%)
         case 3:
-            x := var.%"symbolTextOffsetX" state%
-            y := var.%"symbolTextOffsetY" state%
-            if (nearCursor) {
-                x += var.symbolNearCursorOffsetX
-                y += var.symbolNearCursorOffsetY
-            }
+            x := var.%"symbolTextOffsetX" state% +cursorDeltaX
+            y := var.%"symbolTextOffsetY" state% +cursorDeltaY
             showGui(var.%"symbolTextGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1, var.symbolTextTransparent)
     }
 
@@ -186,48 +182,12 @@ reloadSymbol() {
 hideSymbol(all := 1) {
     for type in ["Picture", "Shape", "Text"] {
         for v in var.stateList {
-            if (currentState != v || all) {
+            if (all || currentState != v) {
                 try var.%"symbol" type "Gui" v%.Hide()
             }
         }
     }
     global lastSymbol := ""
-}
-
-updateSymbolDelay() {
-    if (var.symbolHideDelay) {
-        SetTimer(updateSymbolDelayTimer, 25)
-        updateSymbolDelayTimer() {
-            static timer := 0
-            global needHide, isWait
-            if (GetKeyState("LButton", "P")) {
-                needHide := 0
-                isWait := 1
-                SetTimer(_timer, -var.symbolHideDelay)
-                _timer() {
-                    isWait := 0
-                }
-            }
-            if (A_TimeIdleKeyboard <= leaveDelay) {
-                timer := 0
-            }
-            if (!isWait) {
-                if (A_TimeIdleKeyboard >= var.symbolHideDelay - var.pollInterval || timer >= var.symbolHideDelay) {
-                    needHide := 1
-                    hideSymbol()
-                    timer := 0
-                } else {
-                    needHide := 0
-                }
-            }
-            if (var.symbolHideDelay == 0) {
-                SetTimer(updateSymbolDelayTimer, 0)
-                needHide := 0
-                isWait := 0
-            }
-            timer += 25
-        }
-    }
 }
 
 getSymbolPicturePath() {

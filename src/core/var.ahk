@@ -219,11 +219,32 @@ for v in [
 windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))
 screenSymbolOffset := {}
 
-currentState := "", lastInputState := "", lastExportState := ""
-hasWindowChange := 1, lastWindow := "", lastSymbol := "", lastCursor := ""
-exeName := "", exeTitle := "", leaveDelay := var.pollInterval + 500
-needHide := 0, isWait := 0, canShowSymbol := 0
-left := 0, top := 0, right := 0, bottom := 0
+updateScreenOffset()
+updateCursorMode()
+updateScreenOffset() {
+    for v in StrSplit(readIniSection("Screen.Symbol.Offset"), "`n") {
+        kv := StrSplit(v, "=")
+        part := StrSplit(kv[2], "/")
+        try {
+            screenSymbolOffset.%kv[1]% := { x: part[1], y: part[2] }
+        } catch {
+            screenSymbolOffset.%kv[1]% := { x: 0, y: 0 }
+        }
+    }
+}
+
+updateCursorMode() {
+    modeList := {}
+    for v in var.modeNameList {
+        modeList.%v% := Map()
+    }
+    for v in StrSplit(readIniSection("Window.Symbol.CursorCapture"), "`n") {
+        kv := StrSplit(v, "=", , 2)
+        part := StrSplit(RegExReplace(kv[2], ":$", ""), ":", , 2)
+        try modeList.%part[2]%.Set(part[1], 1)
+    }
+    var.modeList := modeList
+}
 
 getScreenInfo() {
     list := []

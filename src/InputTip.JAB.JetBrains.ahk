@@ -10,19 +10,19 @@ isJAB := 1
 
 #Include core\utils.ahk
 #Include core\gui.ahk
+#Include core\config.ahk
 #Include core\i18n.ahk
 #Include core\ini.ahk
 #Include core\ime.ahk
 #Include core\var.ahk
 #Include core\symbol.ahk
 
-/**
- * 跳过非 JAB/JetBrains IDE 程序，交由 InputTip 处理
- * @param exeName 进程字符串，如 "webstorm64.exe"
- * @returns {1|0} 是否需要跳过
- */
+; JAB 子进程
 needSkip(exeName) {
     return var.symbolNearCursorActive || !var.modeList.JAB.Has(exeName)
+}
+needSkipSymbol(exeName) {
+    return 0
 }
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {

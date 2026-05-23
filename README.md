@@ -19,6 +19,12 @@
 
 <p align="center"><strong>一款轻量的 Windows 输入法状态管理工具，帮助你随时感知和切换输入法状态</strong></p>
 
+<p align="center">
+    <a href="https://inputtip.abgox.com">
+        <img src="https://inputtip.abgox.com/hero.svg" alt="InputTip Hero"/>
+    </a>
+</p>
+
 ## 功能
 
 - [鼠标方案](https://inputtip.abgox.com/docs/tip/cursor)、[浮窗方案](https://inputtip.abgox.com/docs/tip/overlay)、[符号方案](https://inputtip.abgox.com/docs/tip/symbol) 等多种状态提示

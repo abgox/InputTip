@@ -176,7 +176,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
                     }
                     try {
                         Download(StrReplace(url, "/versions.txt", "/CHANGELOG.md"), logFile)
-                        showGui(createUniqueGui(updateGui))
+                        showGui(createUniqueGui(updateGui), , 0)
                         updateGui(info) {
                             g := createGuiOpt(updateTitle)
 
@@ -230,7 +230,7 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
                     }
                     try {
                         Download(StrReplace(url, "/versions.txt", "/CHANGELOG.md"), logFile)
-                        showGui(createUniqueGui(fn))
+                        showGui(createUniqueGui(fn), , 0)
                         fn(info) {
                             g := createGuiOpt(updateTitle, , "AlwaysOnTop")
                             if (info.i) {

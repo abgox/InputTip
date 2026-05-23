@@ -24,15 +24,14 @@ setTrayIcon(path, isPaused := A_IsPaused) {
     } else {
         path := iconDir "\" path
     }
-
     try {
         TraySetIcon(path, , 1)
     } catch {
         if (isPaused) {
-            changeConfig("iconPaused", pausedIcon)
+            changeConfig("iconPaused", pausedIcon, 1)
             path := pausedIcon
         } else {
-            changeConfig("iconRunning", runningIcon)
+            changeConfig("iconRunning", runningIcon, 1)
             path := runningIcon
         }
         TraySetIcon(defaultIconDir "\" path, , 1)
@@ -40,13 +39,21 @@ setTrayIcon(path, isPaused := A_IsPaused) {
 }
 
 createShortcut(dir) {
+    if InStr(dir, A_Desktop) {
+        fileLnk := A_Desktop "\" appname
+    } else if InStr(dir, A_Startup) {
+        fileLnk := A_Startup "\" appid
+    } else {
+        fileLnk := dir "\" appid
+    }
+    fileLnk .= ".lnk"
     if (var.launchAtStartup == 1) {
-        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", dir "\" var.fileLnk, , "/run /tn `"abgox.InputTip.noUAC`"", i18n("desc"), favicon, , , 7)
+        FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"" taskNameNoUAC "`"", i18n("desc"), favicon, , , 7)
     } else {
         if (A_IsCompiled) {
-            FileCreateShortcut(A_ScriptFullPath, dir "\" var.fileLnk, , , i18n("desc"), favicon, , , 7)
+            FileCreateShortcut(A_ScriptFullPath, fileLnk, , , i18n("desc"), favicon, , , 7)
         } else {
-            FileCreateShortcut(A_AhkPath, dir "\" var.fileLnk, , "" " A_ScriptFullPath " "", i18n("desc"), favicon, , , 7)
+            FileCreateShortcut(A_AhkPath, fileLnk, , "`"" A_ScriptFullPath "`"", i18n("desc"), favicon, , , 7)
         }
     }
 }

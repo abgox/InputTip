@@ -170,7 +170,10 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
                         }
                         return
                     }
-
+                    if isTrayMenuOpen {
+                        SetTimer(() => updateConfirm(newVersion, url), -1000)
+                        return
+                    }
                     try {
                         Download(StrReplace(url, "/versions.txt", "/CHANGELOG.md"), logFile)
                         showGui(createUniqueGui(updateGui))
@@ -221,11 +224,15 @@ checkUpdate(init := 0, once := 0, force := 0, silent := var.silentUpdate) {
                         }
                         return
                     }
+                    if isTrayMenuOpen {
+                        SetTimer(() => updatePrompt(newVersion, url), -1000)
+                        return
+                    }
                     try {
                         Download(StrReplace(url, "/versions.txt", "/CHANGELOG.md"), logFile)
                         showGui(createUniqueGui(fn))
                         fn(info) {
-                            g := createGuiOpt(updateTitle)
+                            g := createGuiOpt(updateTitle, , "AlwaysOnTop")
                             if (info.i) {
                                 g.AddText(, line80)
                                 return g
@@ -298,7 +305,7 @@ checkUpdateDone() {
             for v in [flagFile, updater, logFile] {
                 try FileDelete(v)
             }
-            writeIni(versionKey, currentVersion)
+            writeIni("version-" versionType, currentVersion)
         }
     }
 }

@@ -8,14 +8,6 @@ normalizeConfig(key, value) {
     if InStr(key, "color") {
         if !RegExMatch(value, "i)^0x[0-9a-f]{6}$")
             value := "0xffffff"
-        switch value {
-            case 'red':
-                value := "0xFF0000"
-            case 'blue':
-                value := "0x0000FF"
-            case 'green':
-                value := "0x00FF00"
-        }
     } else if InStr(key, "size") {
         value := Abs(returnNumber(value))
         if value < 8 || value > 200
@@ -50,7 +42,7 @@ normalizeConfig(key, value) {
     return value
 }
 
-changeConfig(key, value, debounce := 1, callback := (key, value) => restartJAB()) {
+changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJAB()) {
     if value == "" {
         ; 允许空值的配置
         allowNullVal := InStr(key, "hotkey") || InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "symbolPicturePath") || InStr(key, "overlayText") || InStr(key, "symbolText")
@@ -62,17 +54,20 @@ changeConfig(key, value, debounce := 1, callback := (key, value) => restartJAB()
     if value == oldVal
         return
 
+    if (key == "language") {
+        writeIni(key, value)
+        fn_restart()
+    }
+
     value := normalizeConfig(key, value)
 
     var.%key% := value
-
-    ; TODO
-    ; if (debounce) {
-    ;     writeIniDebounced(key, value, callback(key, value))
-    ; } else {
-    writeIni(key, value)
-    try callback(key, value)
-    ; }
+    if (debounce) {
+        writeIniDebounced(key, value, callback.Bind(key, value))
+    } else {
+        writeIni(key, value)
+        try callback(key, value)
+    }
 
     if InStr(key, "cursor") {
         if var.cursorActive {
@@ -147,7 +142,7 @@ changeConfig(key, value, debounce := 1, callback := (key, value) => restartJAB()
         case "iconRunning", "iconPaused":
             setTrayIcon(value)
         case "enableCustomTrayTip", "trayTipTemplate", "enableKeyStats", "keyStatsTemplate":
-            updateTrayTip()
+            SetTimer(updateTrayTip, -1500)
         default:
     }
 }

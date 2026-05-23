@@ -366,7 +366,7 @@ updateCursorMode() {
 
 checkIni() {
     try {
-        IniRead(configFile, "Settings", "init")
+        IniRead(configFile, "Settings", "version-" versionType)
         checkUpdateDone()
     } catch {
         gc.init := 1
@@ -402,7 +402,7 @@ checkIni() {
             }
             g.OnEvent("Close", e_exit)
             e_exit(*) {
-                try IniDelete(configFile, "Settings", "init")
+                try IniDelete(configFile, "Settings", "version-" versionType)
                 ExitApp()
             }
             return g
@@ -443,7 +443,7 @@ checkIni() {
                 g.OnEvent("Close", e_exit)
                 e_exit(*) {
                     try {
-                        IniDelete(configFile, "Settings", "init")
+                        IniDelete(configFile, "Settings", "version-" versionType)
                     }
                     ExitApp()
                 }
@@ -472,13 +472,9 @@ checkIni() {
 
                 g.AddButton("xs cRed w" bw, i18n("goToRepo")).OnEvent("Click", (*) => Run("https://github.com/abgox/InputTip"))
                 g.AddButton("w" bw, i18n("goToDonate")).OnEvent("Click", (*) => Run("https://www.abgox.com/donate"))
-                g.OnEvent("Close", (*) => (g.Destroy(), done()))
+                g.OnEvent("Close", (*) => (g.Destroy(), writeIni("version-" versionType, currentVersion)))
                 return g
             }
-        }
-        done() {
-            writeIni("init", A_Now, "Settings")
-            writeIni(versionKey, currentVersion)
         }
     }
 }

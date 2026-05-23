@@ -395,8 +395,9 @@ showHotKeyGui(keyConfigList, label := "") {
         e_yes(*) {
             for v in keyConfigList {
                 key := gc.%v.config "3"%.Value
-                changeConfig(v.config, key, 0)
+                changeConfig(v.config, key)
             }
+            g.Destroy()
             fn_restart()
         }
         return g

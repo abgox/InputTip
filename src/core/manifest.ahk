@@ -1,6 +1,16 @@
 ; InputTip
 
 #Requires AutoHotkey v2.0
+
+if (A_IsCompiled) {
+    currentVersion := "3.1.2"
+    versionType := "exe"
+} else {
+    currentVersion := "3.1.2"
+    versionType := "zip"
+}
+
+;@AHK2Exe-SetVersion 3.1.2
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon temp\icon\default-app.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
@@ -33,29 +43,25 @@ WM_MOUSEWHEEL_Handler(wParam, lParam, msg, hwnd) {
     }
 }
 
+isTrayMenuOpen := 0
 hideOnTrayGui := []
 OnMessage(0x0211, onMenuLoop)  ; WM_ENTERMENULOOP
+OnMessage(0x0212, onExitMenuLoop) ; WM_EXITMENULOOP
 onMenuLoop(wParam, lParam, msg, hwnd) {
+    global isTrayMenuOpen := 1
     for v in hideOnTrayGui {
         try v.Hide()
     }
 }
-
-;@AHK2Exe-SetVersion "3.1.1"
-
-if (A_IsCompiled) {
-    ; exe 版本
-    currentVersion := "3.1.1"
-
-    versionType := "exe"
-    versionKey := "version"
-} else {
-    ; zip 版本
-    currentVersion := "3.1.1"
-
-    versionType := "zip"
-    versionKey := "version-zip"
+onExitMenuLoop(wParam, lParam, msg, hwnd) {
+    global isTrayMenuOpen := 0
 }
+
+author := "abgox"
+appname := "InputTip"
+appid := author "." appname
+taskNameNoUAC := appid ".noUAC"
+taskNameJAB := appid ".JAB.JetBrains"
 
 dataDir := A_ScriptDir "\data"
 configFile := dataDir "\config.ini"

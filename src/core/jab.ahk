@@ -13,26 +13,26 @@ runJAB() {
                 FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
             }
         } catch {
-            FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
+            try FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
         }
         try {
-            done := createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", "abgox.InputTip.JAB.JetBrains", , "Limited", 1)
+            done := createScheduleTask(A_ScriptDir "\InputTip.JAB.JetBrains.exe", taskNameJAB, , "Limited", 1)
             if (!done) {
                 showGui(createErrorTipGui(i18n("symbolJAB.error", 1), i18n("symbolJAB")))
-                changeConfig("symbolJABActive", 0)
+                changeConfig("symbolJABActive", 0, 1)
                 return 1
             }
-            Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            runScheduleTask(taskNameJAB)
         }
     } else if (A_IsAdmin) {
         try {
-            done := createScheduleTask(A_AhkPath, "abgox.InputTip.JAB.JetBrains", [JABPath], "Limited", 1)
+            done := createScheduleTask(A_AhkPath, taskNameJAB, [JABPath], "Limited", 1)
             if (!done) {
                 showGui(createErrorTipGui(i18n("symbolJAB.error", 1), i18n("symbolJAB")))
-                changeConfig("symbolJABActive", 0)
+                changeConfig("symbolJABActive", 0, 1)
                 return 1
             }
-            Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+            runScheduleTask(taskNameJAB)
         }
     } else {
         global JAB_PID
@@ -54,7 +54,7 @@ restartJAB() {
             done := 0
             killJAB(1)
             if (A_IsAdmin) {
-                try Run('schtasks /run /tn "abgox.InputTip.JAB.JetBrains"', , "Hide")
+                runScheduleTask(taskNameJAB)
             } else {
                 global JAB_PID
                 Run('"' A_AhkPath '" "' JABPath '"', , "Hide", &JAB_PID)
@@ -71,10 +71,10 @@ restartJAB() {
  */
 killJAB(wait := 1, delete := 0) {
     if (A_IsAdmin) {
-        cmd := 'schtasks /End /tn "abgox.InputTip.JAB.JetBrains"'
+        cmd := "schtasks /End /tn `"" taskNameJAB "`""
         try wait ? RunWait(cmd, , "Hide") : Run(cmd, , "Hide")
         if (delete) {
-            try Run('schtasks /delete /tn "abgox.InputTip.JAB.JetBrains" /f', , "Hide")
+            try Run("schtasks /delete /tn `"" taskNameJAB "`" /f", , "Hide")
         }
     } else {
         ProcessClose(JAB_PID)

@@ -69,7 +69,7 @@ loop {
             hasWindowChange := lastWindow != exeName ":" exeTitle
 
             if (hasWindowChange) {
-                if validateMatch(exeName, exeTitle, var.WindowAutoExit)
+                if exeName != "explorer.exe" && validateMatch(exeName, exeTitle, var.WindowAutoExit)
                     fn_exit()
                 if (var.symbolType) {
                     if (needSkipSymbol(exeName)) {

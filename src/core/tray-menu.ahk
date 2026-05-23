@@ -44,18 +44,6 @@ makeTrayMenu() {
     A_TrayMenu.ClickCount := 1
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("inputMethod"), e_inputMethod)
-    A_TrayMenu.Add(i18n("stateSwitch.hotkey"), (*) =>
-        showHotKeyGui([{
-            config: "hotkeyCN",
-            tip: i18n("state.CN")
-        }, {
-            config: "hotkeyEN",
-            tip: i18n("state.EN")
-        }, {
-            config: "hotkeyCaps",
-            tip: i18n("state.Caps")
-        }], i18n("stateSwitch.hotkey"))
-    )
     A_TrayMenu.Add(i18n("stateSwitch.window"), (*) =>
         createProcessMenuGui(
             i18n("stateSwitch.window"),
@@ -71,6 +59,18 @@ makeTrayMenu() {
                 "Window.AutoSwitch.Caps"
             ]
         )
+    )
+    A_TrayMenu.Add(i18n("stateSwitch.hotkey"), (*) =>
+        showHotKeyGui([{
+            config: "hotkeyCN",
+            tip: i18n("state.CN")
+        }, {
+            config: "hotkeyEN",
+            tip: i18n("state.EN")
+        }, {
+            config: "hotkeyCaps",
+            tip: i18n("state.Caps")
+        }], i18n("stateSwitch.hotkey"))
     )
 
     A_TrayMenu.Add()

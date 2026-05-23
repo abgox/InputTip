@@ -20,8 +20,8 @@ updateSymbol() {
                 }
                 if (path) {
                     var.%key% := _ := createUniqueGui(symbolGui.Bind(key))
-                    _.BackColor := "000000"
-                    WinSetTransColor("000000", _.Hwnd)
+                    _.BackColor := "010101"
+                    WinSetTransColor("010101", _.Hwnd)
                     try _.AddPicture("w" w " h" h, path)
                 } else {
                     try var.%key%.Destroy()
@@ -31,12 +31,8 @@ updateSymbol() {
             for state in var.stateList {
                 key := "symbolShapeGui" state
                 color := var.%"symbolShapeColor" state%
-                transparent := var.%"symbolShapeTransparent" state%
                 if (color) {
                     var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.symbolShapeCornerPreference)
-                    if (transparent > 255) {
-                        transparent := 255
-                    }
                     try _.BackColor := color
                     _.Opt("-LastFound")
                     switch var.symbolShapeEdgeStyle {
@@ -61,9 +57,11 @@ updateSymbol() {
                 if (text) {
                     var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.symbolTextCornerPreference)
                     _.MarginX := 0, _.MarginY := 0
-                    try _.SetFont("s" textSize " c" textColor " w" textWeight, textFont)
+                    try {
+                        _.SetFont("s" textSize " c" textColor " w" textWeight, textFont)
+                        _.BackColor := bgColor
+                    }
                     _.AddText(, text)
-                    try _.BackColor := bgColor
                     switch var.symbolTextEdgeStyle {
                         case 1: _.Opt("-LastFound +e0x00000001")
                         case 2: _.Opt("-LastFound +e0x00000200")
@@ -261,13 +259,15 @@ e_symbol(*) {
 
         renderRadioGroup(g, "symbolType", [
             ["none", 0, ""],
-            [".picture", 1, symbolPictureConfig],
-            [".shape", 2, symbolShapeConfig],
-            [".text", 3, symbolTextConfig]
+            [".picture", 1],
+            [".shape", 2],
+            [".text", 3]
         ])
 
-        g.AddText("yp w20")
-        renderText(g, "configureViaDoubleClick", "yp", "cGray")
+        _w := bw / 3 - g.MarginX / 2
+        g.AddButton("xs w" _w, i18n("symbolPicture")).OnEvent("Click", symbolPictureConfig)
+        g.AddButton("yp w" _w, i18n("symbolShape")).OnEvent("Click", symbolShapeConfig)
+        g.AddButton("yp w" _w, i18n("symbolText")).OnEvent("Click", symbolTextConfig)
 
         renderRadioGroup(g, "symbolOffsetBaseY", [[".above", "above"], [".below", "below"]])
 
@@ -402,7 +402,12 @@ symbolPictureConfig(*) {
             renderEditLabel(g, "symbolPictureOffsetY" state, editOpt, "symbolPictureOffsetY", "yp")
             renderEditLabel(g, "symbolPictureWidth" state, "Number Limit3" editOpt, "symbolPictureWidth", "yp")
             renderEditLabel(g, "symbolPictureHeight" state, "Number Limit3" editOpt, "symbolPictureHeight", "yp")
-            renderDropDownList(g, "symbolPicturePath" state, picList, "xs+20 yp+40", "w" bw - 40, (*) => gc.previewSymbolPicture.Focus())
+
+            _ := g.AddDropDownList("xs+20 yp+40 AltSubmit r9 w" bw - 40, picList)
+            key := "symbolPicturePath" state
+            _.key := key
+            try _.Text := var.%key%
+            _.OnEvent("Change", (ctrl, *) => changeConfig(ctrl.key, ctrl.Text, , (*) => gc.previewSymbolPicture.Focus()))
 
             if (i > 4) {
                 addBtn()

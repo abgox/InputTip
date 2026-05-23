@@ -8,10 +8,12 @@
  */
 debounce(fn, delay := 1000) {
     state := { params: [], timer: 0 }
+    callback := (*) => fn.Call(state.params*)
     return (args*) => (
         state.params := args,
-        state.timer ? SetTimer(state.timer, 0) : 0,
-        state.timer := SetTimer((*) => fn.Call(state.params*), -delay)
+        state.timer ? SetTimer(callback, 0) : 0,
+        state.timer := 1,
+        SetTimer(callback, -delay)
     )
 }
 
@@ -124,4 +126,8 @@ createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 
         }
     }
     return 0
+}
+
+runScheduleTask(taskName) {
+    try Run("schtasks /run /tn `"" taskName "`"", , "Hide")
 }

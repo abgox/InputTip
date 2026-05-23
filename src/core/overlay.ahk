@@ -87,9 +87,12 @@ updateOverlay() {
             var.%"overlayGui" state i% := createUniqueGui(tipGui.Bind(state, i), var.overlayCornerPreference)
             tipGui(state, num, info) {
                 g := createGuiOpt("overlayGui" state num, , "-Caption AlwaysOnTop ToolWindow LastFound E0x20", , 0)
-                g.SetFont("s" textSize " c" textColor " w" textWeight " q5", textFont)
-                g.BackColor := bgColor, g.MarginX := "5", g.MarginY := "5"
-                g.AddText("c" textColor, text)
+                g.MarginX := "5", g.MarginY := "5"
+                try {
+                    g.SetFont("s" textSize " c" textColor " w" textWeight " q5", textFont)
+                    g.BackColor := bgColor
+                    g.AddText("c" textColor, text)
+                }
                 if (info.i) {
                     return g
                 }

@@ -17,7 +17,7 @@ e_about(*) {
 
         renderGroupBox(g, "about.info", "xs", "h120 w" w)
         g.AddLink(opt, i18n("about.version") getLink("inputtip.abgox.com/download", currentVersion))
-        g.AddLink(opt, i18n("about.developer") getLink("www.abgox.com", "abgox"))
+        g.AddLink(opt, i18n("about.developer") getLink("www.abgox.com", author))
 
         renderGroupBox(g, "about.status", "xs", "h120 w" w)
         g.AddLink(opt, i18n("about.type") getLink("inputtip.abgox.com/docs/zip-vs-exe", versionType))

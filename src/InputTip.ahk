@@ -10,8 +10,6 @@ setTrayIcon(var.iconRunning)
 
 checkIni()
 
-checkUpdate(1)
-
 for state in var.stateList {
     if (var.hotkey%state%) {
         try Hotkey(var.hotkey%state%, bindState(state))
@@ -31,6 +29,8 @@ updateTrayTip()
 if (var.symbolJABActive) {
     runJAB()
 }
+
+SetTimer(() => checkUpdate(1), -5000)
 
 /**
  * 跳过 JAB/JetBrains IDE 程序，交由 InputTip.JAB 处理

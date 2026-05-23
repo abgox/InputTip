@@ -57,12 +57,8 @@ var := {
             picture: "default-triangle-purple.png"
         },
     },
-    ; 快捷方式
-    fileLnk: "InputTip.lnk",
     screenNum: SysGet(80),
     screenList: getScreenInfo(),
-    startupHKEY: "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
-    startupRegName: "abgox.InputTip",
     ; 光标捕获模式
     modeNameList: ["HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"],
     cursorInfo: Map(
@@ -153,6 +149,8 @@ var := {
     symbolJABActive: readIni("symbolJABActive", 0),
     enableKeyStats: readIni("enableKeyStats", 0),
     enableCustomTrayTip: readIni("enableCustomTrayTip", 0),
+    trayTipTemplate: readIni("trayTipTemplate", i18n("trayTipTemplate.content")),
+    keyStatsTemplate: readIni("keyStatsTemplate", i18n("keyStatsTemplate.content"))
 }
 
 ; 自定义模式下定义的模式规则

@@ -1,18 +1,17 @@
 ; InputTip
 
+startupHKEY := "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+
 e_startup(item, *) {
     if (var.launchAtStartup) {
         if (var.launchAtStartup != 2 && !A_IsAdmin) {
             runAsAdmin()
         }
-
-        try FileDelete(A_Startup "/" var.fileLnk)
-        try RegDelete(var.startupHKEY, var.startupRegName)
-        try Run('schtasks /delete /tn "abgox.InputTip.noUAC" /f', , "Hide")
-
+        try FileDelete(A_Startup "/" appid ".lnk")
+        try RegDelete(startupHKEY, appid)
+        try Run("schtasks /delete /tn `"" taskNameNoUAC "`" /f", , "Hide")
         A_TrayMenu.Uncheck(item)
-
-        changeConfig("launchAtStartup", 0)
+        changeConfig("launchAtStartup", 0, 1)
     } else {
         showGui(createUniqueGui(startupGui))
         startupGui(info) {
@@ -42,14 +41,14 @@ e_startup(item, *) {
             g.AddButton("Section w" w btnOpt, i18n("startup.task") pad).OnEvent("Click", e_useTask)
             e_useTask(*) {
                 if (A_IsCompiled) {
-                    done := createScheduleTask(A_ScriptFullPath, "abgox.InputTip.noUAC", [0], , , 1)
+                    done := createScheduleTask(A_ScriptFullPath, taskNameNoUAC, [0], , , 1)
                 } else {
-                    done := createScheduleTask(A_AhkPath, "abgox.InputTip.noUAC", [A_ScriptFullPath, 0], , , 1)
+                    done := createScheduleTask(A_AhkPath, taskNameNoUAC, [A_ScriptFullPath, 0], , , 1)
                 }
                 if (done) {
                     g.Destroy()
                     A_TrayMenu.Check(item)
-                    changeConfig("launchAtStartup", 1)
+                    changeConfig("launchAtStartup", 1, 1)
                 } else {
                     showGui(createErrorTipGui(i18n("startup.fail", 1), i18n("startup")))
                 }
@@ -57,11 +56,11 @@ e_startup(item, *) {
             g.AddButton("xs w" w btnOpt, i18n("startup.reg") pad).OnEvent("Click", e_useReg)
             e_useReg(*) {
                 try {
-                    v := A_IsCompiled ? A_ScriptFullPath : "" " A_AhkPath " " " " A_ScriptFullPath " ""
-                    RegWrite(v, "REG_SZ", var.startupHKEY, var.startupRegName)
+                    v := A_IsCompiled ? "`"" A_ScriptFullPath "`"" : " `"" A_AhkPath "`" `"" A_ScriptFullPath "`""
+                    RegWrite(v, "REG_SZ", startupHKEY, appid)
                     g.Destroy()
                     A_TrayMenu.Check(item)
-                    changeConfig("launchAtStartup", 3)
+                    changeConfig("launchAtStartup", 3, 1)
                 } catch {
                     showGui(createErrorTipGui(i18n("startup.fail", 1), i18n("startup")))
                 }
@@ -70,7 +69,7 @@ e_startup(item, *) {
             e_useLnk(*) {
                 g.Destroy()
                 A_TrayMenu.Check(item)
-                changeConfig("launchAtStartup", 2)
+                changeConfig("launchAtStartup", 2, 1)
                 createShortcut(A_Startup)
             }
             return g

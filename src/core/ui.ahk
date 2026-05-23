@@ -44,7 +44,7 @@ renderText(g, textKey, layout, options) {
 renderEdit(g, key, layout := "yp", options := "") {
     _ := g.AddEdit("r1 " layout " " options)
     _.Value := var.%key%
-    _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Value))
+    _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Value, 1))
 }
 
 /**
@@ -79,7 +79,7 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
  * @param {"xs+20 yp+35"|"yp"|"xs"} layout 布局配置
  * @param {String} options 额外选项
  */
-renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "", callback := "") {
+renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "") {
     _list := []
     for v in list
         _list.Push(i18n(v))
@@ -87,10 +87,10 @@ renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "", callbac
     val := var.%key%
     if (IsNumber(val)) {
         try _.Value := val + 1
-        _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Value - 1, , callback))
+        _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Value - 1))
     } else {
         try _.Text := val
-        _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Text, , callback))
+        _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Text))
     }
 }
 
@@ -122,7 +122,7 @@ renderRadio(g, key, textKey, value, layout, dbClickEvent := "") {
     labelText := (SubStr(textKey, 1, 1) == ".") ? i18n(key textKey) : i18n(textKey)
     _ := g.AddRadio(layout " " isChecked, labelText)
     _.val := value
-    _.OnEvent("Click", (ctrl, *) => changeConfig(key, ctrl.val))
+    _.OnEvent("Click", (ctrl, *) => changeConfig(key, ctrl.val, 1))
     if (dbClickEvent) {
         _.OnEvent("DoubleClick", dbClickEvent)
     }
@@ -177,7 +177,7 @@ renderColorPicker(g, key, labelKey := key) {
             return
         try {
             var.%cKey%.Value := color
-            changeConfig(oKey, color)
+            changeConfig(oKey, color, 1)
             var.%oKey% := color
         }
     }

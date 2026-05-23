@@ -98,13 +98,11 @@ fn_restart(*) {
     if (var.symbolJABActive) {
         killJAB()
     }
-
     if (A_IsCompiled) {
         Run('"' A_ScriptFullPath '" ' keyCount)
     } else {
         Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' keyCount)
     }
-    ExitApp()
 }
 
 e_windowInfo(*) {

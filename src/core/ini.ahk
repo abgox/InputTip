@@ -30,4 +30,4 @@ _writeIniDebounced := debounce(
     (key, value, section, path, callback := "") => (
         writeIni(key, value, section, path),
         callback ? callback(key, value, section) : 0
-    ), 500)
+    ), 1000)

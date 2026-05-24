@@ -133,10 +133,10 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
     getXY(options, screenW, screenH, origW, origH) {
         x := ""
         y := ""
-        if RegExMatch(options, "i)(?<![a-z])x(\d+)", &m) {
+        if RegExMatch(options, "i)(?<![a-z])x(-?\d+)", &m) {
             x := Integer(m[1] / dpiScale)
         }
-        if RegExMatch(options, "i)(?<![a-z])y(\d+)", &m) {
+        if RegExMatch(options, "i)(?<![a-z])y(-?\d+)", &m) {
             y := Integer(m[1] / dpiScale)
         }
         return {

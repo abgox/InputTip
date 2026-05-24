@@ -24,17 +24,21 @@ showOverlay(state) {
     }
     Ypos := var.%"overlayOffsetY" state%
     Xpos := var.%"overlayOffsetX" state%
+    basePosition := var.%"overlayBasePosition" state%
 
     i := var.screenNum
     while (i > 0) {
         g := var.%"overlayGui" state i%
         MonitorGet(i, &Left, &Top, &Right, &Bottom)
-        hMonitor := DllCall("MonitorFromPoint", "Int64", (Left + Right) // 2 | ((Top + Bottom) // 2) << 32, "Int", 2, "Ptr")
+        pt := Buffer(8, 0)
+        NumPut("Int", (Left + Right) // 2, pt, 0)
+        NumPut("Int", (Top + Bottom) // 2, pt, 4)
+        hMonitor := DllCall("MonitorFromPoint", "Ptr", pt, "Int", 2, "Ptr")
         DllCall("Shcore\GetDpiForMonitor", "Ptr", hMonitor, "Int", 0, "UInt*", &dpiX := 0, "UInt*", &dpiY := 0)
         scale := dpiX / 96
         scaledW := g.w * scale
         scaledH := g.h * scale
-        switch var.%"overlayBasePosition" currentState% {
+        switch basePosition {
             case "top":
                 x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
                 y := Top + Ypos

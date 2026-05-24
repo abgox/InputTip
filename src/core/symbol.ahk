@@ -267,7 +267,7 @@ e_symbol(*) {
                 [
                     i18n("windowRule")
                 ],
-                getDocsLink("tip/symbol/app-offset"),
+                getDocsLink("tip/symbol/window-offset"),
                 [
                     "Window.Symbol.Offset"
                 ], Map(

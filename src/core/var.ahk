@@ -133,9 +133,9 @@ var := {
     ; 在鼠标附近显示符号
     symbolNearCursorActive: readIni("symbolNearCursorActive", 0),
     symbolNearCursorWindow: readIni("symbolNearCursorWindow", "all"),
-    ; 符号显示在鼠标附近时的特殊偏移量 x
+    ; 符号显示在鼠标附近时的偏移量 x
     symbolNearCursorOffsetX: readIni("symbolNearCursorOffsetX", 0),
-    ; 符号显示在鼠标附近时的特殊偏移量 y
+    ; 符号显示在鼠标附近时的偏移量 y
     symbolNearCursorOffsetY: readIni("symbolNearCursorOffsetY", 30),
     ; 在多少毫秒后隐藏符号，0 表示永不隐藏
     symbolHideDelay: readIni("symbolHideDelay", 0),

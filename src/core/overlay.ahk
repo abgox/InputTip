@@ -26,49 +26,51 @@ showOverlay(state) {
     Xpos := var.%"overlayOffsetX" state%
     basePosition := var.%"overlayBasePosition" state%
 
-    i := var.screenNum
-    while (i > 0) {
-        g := var.%"overlayGui" state i%
-        MonitorGet(i, &Left, &Top, &Right, &Bottom)
-        pt := Buffer(8, 0)
-        NumPut("Int", (Left + Right) // 2, pt, 0)
-        NumPut("Int", (Top + Bottom) // 2, pt, 4)
-        hMonitor := DllCall("MonitorFromPoint", "Ptr", pt, "Int", 2, "Ptr")
-        DllCall("Shcore\GetDpiForMonitor", "Ptr", hMonitor, "Int", 0, "UInt*", &dpiX := 0, "UInt*", &dpiY := 0)
-        scale := dpiX / 96
-        scaledW := g.w * scale
-        scaledH := g.h * scale
-        switch basePosition {
-            case "top":
-                x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
-                y := Top + Ypos
-            case "bottom":
-                x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
-                y := Bottom - scaledH + Ypos
-            case "left":
-                x := Left + Xpos
-                y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
-            case "right":
-                x := Right - scaledW + Xpos
-                y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
-            case "topLeft":
-                x := Left + Xpos
-                y := Top + Ypos
-            case "topRight":
-                x := Right - scaledW + Xpos
-                y := Top + Ypos
-            case "bottomLeft":
-                x := Left + Xpos
-                y := Bottom - scaledH + Ypos
-            case "bottomRight":
-                x := Right - scaledW + Xpos
-                y := Bottom - scaledH + Ypos
-            default: ; center
-                x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
-                y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+    try {
+        i := var.screenNum
+        while (i > 0) {
+            g := var.%"overlayGui" state i%
+            MonitorGet(i, &Left, &Top, &Right, &Bottom)
+            pt := Buffer(8, 0)
+            NumPut("Int", (Left + Right) // 2, pt, 0)
+            NumPut("Int", (Top + Bottom) // 2, pt, 4)
+            hMonitor := DllCall("MonitorFromPoint", "Ptr", pt, "Int", 2, "Ptr")
+            DllCall("Shcore\GetDpiForMonitor", "Ptr", hMonitor, "Int", 0, "UInt*", &dpiX := 0, "UInt*", &dpiY := 0)
+            scale := dpiX / 96
+            scaledW := g.w * scale
+            scaledH := g.h * scale
+            switch basePosition {
+                case "top":
+                    x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
+                    y := Top + Ypos
+                case "bottom":
+                    x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
+                    y := Bottom - scaledH + Ypos
+                case "left":
+                    x := Left + Xpos
+                    y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+                case "right":
+                    x := Right - scaledW + Xpos
+                    y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+                case "topLeft":
+                    x := Left + Xpos
+                    y := Top + Ypos
+                case "topRight":
+                    x := Right - scaledW + Xpos
+                    y := Top + Ypos
+                case "bottomLeft":
+                    x := Left + Xpos
+                    y := Bottom - scaledH + Ypos
+                case "bottomRight":
+                    x := Right - scaledW + Xpos
+                    y := Bottom - scaledH + Ypos
+                default: ; center
+                    x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
+                    y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+            }
+            showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1, var.overlayTransparent)
+            i--
         }
-        showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1, var.overlayTransparent)
-        i--
     }
 
     SetTimer(RemoveTip, -hideDelay)

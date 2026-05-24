@@ -57,7 +57,7 @@ var := {
             picture: "default-triangle-purple.png"
         },
     },
-    screenNum: SysGet(80),
+    screenNum: MonitorGetCount(),
     screenList: getScreenInfo(),
     ; 光标捕获模式
     modeNameList: ["HOOK", "UIA", "GUI_UIA", "MSAA", "HOOK_DLL", "WPF", "ACC", "JAB"],

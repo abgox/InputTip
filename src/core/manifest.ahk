@@ -27,7 +27,6 @@ CoordMode("Mouse", "Screen")
 SetStoreCapsLockMode(0)
 
 OnError(LogError)
-
 LogError(exception, mode) {
     return false
 }
@@ -41,6 +40,15 @@ WM_MOUSEWHEEL_Handler(wParam, lParam, msg, hwnd) {
     if (controlName == "ComboBox") {
         return 0 ; 禁用 ComboBox 控件的鼠标滚轮以避免误切换
     }
+}
+
+OnMessage(0x007E, OnDisplayChange)
+OnDisplayChange(wParam, lParam, msg, hwnd) {
+    SetTimer(() => (
+        var.screenNum := MonitorGetCount(),
+        var.screenList := getScreenInfo(),
+        updateOverlay()
+    ), -500)
 }
 
 isTrayMenuOpen := 0

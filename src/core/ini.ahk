@@ -1,12 +1,9 @@
 ; InputTip
 
 readIni(key, default, section := "Settings", path := configFile) {
-    try {
-        return normalizeConfig(key, IniRead(path, section, key))
-    } catch {
-        writeIni(key, default, section, path)
-        return default
-    }
+    static sentinel := "##__NOT_FOUND__##"
+    raw := IniRead(path, section, key, sentinel)
+    return raw == sentinel ? default : normalizeConfig(key, raw)
 }
 
 writeIni(key, value, section := "Settings", path := configFile) {
@@ -14,12 +11,7 @@ writeIni(key, value, section := "Settings", path := configFile) {
 }
 
 readIniSection(section, default := "", path := configFile) {
-    try {
-        return IniRead(path, section)
-    } catch {
-        try IniWrite(default, path, section)
-        return default
-    }
+    return IniRead(path, section, , default)
 }
 
 writeIniDebounced(key, value, callback := "", section := "Settings", path := configFile) {

@@ -73,7 +73,18 @@ e_moreSettings(*) {
                 return g
             }
         }
-        g.AddButton("xs w" _w, i18n("openAppDirectory")).OnEvent("Click", (*) => Run("explorer.exe /select," A_ScriptFullPath))
+        g.AddButton("xs w" _w, i18n("autoPause.window")).OnEvent("Click", (*) => (
+            createProcessMenuGui(
+                i18n("autoPause.window"),
+                [
+                    i18n("windowRule")
+                ],
+                getDocsLink("auto-pause"),
+                [
+                    "Window.AutoPause"
+                ]
+            )
+        ))
         g.AddButton("yp w" _w, i18n("createDesktopShortcut")).OnEvent("Click", (*) => createShortcut(A_Desktop))
         g.AddButton("xs w" _w, i18n("autoExit.window")).OnEvent("Click", (*) =>
             createProcessMenuGui(

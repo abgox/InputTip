@@ -214,7 +214,7 @@ for v in var.stateList {
 
 for v in [
     "Window.Symbol.Show", "Window.Symbol.Hide", "Window.Symbol.NearCursor",
-    "Window.AutoExit", "Window.IgnoreStateSwitch"
+    "Window.AutoExit", "Window.AutoPause", "Window.IgnoreStateSwitch"
 ] {
     var.%StrReplace(v, ".", "")% := parseMatchRules(StrSplit(readIniSection(v), "`n"))
 }

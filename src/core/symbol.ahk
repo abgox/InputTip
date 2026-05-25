@@ -224,7 +224,7 @@ e_symbol(*) {
             [".text", 3]
         ])
 
-        _w := bw / 3 - g.MarginX / 2
+        _w := bw / 3 - g.MarginX / 2.5
         g.AddButton("xs w" _w, i18n("symbolPicture")).OnEvent("Click", symbolPictureConfig)
         g.AddButton("yp w" _w, i18n("symbolShape")).OnEvent("Click", symbolShapeConfig)
         g.AddButton("yp w" _w, i18n("symbolText")).OnEvent("Click", symbolTextConfig)
@@ -236,27 +236,17 @@ e_symbol(*) {
 
         renderEditGroup(g, "symbolHideDelay", "Number Limit5")
 
-        _w := bw / 4 - g.MarginX / 2
-        g.AddButton("xs w" _w, i18n("symbol.whitelist")).OnEvent("Click", (*) =>
+        _w := bw / 4 - g.MarginX / 2.5
+        g.AddButton("xs w" _w, i18n("symbol.white/blacklist")).OnEvent("Click", (*) =>
             createProcessMenuGui(
-                i18n("symbol.whitelist"),
+                i18n("symbol.white/blacklist"),
                 [
-                    i18n("windowRule")
+                    i18n("symbol.whitelist"),
+                    i18n("symbol.blacklist"),
                 ],
                 getDocsLink("tip/symbol/list-mechanism"),
                 [
-                    "Window.Symbol.Show"
-                ]
-            )
-        )
-        g.AddButton("yp w" _w, i18n("symbol.blacklist")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("symbol.blacklist"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("tip/symbol/list-mechanism"),
-                [
+                    "Window.Symbol.Show",
                     "Window.Symbol.Hide"
                 ]
             )

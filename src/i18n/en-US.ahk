@@ -211,6 +211,7 @@ langStrings.Set("en-US", Map(
     "symbolTextTransparent", "Symbol Transparent",
     "symbolTextOffsetX", ["Offset X", " Offset X "],
     "symbolTextOffsetY", ["Offset Y", " Offset Y "],
+    "symbol.white/blacklist", "White/Black List",
     "symbol.whitelist", "White List",
     "symbol.blacklist", "Black List",
     "symbolOffsetBaseY", "Offset Base (Y)",

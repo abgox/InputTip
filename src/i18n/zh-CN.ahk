@@ -211,6 +211,7 @@ langStrings.Set("zh-CN", Map(
     "symbolTextTransparent", "符号的透明度",
     "symbolTextOffsetX", "偏移量 X",
     "symbolTextOffsetY", "偏移量 Y",
+    "symbol.white/blacklist", "白/黑名单",
     "symbol.whitelist", "白名单",
     "symbol.blacklist", "黑名单",
     "symbolOffsetBaseY", "偏移量参考原点",

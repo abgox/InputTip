@@ -8,13 +8,6 @@
 #Include "*i ui.ahk"
 #Include "*i config.ahk"
 
-; 菜单的宽度参考线
-line50 := "------------------------------------------------"
-line60 := line50 "----------"
-line70 := line60 "----------"
-line80 := line70 "----------"
-line90 := line80 "----------"
-
 fontList := getFontList()
 fontList.InsertAt(1, "Microsoft YaHei")
 

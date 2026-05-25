@@ -51,18 +51,12 @@ OnDisplayChange(wParam, lParam, msg, hwnd) {
     ), -500)
 }
 
-isTrayMenuOpen := 0
 hideOnTrayGui := []
 OnMessage(0x0211, onMenuLoop)  ; WM_ENTERMENULOOP
-OnMessage(0x0212, onExitMenuLoop) ; WM_EXITMENULOOP
 onMenuLoop(wParam, lParam, msg, hwnd) {
-    global isTrayMenuOpen := 1
     for v in hideOnTrayGui {
         try v.Hide()
     }
-}
-onExitMenuLoop(wParam, lParam, msg, hwnd) {
-    global isTrayMenuOpen := 0
 }
 
 author := "abgox"

@@ -92,10 +92,7 @@ var := {
     launchAtStartup: readIni("launchAtStartup", 0),
     ; 输入法模式
     inputMethodDetectionMode: readIni("inputMethodDetectionMode", "general"),
-    ; 更新检查时间间隔，默认是 1440 分钟，即 24 小时
-    updateCheckInterval: readIni("updateCheckInterval", 1440),
-    ; 是否静默自动更新
-    silentUpdate: readIni("silentUpdate", 0),
+    checkUpdateOnStartup: readIni("checkUpdateOnStartup", 1),
     ; 当运行 zip 版本时，是否直接以管理员权限运行
     runCodeWithAdmin: readIni("runCodeWithAdmin", 0),
     ; 默认输入法状态(1: 中文, 0: 英文)

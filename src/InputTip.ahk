@@ -6,6 +6,18 @@
 
 #Include core\init.ahk
 
+if (A_IsCompiled) {
+    favicon := A_ScriptFullPath
+    if var.checkUpdateOnStartup
+        try Run("`"" A_Temp "\abgox.InputTip.updater.exe`" " keyCount " " ProcessExist() " `"" A_ScriptFullPath "`"")
+} else {
+    favicon := A_ScriptDir "\temp\icon\default-app.ico"
+    if var.runCodeWithAdmin && !A_IsAdmin
+        runAsAdmin()
+    if var.checkUpdateOnStartup
+        Run('"' A_AhkPath '" "' A_ScriptDir '\core\updater.ahk" ' keyCount " " ProcessExist(), , "Hide", &updaterPID)
+}
+
 setTrayIcon(var.iconRunning)
 
 checkIni()
@@ -29,8 +41,6 @@ updateTrayTip()
 if (var.symbolJABActive) {
     runJAB()
 }
-
-SetTimer(() => checkUpdate(1), -5000)
 
 ; 主进程
 needSkip(exeName) {

@@ -3,12 +3,7 @@
 isJAB := 0
 JAB_PID := ""
 JABPath := A_ScriptDir "/InputTip.JAB.JetBrains.ahk"
-
-baseUrl := [
-    "https://raw.giteeusercontent.com/abgox/InputTip/raw/main/",
-    "https://raw.githubusercontent.com/abgox/InputTip/main/",
-    "https://gh-proxy.org/https://raw.githubusercontent.com/abgox/InputTip/main/"
-]
+updaterPID := "abgox.InputTip.updater.exe"
 
 #Include "*i manifest.ahk"
 
@@ -19,22 +14,12 @@ baseUrl := [
 #Include jab.ahk
 #Include var.ahk
 
-if (A_IsCompiled) {
-    favicon := A_ScriptFullPath
-} else {
-    favicon := A_ScriptDir "\temp\icon\default-app.ico"
-    if (var.runCodeWithAdmin && !A_IsAdmin) {
-        runAsAdmin()
-    }
-}
-
 #Include "*i runtime.ahk"
 #Include "*i ime.ahk"
 #Include "*i tray-menu.ahk"
 #Include "*i cursor.ahk"
 #Include "*i overlay.ahk"
 #Include "*i symbol.ahk"
-#Include "*i update.ahk"
 
 dirList := [
     "data",
@@ -89,6 +74,9 @@ if FileExist(oldConfigFile) {
 }
 
 if A_IsCompiled {
+    if !FileExist(A_Temp "/abgox.InputTip.updater.exe") || FileExist("temp/abgox-InputTip-update-version-done.txt")
+        FileInstall("core/updater.exe", A_Temp "/abgox.InputTip.updater.exe", 1)
+
     if !FileExist("temp/icon/default-app.png")
         FileInstall("temp/icon/default-app.png", "temp/icon/default-app.png", 1)
     if !FileExist("temp/icon/default-app-paused.png")
@@ -282,7 +270,7 @@ if A_IsCompiled {
         "core/more-settings.ahk",
         "core/startup.ahk",
         "core/tray-menu.ahk",
-        "core/update.ahk",
+        "core/updater.ahk",
         "core/config.ahk",
         "core/core.ahk",
         "core/gui.ahk",
@@ -338,8 +326,10 @@ if A_IsCompiled {
 
 checkIni() {
     try {
-        IniRead(configFile, "Settings", "version-" versionType)
-        checkUpdateDone()
+        oldVersion := IniRead(configFile, "Settings", "version-" versionType)
+        if (currentVersion != oldVersion) {
+            writeIni("version-" versionType, currentVersion)
+        }
     } catch {
         gc.init := 1
         showGui(createUniqueGui(cursorGuideGui))
@@ -498,8 +488,6 @@ migrateConfig(newFile, oldFile) {
     }
 
     migrateConfigList := [
-        ["updateCheckInterval", "checkUpdateDelay"],
-        ["silentUpdate", "silentUpdate"],
         ["runCodeWithAdmin", "runCodeWithAdmin"],
         ["pollInterval", "delay"],
         ["launchAtStartup", "isStartup"],

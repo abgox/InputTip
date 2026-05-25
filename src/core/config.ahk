@@ -23,7 +23,7 @@ normalizeConfig(key, value) {
         value := Abs(returnNumber(value))
         if value < 1
             value := 1
-    } else if InStr(key, "HideDelay") || InStr(key, "DetectionTimeout") || key == "updateCheckInterval" {
+    } else if InStr(key, "HideDelay") || InStr(key, "DetectionTimeout") {
         value := Abs(returnNumber(value))
         if value < 0
             value := 0

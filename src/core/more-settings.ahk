@@ -43,6 +43,36 @@ e_moreSettings(*) {
         _w := bw / 2
         g.AddButton("xs w" _w, i18n("openDataDirectory")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data"))
         g.AddButton("yp w" _w, i18n("updateCheck")).OnEvent("Click", e_updateCheck)
+        e_updateCheck(*) {
+            showGui(createUniqueGui(checkUpdateGui))
+            checkUpdateGui(info) {
+                g := createGuiOpt(i18n("updateCheck"))
+                g.AddLink("Section", getDocsLink("update-check"))
+
+                if (info.i) {
+                    return g
+                }
+                g.w := w := info.w
+                g.bw := bw := w - g.MarginX * 2
+
+                renderRadioGroup(g, "checkUpdateOnStartup", [["yes", 1], ["no", 0]])
+
+                if (A_IsCompiled) {
+                    g.AddButton("xs w" bw, i18n("checkUpdateNow")).OnEvent("Click", update)
+                    update(*) {
+                        g.Destroy()
+                        try Run("`"" A_Temp "\abgox.InputTip.updater.exe`" " keyCount " " ProcessExist() " `"" A_ScriptFullPath "`"")
+                    }
+                } else {
+                    g.AddButton("xs w" bw, i18n("updateNow")).OnEvent("Click", (*) => (
+                        g.Destroy(),
+                        Run('"' A_AhkPath '" "' A_ScriptDir '\core\updater.ahk" ' keyCount " " ProcessExist() " `"getRepoCode`"")
+                    )
+                    )
+                }
+                return g
+            }
+        }
         g.AddButton("xs w" _w, i18n("openAppDirectory")).OnEvent("Click", (*) => Run("explorer.exe /select," A_ScriptFullPath))
         g.AddButton("yp w" _w, i18n("createDesktopShortcut")).OnEvent("Click", (*) => createShortcut(A_Desktop))
         g.AddButton("xs w" _w, i18n("autoExit.window")).OnEvent("Click", (*) =>

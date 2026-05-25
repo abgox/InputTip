@@ -704,29 +704,28 @@ pauseApp(*) {
     if (A_IsPaused) {
         A_TrayMenu.Uncheck(i18n("state.Pause/Run"))
         setTrayIcon(var.iconRunning, 0)
-        showOverlay(currentState)
-        reloadSymbol()
-        loadCursor(currentState, 1)
-        restartJAB()
+        if var.cursorActive
+            loadCursor(currentState, 1)
+        if var.overlayActive
+            showOverlay(currentState)
+        if var.symbolType
+            reloadSymbol()
+        if var.symbolJABActive
+            restartJAB()
     } else {
         A_TrayMenu.Check(i18n("state.Pause/Run"))
         setTrayIcon(var.iconPaused, 1)
-        hideOverlay()
-        hideSymbol(1)
-        if (var.cursorActive) {
+        if var.cursorActive
             revertCursor()
-        }
-        if (var.symbolJABActive) {
+        if var.overlayActive
+            hideOverlay()
+        if var.symbolType
+            hideSymbol(1)
+        if var.symbolJABActive
             killJAB(0)
-        }
     }
+    Suspend(-1)
     Pause(-1)
-
-    for state in var.stateList {
-        if (var.%"hotkey" state%) {
-            try Hotkey(var.%"hotkey" state%, "Toggle")
-        }
-    }
 }
 
 

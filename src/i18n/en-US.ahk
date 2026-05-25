@@ -217,7 +217,7 @@ langStrings.Set("en-US", Map(
     "symbolOffsetBaseY.above", "Cursor Above",
     "symbolOffsetBaseY.below", "Cursor Below",
     "symbolWindowOffset", "Window Offset",
-    "symbolScreenOffsetBase", "Offset base under different screens",
+    "symbolScreenOffset", "Screen Offset",
     "offset.screen", "Screen",
     "offset.coordinate", "Coordinate",
     "offset.topLeft", "Top Left",

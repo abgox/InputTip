@@ -281,7 +281,7 @@ e_symbol(*) {
                 (g, width, config, e_add, e_addManually) => (
                     g.AddButton("xs w" width, i18n("addQuickly")).OnEvent("Click", e_add.Bind(config)),
                     g.AddButton("xs w" width, i18n("addManually")).OnEvent("Click", e_addManually.Bind(config)),
-                    g.AddButton("xs w" width, i18n("symbolScreenOffsetBase")).OnEvent("Click", e_screenOffsetBase)
+                    g.AddButton("xs w" width, i18n("symbolScreenOffset")).OnEvent("Click", e_screenOffsetBase)
                 )
             )
         )
@@ -514,7 +514,7 @@ symbolTextConfig(*) {
 e_screenOffsetBase(*) {
     showGui(createUniqueGui(offsetScreenGui))
     offsetScreenGui(info) {
-        g := createGuiOpt(i18n("symbolScreenOffsetBase"))
+        g := createGuiOpt(i18n("symbolScreenOffset"))
 
         g.AddLink("Section", getDocsLink("tip/symbol/screen-offset"))
         pages := []

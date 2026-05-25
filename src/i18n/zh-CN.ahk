@@ -217,7 +217,7 @@ langStrings.Set("zh-CN", Map(
     "symbolOffsetBaseY.above", "输入光标上方",
     "symbolOffsetBaseY.below", "输入光标下方",
     "symbolWindowOffset", "窗口偏移量",
-    "symbolScreenOffsetBase", "不同屏幕的基础偏移量",
+    "symbolScreenOffset", "屏幕偏移量",
     "offset.screen", "屏幕",
     "offset.coordinate", "屏幕坐标信息",
     "offset.topLeft", "左上角",

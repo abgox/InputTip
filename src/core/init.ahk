@@ -74,7 +74,7 @@ if FileExist(oldConfigFile) {
 }
 
 if A_IsCompiled {
-    if !FileExist(A_Temp "/abgox.InputTip.updater.exe") || FileExist("temp/abgox-InputTip-update-version-done.txt")
+    if !FileExist(A_Temp "/abgox.InputTip.updater.exe") || currentVersion != FileGetVersion(A_Temp "/abgox.InputTip.updater.exe")
         FileInstall("core/updater.exe", A_Temp "/abgox.InputTip.updater.exe", 1)
 
     if !FileExist("temp/icon/default-app.png")

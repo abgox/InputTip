@@ -143,7 +143,7 @@ checkUpdate() {
             }
             try {
                 Download(StrReplace(url, "/versions.txt", "/CHANGELOG.md"), logFile)
-                showGui(createUniqueGui(updateGui))
+                showGui(createUniqueGui(updateGui), , 0)
                 updateGui(info) {
                     g := createGuiOpt(i18n("updateVersion"))
 

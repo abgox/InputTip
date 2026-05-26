@@ -91,44 +91,45 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     try DllCall("SetThreadDpiAwarenessContext", "ptr", -2, "ptr")
 
-    hwnd := getHwnd()
+    hwnd := 0
 
-    if (var.modeList.HOOK.Has(exeName)) {
+    if var.modeList.HOOK.Has(exeName) {
+        hwnd := getHwnd()
         return getCaretPosFromHook(0)
     }
-    else if (var.modeList.UIA.Has(exeName)) {
+    else if var.modeList.UIA.Has(exeName) {
         return getCaretPosFromUIA()
     }
-    else if (var.modeList.GUI_UIA.Has(exeName)) {
-        if (getCaretPosFromGui(&hwnd := 0)) {
+    else if var.modeList.GUI_UIA.Has(exeName) {
+        if getCaretPosFromGui(&hwnd)
             return 1
-        }
         return getCaretPosFromUIA()
     }
-    else if (var.modeList.MSAA.Has(exeName)) {
+    else if var.modeList.MSAA.Has(exeName) {
+        hwnd := getHwnd()
         return getCaretPosFromMSAA()
     }
-    else if (var.modeList.Hook_DLL.Has(exeName)) {
+    else if var.modeList.Hook_DLL.Has(exeName) {
+        hwnd := getHwnd()
         return getCaretPosFromHook(1)
     }
-    else if (var.modeList.WPF.Has(exeName)) {
+    else if var.modeList.WPF.Has(exeName) {
         return getCaretPosFromWpfCaret()
     }
-    else if (var.modeList.ACC.Has(exeName)) {
+    else if var.modeList.ACC.Has(exeName) {
         return getCaretPosFromACC()
     }
     else {
-        if (getCaretPosFromGui(&hwnd := 0)) {
+        if getCaretPosFromGui(&hwnd)
             return 1
-        }
-        if (getCaretPosFromHook(0)) {
+        if getCaretPosFromHook(0)
             return 1
-        }
-        for fn in [getCaretPosFromMSAA, getCaretPosFromUIA] {
-            if (fn()) {
-                return 1
-            }
-        }
+        if getCaretPosFromUIA()
+            return 1
+        if !hwnd
+            hwnd := getHwnd()
+        if getCaretPosFromMSAA()
+            return 1
     }
     return 0
 
@@ -159,9 +160,9 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     }
 
     getCaretPosFromMSAA() {
-        if !hOleacc := DllCall("LoadLibraryW", "str", "oleacc.dll", "ptr")
+        static hOleacc := DllCall("LoadLibraryW", "str", "oleacc.dll", "ptr")
+        if !hOleacc
             return false
-        hOleacc := { Ptr: hOleacc, __Delete: (_) => DllCall("FreeLibrary", "ptr", _) }
         static IID_IAccessible := guidFromString("{618736e0-3c3d-11cf-810c-00aa00389b71}")
         if !DllCall("oleacc\AccessibleObjectFromWindow", "ptr", hwnd, "uint", 0xfffffff8, "ptr", IID_IAccessible, "ptr*", accCaret := ComValue(13, 0), "int") {
             if A_PtrSize == 8 {
@@ -188,8 +189,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     }
 
     getCaretPosFromUIA() {
+        static uia := ComObject("{E22AD333-B25F-460C-83D0-0581107395C9}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")
+        static IID_IUIAutomationTextPattern2 := guidFromString("{506a921a-fcc9-409f-b23b-37eb74106872}")
+        static IID_IUIAutomationTextPattern := guidFromString("{32eba289-3583-42c9-9c59-3b6d9a1e9b6a}")
         try {
-            uia := ComObject("{E22AD333-B25F-460C-83D0-0581107395C9}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")
             ComCall(20, uia, "ptr*", cacheRequest := ComValue(13, 0)) ; uia->CreateCacheRequest(&cacheRequest);
             if !cacheRequest.Ptr
                 return false
@@ -200,7 +203,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             if !focusedEle.Ptr
                 return false
 
-            static IID_IUIAutomationTextPattern2 := guidFromString("{506a921a-fcc9-409f-b23b-37eb74106872}")
             range := ComValue(13, 0)
             ComCall(15, focusedEle, "int", 10024, "ptr", IID_IUIAutomationTextPattern2, "ptr*", textPattern := ComValue(13, 0)) ; focusedEle->GetCachedPatternAs(UIA_TextPattern2Id, IID_PPV_ARGS(&textPattern));
             if textPattern.Ptr {
@@ -209,7 +211,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
                     goto getRangeInfo
             }
             ; If no caret range, get selection range.
-            static IID_IUIAutomationTextPattern := guidFromString("{32eba289-3583-42c9-9c59-3b6d9a1e9b6a}")
             ComCall(15, focusedEle, "int", 10014, "ptr", IID_IUIAutomationTextPattern, "ptr*", textPattern) ; focusedEle->GetCachedPatternAs(UIA_TextPatternId, IID_PPV_ARGS(&textPattern));
             if textPattern.Ptr {
                 ComCall(5, textPattern, "ptr*", ranges := ComValue(13, 0)) ; textPattern->GetSelection(&ranges);
@@ -259,13 +260,15 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             right := left + Round(rects[2])
             bottom := top + Round(rects[3])
             return true
+        } catch {
+            uia := ComObject("{E22AD333-B25F-460C-83D0-0581107395C9}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")
+            return false
         }
-        return false
     }
 
     getCaretPosFromWpfCaret() {
+        static uia := ComObject("{E22AD333-B25F-460C-83D0-0581107395C9}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")
         try {
-            uia := ComObject("{E22AD333-B25F-460C-83D0-0581107395C9}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")
             ComCall(8, uia, "ptr*", focusedEle := ComValue(13, 0)) ; uia->GetFocusedElement(&focusedEle);
             if !focusedEle.Ptr
                 return false
@@ -295,8 +298,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             ComCall(75, wpfCaret, "ptr", rect := Buffer(16)) ; wpfCaret->get_CachedBoundingRectangle(&rect);
             getRect(rect, &left, &top, &right, &bottom)
             return true
+        } catch {
+            uia := ComObject("{E22AD333-B25F-460C-83D0-0581107395C9}", "{30CBE57D-D9D0-452A-AB13-7AC5AC4825EE}")
+            return false
         }
-        return false
     }
 
     getCaretPosFromHook(updateCaret) {
@@ -370,7 +375,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             for v in modules
                 moduleBaseMap[v] := 0
             cnt := modules.Length
-            loop Min(350, needed) {
+            loop Min(350, needed // A_PtrSize) {
                 hModule := NumGet(hModules, A_PtrSize * (A_Index - 1), "ptr")
                 VarSetStrCapacity(&name, 12)
                 if DllCall("K32GetModuleBaseNameW", "ptr", hProcess, "ptr", hModule, "str", &name, "uint", 13) {
@@ -443,10 +448,11 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
                 , "ptr*", oAcc := ComValue(9, 0)) == 0 {
                 x := Buffer(4), y := Buffer(4), w := Buffer(4), h := Buffer(4)
                 oAcc.accLocation(ComValue(0x4003, x.ptr, 1), ComValue(0x4003, y.ptr, 1), ComValue(0x4003, w.ptr, 1), ComValue(0x4003, h.ptr, 1), 0)
-                left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int"), right := NumGet(w, 0, "int"), bottom := NumGet(h, 0, "int")
+                left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int")
+                right := left + NumGet(w, 0, "int"), bottom := top + NumGet(h, 0, "int")
                 if (left | top) != 0
-                    return 0
-                return 1
+                    return 1
+                return 0
             }
         }
     }

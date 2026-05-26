@@ -80,6 +80,7 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
  * @param {String} options 额外选项
  */
 renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "") {
+    static subclassProc := CallbackCreate(ComboBoxSubclass, "F", 6)
     _list := []
     for v in list
         _list.Push(i18n(v))
@@ -92,6 +93,14 @@ renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "") {
         try _.Text := val
         _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Text))
     }
+
+    DllCall("comctl32\SetWindowSubclass", "ptr", _.Hwnd, "ptr", subclassProc, "uptr", 1, "uptr", 0)
+}
+
+ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
+    if uMsg == 0x20A ; WM_MOUSEWHEEL
+        return 0
+    return DllCall("comctl32\DefSubclassProc", "ptr", hwnd, "uint", uMsg, "uptr", wParam, "uptr", lParam, "uptr")
 }
 
 /**

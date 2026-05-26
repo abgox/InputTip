@@ -40,7 +40,7 @@ try updater := A_Args[3]
 
 updater == "getRepoCode" ? getRepoCode() : checkUpdate()
 
-SetTimer(() => gc.w.updateGui ? 0 : ExitApp(), -60000)
+SetTimer(() => gc.updateGui ? 0 : ExitApp(), -60000)
 
 ; 是否有新版本
 hasNewVersion(new, old) {
@@ -87,7 +87,7 @@ checkUpdate() {
     if (A_IsCompiled) {
         checkVersion(currentVersion, updateConfirm)
         updateConfirm(newVersion, url) {
-            if (gc.w.updateGui || !hasNewVersion(newVersion, currentVersion)) {
+            if (gc.updateGui || !hasNewVersion(newVersion, currentVersion)) {
                 return
             }
 
@@ -167,9 +167,9 @@ checkUpdate() {
                     g.OnEvent("Close", (*) => (fn_close(), ExitApp()))
                     fn_close(*) {
                         g.Destroy()
-                        gc.w.updateGui := ""
+                        gc.updateGui := ""
                     }
-                    gc.w.updateGui := g
+                    gc.updateGui := g
                     return g
                 }
             }
@@ -177,7 +177,7 @@ checkUpdate() {
     } else {
         checkVersion(currentVersion, updatePrompt)
         updatePrompt(newVersion, url) {
-            if (gc.w.updateGui || !hasNewVersion(newVersion, currentVersion)) {
+            if (gc.updateGui || !hasNewVersion(newVersion, currentVersion)) {
                 return
             }
             try {
@@ -200,9 +200,9 @@ checkUpdate() {
                     g.OnEvent("Close", fn_close)
                     fn_close(*) {
                         g.Destroy()
-                        gc.w.updateGui := ""
+                        gc.updateGui := ""
                     }
-                    gc.w.updateGui := g
+                    gc.updateGui := g
                     return g
                 }
             }

@@ -156,10 +156,6 @@ e_moreSettings(*) {
             g.Destroy()
             gc.tab := 0
             gc.timer := 0
-            try {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
         }
         return g
     }

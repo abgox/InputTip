@@ -206,7 +206,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
     g.AddButton("yp" w, i18n("addManually")).OnEvent("Click", e_addManually.Bind(config))
 )) {
     ; 列表菜单
-    static listView := {}
+    static listView := {}, processListGui := ""
     showGui(createUniqueGui(processMenuGui))
     processMenuGui(info) {
         g := createGuiOpt(title)
@@ -279,11 +279,6 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
             if (!RowNumber) {
                 return
             }
-            if (gc.w.subGui) {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
-
             itemValue := {}
             for k, v in column {
                 itemValue.%k% := listView.%config%.GetText(RowNumber, v.gui)
@@ -637,7 +632,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                 title: i18n("addQuickly"),
                 configName: config,
             }
-            createProcessListGui(args, addClick)
+            processListGui := createProcessListGui(args, addClick)
 
             addClick(args) {
                 windowInfo := args.windowInfo
@@ -661,10 +656,7 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
         g.OnEvent("Close", fn_close)
         fn_close(*) {
             g.Destroy()
-            try {
-                gc.w.subGui.Destroy()
-                gc.w.subGui := ""
-            }
+            try processListGui.Destroy()
         }
         return g
     }
@@ -774,10 +766,11 @@ autoHdrLV(LV) {
  * @param {Func} cb_addClick 点击添加按钮的回调函数
  */
 createProcessListGui(args, cb_addClick) {
-    showProcessListGui(0)
+    return showProcessListGui(0)
     showProcessListGui(deep) {
-        showGui(createUniqueGui(processListGui))
-        processListGui(info) {
+        g := createUniqueGui(listGui)
+        showGui(g)
+        listGui(info) {
             g := createGuiOpt(args.title)
 
             if (info.i) {
@@ -847,5 +840,6 @@ createProcessListGui(args, cb_addClick) {
             }
             return g
         }
+        return g
     }
 }

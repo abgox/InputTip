@@ -16,15 +16,10 @@ line80 := line70 "----------"
 line90 := line80 "----------"
 
 gc := {
-    init: 0,
     timer: 0,
     stateTimer: 0,
     tab: 0,
-    ; 记录窗口 Gui，同一个 Gui 只允许存在一个
-    w: {
-        updateGui: "",
-        subGui: ""
-    }
+    updateGui: ""
 }
 
 var := {

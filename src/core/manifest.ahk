@@ -44,11 +44,13 @@ WM_MOUSEWHEEL_Handler(wParam, lParam, msg, hwnd) {
 
 OnMessage(0x007E, OnDisplayChange)
 OnDisplayChange(wParam, lParam, msg, hwnd) {
-    SetTimer(() => (
-        var.screenNum := MonitorGetCount(),
-        var.screenList := getScreenInfo(),
+    SetTimer(updateScreenInfo, -500)
+}
+updateScreenInfo() {
+    var.screenNum := MonitorGetCount()
+    var.screenList := getScreenInfo()
+    if !isJAB
         updateOverlay()
-    ), -500)
 }
 
 hideOnTrayGui := []

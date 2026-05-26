@@ -15,11 +15,14 @@ readIniSection(section, default := "", path := configFile) {
 }
 
 writeIniDebounced(key, value, callback := "", section := "Settings", path := configFile) {
-    _writeIniDebounced(key, value, section, path, callback)
+    static debouncedMap := Map()
+    mapKey := section "." key
+    if !debouncedMap.Has(mapKey) {
+        debouncedMap[mapKey] := debounce(
+            (k, v, s, p, cb := "") => (
+                writeIni(k, v, s, p),
+                cb ? cb(k, v, s) : 0
+            ), 500)
+    }
+    debouncedMap[mapKey](key, value, section, path, callback)
 }
-
-_writeIniDebounced := debounce(
-    (key, value, section, path, callback := "") => (
-        writeIni(key, value, section, path),
-        callback ? callback(key, value, section) : 0
-    ), 1000)

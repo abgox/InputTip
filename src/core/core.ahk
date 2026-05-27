@@ -1,8 +1,9 @@
 ; InputTip
 
+currentState := "EN"
+lastInputState := "", lastExportState := ""
 hasWindowChange := 1, canShowSymbol := 0
 lastWindow := "", lastSymbol := "", lastCursor := ""
-currentState := "", lastInputState := "", lastExportState := ""
 exeName := "", exeTitle := "", leaveDelay := var.pollInterval + 500
 
 updateSymbolDelay()

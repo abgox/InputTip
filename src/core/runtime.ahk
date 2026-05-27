@@ -58,15 +58,13 @@ createShortcut(dir) {
     }
 }
 
-updateTrayTip(flag := "") {
+updateTrayTip(paused := A_IsPaused) {
+    trayTipTemplate := var.enableCustomTrayTip ? var.trayTipTemplate : i18n("trayTipTemplate.content")
+    keyStatsTemplate := var.enableKeyStats ? var.keyStatsTemplate : ""
+
+    replaceTip()
+
     if (var.enableKeyStats) {
-        if (flag != "") {
-            tip := StrReplace(var.trayTipTemplate var.keyStatsTemplate, "%appState%", flag ? i18n("state.Paused") : i18n("state.Running"))
-            tip := StrReplace(tip, "%keyCount%", keyCount)
-            tip := StrReplace(tip, "%\n%", "`n")
-            A_IconTip := tip
-            return
-        }
         SetTimer(countTimer, 50)
         countTimer() {
             static last := ""
@@ -79,15 +77,14 @@ updateTrayTip(flag := "") {
             if (A_PriorKey != last) {
                 keyCount++
                 last := A_PriorKey
-                tip := StrReplace(var.trayTipTemplate var.keyStatsTemplate, "%appState%", A_IsPaused ? i18n("state.Paused") : i18n("state.Running"))
-                tip := StrReplace(tip, "%keyCount%", keyCount)
-                tip := StrReplace(tip, "%\n%", "`n")
-                A_IconTip := tip
+                replaceTip()
             }
         }
-    } else {
-        s := flag != "" ? flag : A_IsPaused
-        tip := StrReplace(var.trayTipTemplate, "%appState%", s ? i18n("state.Paused") : i18n("state.Running"))
+    }
+
+    replaceTip() {
+        tip := StrReplace(trayTipTemplate keyStatsTemplate, "%appState%", paused ? i18n("state.Paused") : i18n("state.Running"))
+        tip := StrReplace(tip, "%keyCount%", keyCount)
         tip := StrReplace(tip, "%\n%", "`n")
         A_IconTip := tip
     }

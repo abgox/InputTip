@@ -7,37 +7,35 @@ body:
   - type: checkboxes
     id: checks
     attributes:
-      label: 你应该确保已经完成了下面这些事情。
+      label: 你应该确保已经完成了下面这些事情
       options:
-        - label: 你正在使用 InputTip 最新版本。
+        - label: 你正在使用 InputTip 最新版本
           required: true
-        - label: 你已经阅读了项目的 README 文件。
+        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue
           required: true
-        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue。
+        - label: 你已经查看了 [文档](https://inputtip.abgox.com/docs/), 其中没有你遇到的问题
           required: true
-        - label: 你已经查看了 [文档](https://inputtip.abgox.com/docs/), 其中没有你遇到的问题。
-          required: true
-        - label: 你已经观看了 [InputTip 使用指南](https://inputtip.abgox.com/docs/guide), 仍未解决你的问题。
+        - label: 你已经查看了 [InputTip 使用指南](https://inputtip.abgox.com/docs/guide), 仍未解决你的问题
           required: true
   - type: input
     id: version
     attributes:
       label: 当前使用的 InputTip 版本
       description: |
-        - 在软件的托盘菜单中，点击 **关于** 进行查看。
-        - 如果不是最新版本，请先更新到最新版本。
-        - exe 版本可能落后，请直接使用 zip 版本。
-        - 更新后如果问题依然存在，再提交 issue。
-        - 不要使用 **最新版本** 这样的描述，必须是具体的版本号。
-      placeholder: v2025.10.01
+        - 在软件的托盘菜单中，点击 **关于** 进行查看
+        - 如果不是最新版本，请先更新到最新版本
+        - exe 版本可能落后，请直接使用 zip 版本
+        - 更新后如果问题依然存在，再提交 issue
+        - 不要使用 **最新版本** 这样的描述，必须是具体的版本号
+      placeholder: v3.2.2
     validations:
       required: true
   - type: dropdown
     id: InputTip-type
     attributes:
-      label: 你正在使用哪种类型的安装包?
+      label: 你正在使用哪种类型的安装包？
       description: |
-        - 如果你正在使用 exe 版本，建议切换到 zip 版本。
+        - 如果你正在使用 exe 版本，建议切换到 zip 版本
         - [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/docs/zip-vs-exe)
       options:
         - zip
@@ -48,7 +46,7 @@ body:
   - type: dropdown
     id: windows-version
     attributes:
-      label: 你正在使用什么 Windows 系统版本?
+      label: 你正在使用什么 Windows 系统版本？
       description: 如果是 Windows 10 以下的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本。
       options:
         - Windows 11
@@ -60,10 +58,10 @@ body:
   - type: input
     id: exe
     attributes:
-      label: 哪一个软件出现了问题?软件进程名叫什么?
+      label: 哪一个软件出现了问题？软件进程名叫什么？
       description: |
-        - 使用 `托盘菜单` => `获取窗口信息`
-        - 或者在 `任务管理器` 中找到出现问题的软件进程，右键点击进程名，点击 `打开文件所在的位置` 找到软件的运行进程 exe 文件。
+        - 使用 `托盘菜单` => `窗口信息`
+        - 它可以快速获取到当前聚焦的应用窗口的相关信息
       placeholder: code.exe
     validations:
       required: true
@@ -72,9 +70,9 @@ body:
     attributes:
       label: bug 复现步骤
       placeholder: |
-        如何复现这个 bug?
+        如何复现这个 bug？
         描述尽量简单易懂。
-        如果可以，请提供截图、动图、录屏等来帮助理解这个问题发生的全过程。
+        如果可以，请提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
     validations:
       required: true
   - type: textarea
@@ -82,14 +80,29 @@ body:
     attributes:
       label: 期望结果
       placeholder: |
-        你认为它应该是什么样的?
+        你认为它应该是什么样的？
   - type: textarea
     id: actually-happening
     attributes:
-      label: 实际发生了什么?
+      label: 实际发生了什么？
       placeholder: |
         描述尽量简单易懂。
         如果可以，请提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: 请提供你的配置文件 config.ini
+      description: |
+        - 使用 `托盘菜单` => `更多设置` => `打开数据目录`
+        - 找到其中的 config.ini，将文件内容复制到此处
+      placeholder: |
+        [Settings]
+        cursorActive=1
+        overlayActive=1
+        version-zip=3.2.2
+        ...
     validations:
       required: true
   - type: textarea
@@ -98,5 +111,5 @@ body:
       label: 还有其他你想要补充的信息吗？
       placeholder: |
         提供有问题的应用的下载地址以方便测试。
-        你对这个问题有什么看法?
+        你对这个问题有什么看法？
         ...

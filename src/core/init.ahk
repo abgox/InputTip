@@ -75,7 +75,7 @@ if FileExist(oldConfigFile) {
 
 if A_IsCompiled {
     if !FileExist(A_Temp "/abgox.InputTip.updater.exe") || currentVersion != FileGetVersion(A_Temp "/abgox.InputTip.updater.exe")
-        FileInstall("core/updater.exe", A_Temp "/abgox.InputTip.updater.exe", 1)
+        FileInstall("InputTip.updater.exe", A_Temp "/abgox.InputTip.updater.exe", 1)
 
     if !FileExist("temp/icon/default-app.png")
         FileInstall("temp/icon/default-app.png", "temp/icon/default-app.png", 1)
@@ -261,7 +261,8 @@ if A_IsCompiled {
         ; 启动脚本
         "../InputTip.bat",
         ; 脚本文件
-        "./InputTip.JAB.JetBrains.ahk",
+        "InputTip.JAB.JetBrains.ahk",
+        "InputTip.updater.ahk",
         ; i18n
         "i18n/zh-CN.ahk",
         "i18n/en-US.ahk",
@@ -270,7 +271,6 @@ if A_IsCompiled {
         "core/more-settings.ahk",
         "core/startup.ahk",
         "core/tray-menu.ahk",
-        "core/updater.ahk",
         "core/config.ahk",
         "core/core.ahk",
         "core/gui.ahk",

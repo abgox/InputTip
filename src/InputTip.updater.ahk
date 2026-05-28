@@ -2,27 +2,21 @@
 
 #NoTrayIcon
 
-#Include manifest.ahk
+#Include core\manifest.ahk
 
-;@Ahk2Exe-SetMainIcon ..\temp\icon\default-app.ico
+;@Ahk2Exe-SetMainIcon temp\icon\default-app.ico
 ;@AHK2Exe-SetName InputTip.updater
 ;@Ahk2Exe-SetOrigFilename InputTip.updater
-;@AHK2Exe-SetDescription InputTip 的更新子进程
+;@AHK2Exe-SetDescription InputTip.updater
 
-#Include config.ahk
-#Include gui.ahk
-#Include i18n.ahk
-#Include ini.ahk
-#Include utils.ahk
-#Include var.ahk
+#Include core\config.ahk
+#Include core\gui.ahk
+#Include core\i18n.ahk
+#Include core\ini.ahk
+#Include core\utils.ahk
+#Include core\var.ahk
 
-baseUrl := [
-    "https://raw.giteeusercontent.com/abgox/InputTip/raw/main/",
-    "https://raw.githubusercontent.com/abgox/InputTip/main/",
-    "https://gh-proxy.org/https://raw.githubusercontent.com/abgox/InputTip/main/"
-]
-
-try TraySetIcon(A_ScriptDir "\..\temp\icon\default-app.png", , 1)
+try TraySetIcon(A_ScriptDir "\temp\icon\default-app.png", , 1)
 
 if A_IsCompiled {
     logFile := A_ScriptDir "\abgox.InputTip-CHANGELOG.md"
@@ -214,7 +208,7 @@ checkUpdate() {
 getRepoCode() {
     ; 是否成功下载 files.ini
     downloadIni := 0
-    out := A_ScriptDir "\..\files.ini"
+    out := A_ScriptDir "\files.ini"
     try FileDelete(out)
     for u in baseUrl {
         try {
@@ -231,7 +225,7 @@ getRepoCode() {
         done := showDownloadProcessGui(i18n("update.downloading"), StrSplit(IniRead(out, "files"), "`n"), "updateVersion")
         if (done) {
             try FileDelete(logFile)
-            Run('"' A_AhkPath '" "' A_ScriptDir '\..\InputTip.ahk" ' keyCount)
+            Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.ahk" ' keyCount)
         }
     } else {
         done := 0
@@ -250,103 +244,4 @@ showLog(g) {
         g.AddText("cGray", i18n("update.logFailed"))
     }
     g.SetFont("s16")
-}
-
-
-showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
-    tipGui(info) {
-        g := createGuiOpt(i18n(titleKey), , "AlwaysOnTop")
-        if (info.i) {
-            g.AddText(, line60)
-            return g
-        }
-        g.AddText(, i18n(labelKey))
-        g.process := g.AddProgress("xm h9 w" info.w, 1)
-        g.tip := g.AddText("xs cGray w" info.w)
-        ; WinSetStyle(-0x80000, g.Hwnd)
-        hMenu := DllCall("GetSystemMenu", "Ptr", g.Hwnd, "Int", 0)
-        DllCall("DeleteMenu", "Ptr", hMenu, "UInt", 0xF060, "UInt", 0)
-        return g
-    }
-    downloadingGui := createUniqueGui(tipGui)
-    fileCount := downloadList.Length
-    downloadingGui.tip.Text := 1 "/" fileCount " : "
-    showGui(downloadingGui)
-    Sleep(500)
-    done := 1
-    doneFileList := []
-    for i, kv in downloadList {
-        part := StrSplit(kv, "=")
-        from := part[1]
-        to := part[2]
-        out := A_ScriptDir "\..\" to ".new"
-        success := 0
-        for u in baseUrl {
-            downloadingGui.process.Value := i / fileCount * 100
-            downloadingGui.tip.Text := i "/" fileCount " : " to
-            if (InStr(out, "/")) {
-                dir := RegExReplace(out, "/[^/]*$", "")
-            } else {
-                dir := ""
-            }
-            try {
-                if (dir) {
-                    if (!DirExist(dir)) {
-                        DirCreate(dir)
-                    }
-                }
-                Download(pathToUrl(u "/" from), out)
-                if (FileExist(out)) {
-                    if (InStr(out, ".ahk") || InStr(out, ".bat")) {
-                        try success := InStr(FileOpen(out, "r").ReadLine(), "InputTip")
-                    } else {
-                        success := 1
-                    }
-                    if (success) {
-                        doneFileList.Push(out)
-                        break
-                    }
-                }
-            }
-        }
-        if (!success) {
-            done := 0
-            break
-        }
-    }
-    downloadingGui.Destroy()
-    if (done) {
-        backupList := []
-        replaceOk := 1
-        for v in doneFileList {
-            target := RegExReplace(v, "\.new$", "")
-            backup := target ".bak"
-            try {
-                if FileExist(target) {
-                    FileCopy(target, backup, 1)
-                    backupList.Push([target, backup])
-                }
-                FileMove(v, target, 1)
-            } catch {
-                replaceOk := 0
-                break
-            }
-        }
-        if (replaceOk) {
-            for item in backupList {
-                backup := item[2]
-                try FileDelete(backup)
-            }
-        } else {
-            for item in backupList {
-                target := item[1]
-                backup := item[2]
-                try FileMove(backup, target, 1)
-            }
-        }
-    } else {
-        for v in doneFileList
-            try FileDelete(v)
-    }
-    return done
 }

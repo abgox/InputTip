@@ -6,7 +6,7 @@ if (A_IsCompiled) {
     currentVersion := "3.2.2"
     versionType := "exe"
 } else {
-    currentVersion := "3.2.2"
+    currentVersion := "3.2.2.1"
     versionType := "zip"
 }
 
@@ -62,3 +62,9 @@ iconDir := dataDir "\icon"
 defaultCursorDir := A_ScriptDir "\temp\cursor"
 defaultSymbolDir := A_ScriptDir "\temp\symbol"
 defaultIconDir := A_ScriptDir "\temp\icon"
+
+baseUrl := [
+    "https://raw.giteeusercontent.com/abgox/InputTip/raw/main/",
+    "https://raw.githubusercontent.com/abgox/InputTip/main/",
+    "https://gh-proxy.org/https://raw.githubusercontent.com/abgox/InputTip/main/"
+]

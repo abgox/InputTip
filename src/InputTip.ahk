@@ -15,7 +15,7 @@ if (A_IsCompiled) {
     if var.runCodeWithAdmin && !A_IsAdmin
         runAsAdmin()
     if var.checkUpdateOnStartup
-        Run('"' A_AhkPath '" "' A_ScriptDir '\core\updater.ahk" ' keyCount " " ProcessExist(), , "Hide", &updaterPID)
+        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.updater.ahk" ' keyCount " " ProcessExist(), , "Hide", &updaterPID)
 }
 
 setTrayIcon(var.iconRunning)

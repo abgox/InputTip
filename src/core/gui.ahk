@@ -27,7 +27,7 @@ createGui(callback) {
  * - 回调函数接受形参 `info`
  *    - `info.x`,`info.y`,`info.w`,`info.h`: 最终计算得到的窗口坐标和宽高。
  *    - 当执行隐藏显示时，`info.i` 为 `1`，否则为 `0`
- * @param {0|1|2|3} cornerPreference 圆角样式 (1=直角，2=圆角，3=小圆角)
+ * @param {0|1|2|3} cornerPreference 边角样式 (1=直角，2=圆角，3=小圆角)
  * @param {1|0} useImmersiveDarkMode 是否使用深色模式
  * @returns {Gui} 返回 Gui 对象
  */
@@ -41,7 +41,7 @@ createUniqueGui(callback, cornerPreference := 0, useImmersiveDarkMode := 1) {
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 20, "Int*", useImmersiveDarkMode, "Int", 4)
         }
         if (cornerPreference) {
-            ; 圆角样式（DWMWA_WINDOW_CORNER_PREFERENCE = 33）
+            ; 边角样式（DWMWA_WINDOW_CORNER_PREFERENCE = 33）
             ;
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 33, "Int*", cornerPreference, "Int", 4)
         }

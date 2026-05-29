@@ -239,7 +239,7 @@ e_symbol(*) {
         _w := bw / 4 - g.MarginX / 2.5
         g.AddButton("xs w" _w, i18n("symbol.white/blacklist")).OnEvent("Click", (*) =>
             createProcessMenuGui(
-                i18n("symbol.white/blacklist"),
+                i18n("symbol") " - " i18n("symbol.white/blacklist"),
                 [
                     i18n("symbol.whitelist"),
                     i18n("symbol.blacklist"),
@@ -254,7 +254,7 @@ e_symbol(*) {
         g.AddButton("yp w" _w, i18n("symbolScreenOffset")).OnEvent("Click", e_screenOffset)
         g.AddButton("yp w" _w, i18n("symbolWindowOffset")).OnEvent("Click", (*) =>
             createProcessMenuGui(
-                i18n("symbolWindowOffset"),
+                i18n("symbol") " - " i18n("symbolWindowOffset"),
                 [
                     i18n("windowRule")
                 ],
@@ -273,7 +273,7 @@ e_symbol(*) {
         )
         g.AddButton("yp w" _w, i18n("symbolCursorCapture")).OnEvent("Click", (*) =>
             createProcessMenuGui(
-                i18n("symbolCursorCapture"),
+                i18n("symbol") " - " i18n("symbolCursorCapture"),
                 [
                     i18n("windowRule")
                 ],
@@ -299,7 +299,7 @@ e_symbol(*) {
         g.AddButton("xs w" bw, i18n("symbolNearCursor.window")).OnEvent("Click", set_app_list)
         set_app_list(*) {
             createProcessMenuGui(
-                i18n("symbolNearCursor.window"),
+                i18n("symbolNearCursorActive") " - " i18n("symbolNearCursor.window"),
                 [
                     i18n("windowRule")
                 ],
@@ -316,7 +316,7 @@ e_symbol(*) {
 symbolPictureConfig(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbolPicture"))
+        g := createGuiOpt(i18n("symbol") " - " i18n("symbolPicture"))
         tab := renderTab(g, [i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
@@ -372,7 +372,7 @@ symbolPictureConfig(*) {
 symbolShapeConfig(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbolShape"))
+        g := createGuiOpt(i18n("symbol") " - " i18n("symbolShape"))
         tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
@@ -434,7 +434,7 @@ symbolShapeConfig(*) {
 symbolTextConfig(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbolText"))
+        g := createGuiOpt(i18n("symbol") " - " i18n("symbolText"))
         tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
@@ -500,7 +500,7 @@ symbolTextConfig(*) {
 e_screenOffset(*) {
     showGui(createUniqueGui(offsetScreenGui))
     offsetScreenGui(info) {
-        g := createGuiOpt(i18n("symbolScreenOffset"))
+        g := createGuiOpt(i18n("symbol") " - " i18n("symbolScreenOffset"))
 
         g.AddLink("Section", getDocsLink("tip/symbol/screen-offset"))
         pages := []

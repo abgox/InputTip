@@ -64,7 +64,7 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
         try callback(key, value)
     }
 
-    if InStr(key, "cursor") {
+    if key == "cursorActive" || InStr(key, "cursorPath") {
         if var.cursorActive {
             updateCursor()
             loadCursor(currentState, 1)
@@ -144,7 +144,7 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
         case "iconRunning", "iconPaused":
             setTrayIcon(value)
         case "enableCustomTrayTip", "trayTipTemplate", "enableKeyStats", "keyStatsTemplate":
-            SetTimer(updateTrayTip, -1500)
+            SetTimer(updateTrayTip, -1000)
         default:
     }
 }

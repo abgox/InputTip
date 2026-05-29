@@ -72,7 +72,7 @@ body:
       placeholder: |
         如何复现这个 bug？
         描述尽量简单易懂。
-        如果可以，请提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
+        请尽量提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
     validations:
       required: true
   - type: textarea
@@ -82,21 +82,13 @@ body:
       placeholder: |
         你认为它应该是什么样的？
   - type: textarea
-    id: actually-happening
-    attributes:
-      label: 实际发生了什么？
-      placeholder: |
-        描述尽量简单易懂。
-        如果可以，请提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
-    validations:
-      required: true
-  - type: textarea
     id: config
     attributes:
-      label: 请提供你的配置文件 config.ini
+      label: 请提供你的配置文件 `config.ini`
+      render: text
       description: |
         - 使用 `托盘菜单` => `更多设置` => `打开数据目录`
-        - 找到其中的 config.ini，将文件内容复制到此处
+        - 找到其中的 `config.ini`，将文件内容复制到此处
       placeholder: |
         [Settings]
         cursorActive=1

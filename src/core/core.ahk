@@ -2,8 +2,8 @@
 
 currentState := "EN"
 lastInputState := "", lastExportState := ""
-hasWindowChange := 1, canShowSymbol := 0
-lastWindow := "", lastSymbol := "", lastCursor := ""
+hasWindowChange := 1, hasProcessChange := 1, canShowSymbol := 0
+lastWindow := "", lastProcess := "", lastSymbol := "", lastCursor := ""
 exeName := "", exeTitle := "", leaveDelay := var.pollInterval + 500
 
 updateSymbolDelay()
@@ -24,9 +24,14 @@ loop {
                 continue
             }
 
+            hasProcessChange := lastProcess != exeName
             hasWindowChange := lastWindow != exeName ":" exeTitle
 
-            if (hasWindowChange) {
+            if hasProcessChange {
+                lastProcess := exeName
+            }
+
+            if hasWindowChange {
                 if validateMatch(exeName, exeTitle, var.WindowAutoPause) {
                     pauseApp()
                     continue
@@ -74,7 +79,7 @@ loop {
         if (!isJAB) {
             loadCursor(currentState)
             if (var.overlayActive) {
-                if (currentState != lastInputState || (var.overlayShowOnWindowChange && hasWindowChange)) {
+                if (currentState != lastInputState || (var.overlayShowOnWindowChange && hasWindowChange) || (var.overlayShowOnProcessChange && hasProcessChange)) {
                     showOverlay(currentState)
                     lastInputState := currentState
                 }

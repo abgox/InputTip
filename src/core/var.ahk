@@ -111,6 +111,7 @@ var := {
     overlayCornerPreference: readIni("overlayCornerPreference", 2),
     overlayAnimation: readIni("overlayAnimation", 2),
     overlayShowOnWindowChange: readIni("overlayShowOnWindowChange", 0),
+    overlayShowOnProcessChange: readIni("overlayShowOnProcessChange", 0),
     overlayHideDelay: readIni("overlayHideDelay", 2000),
     overlayTextFont: readIni("overlayTextFont", "Microsoft YaHei"),
     overlayTextSize: readIni("overlayTextSize", 22),

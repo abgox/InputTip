@@ -128,7 +128,7 @@ e_overlay(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        tab := renderTab(g, [i18n("basicConfig"), i18n("basicConfig") 2, i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("basicConfig") 2, i18n("basicConfig") 3, i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/overlay"))
@@ -140,6 +140,11 @@ e_overlay(*) {
             ])
 
         renderEditGroup(g, "overlayHideDelay", "Number Limit5")
+        renderRadioGroup(g, "overlayShowOnProcessChange", [["yes", 1], ["no", 0]])
+        renderRadioGroup(g, "overlayShowOnWindowChange", [["yes", 1], ["no", 0]])
+
+        tab.UseTab(2)
+        g.AddLink("Section", getDocsLink("tip/overlay"))
         renderRadioGroup(g, "overlayAnimation",
             [
                 ["none", 0],
@@ -163,10 +168,9 @@ e_overlay(*) {
                 ["edgeStyle.static", 3]
             ])
 
-        tab.UseTab(2)
-        g.AddLink("Section", getDocsLink("tip/overlay"))
 
-        renderRadioGroup(g, "overlayShowOnWindowChange", [["yes", 1], ["no", 0]])
+        tab.UseTab(3)
+        g.AddLink("Section", getDocsLink("tip/overlay"))
         renderDropDownListGroup(g, "overlayTextFont", fontList)
         renderEditGroup(g, "overlayTextSize", "Number Limit2")
         renderEditGroup(g, "overlayTextWeight", "Number Limit3")
@@ -186,7 +190,7 @@ e_overlay(*) {
 
         for i, v in var.stateList {
             if (Mod(i - 1, 3) == 0) {
-                tab.UseTab(((i - 1) // 3) + 3)
+                tab.UseTab(((i - 1) // 3) + 4)
                 g.AddLink("Section", getDocsLink("tip/overlay"))
             }
 

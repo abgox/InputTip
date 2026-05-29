@@ -5,7 +5,7 @@ JAB_PID := ""
 JABPath := A_ScriptDir "/InputTip.JAB.JetBrains.ahk"
 updaterPID := "abgox.InputTip.updater.exe"
 
-#Include "*i manifest.ahk"
+#Include manifest.ahk
 
 #Include gui.ahk
 #Include i18n.ahk

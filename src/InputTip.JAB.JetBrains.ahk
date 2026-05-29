@@ -1,10 +1,11 @@
 ; InputTip
 
-isJAB := 1
+#NoTrayIcon
 
 #Include core\manifest.ahk
 
-#NoTrayIcon
+isJAB := 1
+
 ;@AHK2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
 ;@AHK2Exe-SetDescription InputTip.JAB.JetBrains

@@ -28,15 +28,18 @@ SetStoreCapsLockMode(0)
 
 OnError((*) => 0)
 
+isJAB := 0
 OnMessage(0x007E, OnDisplayChange)
 OnDisplayChange(wParam, lParam, msg, hwnd) {
     SetTimer(updateScreenInfo, -500)
 }
 updateScreenInfo() {
-    var.screenNum := MonitorGetCount()
-    var.screenList := getScreenInfo()
-    if !isJAB
-        updateOverlay()
+    try {
+        var.screenNum := MonitorGetCount()
+        var.screenList := getScreenInfo()
+        if !isJAB
+            updateOverlay()
+    }
 }
 
 hideOnTrayGui := []

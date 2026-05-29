@@ -113,6 +113,7 @@ var := {
     overlayShowOnWindowChange: readIni("overlayShowOnWindowChange", 0),
     overlayShowOnProcessChange: readIni("overlayShowOnProcessChange", 0),
     overlayHideDelay: readIni("overlayHideDelay", 2000),
+    overlayShowMode: readIni("overlayShowMode", "blacklist"),
     overlayTextFont: readIni("overlayTextFont", "Microsoft YaHei"),
     overlayTextSize: readIni("overlayTextSize", 22),
     overlayTextWeight: readIni("overlayTextWeight", 700),
@@ -209,6 +210,7 @@ for v in var.stateList {
 }
 
 for v in [
+    "Window.Overlay.Show", "Window.Overlay.Hide",
     "Window.Symbol.Show", "Window.Symbol.Hide", "Window.Symbol.NearCursor",
     "Window.AutoExit", "Window.AutoPause", "Window.IgnoreStateSwitch"
 ] {

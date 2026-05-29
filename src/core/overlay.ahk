@@ -168,6 +168,37 @@ e_overlay(*) {
                 ["edgeStyle.static", 3]
             ])
 
+        renderRadioGroup(g, "overlayShowMode",
+            [
+                ["overlayBlacklist", "blacklist"],
+                ["overlayWhitelist", "whitelist"]
+            ])
+
+        _w := bw / 2 - g.MarginX / 4
+        g.AddButton("xs w" _w, i18n("overlayBlacklistBtn")).OnEvent("Click", (*) =>
+            createProcessMenuGui(
+                i18n("overlay") " - " i18n("overlayBlacklistBtn"),
+                [
+                    i18n("overlayBlacklistBtn"),
+                ],
+                getDocsLink("tip/overlay/list-mechanism"),
+                [
+                    "Window.Overlay.Hide"
+                ]
+            )
+        )
+        g.AddButton("yp w" _w, i18n("overlayWhitelistBtn")).OnEvent("Click", (*) =>
+            createProcessMenuGui(
+                i18n("overlay") " - " i18n("overlayWhitelistBtn"),
+                [
+                    i18n("overlayWhitelistBtn"),
+                ],
+                getDocsLink("tip/overlay/list-mechanism"),
+                [
+                    "Window.Overlay.Show"
+                ]
+            )
+        )
 
         tab.UseTab(3)
         g.AddLink("Section", getDocsLink("tip/overlay"))

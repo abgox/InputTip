@@ -80,7 +80,14 @@ loop {
             loadCursor(currentState)
             if (var.overlayActive) {
                 if (currentState != lastInputState || (var.overlayShowOnWindowChange && hasWindowChange) || (var.overlayShowOnProcessChange && hasProcessChange)) {
-                    showOverlay(currentState)
+                    switch var.overlayShowMode {
+                        case "blacklist":
+                            validateMatch(exeName, exeTitle, var.WindowOverlayHide) ? hideOverlay() : showOverlay(currentState)
+                        case "whitelist":
+                            validateMatch(exeName, exeTitle, var.WindowOverlayShow) ? showOverlay(currentState) : hideOverlay()
+                        default:
+                            showOverlay(currentState)
+                    }
                     lastInputState := currentState
                 }
             }

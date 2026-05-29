@@ -1,6 +1,7 @@
 <h1 align="center">✨<a href="https://inputtip.abgox.com">InputTip</a>✨</h1>
 
 <p align="center">
+    <a href="https://inputtip.abgox.com">官网</a> |
     <a href="https://github.com/abgox/InputTip">Github</a> |
     <a href="https://gitee.com/abgox/InputTip">Gitee</a>
 </p>
@@ -30,8 +31,13 @@
 - [鼠标方案](https://inputtip.abgox.com/docs/tip/cursor)、[浮窗方案](https://inputtip.abgox.com/docs/tip/overlay)、[符号方案](https://inputtip.abgox.com/docs/tip/symbol) 等多种状态提示
 - 基于 [窗口规则](https://inputtip.abgox.com/docs/switch/window) 和 [热键](https://inputtip.abgox.com/docs/switch/hotkey) 的状态切换
 - 通过 [状态导出](https://inputtip.abgox.com/docs/input-method/export-state) 实现扩展集成: [InputTip for VSCode](https://inputtip.abgox.com/docs/inputtip-for-vscode)
+- ...
 
 _更多详情请参阅 [文档](https://inputtip.abgox.com/docs)_
+
+## 新的变化
+
+[更新日志](./src/CHANGELOG.md)
 
 ## 相关项目
 
@@ -42,6 +48,12 @@ _更多详情请参阅 [文档](https://inputtip.abgox.com/docs)_
 - [KBLAutoSwitch - flyinclouds](https://github.com/flyinclouds/KBLAutoSwitch)
 - [Language Indicator - yakunins](https://github.com/yakunins/language-indicator)
 - [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot)
+
+## 我的其他项目
+
+- [abyss](https://github.com/abgox/abyss)
+- [SpaceKey](https://github.com/abgox/SpaceKey)
+- [PSCompletions](https://github.com/abgox/PSCompletions)
 
 ## 支持与赞助
 

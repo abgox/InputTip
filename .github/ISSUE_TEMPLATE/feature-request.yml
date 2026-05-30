@@ -4,6 +4,15 @@ title: "[Request]: "
 labels: ["enhancement"]
 assignees: [abgox]
 body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 你应该确保已经完成了下面这些事情
+      options:
+        - label: 你正在使用 InputTip 的最新版本
+          required: true
+        - label: 你确定这个新功能是合理的，在 InputTip 中没有等效的相关功能
+          required: true
   - type: textarea
     id: description
     attributes:

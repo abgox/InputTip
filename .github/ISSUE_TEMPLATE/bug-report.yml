@@ -9,31 +9,30 @@ body:
     attributes:
       label: 你应该确保已经完成了下面这些事情
       options:
-        - label: 你正在使用 InputTip 最新版本
+        - label: 你正在使用 InputTip 的最新版本
           required: true
-        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你遇到的问题，但没有找到相关 issue
+        - label: 你已经在 [Issues](https://github.com/abgox/InputTip/issues) 中搜索了你的问题，但没有找到相关 issue
           required: true
-        - label: 你已经查看了 [文档](https://inputtip.abgox.com/docs/), 其中没有你遇到的问题
+        - label: 你已经查看了 [文档](https://inputtip.abgox.com/docs/), 其中的内容没有解决你的问题
           required: true
-        - label: 你已经查看了 [InputTip 使用指南](https://inputtip.abgox.com/docs/guide), 仍未解决你的问题
+        - label: 你已经查看了 [使用指南](https://inputtip.abgox.com/docs/guide), 仍未解决你的问题
           required: true
   - type: input
     id: version
     attributes:
       label: 当前使用的 InputTip 版本
       description: |
-        - 在软件的托盘菜单中，点击 **关于** 进行查看
+        - 在软件的 `托盘菜单` 中，点击 `关于` 进行查看
         - 如果不是最新版本，请先更新到最新版本
-        - exe 版本可能落后，请直接使用 zip 版本
         - 更新后如果问题依然存在，再提交 issue
-        - 不要使用 **最新版本** 这样的描述，必须是具体的版本号
-      placeholder: v3.2.2
+        - 不要填写 `最新版本` 这样的描述，必须是具体的版本号
+      placeholder: v3.3.0
     validations:
       required: true
   - type: dropdown
-    id: InputTip-type
+    id: type
     attributes:
-      label: 你正在使用哪种类型的安装包？
+      label: 你正在使用哪种类型的版本？
       description: |
         - 如果你正在使用 exe 版本，建议切换到 zip 版本
         - [关于 zip 版本和 exe 版本的区别](https://inputtip.abgox.com/docs/zip-vs-exe)
@@ -47,7 +46,7 @@ body:
     id: windows-version
     attributes:
       label: 你正在使用什么 Windows 系统版本？
-      description: 如果是 Windows 10 以下的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本。
+      description: 如果是 Windows 10 以下的系统，请选择 `其他`, 并在最后的补充信息中说明具体系统版本
       options:
         - Windows 11
         - Windows 10
@@ -58,21 +57,20 @@ body:
   - type: input
     id: exe
     attributes:
-      label: 哪一个软件出现了问题？软件进程名叫什么？
+      label: 哪一个软件出现了问题？软件进程名称是什么？
       description: |
         - 使用 `托盘菜单` => `窗口信息`
         - 它可以快速获取到当前聚焦的应用窗口的相关信息
-      placeholder: code.exe
+      placeholder: Code.exe
     validations:
       required: true
   - type: textarea
     id: steps-to-reproduce
     attributes:
-      label: bug 复现步骤
+      label: 问题的复现步骤
       placeholder: |
-        如何复现这个 bug？
-        描述尽量简单易懂。
-        请尽量提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
+        它实际发生了什么？如何复现这个问题？
+        描述尽量简单易懂，请尽量提供截图、gif、录屏等来帮助理解这个问题发生的全过程。
     validations:
       required: true
   - type: textarea
@@ -84,7 +82,7 @@ body:
   - type: textarea
     id: config
     attributes:
-      label: 请提供你的配置文件 `config.ini`
+      label: 请提供你的配置文件 config.ini
       render: text
       description: |
         - 使用 `托盘菜单` => `更多设置` => `打开数据目录`
@@ -93,7 +91,7 @@ body:
         [Settings]
         cursorActive=1
         overlayActive=1
-        version-zip=3.2.2
+        version-zip=3.3.0
         ...
     validations:
       required: true

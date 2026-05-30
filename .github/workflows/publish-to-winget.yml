@@ -36,7 +36,7 @@ jobs:
           git checkout -b $new_branch
           git add .
           git commit -m $commit_msg
-          git push origin $new_branch
+          git push -f origin $new_branch
 
           gh pr create `
             --title "$pr_title" `

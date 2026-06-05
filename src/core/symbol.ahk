@@ -142,7 +142,7 @@ showSymbol(state, left, top, right, bottom, nearCursor := 0) {
         offsetY := top
         cursorDeltaX := var.symbolNearCursorOffsetX
         cursorDeltaY := var.symbolNearCursorOffsetY
-    } else if (var.modeList.JAB.Has(exeName)) {
+    } else if (var.modeList.JAB.Has(exeName) && false) {
         offsetY := top + bottom
     } else {
         offsetY := var.symbolOffsetBaseY == "below" ? bottom : top

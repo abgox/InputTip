@@ -34,6 +34,9 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         left := 0, top := 0, right := 0, bottom := 0
         return 0
     }
+    if (!left && !top && !right && !bottom) {
+        return returnCanShowSymbolN(&left, &top, &right, &bottom)
+    }
     s := isWhichScreen(var.screenList)
     if (s.num) {
         try {
@@ -94,4 +97,5 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
     }
 }
 
+#Include returnCanShowSymbolN.ahk
 #Include core\core.ahk

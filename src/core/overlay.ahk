@@ -26,6 +26,9 @@ showOverlay(state) {
     Xpos := var.%"overlayOffsetX" state%
     basePosition := var.%"overlayBasePosition" state%
 
+    WinX := 0, WinY := 0, WinW := 0, WinH := 0
+    try WinGetPos(&WinX, &WinY, &WinW, &WinH, "A")
+
     try {
         i := var.screenNum
         while (i > 0) {
@@ -74,6 +77,33 @@ showOverlay(state) {
                 case "bottomRightWorkArea":
                     x := WARight - scaledW + Xpos
                     y := WABottom - scaledH + Ypos
+                case "topWindow":
+                    x := WinX + WinW / 2 - scaledW / 2 + Xpos
+                    y := WinY + Ypos
+                case "bottomWindow":
+                    x := WinX + WinW / 2 - scaledW / 2 + Xpos
+                    y := WinY + WinH - scaledH + Ypos
+                case "leftWindow":
+                    x := WinX + Xpos
+                    y := WinY + WinH / 2 - scaledH / 2 + Ypos
+                case "rightWindow":
+                    x := WinX + WinW - scaledW + Xpos
+                    y := WinY + WinH / 2 - scaledH / 2 + Ypos
+                case "topLeftWindow":
+                    x := WinX + Xpos
+                    y := WinY + Ypos
+                case "topRightWindow":
+                    x := WinX + WinW - scaledW + Xpos
+                    y := WinY + Ypos
+                case "bottomLeftWindow":
+                    x := WinX + Xpos
+                    y := WinY + WinH - scaledH + Ypos
+                case "bottomRightWindow":
+                    x := WinX + WinW - scaledW + Xpos
+                    y := WinY + WinH - scaledH + Ypos
+                case "centerWindow":
+                    x := WinX + WinW / 2 - scaledW / 2 + Xpos
+                    y := WinY + WinH / 2 - scaledH / 2 + Ypos
                 default: ; center
                     x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
                     y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
@@ -219,7 +249,11 @@ e_overlay(*) {
 
         posTextMap := Map()  ; text -> value
         posValueMap := Map() ; value -> text
-        posList := ["center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight", "bottomWorkArea", "bottomLeftWorkArea", "bottomRightWorkArea"]
+        posList := [
+            "center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight",
+            "centerWindow", "topWindow", "bottomWindow", "leftWindow", "rightWindow", "topLeftWindow", "topRightWindow", "bottomLeftWindow", "bottomRightWindow",
+            "bottomWorkArea", "bottomLeftWorkArea", "bottomRightWorkArea"
+        ]
         for i, v in posList {
             text := i18n("overlayBasePosition." v)
             posTextMap.Set(text, v)

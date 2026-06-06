@@ -31,6 +31,7 @@ showOverlay(state) {
         while (i > 0) {
             g := var.%"overlayGui" state i%
             MonitorGet(i, &Left, &Top, &Right, &Bottom)
+            MonitorGetWorkArea(i, &WALeft, &WATop, &WARight, &WABottom)
             pt := Buffer(8, 0)
             NumPut("Int", (Left + Right) // 2, pt, 0)
             NumPut("Int", (Top + Bottom) // 2, pt, 4)
@@ -64,6 +65,15 @@ showOverlay(state) {
                 case "bottomRight":
                     x := Right - scaledW + Xpos
                     y := Bottom - scaledH + Ypos
+                case "bottomWorkArea":
+                    x := WALeft + Abs(WARight - WALeft) / 2 - scaledW / 2 + Xpos
+                    y := WABottom - scaledH + Ypos
+                case "bottomLeftWorkArea":
+                    x := WALeft + Xpos
+                    y := WABottom - scaledH + Ypos
+                case "bottomRightWorkArea":
+                    x := WARight - scaledW + Xpos
+                    y := WABottom - scaledH + Ypos
                 default: ; center
                     x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
                     y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
@@ -122,7 +132,7 @@ e_overlay(*) {
         g := createGuiOpt(i18n("overlay"))
 
         if (info.i) {
-            g.AddText(, line70)
+            g.AddText(, line80)
             return g
         }
         g.w := w := info.w
@@ -209,16 +219,13 @@ e_overlay(*) {
 
         posTextMap := Map()  ; text -> value
         posValueMap := Map() ; value -> text
-        posList := ["center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight"]
+        posList := ["center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight", "bottomWorkArea", "bottomLeftWorkArea", "bottomRightWorkArea"]
         for i, v in posList {
             text := i18n("overlayBasePosition." v)
             posTextMap.Set(text, v)
             posValueMap.Set(v, text)
             posList[i] := text
         }
-
-        editOpt := " w" bw / 6
-
         for i, v in var.stateList {
             if (Mod(i - 1, 3) == 0) {
                 tab.UseTab(((i - 1) // 3) + 4)
@@ -229,17 +236,17 @@ e_overlay(*) {
             g.AddGroupBox("xs h120 w" bw, i18n("state." v))
             g.SetFont("Norm")
 
-            renderEditLabel(g, "overlayText" v, editOpt, "overlayText")
-            renderEditLabel(g, "overlayOffsetX" v, editOpt, "overlayOffsetX", "yp")
+            renderEditLabel(g, "overlayText" v, "w" bw / 3, "overlayText")
+            renderEditLabel(g, "overlayOffsetX" v, "w" bw / 8, "overlayOffsetX", "yp")
             renderColorPicker(g, "overlayTextColor" v, "overlayTextColor")
 
             g.AddText("xs+20 yp+40", i18n("overlayBasePosition"))
-            _ := g.AddDropDownList("yp w" bw / 6, posList)
+            _ := g.AddDropDownList("yp r9 w" bw / 3, posList)
             try _.Text := posValueMap.Get(var.%"overlayBasePosition" v%)
             _.state := v
             _.OnEvent("Change", (i, *) => changeConfig("overlayBasePosition" i.state, posTextMap.Get(i.Text), 1))
 
-            renderEditLabel(g, "overlayOffsetY" v, editOpt, "overlayOffsetY", "yp")
+            renderEditLabel(g, "overlayOffsetY" v, "w" bw / 8, "overlayOffsetY", "yp")
             renderColorPicker(g, "overlayBgColor" v, "overlayBgColor")
 
         }

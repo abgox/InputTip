@@ -170,13 +170,12 @@ renderRadioGroupList(g, list) {
  * @param {String} labelKey 标签的 i18n key
  */
 renderColorPicker(g, key, labelKey := key) {
-    w := " w" (g.bw / 6)
     ctrlKey := key A_Now
     _ := g.AddText("yp", i18n(labelKey))
     _.ctrl := ctrlKey
     _.key := key
     _.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
-    var.%ctrlKey% := pickerCtrl := g.AddText("yp " w)
+    var.%ctrlKey% := pickerCtrl := g.AddText("yp w100")
     pickerCtrl.Text := var.%key%
     pickerCtrl.ctrl := ctrlKey
     pickerCtrl.key := key

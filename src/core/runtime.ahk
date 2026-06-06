@@ -4,6 +4,7 @@ runAsAdmin() {
     try {
         Run('*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount)
     } catch {
+        try TraySetIcon(A_ScriptDir "\temp\icon\default-app.png", , 1)
         showGui(createErrorTipGui(i18n("runCodeWithAdmin.error", 1), i18n("runCodeWithAdmin")))
         changeConfig("runCodeWithAdmin", 0)
     }
@@ -76,6 +77,7 @@ updateTrayTip(paused := A_IsPaused) {
             }
             if (A_PriorKey != last) {
                 keyCount++
+                try IniWrite(keyCount, A_ScriptDir "\data\stats.ini", "DailyKeystrokes", FormatTime(, "yyyy-MM-dd"))
                 last := A_PriorKey
                 replaceTip()
             }
@@ -83,7 +85,7 @@ updateTrayTip(paused := A_IsPaused) {
     }
 
     replaceTip() {
-        tip := StrReplace(trayTipTemplate keyStatsTemplate, "%appState%", paused ? i18n("state.Paused") : i18n("state.Running"))
+        tip := StrReplace(trayTipTemplate keyStatsTemplate, "%appState%", paused ? i18n("Paused") : i18n("Running"))
         tip := StrReplace(tip, "%keyCount%", keyCount)
         tip := StrReplace(tip, "%\n%", "`n")
         A_IconTip := tip

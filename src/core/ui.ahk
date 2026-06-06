@@ -9,8 +9,9 @@
  */
 renderGroupBox(g, labelKey, layout := "xs", options := "") {
     g.SetFont("Bold")
-    g.AddGroupBox(layout " " options, i18n(labelKey))
+    _ := g.AddGroupBox(layout " " options, i18n(labelKey))
     g.SetFont("Norm")
+    return _
 }
 
 /**
@@ -31,7 +32,7 @@ renderTab(g, pages, options := "") {
  * @param {String} options 额外选项
  */
 renderText(g, textKey, layout, options) {
-    g.AddText(layout " " options, i18n(textKey))
+    return g.AddText(layout " " options, i18n(textKey))
 }
 
 /**
@@ -45,6 +46,7 @@ renderEdit(g, key, layout := "yp", options := "") {
     _ := g.AddEdit("r1 " layout " " options)
     _.Value := var.%key%
     _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Value, 1))
+    return _
 }
 
 /**
@@ -54,8 +56,9 @@ renderEdit(g, key, layout := "yp", options := "") {
  * @param {"Number"|"Number Limit2"|String} options 编辑框的额外选项
  */
 renderEditGroup(g, key, options) {
-    renderGroupBox(g, key, "xs", "h80 w" g.bw)
-    renderEdit(g, key, "xs+20 yp+35", "w" g.bw - 40 " " options)
+    _ := renderGroupBox(g, key, "xs", "h80 w" g.bw)
+    __ := renderEdit(g, key, "xs+20 yp+35", "w" g.bw - 40 " " options)
+    return { group: _, edit: __ }
 }
 
 /**
@@ -67,8 +70,9 @@ renderEditGroup(g, key, options) {
  * @param {String} textLayout 标签的布局配置
  */
 renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+20 yp+35") {
-    renderText(g, labelKey, textLayout, "")
-    renderEdit(g, editKey, "yp", editOptions)
+    _ := renderText(g, labelKey, textLayout, "")
+    __ := renderEdit(g, editKey, "yp", editOptions)
+    return { text: _, edit: __ }
 }
 
 /**
@@ -81,20 +85,21 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
  */
 renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "") {
     static subclassProc := CallbackCreate(ComboBoxSubclass, "F", 6)
+    valMap := Map()
     _list := []
-    for v in list
-        _list.Push(i18n(v))
-    _ := g.AddDropDownList(layout " AltSubmit r9 " options, _list)
-    val := var.%key%
-    if (IsNumber(val)) {
-        try _.Value := val + 1
-        _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Value - 1))
-    } else {
-        try _.Text := val
-        _.OnEvent("Change", (ctrl, *) => changeConfig(key, ctrl.Text))
+    for v in list {
+        val := i18n(v)
+        _list.Push(val)
+        valMap.Set(val, v)
     }
+    _ := g.AddDropDownList(layout " r9 " options, _list)
+    val := var.%key%
+    try _.Text := i18n(val)
+    _.OnEvent("Change", (ctrl, *) => changeConfig(key, valMap.Get(ctrl.text)))
 
     DllCall("comctl32\SetWindowSubclass", "ptr", _.Hwnd, "ptr", subclassProc, "uptr", 1, "uptr", 0)
+
+    return _
 }
 
 ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
@@ -113,8 +118,9 @@ ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
  * @param {String} listOptions 列表的额外选项
  */
 renderDropDownListGroup(g, groupLabelKey, list, listLabelKey := groupLabelKey, groupLayout := "xs", listOptions := "") {
-    renderGroupBox(g, groupLabelKey, groupLayout, "h80 w" g.bw)
-    renderDropDownList(g, listLabelKey, list, "xs+20 yp+35", "w" g.bw - 40 " " listOptions)
+    _ := renderGroupBox(g, groupLabelKey, groupLayout, "h80 w" g.bw)
+    __ := renderDropDownList(g, listLabelKey, list, "xs+20 yp+35", "w" g.bw - 40 " " listOptions)
+    return { group: _, dropDownList: __ }
 }
 
 /**
@@ -124,17 +130,14 @@ renderDropDownListGroup(g, groupLabelKey, list, listLabelKey := groupLabelKey, g
  * @param {String} textKey 按钮文本 (i18n key)
  * @param {String|Number} value 选中时写入的值
  * @param {"xs+20 yp+35"|"yp"} layout 布局配置
- * @param {Func} dbClickEvent 双击事件回调
+ * @param {Func} callback 点击按钮后的回调
  */
-renderRadio(g, key, textKey, value, layout, dbClickEvent := "") {
+renderRadio(g, key, textKey, value, layout, callback := (key, value, *) => changeConfig(key, value)) {
     isChecked := (var.%key% == value ? "Checked" : "")
     labelText := (SubStr(textKey, 1, 1) == ".") ? i18n(key textKey) : i18n(textKey)
     _ := g.AddRadio(layout " " isChecked, labelText)
-    _.val := value
-    _.OnEvent("Click", (ctrl, *) => changeConfig(key, ctrl.val))
-    if (dbClickEvent) {
-        _.OnEvent("DoubleClick", dbClickEvent)
-    }
+    _.OnEvent("Click", callback.Bind(key, value))
+    return _
 }
 
 /**
@@ -144,12 +147,15 @@ renderRadio(g, key, textKey, value, layout, dbClickEvent := "") {
  * @param {Array} radios 单选按钮列表 (i18n key)
  */
 renderRadioGroup(g, key, radios) {
-    renderGroupBox(g, key, "xs", "h70 w" g.bw)
+    _ := renderGroupBox(g, key, "xs", "h70 w" g.bw)
     for i, k in radios {
         layout := i == 1 ? "xs+20 yp+35" : "yp"
-        cb := k.Length == 3 ? k[3] : ""
-        renderRadio(g, key, k[1], k[2], layout, cb)
+        param := [g, key, k[1], k[2], layout]
+        if k.Length == 3
+            param.Push(k[3])
+        renderRadio(param*)
     }
+    return _
 }
 
 /**
@@ -158,9 +164,8 @@ renderRadioGroup(g, key, radios) {
  * @param {Array} list 单选按钮组列表
  */
 renderRadioGroupList(g, list) {
-    for v in list {
+    for v in list
         renderRadioGroup(g, v[1], v[2])
-    }
 }
 
 /**
@@ -168,25 +173,30 @@ renderRadioGroupList(g, list) {
  * @param {Gui} g
  * @param {String} key 绑定控件的 key
  * @param {String} labelKey 标签的 i18n key
+ * @param {"yp"|"xs+20 yp+35"|String} layout
  */
-renderColorPicker(g, key, labelKey := key) {
+renderColorPicker(g, key, labelKey := key, layout := "yp") {
     ctrlKey := key A_Now
-    _ := g.AddText("yp", i18n(labelKey))
+    _ := g.AddText(layout, i18n(labelKey))
     _.ctrl := ctrlKey
     _.key := key
     _.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
-    var.%ctrlKey% := pickerCtrl := g.AddText("yp w100")
+    _.OnEvent("ContextMenu", (ctrl, *) => _clearColor(ctrl.ctrl, ctrl.key))
+    var.%ctrlKey% := pickerCtrl := g.AddText("yp w120")
     pickerCtrl.Text := var.%key%
     pickerCtrl.ctrl := ctrlKey
     pickerCtrl.key := key
     pickerCtrl.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
     _changeColor(color, cKey, oKey) {
-        if (!color)
+        if !color
             return
         try {
             var.%cKey%.Value := color
-            changeConfig(oKey, color, 1)
-            var.%oKey% := color
+            changeConfig(oKey, color)
         }
+    }
+    _clearColor(cKey, oKey) {
+        var.%cKey%.Value := ""
+        changeConfig(oKey, "")
     }
 }

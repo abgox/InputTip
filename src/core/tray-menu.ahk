@@ -13,7 +13,8 @@ fontList.InsertAt(1, "Microsoft YaHei")
 
 makeTrayMenu() {
     A_TrayMenu.Delete()
-    A_TrayMenu.Add(i18n("usageGuide"), (*) => Run("https://inputtip.abgox.com/zh-cn/docs/guide"))
+    A_TrayMenu.Add(i18n("usageGuide"), (*) => showGui(createMsgGui(i18n("usageGuide.tips", 1), i18n("usageGuide"))))
+
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("startup"), e_startup)
     checkStartup()
@@ -28,56 +29,48 @@ makeTrayMenu() {
             A_TrayMenu.Check(i18n("runCodeWithAdmin"))
         }
     }
-
-    A_TrayMenu.Add()
-    A_TrayMenu.Add(i18n("state.Pause/Run"), pauseApp)
-    A_TrayMenu.Default := i18n("state.Pause/Run")
-    A_TrayMenu.ClickCount := 1
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("inputMethod"), e_inputMethod)
-    A_TrayMenu.Add(i18n("stateSwitch.window"), (*) =>
-        createProcessMenuGui(
-            i18n("stateSwitch.window"),
-            [
-                i18n("state.CN"),
-                i18n("state.EN"),
-                i18n("state.Caps")
-            ],
-            getDocsLink("switch/window"),
-            [
-                "Window.AutoSwitch.CN",
-                "Window.AutoSwitch.EN",
-                "Window.AutoSwitch.Caps"
-            ]
+    A_TrayMenu.Add(i18n("windowRule"), (*) =>
+        createProcessMenuGui({
+            title: i18n("windowRule"),
+            tab: [i18n("windowRule")],
+            link: getDocsLink("rule/window"),
+            section: "Window.Rule",
+            trigger: windowTriggerKeyList,
+            cols: ["process", "trigger", "condition", "idleTimer", "textMonitor", "hotkeyMonitor", "class", "title"],
+            conditions: windowConditionKeyList
+        }
         )
     )
-    A_TrayMenu.Add(i18n("stateSwitch.hotkey"), (*) =>
-        showHotKeyGui([{
-            config: "hotkeyCN",
-            tip: i18n("state.CN")
-        }, {
-            config: "hotkeyEN",
-            tip: i18n("state.EN")
-        }, {
-            config: "hotkeyCaps",
-            tip: i18n("state.Caps")
-        }], i18n("stateSwitch.hotkey"))
+    A_TrayMenu.Add(i18n("hotkeyRule"),
+        createProcessMenuGui.Bind({
+            title: i18n("hotkey"),
+            tab: [i18n("hotkeyRule")],
+            trigger: triggerKeyList,
+            link: getDocsLink("rule/hotkey"),
+            section: "Hotkey.Rule",
+            cols: ["hotkey", "trigger", "process", "condition", "class", "title"],
+            conditions: conditionKeyList
+        })
     )
 
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("cursor"), e_cursor)
     A_TrayMenu.Add(i18n("overlay"), e_overlay)
-    A_TrayMenu.Add(i18n("symbol"), e_symbol)
+    A_TrayMenu.Add(i18n("caretSymbol"), e_symbol)
+    A_TrayMenu.Add(i18n("cursorSymbol"), e_cursorSymbol)
+    A_TrayMenu.Add(i18n("border"), e_border)
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("windowInfo"), e_windowInfo)
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("moreSettings"), e_moreSettings)
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("about"), e_about)
-    A_TrayMenu.Add(i18n("state.Restart"), fn_restart)
+    A_TrayMenu.Add(i18n("Restart"), fn_restart)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add(i18n("state.Exit"), fn_exit)
+    A_TrayMenu.Add(i18n("Exit"), fn_exit)
 }
 
 fn_exit(*) {
@@ -101,10 +94,11 @@ fn_restart(*) {
 e_windowInfo(*) {
     showGui(createUniqueGui(windowInfoGui))
     windowInfoGui(info) {
+        static timer := 0
         g := createGuiOpt(i18n("windowInfo"), , "AlwaysOnTop")
 
         if (info.i) {
-            g.AddText(, line70)
+            g.AddText(, line60)
             return g
         }
         w := info.w
@@ -112,72 +106,45 @@ e_windowInfo(*) {
 
         g.AddLink("Section", getDocsLink("menu/window-info"))
         for v in i18n("windowInfo.list", 1) {
-            g.SetFont("Bold")
-            g.AddGroupBox("xs h70 w" bw, v)
-            g.SetFont("Norm")
-            gc.%v% := g.AddEdit("xs+20 yp+30 ReadOnly -VScroll w" bw - 40)
+            renderGroupBox(g, v, , "h70 w" bw)
+            gc.%v% := _ := g.AddEdit("xs+20 yp+30 ReadOnly cGray -VScroll w" bw - 40)
+            _.Text := i18n("windowInfo.tip")
         }
-        g.OnEvent("Close", (*) => gc.stateTimer := 0)
-        gc.stateTimer := 1
+        g.OnEvent("Close", (*) => timer := 0)
+        timer := 1
         SetTimer(stateTimer, 50)
         stateTimer() {
-            static first := "", last := ""
-            if (!gc.stateTimer) {
-                SetTimer(, 0)
-                first := ""
+            static last := ""
+            if !timer {
                 last := ""
+                SetTimer(, 0)
                 return
             }
             try {
+                processPath := WinGetProcessPath("A")
+                path := A_IsCompiled ? A_ScriptFullPath : A_AhkPath
+                if processPath == path
+                    return
+
                 list := [
                     WinGetProcessName("A"),
-                    WinGetProcessPath("A"),
+                    WinGetClass("A"),
                     WinGetTitle("A"),
-                    WinGetClass("A")
+                    processPath,
                 ]
-                if (!first) {
+                info := arrJoin(list, "-")
+
+                if info != last {
                     for i, v in i18n("windowInfo.list", 1) {
                         gc.%v%.Value := list[i]
+                        if list[i] != ""
+                            gc.%v%.Opt("cDefault")
                     }
-                    first := arrJoin(list, "-")
+                    last := info
                 }
-                info := arrJoin(list, "-")
-                if (info == last || info == first) {
-                    return
-                }
-                for i, v in i18n("windowInfo.list", 1) {
-                    gc.%v%.Value := list[i]
-                }
-                last := info
             }
         }
         return g
-    }
-}
-
-/**
- * 将进程以【进程级】添加到白名单中
- * @param app 要添加的进程名称
- */
-updateWhiteList(app) {
-    exist := 0
-    for v in var.WindowSymbolShow {
-        kv := StrSplit(v, "=", , 2)
-        part := StrSplit(kv[2], ":", , 3)
-        try {
-            if (part[1] == app) {
-                isGlobal := part[2]
-                if (isGlobal) {
-                    exist := 1
-                    return
-                } else {
-                    continue
-                }
-            }
-        }
-    }
-    if (!exist) {
-        writeIniDebounced(returnTime(), app ":1", (key, value, section) => var.WindowSymbolShow := StrSplit(readIniSection(section), "`n"), "Window.Symbol.Show")
     }
 }
 
@@ -193,107 +160,67 @@ updateWhiteList(app) {
  * - gui: 表格列的位置，从 1 开始
  * - label: 表格列的标题
  */
-createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
-    "exe", { config: 1, gui: 1 },
-    "range", { config: 2, gui: 2 },
-    "mode", { config: 3, gui: 3 },
-    "title", { config: 4, gui: 4 },
-    "time", { config: 5, gui: 5 },
-), addBtn := (g, width, config, e_add, e_addManually) => (
-    w := " w" width / 2 - g.MarginX / 4,
-    g.AddButton("xs" w, i18n("addQuickly")).OnEvent("Click", e_add.Bind(config)),
-    g.AddButton("yp" w, i18n("addManually")).OnEvent("Click", e_addManually.Bind(config))
-)) {
-    ; 列表菜单
-    static listView := {}, processListGui := ""
+createProcessMenuGui(meta, *) {
     showGui(createUniqueGui(processMenuGui))
     processMenuGui(info) {
-        g := createGuiOpt(title)
+        g := createGuiOpt(meta.title)
 
         if (info.i) {
-            g.AddText(, line70)
+            g.AddText(, line90)
             return g
         }
         w := info.w
         bw := w - g.MarginX * 2
 
-        tab := renderTab(g, tabList)
+        column := Map()
+        for i, v in meta.cols {
+            column.Set(v, i)
+        }
+
+        tab := renderTab(g, meta.tab)
         loseFocusOnTab(tab)
         tab.UseTab(1)
 
-        addItem(config) {
-            listView.%config%.Opt("-Redraw")
-            for v in StrSplit(readIniSection(config), "`n") {
-                try {
-                    kv := StrSplit(v, "=", , 2)
-                    part := StrSplit(kv[2], ":", , column.Count - 1)
-                    cols := []
-                    i := 0
-                    while (i < column.Count) {
-                        cols.Push("")
-                        i++
+        addItem(ruleList, LV) {
+            for item in ruleList {
+                columnList := []
+                for i in meta.cols {
+                    val := ""
+                    if i == "condition" {
+                        if indexOfArr(meta.conditions, item.%i%)
+                            val := i18n("condition." item.%i%)
+                    } else if i == "trigger" {
+                        if indexOfArr(meta.trigger, item.%i%) {
+                            val := i18n("trigger." item.%i%)
+                        }
                     }
-                    num := column.Get("exe", 0)
-                    if (num) {
-                        cols[num.gui] := part[num.config]
+                    else {
+                        try val := item.%i%
                     }
-                    num := column.Get("range", 0)
-                    if (num) {
-                        cols[num.gui] := part[num.config] ? i18n("match.process") : i18n("match.titleLevel")
-                    }
-                    num := column.Get("mode", 0)
-                    if (num) {
-                        cols[num.gui] := part[num.config] ? i18n("match.regex") : i18n("match.equal")
-                    }
-                    num := column.Get("title", 0)
-                    if (num) {
-                        cols[num.gui] := part[num.config]
-                    }
-                    num := column.Get("capture", 0)
-                    if (num) {
-                        cols[num.gui] := part[num.config]
-                    }
-                    num := column.Get("offset", 0)
-                    if (num) {
-                        cols[num.gui] := part[num.config]
-                    }
-                    num := column.Get("time", 0)
-                    if (num) {
-                        cols[num.gui] := kv[1]
-                    }
-                    listView.%config%.Add(, cols*)
-                } catch {
-                    IniDelete(configFile, config, kv[1])
+                    columnList.Push(val)
                 }
+                columnList.Push(item.time)
+                LV.Add(, columnList*)
             }
-            listView.%config%.Opt("+Redraw")
-            autoHdrLV(listView.%config%)
         }
 
-        e_dbClick(config, LV, RowNumber, *) {
-            handleClick(RowNumber, config)
-        }
-
-        handleClick(RowNumber, config) {
+        e_handleClick(LV, RowNumber, *) {
             if (!RowNumber) {
                 return
             }
-            itemValue := {}
+            colValue := {}
             for k, v in column {
-                itemValue.%k% := listView.%config%.GetText(RowNumber, v.gui)
+                colValue.%k% := LV.GetText(RowNumber, v)
             }
-            showGui(createUniqueGui((info) => fn_edit(RowNumber, config, "edit", itemValue)))
+            colValue.time := LV.GetText(RowNumber, LV.GetCount("Col"))
+            showGui(createUniqueGui(fn_edit.Bind(LV, RowNumber, "edit", colValue)))
         }
 
-        fn_edit(RowNumber, config, action, itemValue) {
-            if (action == "edit") {
-                g := createGuiOpt(i18n("editRule"))
-            } else {
-                g := createGuiOpt(i18n("addRule"))
-            }
+        fn_edit(LV, RowNumber, action, colValue, info) {
+            g := createGuiOpt(i18n(action "Rule"), , "AlwaysOnTop")
 
             if (info.i) {
-                g.AddText(, i18n("match.range.invalid"))
+                g.AddText(, line70)
                 return g
             }
             w := info.w
@@ -308,86 +235,172 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                 i++
             }
 
-            num := column.Get("exe", 0)
+            groupLayout := ""
+            num := column.Get("hotkey", 0)
             if (num) {
-                sectionList[num.gui] := fn_exe
-                fn_exe() {
-                    g.SetFont("Bold")
-                    g.AddGroupBox("Section h70 w" bw, i18n("match.exe"))
-                    g.SetFont("Norm")
+                groupLayout := "xs"
+                sectionList[num] := fn_hotkey
+                fn_hotkey() {
+                    renderGroupBox(g, "match.hotkey", "h70 w" bw)
+                    _ := g.AddComboBox(opt, [
+                        "",
+                        "~LShift Up",
+                        "~RShift Up",
+                        "~Shift Up",
+                        "~^Space",
+                        "~!Space",
+                        "~+Space",
+                        "~#Space",
+                    ])
+                    try _.Text := colValue.hotkey
+                    colValue.hotkey := _.Text
+                    _.OnEvent("Change", (i, *) => colValue.hotkey := i.Text)
+                }
+            }
+
+            num := column.Get("process", 0)
+            if (num) {
+                sectionList[num] := fn_process
+                fn_process() {
+                    renderGroupBox(g, "match.process", groupLayout " h70 w" bw)
                     _ := g.AddEdit(opt, "")
-                    try _.Text := itemValue.exe
-                    itemValue.exe := _.Text
-                    _.OnEvent("Change", (i, *) => itemValue.exe := i.Text)
+                    try _.Text := colValue.process
+                    colValue.process := _.Text
+                    _.OnEvent("Change", (i, *) => colValue.process := i.Text)
                 }
             }
 
-            num := column.Get("range", 0)
+            num := column.Get("trigger", 0)
             if (num) {
-                sectionList[num.gui] := fn_range
-                fn_range() {
-                    g.SetFont("Bold")
-                    g.AddGroupBox("xs h70 w" bw, i18n("match.range"))
-                    g.SetFont("Norm")
-                    _ := g.AddDropDownList(opt, [i18n("match.process"), i18n("match.titleLevel")])
-                    try {
-                        _.Text := itemValue.range
-                    } catch {
-                        _.Text := i18n("match.process")
+                sectionList[num] := fn_trigger
+                fn_trigger() {
+                    triggerList := [""]
+                    for v in meta.trigger {
+                        triggerList.Push(i18n("trigger." v))
                     }
-                    itemValue.range := _.Text
-                    _.OnEvent("Change", (i, *) => itemValue.range := i.Text)
+                    renderGroupBox(g, "match.trigger", "xs h70 w" bw)
+                    _ := g.AddDropDownList(opt, triggerList)
+                    try _.Text := colValue.trigger
+                    colValue.trigger := _.Text
+                    _.OnEvent("Change", (i, *) => colValue.trigger := i.Text)
                 }
             }
 
-            num := column.Get("mode", 0)
+            num := column.Get("condition", 0)
             if (num) {
-                sectionList[num.gui] := fn_mode
-                fn_mode() {
-                    g.AddText("xs cGray", i18n("match.range.invalid"))
-                    g.SetFont("Bold")
-                    g.AddGroupBox("xs h70 w" bw, i18n("match.mode"))
-                    g.SetFont("Norm")
-                    _ := g.AddDropDownList(opt, [i18n("match.equal"), i18n("match.regex")])
-                    try {
-                        _.Text := itemValue.mode
-                    } catch {
-                        _.Text := i18n("match.equal")
+                sectionList[num] := fn_condition
+                fn_condition() {
+                    conditionList := [""]
+                    for v in meta.conditions {
+                        conditionList.Push(i18n("condition." v))
                     }
-                    itemValue.mode := _.Text
-                    _.OnEvent("Change", (i, *) => itemValue.mode := i.Text)
+                    renderGroupBox(g, "match.condition", "xs h70 w" bw)
+                    var._conditionCtrl := _ := g.AddDropDownList(opt, conditionList)
+                    try _.Text := colValue.condition
+                    colValue.condition := _.Text
+                    _.OnEvent("Change", (i, *) => (updateConditionState(i.Text), colValue.condition := i.Text))
+                }
+                updateConditionState(conditionText) {
+                    isMonitor := conditionText == i18n("condition.idleTimer") || conditionText == i18n("condition.textMonitor") || conditionText == i18n("condition.hotkeyMonitor")
+                    isClass := conditionText == i18n("condition.class") || conditionText == i18n("condition.classAndTitle")
+                    isTitle := conditionText == i18n("condition.title") || conditionText == i18n("condition.classAndTitle")
+
+                    try var._tthEditCtrl.Opt(isMonitor ? "cDefault" : "cC0C0C0")
+                    try var._tthEditCtrl.Opt(isMonitor ? "-ReadOnly" : "+ReadOnly")
+                    try var._classEditCtrl.Opt(isClass ? "cDefault" : "cC0C0C0")
+                    try var._titleEditCtrl.Opt(isTitle ? "cDefault" : "cC0C0C0")
+
+                    switch conditionText {
+                        case i18n("condition.idleTimer"):
+                            try var._tthGroupCtrl.Text := i18n("condition.idleTimer.label")
+                            try var._tthEditCtrl.Text := colValue.idleTimer
+                            try var._tthEditCtrl.Opt("Number")
+                        case i18n("condition.textMonitor"):
+                            try var._tthGroupCtrl.Text := i18n("condition.textMonitor.label")
+                            try var._tthEditCtrl.Text := colValue.textMonitor
+                            try var._tthEditCtrl.Opt("-Number")
+                        case i18n("condition.hotkeyMonitor"):
+                            try var._tthGroupCtrl.Text := i18n("condition.hotkeyMonitor")
+                            try var._tthEditCtrl.Text := colValue.hotkeyMonitor
+                            try var._tthEditCtrl.Opt("-Number")
+                        default:
+                            try var._tthGroupCtrl.Text := i18n("match.idleTimer/textMonitor/hotkeyMonitor")
+                            try var._tthEditCtrl.Text := arrJoin([
+                                colValue.idleTimer != "" ? colValue.idleTimer : i18n("none"),
+                                colValue.textMonitor ? colValue.textMonitor : i18n("none"),
+                                colValue.hotkeyMonitor ? colValue.hotkeyMonitor : i18n("none")
+                            ], " / ")
+                            try var._tthEditCtrl.Opt("-Number")
+                    }
+                }
+            }
+
+            num := column.Get("class", 0)
+            if (num) {
+                sectionList[num] := fn_class
+                fn_class() {
+                    renderGroupBox(g, "match.class", "xs h70 w" bw)
+                    var._classEditCtrl := _ := g.AddEdit(opt)
+                    try _.Text := colValue.class
+                    _.OnEvent("Change", (i, *) => colValue.class := i.Text)
                 }
             }
 
             num := column.Get("title", 0)
             if (num) {
-                sectionList[num.gui] := fn_title
+                sectionList[num] := fn_title
                 fn_title() {
-                    g.SetFont("Bold")
-                    g.AddGroupBox("xs h70 w" bw, i18n("match.title"))
-                    g.SetFont("Norm")
-                    _ := g.AddEdit(opt)
-                    try _.Text := itemValue.title
-                    itemValue.title := _.Text
-                    _.OnEvent("Change", (i, *) => itemValue.title := i.Text)
+                    renderGroupBox(g, "match.title", "xs h70 w" bw)
+                    var._titleEditCtrl := _ := g.AddEdit(opt)
+                    try _.Text := colValue.title
+                    _.OnEvent("Change", (i, *) => colValue.title := i.Text)
                 }
             }
 
             num := column.Get("capture", 0)
             if (num) {
-                sectionList[num.gui] := fn_capture
+                sectionList[num] := fn_capture
                 fn_capture() {
-                    g.SetFont("Bold")
-                    g.AddGroupBox("xs h70 w" bw, i18n("symbolCursorCapture"))
-                    g.SetFont("Norm")
-                    _ := g.AddDropDownList(opt, var.modeNameList)
-                    try {
-                        _.Text := itemValue.capture
-                    } catch {
-                        _.Text := var.modeNameList[1]
+                    captureList := ["", "", "", "", "", "", "", ""]
+                    modeNameList := ["GUI", "UIA", "HOOK", "HOOK_DLL", "MSAA", "WPF", "ACC", "JAB"]
+                    ddlControls := captureList.Clone()
+                    renderGroupBox(g, "symbolCaretCapture", "xs h120 w" bw)
+                    for i, v in captureList {
+                        if i == 1 || i == 5 {
+                            _opt := "xs+20 yp+35"
+                        } else {
+                            _opt := "yp"
+                            g.AddText("yp", ">")
+                        }
+                        ddlControls[i] := _ := g.AddDropDownList(_opt " w" bw / 5 - 5, ["", modeNameList*])
+                        try _.Text := StrSplit(colValue.capture, ">")[i]
+                        captureList[i] := _.Text
+                        _.num := i
                     }
-                    itemValue.capture := _.Text
-                    _.OnEvent("Change", (i, *) => itemValue.capture := i.Text)
+
+                    colValue.capture := arrJoin(captureList, ">", 1)
+
+                    for ctrl in ddlControls
+                        (ctrl == "") ? 0 : ctrl.OnEvent("Change", e_changeDDL)
+
+                    e_changeDDL(ctrl, *) {
+                        num := ctrl.num
+                        captureList[num] := ctrl.Text
+                        for i, targetCtrl in ddlControls {
+                            if i == num
+                                continue
+                            cleanList := []
+                            for v in modeNameList {
+                                idx := indexOfArr(captureList, v)
+                                (idx && idx != i) ? 0 : cleanList.Push(v)
+                            }
+                            currentText := targetCtrl.Text
+                            targetCtrl.Delete()
+                            targetCtrl.Add(["", cleanList*])
+                            targetCtrl.Text := currentText
+                        }
+                        colValue.capture := arrJoin(captureList, ">", 1)
+                    }
                 }
             }
 
@@ -395,18 +408,18 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
             btnLayout := "xs"
             if (num) {
                 btnLayout := "Section"
-                sectionList[num.gui] := fn_offset
+                sectionList.Push(fn_offset)
                 fn_offset() {
                     pages := []
                     for v in var.screenList {
                         pages.push(i18n("offset.screen") " " v.num)
                     }
-                    tab := renderTab(g, pages, "w" bw)
+                    tab := renderTab(g, pages, "xs w" bw)
                     loseFocusOnTab(tab)
 
                     offsetMap := Map()
                     if (action == "edit") {
-                        for o in StrSplit(itemValue.offset, "|") {
+                        for o in StrSplit(colValue.offset, "|") {
                             if (o == "")
                                 continue
                             p := StrSplit(o, "/")
@@ -431,18 +444,16 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                         g.SetFont("Bold")
                         g.AddText("xs", i18n("offset.offset_x"))
                         g.SetFont("Norm")
-                        _ := g.AddEdit("yp")
+                        _ := g.AddEdit("yp Limit5")
                         _.Value := x
                         _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
-                        _.OnEvent("LoseFocus", e_changeOffset.Bind(n, "x"))
 
                         g.SetFont("Bold")
                         g.AddText("xs", i18n("offset.offset_y"))
                         g.SetFont("Norm")
-                        _ := g.AddEdit("yp")
+                        _ := g.AddEdit("yp Limit5")
                         _.Value := y
                         _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
-                        _.OnEvent("LoseFocus", e_changeOffset.Bind(n, "y"))
                     }
 
                     e_changeOffset(n, pos, item, *) {
@@ -450,213 +461,223 @@ createProcessMenuGui(title, tabList, link, configSectionList, column := Map(
                             offsetMap.Set(n, { x: 0, y: 0 })
                         offsetMap.Get(n).%pos% := returnNumber(item.value)
 
-                        if (item.Focused)
-                            return
-
-                        itemValue.offset := ""
+                        colValue.offset := ""
                         for k, v in offsetMap {
-                            itemValue.offset .= "|" k "/" v.x "/" v.y
+                            colValue.offset .= "|" k "/" v.x "/" v.y
                         }
-                        itemValue.offset := SubStr(itemValue.offset, 2)
+                        colValue.offset := SubStr(colValue.offset, 2)
+
+                        if process := colValue.process {
+                            if !var._previewOffsetMap.Has(process)
+                                var._previewOffsetMap.Set(process, [])
+
+                            colValue.offsetMap := Map()
+                            for o in StrSplit(colValue.offset, "|") {
+                                screenNum := SubStr(o, 1, 1)
+                                posPart := StrSplit(SubStr(o, 3), "/")
+                                colValue.offsetMap.Set(screenNum, {
+                                    x: posPart[1],
+                                    y: posPart[2]
+                                })
+                            }
+                            var._previewOffsetMap.Get(process).Push(colValue)
+                        }
                     }
                 }
             }
-            if (InStr(config, "Window.AutoSwitch.")) {
-                state := StrSplit(config, ".")[-1]
-                itemValue.stateText := itemValue.oldStateText := var.stateVal.%state%.text
-                sectionList.InsertAt(2, fn_state)
-                fn_state() {
-                    g.SetFont("Bold")
-                    g.AddGroupBox("xs h70 w" bw, i18n("match.state"))
-                    g.SetFont("Norm")
-                    _ := g.AddDropDownList(opt, tabList)
-                    try _.Text := itemValue.stateText
-                    _.OnEvent("Change", (i, *) => itemValue.stateText := i.Text)
+
+            if meta.section == "Window.Rule" {
+                sectionList.InsertAt(4, fn_content)
+                fn_content() {
+                    var._tthGroupCtrl := renderGroupBox(g, "match.idleTimer/textMonitor/hotkeyMonitor", "xs h70 w" bw)
+                    var._tthEditCtrl := _ := g.AddEdit(opt)
+
+                    switch colValue.condition {
+                        case i18n("condition.idleTimer"):
+                            try _.Text := colValue.idleTimer
+                            var._tthGroupCtrl.Text := i18n("condition.idleTimer.label")
+                            var._tthEditCtrl.Opt("Number")
+                        case i18n("condition.textMonitor"):
+                            try _.Text := colValue.textMonitor
+                            var._tthGroupCtrl.Text := i18n("condition.textMonitor.label")
+                            var._tthEditCtrl.Opt("-Number")
+                        case i18n("condition.hotkeyMonitor"):
+                            try _.Text := colValue.hotkeyMonitor
+                            var._tthGroupCtrl.Text := colValue.condition
+                            var._tthEditCtrl.Opt("-Number")
+                    }
+                    _.OnEvent("Change", e_content)
+                    e_content(i, *) {
+                        switch var._conditionCtrl.Text {
+                            case i18n("condition.idleTimer"):
+                                colValue.idleTimer := i.Text
+                            case i18n("condition.textMonitor"):
+                                colValue.textMonitor := i.Text
+                            case i18n("condition.hotkeyMonitor"):
+                                colValue.hotkeyMonitor := i.Text
+                        }
+                    }
                 }
             }
 
             for v in sectionList {
-                if (v) {
+                if v
                     v()
-                }
             }
+            try updateConditionState(colValue.condition)
+
             tab.UseTab(0)
 
-            g.AddButton(btnLayout " w" bw, i18n("ok")).OnEvent("Click", (*) => fn_set(action, 0, 0))
-            ; if (action != "edit" && config != "Window.Symbol.Show") {
-            ;     g.AddButton("xs w" bw, i18n("okAndAddWhitelist")).OnEvent("Click", (*) => fn_set(action, 0, 1))
-            ; }
-            if (action == "edit") {
-                g.AddButton("xs w" bw, i18n("delete")).OnEvent("Click", (*) => fn_set(action, 1, 0))
+            needWindowInfo := InStr(meta.section, "Window.") || InStr(meta.section, "Hotkey.")
+
+            if needWindowInfo {
+                opt := " w" bw / 3 - g.MarginX / 3
+            } else {
+                opt := " w" bw / 2 - g.MarginX / 4
             }
+            g.AddButton(btnLayout opt, i18n("ok")).OnEvent("Click", fn_set.Bind(LV, RowNumber, action, colValue))
+            if action == "edit" {
+                g.AddButton("yp" opt, i18n("delete")).OnEvent("Click", fn_set.Bind(LV, RowNumber, "delete", colValue))
+            } else {
+                g.AddButton("yp" opt, i18n("cancel")).OnEvent("Click", (*) => (g.Destroy(), var._previewOffsetMap.Clear()))
+            }
+            if needWindowInfo
+                g.AddButton("yp" opt, i18n("windowInfo")).OnEvent("Click", e_windowInfo)
 
-            fn_set(action, delete, needAddWhiteList) {
+            fn_set(LV, RowNumber, action, colValue, *) {
                 g.Destroy()
-
-                if (delete) {
-                    changeSectionConfig(itemValue.time, '', config, 1)
-                    try listView.%config%.Delete(RowNumber)
-                } else {
-                    value := []
-                    i := 0
-                    while (i < column.Count) {
-                        value.Push("")
-                        i++
+                var._previewOffsetMap.Clear()
+                time := colValue.time
+                section := meta.section "." time
+                if action == "delete" {
+                    try {
+                        IniDelete(configFile, section)
+                        LV.Delete(RowNumber)
+                        try autoHdrLV(LV)
+                        restartJAB()
+                        parseWindowRule()
+                        registerHotkey()
+                        updateWindowHotkey()
+                        initMonitor()
                     }
-                    num := column.Get("exe", 0)
-                    if (num) {
-                        value[num.config] := itemValue.exe
-                    }
-                    num := column.Get("range", 0)
-                    if (num) {
-                        value[num.config] := itemValue.range == i18n("match.process") ? 1 : 0
-                    }
-                    num := column.Get("mode", 0)
-                    if (num) {
-                        value[num.config] := itemValue.mode == i18n("match.regex") ? 1 : 0
-                    }
-                    num := column.Get("title", 0)
-                    if (num) {
-                        value[num.config] := itemValue.title
-                    }
-                    num := column.Get("capture", 0)
-                    if (num) {
-                        value[num.config] := itemValue.capture
-                    }
-                    num := column.Get("offset", 0)
-                    if (num) {
-                        value[num.config] := itemValue.offset
-                    }
-
-                    if (value[-1] == "") {
-                        value.Pop()
-                    }
-                    value := arrJoin(value, ":")
-
-                    cols := []
-                    i := 0
-                    while (i < column.Count) {
-                        cols.Push("")
-                        i++
-                    }
-                    for k, v in column {
-                        cols[v.gui] := itemValue.%k%
-                    }
-
-                    if (InStr(config, "Window.AutoSwitch.")) {
-                        ; 没有进行移动
-                        if (itemValue.stateText == itemValue.oldStateText) {
-                            changeSectionConfig(itemValue.time, value, config)
-                            if (action == "edit") {
-                                listView.%config%.Modify(RowNumber, , cols*)
-                            } else {
-                                listView.%config%.Insert(RowNumber, , cols*)
-                            }
-                        } else {
-                            if (action == "edit") {
-                                try {
-                                    IniDelete(configFile, config, itemValue.time)
-                                    listView.%config%.Delete(RowNumber)
-                                }
-                            }
-
-                            newState := ""
-                            for v in var.stateVal.OwnProps() {
-                                if (itemValue.stateText == var.stateVal.%v%.text) {
-                                    newState := v
-                                    break
-                                }
-                            }
-                            if (newState) {
-                                newConfig := "Window.AutoSwitch." newState
-                                changeSectionConfig(itemValue.time, value, newConfig)
-                                listView.%newConfig%.Insert(RowNumber, , cols*)
-                            }
-                        }
-                    } else {
-                        changeSectionConfig(itemValue.time, value, config)
-                        if (action == "edit") {
-                            listView.%config%.Modify(RowNumber, , cols*)
-                        } else {
-                            listView.%config%.Insert(RowNumber, , cols*)
-                        }
-                    }
-                    if (needAddWhiteList) {
-                        updateWhiteList(itemValue.exe)
-                    }
+                    return
                 }
-                try autoHdrLV(listView.%config%)
-                try autoHdrLV(listView.%newConfig%)
+                cols := []
+                try {
+                    for v in meta.cols {
+                        if v == "condition" && colValue.%v% {
+                            val := conditionTextMap.Get(colValue.%v%)
+                            col := i18n("condition." val)
+                        } else if v == "trigger" && colValue.%v%{
+                            val := triggerTextMap.Get(colValue.%v%)
+                            col := i18n("trigger." val)
+                        }
+                        else {
+                            val := colValue.%v%
+                            col := val
+                        }
+                        cols.Push(col)
+                        if val {
+                            IniWrite(val, configFile, section, v)
+                        } else {
+                            IniDelete(configFile, section, v)
+                        }
+                    }
+                    cols.Push(time)
+                    trigger := ""
+                    try {
+                        trigger := triggerTextMap.Get(colValue.trigger, "")
+                    } catch {
+                        trigger := LV.trigger
+                    }
+                    IniWrite(trigger, configFile, section, "trigger")
+                    restartJAB()
+                    parseWindowRule()
+                    registerHotkey()
+                    updateWindowHotkey()
+                    initMonitor()
+                    if (action == "edit") {
+                        LV.Modify(RowNumber, , cols*)
+                    } else {
+                        LV.Insert(RowNumber, , cols*)
+                    }
+                    try autoHdrLV(LV)
+                } catch {
+                    try IniDelete(configFile, section)
+                }
             }
             return g
         }
 
         columnText := []
-        i := 0
-        while (i < column.Count) {
-            columnText.Push("")
-            i++
+        for v in meta.cols {
+            columnText.Push(i18n("match." v))
         }
-        for k, v in column {
-            columnText[v.gui] := i18n("match." k)
+        columnText.Push(i18n("match.time"))
+
+        switch meta.section {
+            case "Window.Rule":
+                g.AddLink("Section", meta.link)
+                LV := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, columnText)
+                LV.Opt("-Redraw")
+                for trigger in meta.trigger {
+                    for p, ruleList in var.WindowRule.Get(trigger)
+                        try addItem(ruleList, LV)
+                }
+                for p, ruleList in var.WindowRule.Get("")
+                    try addItem(ruleList, LV)
+                LV.Opt("+Redraw")
+                autoHdrLV(LV)
+                LV.OnEvent("DoubleClick", e_handleClick)
+                g.AddButton("xs w" w, i18n("addRule")).OnEvent("Click", e_add.Bind(LV))
+
+            case "Hotkey.Rule":
+                g.AddLink("Section", meta.link)
+                LV := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, columnText)
+                LV.Opt("-Redraw")
+                for p, ruleList in var.hotkeyRule
+                    try addItem(ruleList, LV)
+                LV.Opt("+Redraw")
+                autoHdrLV(LV)
+                LV.OnEvent("DoubleClick", e_handleClick)
+                g.AddButton("xs w" w, i18n("addRule")).OnEvent("Click", e_add.Bind(LV))
+            default:
+                for i, trigger in meta.trigger {
+                    tab.UseTab(i)
+                    g.AddLink("Section", meta.link)
+                    LV := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, columnText)
+                    LV.trigger := trigger
+                    LV.Opt("-Redraw")
+                    ruleMap := var.%StrReplace(meta.section, ".", "")%
+                    for p, ruleList in ruleMap.Get(trigger) {
+                        if type(ruleList) != "Array"
+                            ruleList := [ruleList]
+                        addItem(ruleList, LV)
+                    }
+                    for p, ruleList in ruleMap.Get("") {
+                        if type(ruleList) != "Array"
+                            ruleList := [ruleList]
+                        addItem(ruleList, LV)
+                    }
+                    LV.Opt("+Redraw")
+                    autoHdrLV(LV)
+                    LV.OnEvent("DoubleClick", e_handleClick)
+                    g.AddButton("xs w" w, i18n("addRule")).OnEvent("Click", e_add.Bind(LV))
+                }
         }
 
-        for i, v in configSectionList {
-            tab.UseTab(i)
-            g.AddLink("Section", link)
-
-            _ := listView.%v% := g.AddListView("xs -LV0x10 -Multi r9 NoSortHdr Sort Grid w" w, columnText)
-            addItem(v)
-            autoHdrLV(_)
-            _.OnEvent("DoubleClick", e_dbClick.Bind(v))
-            addBtn(g, w, v, e_add, e_addManually)
-        }
-
-        e_addManually(config, *) {
-            itemValue := {
-                range: i18n("match.process"),
-                mode: i18n("match.equal"),
+        e_add(LV, *) {
+            colValue := {
                 time: returnTime()
             }
             for k, v in column {
-                if (!itemValue.HasProp(k)) {
-                    itemValue.%k% := ""
+                if (!colValue.HasProp(k)) {
+                    colValue.%k% := ""
                 }
             }
-            showGui(createUniqueGui((info) => fn_edit(1, config, "add", itemValue)))
+            showGui(createUniqueGui(fn_edit.Bind(LV, 1, "add", colValue)))
         }
-
-        e_add(config, *) {
-            args := {
-                title: i18n("addQuickly"),
-                configName: config,
-            }
-            processListGui := createProcessListGui(args, addClick)
-
-            addClick(args) {
-                windowInfo := args.windowInfo
-                RowNumber := args.RowNumber
-                itemValue := {
-                    exe: windowInfo.exe,
-                    range: i18n("match.process"),
-                    mode: i18n("match.equal"),
-                    title: windowInfo.title,
-                    time: windowInfo.time
-                }
-
-                for k, v in column {
-                    if (!itemValue.HasProp(k)) {
-                        itemValue.%k% := ""
-                    }
-                }
-                showGui(createUniqueGui((info) => fn_edit(RowNumber, args.parentArgs.configName, "add", itemValue)))
-            }
-        }
-        g.OnEvent("Close", fn_close)
-        fn_close(*) {
-            g.Destroy()
-            try processListGui.Destroy()
-        }
+        g.OnEvent("Close", (*) => g.Destroy())
         return g
     }
 }
@@ -693,25 +714,23 @@ getFontList() {
 pauseApp(*) {
     updateTrayTip(!A_IsPaused)
     if (A_IsPaused) {
-        A_TrayMenu.Uncheck(i18n("state.Pause/Run"))
         setTrayIcon(var.iconRunning, 0)
         if var.cursorActive
             loadCursor(currentState, 1)
         if var.overlayActive
             showOverlay(currentState)
-        if var.symbolType
-            reloadSymbol()
+        if var.caretSymbolType
+            reloadCaretSymbol()
         if var.symbolJABActive
             restartJAB()
     } else {
-        A_TrayMenu.Check(i18n("state.Pause/Run"))
         setTrayIcon(var.iconPaused, 1)
         if var.cursorActive
             revertCursor()
         if var.overlayActive
             hideOverlay()
-        if var.symbolType
-            hideSymbol(1)
+        if var.caretSymbolType
+            hideCaretSymbol()
         if var.symbolJABActive
             killJAB(0)
     }
@@ -721,27 +740,18 @@ pauseApp(*) {
 
 
 ; 显示状态码和转换码
-showCode(*) {
-    if (gc.timer) {
-        gc.timer := 0
-        try gc.state_btn.Text := i18n("inputMethodDetectionMode.showCodeDoubleClick")
+showStateCode(show, *) {
+    if show {
+        SetTimer(showStateCodeTimer, 25)
         return
     }
+    ToolTip()
+    SetTimer(showStateCodeTimer, 0)
+}
 
-    gc.timer := 1
-    try gc.state_btn.Text := i18n("inputMethodDetectionMode.stopShowCode")
-
-    SetTimer(stateTimer, 25)
-    stateTimer() {
-        if (!gc.timer) {
-            ToolTip()
-            SetTimer(, 0)
-            return
-        }
-
-        info := IME.CheckInputMode()
-        ToolTip(i18n("inputMethodDetectionMode.stateCode") ": " info.stateMode "`n" i18n("inputMethodDetectionMode.conversionCode") ": " info.conversionMode)
-    }
+showStateCodeTimer() {
+    info := IME.CheckInputMode()
+    ToolTip(i18n("inputMethodDetectionMode.stateCode") ": " info.stateMode "`n" i18n("inputMethodDetectionMode.conversionCode") ": " info.conversionMode)
 }
 
 /**
@@ -755,90 +765,5 @@ autoHdrLV(LV) {
             LV.ModifyCol(col, "AutoHdr")
             col--
         }
-    }
-}
-
-/**
- * 创建一个包含当前正在运行的进程列表的窗口，用于提取信息，便于进行后续操作
- * @param {Object} args 传入的参数，格式为 {title: "窗口标题", ...}
- * @param {String} args.title - 窗口标题
- * @param {Func} cb_addClick 点击添加按钮的回调函数
- */
-createProcessListGui(args, cb_addClick) {
-    return showProcessListGui(0)
-    showProcessListGui(deep) {
-        g := createUniqueGui(listGui)
-        showGui(g)
-        listGui(info) {
-            g := createGuiOpt(args.title)
-
-            if (info.i) {
-                g.AddText(, line70)
-                return g
-            }
-            w := info.w
-            bw := w - g.MarginX * 2
-
-            tab := renderTab(g, [i18n("processList.label")])
-            loseFocusOnTab(tab)
-            tab.UseTab(1)
-            g.AddLink("Section", getDocsLink("menu/process-list"))
-
-            gc.LV_processList := g.AddListView("-LV0x10 -Multi r11 NoSortHdr Sort Grid w" bw, [i18n("processList.exe"), i18n("processList.from"), i18n("processList.title"), i18n("processList.path")])
-
-            gc.LV_processList.OnEvent("DoubleClick", e_click_add)
-            e_click_add(LV, RowNumber, *) {
-                windowInfo := {
-                    exe: LV.GetText(RowNumber, 1),
-                    title: LV.GetText(RowNumber, 3),
-                    time: returnTime()
-                }
-                cb_addClick({
-                    windowInfo: windowInfo,
-                    LV: LV,
-                    RowNumber: RowNumber,
-                    parentArgs: args
-                })
-            }
-
-            gc.LV_processList._type := "add"
-
-            seen := Map()
-            DetectHiddenWindows(deep)
-            gc.LV_processList.Opt("-Redraw")
-
-            for v in WinGetList() {
-                try {
-                    exe := ProcessGetName(WinGetPID("ahk_id " v))
-                    if !seen.Has(exe) {
-                        seen.Set(exe, 1)
-                        gc.LV_processList.Add(, exe, i18n("processList.from.system"), WinGetTitle("ahk_id " v), WinGetProcessPath("ahk_id " v))
-                    }
-                }
-            }
-
-            if (args.configName != "Window.Symbol.Show") {
-                for name in var.WindowSymbolShow {
-                    if !seen.Has(name) {
-                        seen.Set(name, 1)
-                        gc.LV_processList.Add(, name, i18n("processList.from.whitelist"))
-                    }
-                }
-            }
-
-            gc.LV_processList.Opt("+Redraw")
-            DetectHiddenWindows(1)
-            autoHdrLV(gc.LV_processList)
-
-            w := " w" bw / 2 - g.MarginX / 4
-            g.AddButton("Section" w, i18n("processList.refresh")).OnEvent("Click", (*) => showProcessListGui(deep))
-            if (deep) {
-                g.AddButton("yp" w, i18n("processList.less")).OnEvent("Click", (*) => showProcessListGui(0))
-            } else {
-                g.AddButton("yp" w, i18n("processList.more")).OnEvent("Click", (*) => showProcessListGui(1))
-            }
-            return g
-        }
-        return g
     }
 }

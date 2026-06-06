@@ -8,6 +8,28 @@ oldConfigFile := A_ScriptDir "/InputTip.ini"
 
 #Include manifest.ahk
 
+dirList := [
+    "data",
+    "data/icon",
+    "data/symbol",
+    "data/cursor",
+    "temp",
+    "temp/cursor",
+    "temp/symbol",
+    "temp/icon",
+]
+
+for v in ["CN", "EN", "Caps", "JP", "KR"]
+    dirList.Push("temp/cursor/default-" stateVal.%v%.colorText)
+
+if !A_IsCompiled
+    dirList.Push("data/plugin")
+
+for d in dirList {
+    if !DirExist(d)
+        DirCreate(d)
+}
+
 if FileExist(oldConfigFile)
     migrateConfig1(configFile, oldConfigFile)
 
@@ -26,28 +48,7 @@ migrateConfig2()
 #Include "*i cursor.ahk"
 #Include "*i overlay.ahk"
 #Include "*i symbol.ahk"
-
-dirList := [
-    "data",
-    "data/icon",
-    "data/symbol",
-    "data/cursor",
-    "temp",
-    "temp/cursor",
-    "temp/symbol",
-    "temp/icon",
-]
-
-for v in var.stateList
-    dirList.Push("temp/cursor/default-" var.stateVal.%v%.colorText)
-
-if !A_IsCompiled
-    dirList.Push("data/plugin")
-
-for d in dirList {
-    if !DirExist(d)
-        DirCreate(d)
-}
+#Include "*i border.ahk"
 
 migrateAsset()
 
@@ -242,26 +243,29 @@ if A_IsCompiled {
         "InputTip.JAB.JetBrains.ahk",
         "InputTip.updater.ahk",
         ; i18n
-        "i18n/zh-CN.ahk",
-        "i18n/en-US.ahk",
+        "core/i18n/en-US.ahk",
+        "core/i18n/zh-CN.ahk",
         "core/about.ahk",
-        "core/input-method.ahk",
-        "core/more-settings.ahk",
-        "core/startup.ahk",
-        "core/tray-menu.ahk",
+        "core/border.ahk",
         "core/config.ahk",
         "core/core.ahk",
-        "core/gui.ahk",
         "core/cursor.ahk",
+        "core/gui.ahk",
         "core/i18n.ahk",
         "core/ime.ahk",
         "core/ini.ahk",
+        "core/init.ahk",
+        "core/input-method.ahk",
         "core/jab.ahk",
         "core/manifest.ahk",
+        "core/more-settings.ahk",
         "core/overlay.ahk",
-        "core/symbol.ahk",
         "core/runtime.ahk",
+        "core/startup.ahk",
+        "core/symbol.ahk",
+        "core/tray-menu.ahk",
         "core/ui.ahk",
+        "core/utils.ahk",
         "core/var.ahk",
     ]
 
@@ -275,13 +279,13 @@ if A_IsCompiled {
     styleList := [
         "AppStarting.ani", "Arrow.cur", "Cross.cur", "Hand.cur", "Help.cur", "IBeam.cur", "No.cur", "Pen.cur", "SizeAll.cur", "SizeNESW.cur", "SizeNS.cur", "SizeNWSE.cur", "SizeWE.cur", "UpArrow.cur", "Wait.ani"
     ]
-    for state in var.stateList {
-        pic := "temp/symbol/default-triangle-" var.stateVal.%state%.colorText ".png"
+    for state in stateList {
+        pic := "temp/symbol/default-triangle-" stateVal.%state%.colorText ".png"
         if (!FileExist(pic)) {
             missFileList.Push("src/" pic "=" pic)
         }
         for s in styleList {
-            p := "temp/cursor/default-" var.stateVal.%state%.colorText "/" s
+            p := "temp/cursor/default-" stateVal.%state%.colorText "/" s
             if (!FileExist(p)) {
                 missFileList.Push("src/" p "=" p)
             }
@@ -309,7 +313,6 @@ checkIni() {
             writeIni("version-" versionType, currentVersion)
         }
     } catch {
-        gc.init := 1
         showGui(createUniqueGui(cursorGuideGui))
         cursorGuideGui(info) {
             g := Gui(, "InputTip - " i18n("init.title"))
@@ -453,8 +456,8 @@ migrateConfig1(newFile, oldFile) {
     colorMap := Map(
         "ffffff", "0xFFFFFF"
     )
-    for v in var.stateList {
-        colorMap.Set(var.stateVal.%v%.colorText, var.stateVal.%v%.color)
+    for v in stateList {
+        colorMap.Set(stateVal.%v%.colorText, stateVal.%v%.color)
     }
     _migrateConfig(newKey := "", oldKey := "", newSection := "Settings", oldSection := "Config-v2", valueMap := Map()) {
         if (newKey) {
@@ -529,12 +532,12 @@ migrateConfig1(newFile, oldFile) {
         ; Cursor
         ["cursorActive", "changeCursor"],
         ; Symbol
-        ["symbolType", "symbolType"],
-        ["symbolOffsetBaseY", "symbolOffsetBase", , , Map(
+        ["caretSymbolType", "symbolType"],
+        ["caretSymbolOriginY", "symbolOffsetBase", , , Map(
             0, "above",
             1, "below",
         )],
-        ["symbolHideDelay", "hideSymbolDelay"],
+        ["caretSymbolHideDelay", "hideSymbolDelay"],
         ["symbolNearCursorWindow", "showCursorPos"],
         ["symbolNearCursorOffsetX", "showCursorPos_x"],
         ["symbolNearCursorOffsetY", "showCursorPos_y"],
@@ -598,6 +601,57 @@ migrateConfig1(newFile, oldFile) {
 }
 
 migrateConfig2() {
+    renameList := [
+        ["symbolType", "caretSymbolType"],
+        ["symbolTextFont", "caretSymbolTextFont"],
+        ["symbolTextEdgeStyle", "caretSymbolTextEdgeStyle"],
+        ["symbolTextWeight", "caretSymbolTextWeight"],
+        ["symbolTextTransparent", "caretSymbolTextTransparent"],
+        ["symbolShapeEdgeStyle", "caretSymbolShapeEdgeStyle"],
+        ["symbolTextCornerPreference", "caretSymbolTextCornerPreference"],
+        ["symbolShapeCornerPreference", "caretSymbolShapeCornerPreference"],
+        ["symbolOffsetBaseY", "caretSymbolOriginY"],
+        ["symbolHideDelay", "caretSymbolHideDelay"],
+        ["symbolNearCursorActive", "cursorSymbolType"]
+    ]
+
+    _list := [
+        ["SymbolPicturePath", ""],
+        ["SymbolPictureOffsetX", -40],
+        ["SymbolPictureOffsetY", -5],
+        ["SymbolPictureWidth", 15],
+        ["SymbolPictureHeight", 15],
+        ["SymbolShapeColor", ""],
+        ["SymbolShapeOffsetX", 0],
+        ["SymbolShapeOffsetY", 10],
+        ["SymbolShapeWidth", 9],
+        ["SymbolShapeHeight", 9],
+        ["SymbolShapeTransparent", 255],
+        ["SymbolTextContent", ""],
+        ["SymbolTextBgColor", ""],
+        ["SymbolTextColor", "0xFFFFFF"],
+        ["SymbolTextSize", 16],
+        ["SymbolTextOffsetX", 0],
+        ["SymbolTextOffsetY", 0],
+    ]
+
+    for v in ["CN", "EN", "Caps", "JP", "KR"]
+        for i in _list
+            renameList.Push([i[1] v, "caret" i[1] v, i[2]])
+
+    for v in renameList {
+        param := [v[1], v[2]]
+        if v.Length == 3
+            param.Push(v[3])
+        renameConfigKey(param*)
+    }
+
+    if val := IniRead(configFile, "Settings", "symbolNearCursorWindow", "") {
+        IniWrite(val == "all" ? "blacklist" : "whitelist", configFile, "Settings", "cursorSymbolShowMode")
+        try IniDelete(configFile, "Settings", "symbolNearCursorWindow")
+    }
+
+
     sectionList := [
         "Window.AutoSwitch.CN",
         "Window.AutoSwitch.EN",
@@ -612,6 +666,7 @@ migrateConfig2() {
         "Window.AutoPause",
         "Window.AutoExit",
         "Window.IgnoreStateSwitch",
+        "Screen.Symbol.Offset"
     ]
 
     for v in sectionList {
@@ -631,24 +686,35 @@ migrateConfig2() {
                     process := valuePart[1]
 
                     if process {
-                        IniWrite(process, configFile, "Window.Symbol.Rule." key, "process")
+                        IniWrite(process, configFile, "Window.CaretSymbol.Rule." key, "process")
                     } else {
                         continue
                     }
                     matchRange := valuePart[2]
                     if matchRange == 0 {
                         conditionVal := valuePart[3] == 1 ? "titleRegex" : "titleEqual"
-                        IniWrite(conditionVal, configFile, "Window.Symbol.Rule." key, "condition")
+                        IniWrite(conditionVal, configFile, "Window.CaretSymbol.Rule." key, "condition")
                     }
                     offset := valuePart[4]
                     if offset != "" {
-                        IniWrite(offset, configFile, "Window.Symbol.Rule." key, "offset")
-                        IniWrite("offset", configFile, "Window.Symbol.Rule." key, "trigger")
+                        IniWrite(offset, configFile, "Window.CaretSymbol.Rule." key, "offset")
+                        IniWrite("offset", configFile, "Window.CaretSymbol.Rule." key, "trigger")
                     }
                     title := valuePart[5]
                     if title != "" {
-                        IniWrite(title, configFile, "Window.Symbol.Rule." key, "title")
+                        IniWrite(title, configFile, "Window.CaretSymbol.Rule." key, "title")
                     }
+                }
+            case "Screen.Symbol.Offset":
+                offsetList := []
+                for kv in StrSplit(val, "`n") {
+                    part := StrSplit(kv, "=", , 2)
+                    screen := part[1]
+                    offset := part[2]
+                    offsetList.Push(screen "/" offset)
+                }
+                if offsets := arrJoin(offsetList, "|") {
+                    IniWrite(offsets, configFile, "Settings", "caretSymbolScreenOffset")
                 }
             case "Window.Symbol.CursorCapture":
                 for kv in StrSplit(val, "`n") {
@@ -660,22 +726,24 @@ migrateConfig2() {
                     process := valuePart[1]
 
                     if process {
-                        IniWrite(process, configFile, "Window.Symbol.Rule." key, "process")
+                        IniWrite(process, configFile, "Window.CaretSymbol.Rule." key, "process")
                     } else {
                         continue
                     }
                     captureMode := valuePart[2]
                     if captureMode {
                         captureMode := captureMode == "GUI_UIA" ? "GUI>UIA" : captureMode
-                        IniWrite(captureMode, configFile, "Window.Symbol.Rule." key, "capture")
-                        IniWrite("capture", configFile, "Window.Symbol.Rule." key, "trigger")
+                        IniWrite(captureMode, configFile, "Window.CaretSymbol.Rule." key, "capture")
+                        IniWrite("capture", configFile, "Window.CaretSymbol.Rule." key, "trigger")
                     }
                 }
             default:
                 if InStr(v, "Symbol") {
-                    section := "Window.Symbol.Rule."
+                    section := "Window.CaretSymbol.Rule."
                 } else if InStr(v, "Overlay") {
                     section := "Window.Overlay.Rule."
+                } else if v == "Window.Symbol.NearCursor" {
+                    section := "Window.CursorSymbol.Rule."
                 } else {
                     section := "Window.Rule."
                 }
@@ -702,41 +770,38 @@ migrateConfig2() {
                         IniWrite(title, configFile, section key, "title")
                     }
 
-                    if InStr(v, ".Show") {
+                    if InStr(v, ".Show") || v == "Window.Symbol.NearCursor" {
                         IniWrite("show", configFile, section key, "trigger")
                     } else if InStr(v, ".Hide") {
                         IniWrite("hide", configFile, section key, "trigger")
-                    }
-
-                    switch inputMethodSwitchState := IniRead(configFile, "Settings", "inputMethodSwitchState", "") {
-                        case "{RShift}":
-                            switchMethod := "RShift"
-                        case "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}":
-                            switchMethod := "CtrlSpace"
-                        case "ime":
-                            switchMethod := "IME"
-                        default:
-                            switchMethod := "LShift"
-                            if inputMethodSwitchState
-                                try IniDelete(configFile, "Settings", "inputMethodSwitchState")
-                    }
-
-                    switch v {
-                        case "Window.AutoSwitch.CN":
-                            IniWrite("switchStateCN-" switchMethod, configFile, section key, "trigger")
-                        case "Window.AutoSwitch.EN":
-                            IniWrite("switchStateEN-" switchMethod, configFile, section key, "trigger")
-                        case "Window.AutoSwitch.Caps":
-                            IniWrite("switchStateCaps-CapsLock", configFile, section key, "trigger")
-                        case "Window.Symbol.NearCursor":
-                            IniWrite("showNearCursor", configFile, section key, "trigger")
-                        case "Window.AutoPause":
-                            IniWrite("pause", configFile, section key, "trigger")
-                        case "Window.AutoExit":
-                            IniWrite("exit", configFile, section key, "trigger")
-                        case "Window.IgnoreStateSwitch":
-                            IniWrite("ignoreStateSwitch", configFile, section key, "trigger")
-                        default:
+                    } else {
+                        switch inputMethodSwitchState := IniRead(configFile, "Settings", "inputMethodSwitchState", "") {
+                            case "{RShift}":
+                                switchMethod := "RShift"
+                            case "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}":
+                                switchMethod := "CtrlSpace"
+                            case "ime":
+                                switchMethod := "IME"
+                            default:
+                                switchMethod := "LShift"
+                                if inputMethodSwitchState
+                                    try IniDelete(configFile, "Settings", "inputMethodSwitchState")
+                        }
+                        switch v {
+                            case "Window.AutoSwitch.CN":
+                                IniWrite("switchStateCN-" switchMethod, configFile, section key, "trigger")
+                            case "Window.AutoSwitch.EN":
+                                IniWrite("switchStateEN-" switchMethod, configFile, section key, "trigger")
+                            case "Window.AutoSwitch.Caps":
+                                IniWrite("switchStateCaps-CapsLock", configFile, section key, "trigger")
+                            case "Window.AutoPause":
+                                IniWrite("pause", configFile, section key, "trigger")
+                            case "Window.AutoExit":
+                                IniWrite("exit", configFile, section key, "trigger")
+                            case "Window.IgnoreStateSwitch":
+                                IniWrite("ignoreStateSwitch", configFile, section key, "trigger")
+                            default:
+                        }
                     }
                 }
         }
@@ -766,7 +831,7 @@ migrateConfig2() {
             try IniDelete(configFile, "Settings", v[1])
         }
     }
-    val := IniRead(configFile, "Settings", "inputMethodBaseState", 0)
+    val := IniRead(configFile, "Settings", "inputMethodBaseState", "")
     if IsNumber(val)
         IniWrite(val ? "CN" : "EN", configFile, "Settings", "inputMethodBaseState")
 
@@ -779,5 +844,20 @@ migrateConfig2() {
         }
         newVal := arrJoin(newVal, "|")
         IniWrite(newVal, configFile, "Settings", "inputMethodDetectionRule")
+    }
+}
+
+renameConfigKey(old, new, default?, section := "Settings") {
+    static sentinel := "##__NOT_FOUND__##"
+    val := IniRead(configFile, section, old, sentinel)
+    if val == sentinel
+        return
+    if IsSet(default) && val == default {
+        try IniDelete(configFile, section, old)
+        return
+    }
+    try {
+        IniWrite(val, configFile, section, new)
+        IniDelete(configFile, section, old)
     }
 }

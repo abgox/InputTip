@@ -5,7 +5,7 @@
  * @example
  * var.inputMethodDetectionTimeout := 200 ; 超时时间(单位：毫秒)
  * var.inputMethodDetectionRules := [] ; 状态规则
- * var.inputMethodBaseState := 0 ; 默认状态为英文
+ * var.inputMethodBaseState := "EN" ; 默认状态为英文
  */
 class IME {
     static LangMap := Map(
@@ -64,7 +64,7 @@ class IME {
         baseState := var.inputMethodBaseState
 
         for v in var.inputMethodDetectionRules {
-            r := StrSplit(v, "*")
+            r := StrSplit(v, ",")
 
             ; 状态码规则
             sm := r[1]
@@ -98,11 +98,7 @@ class IME {
             return isMatch
         }
 
-        try {
-            return this.OpenStateMap.Get(Integer(baseState), "EN")
-        } catch {
-            return "EN"
-        }
+        return baseState
     }
 
     /**
@@ -239,20 +235,21 @@ class IME {
  * @param {"CN"|"EN"|"JP"|"KR"} state 要切换的键盘布局
  */
 switchKeyboard(state) {
-    if matchWindowRule(exeName, exeTitle, exeClass, var.windowRule["ignoreStateSwitch"])
+    if matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule["ignoreKeyboardSwitch"]).Length
         return 0
     return IME.SwitchKeyboard(state)
 }
 
 /**
  * 切换输入法状态
- * @param {"CN"|"EN"|"Caps"} state 要切换的输入法状态
+ * @param {"CN"|"EN"|"Caps"} state 输入法状态
+ * @param {"LShift"|"RShift"|"IME"|String} method  切换方式(模拟按键/IME)
  */
-switchState(state) {
+switchState(state, method) {
     if (!state) {
         return
     }
-    if matchWindowRule(exeName, exeTitle, exeClass, var.windowRule["ignoreStateSwitch"])
+    if matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule["ignoreStateSwitch"]).Length
         return
 
     SetTimer(onRun, 50)
@@ -287,10 +284,11 @@ switchState(state) {
             SendInput("{CapsLock}")
             return
         }
-        if (var.inputMethodSwitchState == "ime") {
-            IME.SetInputMode(var.stateVal.%state%.id)
+
+        if method == "IME" {
+            IME.SetInputMode(stateVal.%state%.id)
         } else {
-            SendInput(var.inputMethodSwitchState)
+            SendInput(method)
         }
     }
 }

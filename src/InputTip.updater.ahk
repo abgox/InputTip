@@ -34,6 +34,8 @@ try updater := A_Args[3]
 
 updater == "getRepoCode" ? getRepoCode() : checkUpdate()
 
+gc.updateGui := 0
+
 SetTimer(() => gc.updateGui ? 0 : ExitApp(), -60000)
 
 ; 是否有新版本

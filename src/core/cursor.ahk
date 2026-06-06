@@ -22,8 +22,8 @@ updateCursor() {
         "default-purple", 1,
     )
 
-    for state in var.stateList {
-        path := "default-" var.stateVal.%state%.colorText
+    for state in stateList {
+        path := "default-" stateVal.%state%.colorText
         dir := readIni("cursorPath" state, path)
         var.%"cursorPath" state% := dir
         if (dir) {
@@ -94,8 +94,8 @@ getCursorPath() {
             }
     }
     list := []
-    for state in var.stateList {
-        path := "default-" var.stateVal.%state%.colorText
+    for state in stateList {
+        path := "default-" stateVal.%state%.colorText
         if listMap.Has(path) {
             list.Push(path)
             listMap.Delete(path)
@@ -134,7 +134,7 @@ e_cursor(*) {
         list := getCursorPath()
         list.InsertAt(1, "")
 
-        for i, state in var.stateList {
+        for i, state in stateList {
             if (Mod(i - 1, 3) == 0) {
                 page := ((i - 1) // 3) + 2
                 tab.UseTab(page)
@@ -142,7 +142,7 @@ e_cursor(*) {
             } else {
                 opt := "xs"
             }
-            renderDropDownListGroup(g, "state." state, list, "cursorPath" state, opt)
+            renderDropDownListGroup(g, state, list, "cursorPath" state, opt)
         }
         return g
     }

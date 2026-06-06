@@ -18,7 +18,7 @@
     </a>
 </p>
 
-<p align="center"><strong>一款轻量的 Windows 输入法状态管理工具，帮助你随时感知和切换输入法状态</strong></p>
+<p align="center"><strong>规则驱动的输入法状态管理器 · 即时 · 强大 · 高效</strong></p>
 
 <p align="center">
     <a href="https://inputtip.abgox.com">
@@ -26,20 +26,22 @@
     </a>
 </p>
 
-## 功能
+## ✨ 功能
 
-- [鼠标方案](https://inputtip.abgox.com/docs/tip/cursor)、[浮窗方案](https://inputtip.abgox.com/docs/tip/overlay)、[符号方案](https://inputtip.abgox.com/docs/tip/symbol) 等多种状态提示
-- 基于 [窗口规则](https://inputtip.abgox.com/docs/switch/window) 和 [热键](https://inputtip.abgox.com/docs/switch/hotkey) 的状态切换
-- 通过 [状态导出](https://inputtip.abgox.com/docs/input-method/export-state) 实现扩展集成: [InputTip for VSCode](https://inputtip.abgox.com/docs/inputtip-for-vscode)
-- ...
+- **状态提示（视觉感知）**
+  - 支持中、英、日、韩及大写锁定状态
+  - 提供 [鼠标样式](https://inputtip.abgox.com/docs/tip/cursor)、[悬浮小窗](https://inputtip.abgox.com/docs/tip/overlay)、[光标符号](https://inputtip.abgox.com/docs/tip/symbol-caret) 和 [鼠标符号](https://inputtip.abgox.com/docs/tip/symbol-cursor)、[窗口边框](https://inputtip.abgox.com/docs/tip/border) 五种高度可定制的视觉方案
+- **规则调度（智能切换）**
+  - 使用 **窗口匹配**、**动态热键**、**计时器**、**文本监控**、**热键监控** 等机制
+  - 命中预设规则后精准执行特定的行为调度，如 **状态切换**、**键盘布局切换**、**热键注册**、**窗口置顶** 等
 
-_更多详情请参阅 [文档](https://inputtip.abgox.com/docs)_
+_更多详情请参阅 [官方文档](https://inputtip.abgox.com/docs)_
 
-## 新的变化
+## 📅 新的变化
 
 [更新日志](./src/CHANGELOG.md)
 
-## 相关项目
+## 🤝 相关项目
 
 - [AutoHotkey](https://autohotkey.com) ([GitHub](https://github.com/AutoHotkey/AutoHotkey))
 - [AutoHotkey2 Lib - thqby](https://github.com/thqby/ahk2_lib)
@@ -49,18 +51,18 @@ _更多详情请参阅 [文档](https://inputtip.abgox.com/docs)_
 - [Language Indicator - yakunins](https://github.com/yakunins/language-indicator)
 - [RedDot - Autumn-one](https://github.com/Autumn-one/RedDot)
 
-## 我的其他项目
+## 🛠️ 我的其他项目
 
 - [abyss](https://github.com/abgox/abyss)
 - [SpaceKey](https://github.com/abgox/SpaceKey)
 - [PSCompletions](https://github.com/abgox/PSCompletions)
 
-## 支持与赞助
+## 💖 支持与赞助
 
 如果你喜欢这个项目，欢迎给它 Star ⭐️ 或 [赞赏 💰](https://www.abgox.com/donate)
 
 [![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
 
-## License
+## 📄 License
 
 [AGPL-3.0](./LICENSE) © [abgox](https://www.abgox.com)

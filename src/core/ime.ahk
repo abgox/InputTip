@@ -8,15 +8,28 @@
  * var.inputMethodBaseState := 0 ; 默认状态为英文
  */
 class IME {
+    static LangMap := Map(
+        "EN", { langId: 0x09, klid: 0x0409, convMode: 0 },
+        "CN", { langId: 0x04, klid: 0x0804, convMode: 1025 },
+        "JP", { langId: 0x11, klid: 0x0411, convMode: 9 },
+        "KR", { langId: 0x12, klid: 0x0412, convMode: 0 },
+    )
+    static OpenStateMap := Map(
+        1, "CN",
+        0, "EN",
+    )
+
     static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if !this.GetOpenStatus(hwnd) {
+        if !this.GetOpenStatus(hwnd)
             return false
-        }
         convMode := this.GetConversionMode(hwnd)
-        if (convMode & 0x100) {  ; IME_CMODE_NOCONVERSION，强制英文
+
+        ; IME_CMODE_NOCONVERSION，强制英文
+        if convMode & 0x100
             return false
-        }
-        return convMode & 3  ; IME_CMODE_LANGUAGE，兼容日文
+
+        ; IME_CMODE_LANGUAGE，兼容日文
+        return convMode & 3
     }
 
     /**
@@ -24,40 +37,28 @@ class IME {
      * @returns {"CN"|"EN"|"Caps"|"JP"|"KR"}
      */
     static GetInputModeText(hwnd := this.GetFocusedWindow()) {
-        if (GetKeyState("CapsLock", "T")) {
+        if GetKeyState("CapsLock", "T")
             return "Caps"
-        }
-        langID := this.GetKeyboardLayout(hwnd) & 0xFFFF
-        switch langID {
-            ; case 0x0404, 0x0804:  ; 繁体中文、简体中文
-            case 0x0409:  ; 英文
-                return "EN"
-            case 0x0411:  ; 日文
-                return "JP"
-            case 0x0412:  ; 韩文
-                return "KR"
+
+        langID := this.GetKeyboardLayout(hwnd) & 0xFF
+        for state, info in this.LangMap {
+            if langID == info.langId {
+                ; CN 需要走后续状态判断
+                if state != "CN"
+                    return state
+                break
+            }
         }
 
-        langMap := Map(
-            1, "CN",
-            0, "EN",
-        )
         opened := this.GetOpenStatus(hwnd)
         convMode := this.GetConversionMode(hwnd)
 
-        ; 英文键盘布局时 opened 强制视为关闭
-        if (opened && langID == 0x0409) {
-            opened := false
-        }
-
         ; IME_CMODE_NOCONVERSION：即使 opened 为 1 也视为英文
-        if (convMode & 0x100) {
+        if convMode & 0x100
             opened := false
-        }
 
-        if (var.inputMethodDetectionMode == "general") {
-            return langMap.Get(opened && (convMode & 3) ? 1 : 0, "EN")
-        }
+        if var.inputMethodDetectionMode == "general"
+            return this.OpenStateMap.Get(opened && (convMode & 3) ? 1 : 0, "EN")
 
         ; 存储默认状态，如果都不匹配，就返回预先指定的默认状态
         baseState := var.inputMethodBaseState
@@ -72,7 +73,7 @@ class IME {
             ; 匹配状态
             s := r[3]
 
-            if (matchRule(opened, sm) && matchRule(convMode, cm)) {
+            if matchRule(opened, sm) && matchRule(convMode, cm) {
                 ; 匹配成功
                 baseState := s
                 break
@@ -87,22 +88,18 @@ class IME {
          */
         matchRule(value, ruleValue) {
             ; 规则为空，默认匹配成功
-            if (ruleValue == "") {
+            if ruleValue == ""
                 return 1
-            }
-
-            if (ruleValue == "evenNum") { ; 如果值是偶数
-                isMatch := !(value & 1)
-            } else if (ruleValue == "oddNum") { ; 如果值是奇数
-                isMatch := value & 1
-            } else {
-                isMatch := InStr("/" ruleValue "/", "/" value "/")
+            switch ruleValue {
+                case "evenNum": isMatch := !(value & 1)
+                case "oddNum": isMatch := value & 1
+                default: isMatch := InStr("/" ruleValue "/", "/" value "/")
             }
             return isMatch
         }
 
         try {
-            return langMap.Get(Integer(baseState), "EN")
+            return this.OpenStateMap.Get(Integer(baseState), "EN")
         } catch {
             return "EN"
         }
@@ -121,16 +118,17 @@ class IME {
 
     /**
      * 切换到指定的输入法状态
-     * @param mode 要切换的指定输入法状态(1:中文，0:英文)
+     * @param mode 要切换的指定输入法状态(1:中文/日文，0:英文)
      */
     static SetInputMode(mode, hwnd := this.GetFocusedWindow()) {
         if mode {
             this.SetOpenStatus(true, hwnd)
-            switch this.GetKeyboardLayout(hwnd) {
-                case 0x08040804:
-                    this.SetConversionMode(1025, hwnd)
-                case 0x04110411:
-                    this.SetConversionMode(9, hwnd)
+            langID := this.GetKeyboardLayout(hwnd) & 0xFF
+            for state, info in this.LangMap {
+                if (langID == info.langId) && info.convMode {
+                    this.SetConversionMode(info.convMode, hwnd)
+                    break
+                }
             }
         }
         else {
@@ -173,18 +171,17 @@ class IME {
     }
 
     static SetKeyboardLayout(hkl, hwnd := this.GetFocusedWindow()) {
-        SendMessage(0x50, 1, hkl, hwnd)
+        try SendMessage(0x50, 1, hkl, hwnd)
     }
 
     static GetKeyboardLayoutList() {
+        list := []
         if cnt := DllCall("GetKeyboardLayoutList", "int", 0, "ptr", 0) {
-            list := []
             buf := Buffer(cnt * A_PtrSize)
-            loop DllCall("GetKeyboardLayoutList", "int", cnt, "ptr", buf) {
+            loop DllCall("GetKeyboardLayoutList", "int", cnt, "ptr", buf)
                 list.Push(NumGet(buf, (A_Index - 1) * A_PtrSize, "ptr"))
-            }
-            return list
         }
+        return list
     }
 
     static LoadKeyboardLayout(hkl) {
@@ -195,14 +192,42 @@ class IME {
         return DllCall("UnloadKeyboardLayout", "ptr", hkl)
     }
 
+    /**
+     * 切换到指定的语言输入法布局
+     * @param {"CN"|"EN"|"JP"|"KR"} state
+     */
+    static SwitchKeyboard(state) {
+        if !this.LangMap.Has(state)
+            return false
+        info := this.LangMap[state]
+
+        hwnd := this.GetFocusedWindow()
+        if !hwnd
+            return false
+
+        for hkl in this.GetKeyboardLayoutList() {
+            if (hkl & 0xFF) == info.langId {
+                this.SetKeyboardLayout(hkl, hwnd)
+                return true
+            }
+        }
+
+        hkl := this.LoadKeyboardLayout(info.klid)
+        if hkl {
+            this.SetKeyboardLayout(hkl, hwnd)
+            return true
+        }
+        return false
+    }
+
+
     static GetFocusedWindow() {
         if foreHwnd := WinExist("A") {
             guiThreadInfo := Buffer(A_PtrSize == 8 ? 72 : 48)
             NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
             DllCall("GetGUIThreadInfo", "uint", DllCall("GetWindowThreadProcessId", "ptr", foreHwnd, "ptr", 0, "uint"), "ptr", guiThreadInfo)
-            if focusedHwnd := NumGet(guiThreadInfo, A_PtrSize == 8 ? 16 : 12, "ptr") {
+            if focusedHwnd := NumGet(guiThreadInfo, A_PtrSize == 8 ? 16 : 12, "ptr")
                 return focusedHwnd
-            }
             return foreHwnd
         }
         return 0
@@ -210,45 +235,62 @@ class IME {
 }
 
 /**
+ * 切换键盘布局
+ * @param {"CN"|"EN"|"JP"|"KR"} state 要切换的键盘布局
+ */
+switchKeyboard(state) {
+    if matchWindowRule(exeName, exeTitle, exeClass, var.windowRule["ignoreStateSwitch"])
+        return 0
+    return IME.SwitchKeyboard(state)
+}
+
+/**
  * 切换输入法状态
  * @param {"CN"|"EN"|"Caps"} state 要切换的输入法状态
  */
-switchState(state, pressKey := "", *) {
+switchState(state) {
     if (!state) {
         return
     }
-    if (validateMatch(exeName, exeTitle, var.WindowIgnoreStateSwitch)) {
+    if matchWindowRule(exeName, exeTitle, exeClass, var.windowRule["ignoreStateSwitch"])
         return
-    }
 
-    ; 当按下 shift + 任意键，取消切换
-    if (pressKey && InStr(var.%"hotkey" state%, "shift") && A_TimeIdleKeyboard < 200 && !InStr(A_PriorKey, "shift")) {
-        return
-    }
-    if (state != "Caps") {
-        ; 预防热键本身就是 Shift 造成的冲突
-        Sleep(50)
-    }
-
-    stateText := IME.GetInputModeText()
-    if (!stateText) {
-        return
-    }
-    if (state == stateText) {
-        return
-    }
-    if (stateText == "Caps") {
-        if (var.keepCapsLockWhenStateSwitch) {
+    SetTimer(onRun, 50)
+    onRun() {
+        static modifiers := ["Ctrl", "Alt", "Shift", "LWin", "RWin", "Shift"]
+        for mod in modifiers {
+            if GetKeyState(mod, "P")
+                return
+        }
+        SetTimer(onRun, 0)
+        stateText := IME.GetInputModeText()
+        if (!stateText) {
             return
         }
-        SendInput("{CapsLock}")
-    } else if (state == "Caps") {
-        SendInput("{CapsLock}")
-        return
-    }
-    if (var.inputMethodSwitchState == "ime") {
-        IME.SetInputMode(var.stateVal.%state%.id)
-    } else {
-        SendInput(var.inputMethodSwitchState)
+        if (state == stateText) {
+            return
+        }
+        if (stateText == "Caps") {
+            if (var.keepCapsLockWhenStateSwitch) {
+                return
+            }
+            SendInput("{CapsLock}")
+            Sleep(50)
+            stateText := IME.GetInputModeText()
+            if (!stateText) {
+                return
+            }
+            if (state == stateText) {
+                return
+            }
+        } else if (state == "Caps") {
+            SendInput("{CapsLock}")
+            return
+        }
+        if (var.inputMethodSwitchState == "ime") {
+            IME.SetInputMode(var.stateVal.%state%.id)
+        } else {
+            SendInput(var.inputMethodSwitchState)
+        }
     }
 }

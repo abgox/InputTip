@@ -56,7 +56,7 @@ e_startup(item, *) {
             g.AddButton("xs w" w btnOpt, i18n("startup.reg") pad).OnEvent("Click", e_useReg)
             e_useReg(*) {
                 try {
-                    v := A_IsCompiled ? "`"" A_ScriptFullPath "`"" : " `"" A_AhkPath "`" `"" A_ScriptFullPath "`""
+                    v := A_IsCompiled ? "`"" A_ScriptFullPath "`"" : "`"" A_AhkPath "`" `"" A_ScriptFullPath "`""
                     RegWrite(v, "REG_SZ", startupHKEY, appid)
                     g.Destroy()
                     A_TrayMenu.Check(item)
@@ -75,4 +75,38 @@ e_startup(item, *) {
             return g
         }
     }
+}
+
+checkStartup() {
+    startupFlag := 0
+    switch var.launchAtStartup {
+        case 1:
+            taskExists := 0
+            try {
+                scheduler := ComObject("Schedule.Service")
+                scheduler.Connect()
+                folder := scheduler.GetFolder("\")
+                folder.GetTask(taskNameNoUAC)
+                taskExists := 1
+            } catch {
+                taskExists := 0
+            }
+            if taskExists
+                startupFlag := 1
+        case 2:
+            try {
+                FileGetShortcut(A_Startup "\abgox.InputTip.lnk", &target, , &args)
+                if target == A_AhkPath && args == "`"" A_ScriptFullPath "`""
+                    startupFlag := 2
+            }
+        case 3:
+            if RegRead(startupHKEY, appid, "") == "`"" A_AhkPath "`" `"" A_ScriptFullPath "`""
+                startupFlag := 3
+        default:
+            A_TrayMenu.Uncheck(i18n("startup"))
+    }
+    if startupFlag
+        A_TrayMenu.Check(i18n("startup"))
+
+    var.launchAtStartup := startupFlag
 }

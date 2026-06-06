@@ -16,9 +16,7 @@ makeTrayMenu() {
     A_TrayMenu.Add(i18n("usageGuide"), (*) => Run("https://inputtip.abgox.com/zh-cn/docs/guide"))
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("startup"), e_startup)
-    if (var.launchAtStartup) {
-        A_TrayMenu.Check(i18n("startup"))
-    }
+    checkStartup()
 
     if (!A_IsCompiled) {
         A_TrayMenu.Add(i18n("runCodeWithAdmin"), (*) => (

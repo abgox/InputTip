@@ -22,15 +22,15 @@ setTrayIcon(var.iconRunning)
 
 checkIni()
 
-for state in var.stateList {
-    if (var.hotkey%state%) {
-        try Hotkey(var.hotkey%state%, bindState(state))
-    }
+if (var.hotkeyCN) {
+    try Hotkey(var.hotkeyCN, (pressKey) => switchState("CN", pressKey))
 }
-bindState(state) {
-    return (key, *) => switchState(state, key)
+if (var.hotkeyEN) {
+    try Hotkey(var.hotkeyEN, (pressKey) => switchState("EN", pressKey))
 }
-
+if (var.hotkeyCaps) {
+    try Hotkey(var.hotkeyCaps, (pressKey) => switchState("Caps", pressKey))
+}
 if (var.hotkeyShowCode) {
     try Hotkey(var.hotkeyShowCode, showCode)
 }

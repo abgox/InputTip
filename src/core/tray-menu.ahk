@@ -131,8 +131,9 @@ e_windowInfo(*) {
             try {
                 list := [
                     WinGetProcessName("A"),
+                    WinGetProcessPath("A"),
                     WinGetTitle("A"),
-                    WinGetProcessPath("A")
+                    WinGetClass("A")
                 ]
                 if (!first) {
                     for i, v in i18n("windowInfo.list", 1) {

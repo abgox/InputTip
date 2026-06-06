@@ -3,8 +3,8 @@
 currentState := "EN"
 lastInputState := "", lastExportState := ""
 hasWindowChange := 1, hasProcessChange := 1, canShowSymbol := 0
-lastWindow := "", lastProcess := "", lastSymbol := "", lastCursor := ""
-exeName := "", exeTitle := "", leaveDelay := var.pollInterval + 500
+lastWindow := "", lastProcess := "", lastClass := "", lastSymbol := "", lastCursor := ""
+exeName := "", exeTitle := "", exeClass := "", leaveDelay := var.pollInterval + 500
 
 updateSymbolDelay()
 
@@ -15,6 +15,7 @@ loop {
         try {
             exeName := ProcessGetName(WinGetPID("A"))
             exeTitle := WinGetTitle("A")
+            exeClass := WinGetClass("A")
 
             if (needSkip(exeName)) {
                 hideSymbol()
@@ -26,12 +27,13 @@ loop {
 
             hasProcessChange := lastProcess != exeName
             hasWindowChange := lastWindow != exeName ":" exeTitle
+            hasClassChange := lastClass != exeClass
 
             if hasProcessChange {
                 lastProcess := exeName
             }
 
-            if hasWindowChange {
+            if hasClassChange || hasWindowChange {
                 if validateMatch(exeName, exeTitle, var.WindowAutoPause) {
                     pauseApp()
                     continue
@@ -54,6 +56,7 @@ loop {
                 lastSymbol := ""
                 lastCursor := ""
                 lastWindow := exeName ":" exeTitle
+                lastClass := exeClass
 
                 ; JAB 进程不执行状态切换
                 if !isJAB

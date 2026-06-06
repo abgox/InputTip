@@ -84,19 +84,29 @@ createGuiOpt(title, fontOption := fontOpt, guiOption := "", prefix := "InputTip 
     return g
 }
 
-createMsgGui(Tips, title, btnText, opt := "") {
+/**
+ * 创建一个提示
+ * @param {Array} Tips 显示的提示信息
+ * @param {String} tipType Gui 标题
+ * @param {"tip"|"warning"|"error"} type 提示的类型
+ * @param {"ok"|"cancel"|String} btnTextKey 按钮的文本
+ * @param {"cRed"|String} opt 文本控件的选项
+ * @returns {Gui} 返回 Gui 对象
+ */
+createMsgGui(Tips, title, typeKey := "", btnTextKey := "ok", opt := "") {
     tipGui(info) {
-        g := createGuiOpt(title)
+        t := i18n(typeKey)
+        if title
+            t .= " - " title
+        g := createGuiOpt(t)
 
-        for v in Tips {
+        for v in Tips
             g.AddLink(opt, v)
-        }
 
-        if (info.i) {
+        if info.i
             return g
-        }
 
-        btn := g.AddButton("xs w" info.w, btnText)
+        btn := g.AddButton("xs w" info.w, i18n(btnTextKey))
         btn.Focus()
         btn.OnEvent("Click", (*) => g.Destroy())
         return g
@@ -111,56 +121,29 @@ createMsgGui(Tips, title, btnText, opt := "") {
  * @returns {Gui} 返回 Gui 对象
  */
 createErrorTipGui(Tips, title := "") {
-    t := i18n("error")
-    if (title) {
-        t .= " - " title
-    }
-    return createMsgGui(Tips, t, i18n("ok"), "cRed")
+    return createMsgGui(Tips, title, "error", "ok", "cRed")
 }
+
 
 /**
  * 显示 Gui
  * @param {gui} g Gui 对象
  * @param {String} options 显示时的选项
- * @param {"fade"|"slide"|"scale"} animation 显示动画效果
+ * @param {"fade"} animation 显示动画效果
  * @param {1|0} hideOnTrayMenu 显示托盘菜单时是否隐藏
  * @param {Number} transparency 透明度值
  */
 showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, transparency := "") {
-    if (hideOnTrayMenu) {
+    if hideOnTrayMenu
         hideOnTrayGui.Push(g)
-    }
-    getXY(options, screenW, screenH, origW, origH) {
-        x := ""
-        y := ""
-        if RegExMatch(options, "i)(?<![a-z])x(-?\d+)", &m) {
-            x := Integer(m[1] / dpiScale)
-        }
-        if RegExMatch(options, "i)(?<![a-z])y(-?\d+)", &m) {
-            y := Integer(m[1] / dpiScale)
-        }
-        return {
-            x: x != "" ? x : Integer((screenW - origW) / 2),
-            y: y != "" ? y : Integer((screenH - origH) / 2)
-        }
-    }
+
+    targetAlpha := transparency != "" ? transparency : 255
 
     try {
         hwnd := g.Hwnd
-        dpiScale := A_ScreenDPI / 96
-        primary := {}
-        for v in var.screenList {
-            if (v.num == v.main) {
-                primary := v
-                break
-            }
-        }
-        screenW := Integer((primary.right - primary.left) / dpiScale)
-        screenH := Integer((primary.bottom - primary.top) / dpiScale)
 
         switch animation {
             case 1, "fade":
-                targetAlpha := transparency != "" ? transparency : 255
                 applyTransparency(hwnd, 0)
                 try g.Show(options)
                 step := 0
@@ -185,66 +168,86 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
                         applyTransparency(hwnd, transparency)
                     }
                 }
-            case 2, "slide":
-                try g.Show("Hide " options)
-                try g.GetPos(, , &origW, &origH)
-                pos := getXY(options, screenW, screenH, origW, origH)
-                origX := pos.x
-                origY := pos.y
-                offsetY := 15
-                try g.Move(origX, origY + offsetY)
-                applyTransparency(hwnd, transparency)
+
+            case "slideOverlay":
+                try {
+                    if HasProp(g, "AnimationTimer") && g.AnimationTimer {
+                        SetTimer(g.AnimationTimer, 0)
+                        g.AnimationTimer := ""
+                    }
+                }
+
+                applyTransparency(hwnd, 0)
                 try g.Show(options)
+
+                targetCtrl := ""
+                for ctrlHwnd, ctrlObj in g {
+                    targetCtrl := ctrlObj
+                    break
+                }
+
+                if (!targetCtrl) {
+                    (transparency == "") ? WinSetTransparent("Off", hwnd) : applyTransparency(hwnd, transparency)
+                    return
+                }
+
+                hMonitor := DllCall("MonitorFromWindow", "Ptr", hwnd, "Int", 2, "Ptr")
+                DllCall("Shcore\GetDpiForMonitor", "Ptr", hMonitor, "Int", 0, "UInt*", &dpiX := 0, "UInt*", &dpiY := 0)
+                scale := dpiX > 0 ? dpiX / 96 : 1
+                offset := Round(15 * scale)
+
+                try {
+                    if HasProp(targetCtrl, "origY") {
+                        targetCtrl.Move(, targetCtrl.origY)
+                    } else {
+                        targetCtrl.GetPos(, &cy)
+                        targetCtrl.origY := cy
+                    }
+                    targetCtrl.Move(, targetCtrl.origY + offset)
+                    DllCall("user32\UpdateWindow", "Ptr", hwnd)
+                } catch {
+                    (transparency == "") ? WinSetTransparent("Off", hwnd) : applyTransparency(hwnd, transparency)
+                    return
+                }
+
                 step := 0
-                total := 20
-                SetTimer(slide, 8)
-                slide() {
+                total := 12
+
+                g.AnimationTimer := overlaySlide
+                SetTimer(g.AnimationTimer, 10)
+
+                overlaySlide() {
+                    if !WinExist("ahk_id " hwnd) {
+                        try SetTimer(g.AnimationTimer, 0)
+                        return
+                    }
+
                     try {
                         step++
                         t := step / total
-                        eased := 1 - (1 - t) ** 3
-                        curY := Integer(origY + offsetY * (1 - eased))
-                        try g.Move(origX, curY)
-                        if (step >= total) {
-                            SetTimer(slide, 0)
-                            try g.Move(origX, origY)
+
+                        easeOutValue := (1 - t) ** 3
+                        currentOffset := offset * easeOutValue
+                        currentAlpha := Integer(targetAlpha * (t ** 0.5))
+
+                        if (currentOffset > 0.5 && step < total) {
+                            try targetCtrl.Move(, targetCtrl.origY + currentOffset)
+                            applyTransparency(hwnd, Min(currentAlpha, targetAlpha))
+                        } else {
+                            try SetTimer(g.AnimationTimer, 0)
+                            g.AnimationTimer := ""
+
+                            try targetCtrl.Move(, targetCtrl.origY)
+                            (transparency == "") ? WinSetTransparent("Off", hwnd) : applyTransparency(hwnd, transparency)
                         }
                     } catch {
-                        SetTimer(slide, 0)
-                        try g.Move(origX, origY)
+                        try SetTimer(g.AnimationTimer, 0)
+                        try g.AnimationTimer := ""
+                        try targetCtrl.Move(, targetCtrl.origY)
+                        applyTransparency(hwnd, transparency)
                     }
                 }
-            case 3, "scale":
-                try g.Show("Hide " options)
-                try g.GetPos(, , &origW, &origH)
-                pos := getXY(options, screenW, screenH, origW, origH)
-                origX := pos.x
-                origY := pos.y
-                try g.Move(origX, origY)
-                applyTransparency(hwnd, transparency)
-                try g.Show(options)
-                step := 0
-                total := 20
-                SetTimer(scale, 8)
-                scale() {
-                    try {
-                        step++
-                        t := step / total
-                        eased := 1 - (1 - t) ** 3
-                        w := Integer(origW * (0.9 + 0.1 * eased))
-                        h := Integer(origH * (0.9 + 0.1 * eased))
-                        x := Integer(origX + (origW - w) / 2)
-                        y := Integer(origY + (origH - h) / 2)
-                        try g.Move(x, y, w, h)
-                        if (step >= total) {
-                            SetTimer(scale, 0)
-                            try g.Move(origX, origY, origW, origH)
-                        }
-                    } catch {
-                        SetTimer(scale, 0)
-                        try g.Move(origX, origY, origW, origH)
-                    }
-                }
+
             default:
                 applyTransparency(hwnd, transparency)
                 try g.Show(options)
@@ -352,153 +355,4 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
             try FileDelete(v)
     }
     return done
-}
-
-showHotKeyGui(keyConfigList, label := "") {
-    showGui(createUniqueGui(hotKeyGui))
-    hotKeyGui(info) {
-        g := createGuiOpt(label)
-
-        if (info.i) {
-            g.AddText(, keyConfigList[1].tip)
-            g.AddDropDownList("yp r9", [])
-            g.AddCheckbox("yp", i18n("hotkey.win"))
-            return g
-        }
-        w := info.w
-
-        tab := renderTab(g, [i18n("hotkey.single"), i18n("hotkey.combine"), i18n("hotkey.manual")], "w" w)
-        loseFocusOnTab(tab)
-        tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("switch/hotkey"))
-
-        keyList := []
-        keyList.Push([i18n("none"), "Esc", "Shift", "LShift", "RShift", "Ctrl", "LCtrl", "RCtrl", "Alt", "LAlt", "RAlt"]*)
-        keyList.Push(["MButton", "LButton", "RButton"]*)
-        keyList.Push(["Space", "Tab", "Enter", "Backspace", "Delete", "Insert", "Home", "End", "PgUp", "PgDn", "Up", "Down", "Left", "Right"]*)
-
-        i := 0
-        while (i <= 9) {
-            keyList.Push("Numpad" i)
-            i++
-        }
-        keyList.Push(["NumpadDot", "NumLock", "NumpadDiv", "NumpadMult", "NumpadAdd", "NumpadSub", "NumpadEnter"]*)
-
-        i := 1
-        while (i <= 24) {
-            keyList.Push("F" i)
-            i++
-        }
-
-        for v in keyConfigList {
-            g.SetFont("Bold")
-            g.AddText("xs", v.tip)
-            g.SetFont("Norm")
-            _ := gc.%v.config% := g.AddDropDownList("yp r9", keyList)
-            _._config := v.config
-            _._with := v.config "_win"
-            _.OnEvent("Change", e_changeHotkey)
-
-            config := readIni(v.config, "")
-            if (config ~= "^~\w+\sUp$") {
-                try {
-                    _.Text := Trim(StrReplace(StrReplace(config, "~", ""), "Up", ""))
-                    if (!_.Value) {
-                        _.Value := 1
-                    }
-                } catch {
-                    _.Text := i18n("none")
-                }
-            } else {
-                _.Text := i18n("none")
-            }
-        }
-        e_changeHotkey(item, *) {
-            ; 同步修改到【设置组合快捷键】和【手动输入快捷键】
-            if (item.Text == i18n("none")) {
-                key := ""
-            } else {
-                key := "~" item.Text " Up"
-            }
-            gc.%item._config "2"%.Value := ""
-            gc.%item._config "3"%.Value := key
-            gc.%item._with%.Value := 0
-        }
-        tab.UseTab(2)
-        g.AddLink("Section", getDocsLink("switch/hotkey"))
-
-        for v in keyConfigList {
-            g.SetFont("Bold")
-            g.AddText("xs", v.tip)
-            g.SetFont("Norm")
-            value := readIni(v.config, "")
-            _ := gc.%v.config "2"% := g.AddHotkey("yp", StrReplace(value, "#", ""))
-            _._config := v.config
-            _._with := v.config "_win"
-            _.OnEvent("Change", e_changeHotkey1)
-            gc.%_._with% := g.AddCheckbox("yp", i18n("hotkey.win"))
-            gc.%_._with%._config := v.config
-            gc.%_._with%.OnEvent("Click", e_winKey)
-            gc.%_._with%.Value := InStr(value, "#") ? 1 : 0
-        }
-        e_changeHotkey1(item, *) {
-            ; 同步修改到【设置单键】和【手动输入快捷键】
-            gc.%item._config%.Text := i18n("none")
-            v := item.value
-            if (gc.%item._with%.Value) {
-                v := "#" v
-            }
-            gc.%item._config "3"%.Value := v
-        }
-        e_winKey(item, *) {
-            ; 同步修改到【设置单键】和【手动输入快捷键】
-            gc.%item._config%.Text := i18n("none")
-            v := gc.%item._config "2"%.Value
-            gc.%item._config "3"%.Value := item.value ? "#" v : v
-        }
-        tab.UseTab(3)
-        g.AddLink("Section", getDocsLink("switch/hotkey"))
-
-        for v in keyConfigList {
-            g.SetFont("Bold")
-            g.AddText("xs", v.tip)
-            g.SetFont("Norm")
-            _ := gc.%v.config "3"% := g.AddEdit("yp")
-            _._config := v.config
-            _._with := v.config "_win"
-            _.Value := readIni(v.config, "")
-            _.OnEvent("Change", e_changeHotkey2)
-        }
-        e_changeHotkey2(item, *) {
-            gc.%item._with%.Value := InStr(item.value, "#") ? 1 : 0
-            ; 当输入的快捷键符合单键时，同步修改
-            if (item.value ~= "^~\w+\sUp$") {
-                try {
-                    gc.%item._config%.Text := Trim(StrReplace(StrReplace(item.value, "~", ""), "Up", ""))
-                } catch {
-                    gc.%item._config%.Text := i18n("none")
-                }
-                gc.%item._config "2"%.Value := ""
-            } else {
-                gc.%item._config%.Text := i18n("none")
-                ; 当输入的快捷键符合组合快捷键时，同步修改
-                try {
-                    gc.%item._config "2"%.Value := StrReplace(item.value, "#", "")
-                } catch {
-                    gc.%item._config "2"%.Value := ""
-                }
-            }
-        }
-        tab.UseTab(0)
-        g.AddButton("Section w" w, i18n("ok")).OnEvent("Click", e_yes)
-        e_yes(*) {
-            for v in keyConfigList {
-                key := gc.%v.config "3"%.Value
-                changeConfig(v.config, key)
-            }
-            g.Destroy()
-            fn_restart()
-        }
-        return g
-    }
 }

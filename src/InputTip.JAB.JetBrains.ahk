@@ -19,38 +19,37 @@ isJAB := 1
 #Include core\var.ahk
 #Include core\symbol.ahk
 
-; JAB 子进程
-needSkip(exeName) {
-    return var.symbolNearCursorActive || !var.modeList.JAB.Has(exeName)
-}
-needSkipSymbol(exeName) {
-    return 0
-}
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
+    left := 0, top := 0, right := 0, bottom := 0
     try {
         GetCaretPosFromJAB(&left, &top, &right, &bottom)
     } catch {
-        left := 0, top := 0, right := 0, bottom := 0
         return 0
     }
-    s := isWhichScreen(var.screenList)
-    if (s.num) {
+    if !left
+        GetCaretPosEx(&left, &top, &right, &bottom)
+    if !left
+        return
+
+    s := isWhichScreen()
+    if s.num {
         try {
-            offset := screenSymbolOffset.%s.num%
+            offset := symbolScreenOffset.caret.%s.num%
             left += offset.x
             top += offset.y
         }
-        rule := matchOffsetRule(exeName, exeTitle, windowSymbolOffset)
+        rules := matchWindowRules(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["offset"])
         num := String(s.num)
-        if (rule && rule.offset.Has(num)) {
-            offset := rule.offset.Get(num)
-            left += offset.x
-            top += offset.y
+        for rule in rules {
+            if rule && rule.offsetMap.Has(num) {
+                offset := rule.offsetMap.Get(num)
+                left += offset.x
+                top += offset.y
+            }
         }
-        return left
     }
-    return 0
+    return left
 }
 
 /**

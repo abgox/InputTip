@@ -2,8 +2,8 @@
 
 langStrings := Map()
 
-#Include "*i ..\i18n\zh-CN.ahk"
-#Include "*i ..\i18n\en-US.ahk"
+#Include "*i i18n\zh-CN.ahk"
+#Include "*i i18n\en-US.ahk"
 
 langCN := Map(
     "7804", "zh",
@@ -19,9 +19,7 @@ systemLang := langCN.Has(A_Language) ? "zh-CN" : "en-US"
 
 currentLang := readIni("language", systemLang)
 
-if (currentLang != "zh-CN") {
-    fontOpt := ["s16", "Consolas"]
-}
+isChinese := currentLang == "zh-CN"
 
 /**
  * 获取 i18n 文本

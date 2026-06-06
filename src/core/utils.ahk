@@ -17,12 +17,22 @@ debounce(fn, delay := 1000) {
     )
 }
 
-arrJoin(arr, separator := "") {
+arrJoin(arr, separator := "", filterEmpty := 0) {
     res := ""
     for i, v in arr {
-        res .= i == arr.Length ? v : v separator
+        if filterEmpty && v == ""
+            continue
+        res .= res == "" ? v : separator v
     }
     return res
+}
+
+indexOfArr(arr, val) {
+    for i, v in arr {
+        if v == val
+            return i
+    }
+    return 0
 }
 
 pathToUrl(path) {
@@ -55,18 +65,36 @@ replaceEnvVariables(str) {
     return str
 }
 
+; 从 Map 中通过 value 获取 key
+MapKeyOf(map, value) {
+    for k, v in map {
+        if v = value
+            return k
+    }
+    return ""
+}
+
 ; 从字符串中提取出数字，支持负数和小数
 returnNumber(value) {
     if (value == "" || !(value ~= "\d")) {
         return 0
     }
     RegExMatch(value, "(-?\d+\.?\d*)", &numbers)
-    return numbers[1]
+    return Number(numbers[1])
 }
 
 ; 返回当前的时间，作为唯一标识符
 returnTime() {
     return FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
+}
+
+; 将 RGB 转换为 Windows 底层认识的 BGR (COLORREF) 格式
+RGBtoBGR(rgb) {
+    ; 输入示例: 0xFF2600
+    r := (rgb >> 16) & 0xFF
+    g := (rgb >> 8) & 0xFF
+    b := rgb & 0xFF
+    return (b << 16) | (g << 8) | r
 }
 
 ; 让 Tab 控件对 Link 失去默认聚焦
@@ -130,4 +158,58 @@ createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 
 
 runScheduleTask(taskName) {
     try Run("schtasks /run /tn `"" taskName "`"", , "Hide")
+}
+
+
+getWinPhysicalRect(hwnd := 0) {
+    rc := Buffer(16, 0)
+    if !hwnd
+        hwnd := WinExist("A")
+    DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", rc)
+    x := NumGet(rc, 0, "Int")
+    y := NumGet(rc, 4, "Int")
+    w := NumGet(rc, 8, "Int") - x
+    h := NumGet(rc, 12, "Int") - y
+    return { x: x, y: y, w: w, h: h }
+}
+
+; 获取屏幕的DPI缩放比
+getMonitorScale(screen) {
+    pt := Buffer(8, 0)
+    NumPut("Int", (screen.left + screen.right) // 2, pt, 0)
+    NumPut("Int", (screen.top + screen.bottom) // 2, pt, 4)
+    hMonitor := DllCall("MonitorFromPoint", "Ptr", pt, "Int", 2, "Ptr")
+    DllCall("Shcore\GetDpiForMonitor", "Ptr", hMonitor, "Int", 0, "UInt*", &dpiX := 0, "UInt*", &dpiY := 0)
+    return dpiX / 96
+}
+
+; 逻辑像素转物理像素
+toPhysical(value, scale) {
+    return Round(value * scale)
+}
+
+; 用物理坐标定位并显示Gui窗口
+setGuiPhysicalPos(hwnd, x, y, w := -1, h := -1) {
+    flags := 0x10 | 0x40  ; SWP_NOACTIVATE | SWP_SHOWWINDOW
+    if w == -1 || h == -1
+        flags |= 0x01  ; SWP_NOSIZE，不改变尺寸
+    DllCall("SetWindowPos",
+        "Ptr", hwnd,
+        "Ptr", -1,
+        "Int", Round(x),
+        "Int", Round(y),
+        "Int", Round(w),
+        "Int", Round(h),
+        "UInt", flags)
+}
+
+
+isLocked() {
+    if ProcessExist("LogonUI.exe")
+        return 1
+    hDesktop := DllCall("OpenInputDesktop", "UInt", 0, "Int", 0, "UInt", 0x0001)
+    if hDesktop == 0
+        return 1
+    DllCall("CloseDesktop", "Ptr", hDesktop)
+    return 0
 }

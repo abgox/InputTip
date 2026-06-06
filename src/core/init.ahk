@@ -4,8 +4,14 @@ isJAB := 0
 JAB_PID := ""
 JABPath := A_ScriptDir "/InputTip.JAB.JetBrains.ahk"
 updaterPID := "abgox.InputTip.updater.exe"
+oldConfigFile := A_ScriptDir "/InputTip.ini"
 
 #Include manifest.ahk
+
+if FileExist(oldConfigFile)
+    migrateConfig1(configFile, oldConfigFile)
+
+migrateConfig2()
 
 #Include gui.ahk
 #Include i18n.ahk
@@ -43,35 +49,7 @@ for d in dirList {
         DirCreate(d)
 }
 
-oldConfigFile := A_ScriptDir "/InputTip.ini"
-if FileExist(oldConfigFile) {
-    copyDirs := [{
-        old: A_ScriptDir "/InputTipCursor",
-        new: cursorDir
-    }, {
-        old: A_ScriptDir "/InputTipSymbol",
-        new: symbolDir
-    }, {
-        old: A_ScriptDir "/InputTipIcon",
-        new: iconDir
-    }, {
-        old: A_ScriptDir "/plugins",
-        new: pluginDir
-    }]
-    for d in copyDirs {
-        if DirExist(d.old) {
-            try {
-                DirCopy(d.old, d.new, 1)
-                DirDelete(d.old, 1)
-            }
-            dd := d.new '/default'
-            if DirExist(dd)
-                try DirDelete(dd, 1)
-        }
-    }
-    migrateConfig(configFile, oldConfigFile)
-    try FileDelete(A_ScriptDir "/InputTip.ini")
-}
+migrateAsset()
 
 if A_IsCompiled {
     if !FileExist(A_Temp "/abgox.InputTip.updater.exe") || currentVersion != FileGetVersion(A_Temp "/abgox.InputTip.updater.exe")
@@ -441,7 +419,37 @@ checkIni() {
     }
 }
 
-migrateConfig(newFile, oldFile) {
+migrateAsset() {
+    if FileExist(oldConfigFile) {
+        copyDirs := [{
+            old: A_ScriptDir "/InputTipCursor",
+            new: cursorDir
+        }, {
+            old: A_ScriptDir "/InputTipSymbol",
+            new: symbolDir
+        }, {
+            old: A_ScriptDir "/InputTipIcon",
+            new: iconDir
+        }, {
+            old: A_ScriptDir "/plugins",
+            new: pluginDir
+        }]
+        for d in copyDirs {
+            if DirExist(d.old) {
+                try {
+                    DirCopy(d.old, d.new, 1)
+                    DirDelete(d.old, 1)
+                }
+                dd := d.new '/default'
+                if DirExist(dd)
+                    try DirDelete(dd, 1)
+            }
+        }
+        try FileDelete(A_ScriptDir "/InputTip.ini")
+    }
+}
+
+migrateConfig1(newFile, oldFile) {
     colorMap := Map(
         "ffffff", "0xFFFFFF"
     )
@@ -585,7 +593,191 @@ migrateConfig(newFile, oldFile) {
         }
         migrateConfigList.Push(["symbolTextBgColor" v, "textSymbol_" v "_color"])
     }
-    for v in migrateConfigList {
+    for v in migrateConfigList
         _migrateConfig(v*)
+}
+
+migrateConfig2() {
+    sectionList := [
+        "Window.AutoSwitch.CN",
+        "Window.AutoSwitch.EN",
+        "Window.AutoSwitch.Caps",
+        "Window.Overlay.Show",
+        "Window.Overlay.Hide",
+        "Window.Symbol.Show",
+        "Window.Symbol.Hide",
+        "Window.Symbol.Offset",
+        "Window.Symbol.CursorCapture",
+        "Window.Symbol.NearCursor",
+        "Window.AutoPause",
+        "Window.AutoExit",
+        "Window.IgnoreStateSwitch",
+    ]
+
+    for v in sectionList {
+        val := IniRead(configFile, v, , "")
+        if !val {
+            try IniDelete(configFile, v)
+            continue
+        }
+        switch v {
+            case "Window.Symbol.Offset":
+                for kv in StrSplit(val, "`n") {
+                    part := StrSplit(kv, "=", , 2)
+                    key := part[1]
+                    value := part[2]
+
+                    valuePart := StrSplit(value, ":", , 5)
+                    process := valuePart[1]
+
+                    if process {
+                        IniWrite(process, configFile, "Window.Symbol.Rule." key, "process")
+                    } else {
+                        continue
+                    }
+                    matchRange := valuePart[2]
+                    if matchRange == 0 {
+                        conditionVal := valuePart[3] == 1 ? "titleRegex" : "titleEqual"
+                        IniWrite(conditionVal, configFile, "Window.Symbol.Rule." key, "condition")
+                    }
+                    offset := valuePart[4]
+                    if offset != "" {
+                        IniWrite(offset, configFile, "Window.Symbol.Rule." key, "offset")
+                        IniWrite("offset", configFile, "Window.Symbol.Rule." key, "trigger")
+                    }
+                    title := valuePart[5]
+                    if title != "" {
+                        IniWrite(title, configFile, "Window.Symbol.Rule." key, "title")
+                    }
+                }
+            case "Window.Symbol.CursorCapture":
+                for kv in StrSplit(val, "`n") {
+                    part := StrSplit(kv, "=", , 2)
+                    key := part[1]
+                    value := part[2]
+
+                    valuePart := StrSplit(value, ":", , 2)
+                    process := valuePart[1]
+
+                    if process {
+                        IniWrite(process, configFile, "Window.Symbol.Rule." key, "process")
+                    } else {
+                        continue
+                    }
+                    captureMode := valuePart[2]
+                    if captureMode {
+                        captureMode := captureMode == "GUI_UIA" ? "GUI>UIA" : captureMode
+                        IniWrite(captureMode, configFile, "Window.Symbol.Rule." key, "capture")
+                        IniWrite("capture", configFile, "Window.Symbol.Rule." key, "trigger")
+                    }
+                }
+            default:
+                if InStr(v, "Symbol") {
+                    section := "Window.Symbol.Rule."
+                } else if InStr(v, "Overlay") {
+                    section := "Window.Overlay.Rule."
+                } else {
+                    section := "Window.Rule."
+                }
+                for kv in StrSplit(val, "`n") {
+                    part := StrSplit(kv, "=", , 2)
+                    key := part[1]
+                    value := part[2]
+
+                    valuePart := StrSplit(value, ":", , 4)
+                    process := valuePart[1]
+
+                    if process {
+                        IniWrite(process, configFile, section key, "process")
+                    } else {
+                        continue
+                    }
+                    matchRange := valuePart[2]
+                    if matchRange == 0 {
+                        conditionVal := valuePart[3] == 1 ? "titleRegex" : "titleEqual"
+                        IniWrite(conditionVal, configFile, section key, "condition")
+                    }
+                    title := valuePart[4]
+                    if title != "" {
+                        IniWrite(title, configFile, section key, "title")
+                    }
+
+                    if InStr(v, ".Show") {
+                        IniWrite("show", configFile, section key, "trigger")
+                    } else if InStr(v, ".Hide") {
+                        IniWrite("hide", configFile, section key, "trigger")
+                    }
+
+                    switch inputMethodSwitchState := IniRead(configFile, "Settings", "inputMethodSwitchState", "") {
+                        case "{RShift}":
+                            switchMethod := "RShift"
+                        case "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}":
+                            switchMethod := "CtrlSpace"
+                        case "ime":
+                            switchMethod := "IME"
+                        default:
+                            switchMethod := "LShift"
+                            if inputMethodSwitchState
+                                try IniDelete(configFile, "Settings", "inputMethodSwitchState")
+                    }
+
+                    switch v {
+                        case "Window.AutoSwitch.CN":
+                            IniWrite("switchStateCN-" switchMethod, configFile, section key, "trigger")
+                        case "Window.AutoSwitch.EN":
+                            IniWrite("switchStateEN-" switchMethod, configFile, section key, "trigger")
+                        case "Window.AutoSwitch.Caps":
+                            IniWrite("switchStateCaps-CapsLock", configFile, section key, "trigger")
+                        case "Window.Symbol.NearCursor":
+                            IniWrite("showNearCursor", configFile, section key, "trigger")
+                        case "Window.AutoPause":
+                            IniWrite("pause", configFile, section key, "trigger")
+                        case "Window.AutoExit":
+                            IniWrite("exit", configFile, section key, "trigger")
+                        case "Window.IgnoreStateSwitch":
+                            IniWrite("ignoreStateSwitch", configFile, section key, "trigger")
+                        default:
+                    }
+                }
+        }
+
+        try IniDelete(configFile, v)
+    }
+    migrateHotkey("hotkeyCN", "switchStateCN-LShift")
+    migrateHotkey("hotkeyEN", "switchStateEN-LShift")
+    migrateHotkey("hotkeyCaps", "switchStateCaps-CapsLock")
+    migrateHotkey("hotkeyPause", "pause")
+    migrateHotkey("hotkeyShowCode", "showStateCode")
+
+    migrateHotkey(key, trigger) {
+        if val := IniRead(configFile, "Settings", key, "") {
+            IniWrite(val, configFile, "Hotkey.Rule." returnTime(), "hotkey")
+            IniWrite(trigger, configFile, "Hotkey.Rule." returnTime(), "trigger")
+        }
+        try IniDelete(configFile, "Settings", key)
+    }
+
+    for v in [
+        ["overlayShowOnWindowChange", "overlayReshowOnTitleChange"],
+        ["overlayShowOnProcessChange", "overlayReshowOnProcessChange"]
+    ] {
+        if val := IniRead(configFile, "Settings", v[1], 0) {
+            IniWrite(val, configFile, "Settings", v[2])
+            try IniDelete(configFile, "Settings", v[1])
+        }
+    }
+    val := IniRead(configFile, "Settings", "inputMethodBaseState", 0)
+    if IsNumber(val)
+        IniWrite(val ? "CN" : "EN", configFile, "Settings", "inputMethodBaseState")
+
+    val := IniRead(configFile, "Settings", "inputMethodDetectionRule", "")
+    if val && !InStr(val, ",") {
+        newVal := []
+        for rule in StrSplit(val, ":") {
+            part := StrSplit(rule, "*")
+            newVal.Push(part[1] "," part[2] "," (part[3] ? "CN" : "EN"))
+        }
+        newVal := arrJoin(newVal, "|")
+        IniWrite(newVal, configFile, "Settings", "inputMethodDetectionRule")
     }
 }

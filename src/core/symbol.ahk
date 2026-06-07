@@ -406,6 +406,8 @@ e_cursorSymbol(*) {
         _.OnEvent("Click", e_screenOffset.Bind("cursor"))
         symbolTypeBtns.Push(_)
 
+        renderEditGroup(g, "cursorSymbolHideDelay", "Number Limit5")
+
         renderRadioGroup(g, "cursorSymbolShowMode",
             [
                 ["blacklist", "blacklist"],

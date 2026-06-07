@@ -110,6 +110,7 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
 
         if InStr(key, "HideDelay") {
             updateSymbolDelay()
+            updateCursorDelay()
         }
         if InStr(key, "JAB") {
             if var.symbolJABActive {

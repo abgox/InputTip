@@ -652,6 +652,34 @@ onDelayTick() {
     delayState.timer += 25
 }
 
+cursorDelayState := {
+    hidden: 0,
+    timer: 0
+}
+
+updateCursorDelay() {
+    if !var.cursorSymbolHideDelay
+        return
+    cursorDelayState.hidden := 0
+    SetTimer(onCursorDelayTick, 0)
+    SetTimer(onCursorDelayTick, 25)
+}
+
+onCursorDelayTick() {
+    if !var.cursorSymbolHideDelay {
+        SetTimer(onCursorDelayTick, 0)
+        return
+    }
+    if cursorDelayState.hidden {
+        if A_TimeIdleMouse < 100
+            cursorDelayState.hidden := 0
+        return
+    }
+    if A_TimeIdleMouse >= var.cursorSymbolHideDelay {
+        cursorDelayState.hidden := 1
+        hideCursorSymbol()
+    }
+}
 
 initMonitor() {
     ; 空闲计时器

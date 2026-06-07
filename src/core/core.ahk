@@ -8,6 +8,7 @@ lastProcess := "", lastTitle := "", lastClass := ""
 lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := "", lastBorderState := ""
 
 updateSymbolDelay()
+updateCursorDelay()
 
 
 if isJAB {
@@ -185,9 +186,18 @@ if isJAB {
 
             switch var.cursorSymbolShowMode {
                 case "blacklist":
-                    matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["hide"]) ? hideCursorSymbol() : ShowCursorSymbolEx(currentState)
+                    if matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["hide"]) {
+                        hideCursorSymbol()
+                    } else if !cursorDelayState.hidden {
+                        ShowCursorSymbolEx(currentState)
+                    }
                 case "whitelist":
-                    matchWindowRules(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["show"]) ? ShowCursorSymbolEx(currentState) : hideCursorSymbol()
+                    if matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["show"]) {
+                        if !cursorDelayState.hidden
+                            ShowCursorSymbolEx(currentState)
+                    } else {
+                        hideCursorSymbol()
+                    }
                 default:
                     hideCursorSymbol()
             }

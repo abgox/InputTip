@@ -202,7 +202,7 @@ triggerTextMap := Map()
 for v in ["ignoreStateSwitch", "ignoreKeyboardSwitch", "hotkey", triggerKeyList*]
     triggerTextMap.Set(i18n("trigger." v), v)
 
-runTriggers(triggers) {
+runTriggers(triggers, *) {
     for trigger in triggers {
         switch trigger {
             case "switchStateCaps-CapsLock": _switchState("Caps", "{CapsLock}")
@@ -430,7 +430,7 @@ parseWindowRule() {
 
     var._matchCache.Clear()
 }
-getMatchingRuleLists(exeName, triggerMap) {
+getMatchingRuleLists(exeName, triggerMap, hotkey := 0) {
     cacheKey := exeName . "|" . ObjPtr(triggerMap)
     if var._matchCache.Has(cacheKey)
         return var._matchCache[cacheKey]
@@ -440,7 +440,7 @@ getMatchingRuleLists(exeName, triggerMap) {
         result.Push(triggerMap[exeName])
 
     for key, ruleList in triggerMap {
-        if key == "" || key == exeName
+        if (key == "" && !hotkey) || key == exeName
             continue
         if RegExMatch(exeName, key)
             result.Push(ruleList)

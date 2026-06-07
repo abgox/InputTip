@@ -34,9 +34,7 @@ checkIni()
 registerHotkey()
 
 setHotkeyTrigger(key, trigger) {
-    ; XXX: 对于 Hotkey()，如果使用 callback.Bind() 似乎存在问题
-    ; try Hotkey(hk, runTriggers.Bind([trigger]), "On")
-    try Hotkey(key, ((t) => (*) => runTriggers(t))([trigger]), "On")
+    try Hotkey(key, runTriggers.Bind([trigger]), "On")
 }
 registerHotkey() {
     static lastHotkeyList := []
@@ -75,7 +73,7 @@ updateWindowHotkey() {
     if !exeName
         return
 
-    ruleLists := getMatchingRuleLists(exeName, var.hotkeyRule)
+    ruleLists := getMatchingRuleLists(exeName, var.hotkeyRule, 1)
     if !ruleLists.Length
         return
 

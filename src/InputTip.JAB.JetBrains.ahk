@@ -39,7 +39,9 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
             left += offset.x
             top += offset.y
         }
-        rules := matchWindowRules(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["offset"])
+        rules := []
+        for ruleList in getMatchingRuleLists(exeName, var.WindowCaretSymbolRule["offset"])
+            rules.Push(ruleList*)
         num := String(s.num)
         for rule in rules {
             if rule && rule.offsetMap.Has(num) {

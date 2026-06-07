@@ -142,7 +142,22 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
                 top += toPhysical(offset.y, scale)
             }
         }
-        rules := matchWindowRules(exeName, exeTitle, exeClass, var._previewOffsetMap) || matchWindowRules(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["offset"])
+
+        rules := []
+        previewTimes := Map()
+        for key, item in var._previewOffsetMap {
+            if RegExMatch(exeName, key) {
+                previewTimes.Set(item.time, 1)
+                rules.Push(item)
+            }
+        }
+        for ruleList in getMatchingRuleLists(exeName, var.WindowCaretSymbolRule["offset"]) {
+            for rule in ruleList {
+                if !previewTimes.Has(rule.time)
+                    rules.Push(rule)
+            }
+        }
+
         num := String(s.num)
         for rule in rules {
             if rule && rule.offsetMap.Has(num) {

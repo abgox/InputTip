@@ -468,9 +468,6 @@ createProcessMenuGui(meta, *) {
                         colValue.offset := SubStr(colValue.offset, 2)
 
                         if process := colValue.process {
-                            if !var._previewOffsetMap.Has(process)
-                                var._previewOffsetMap.Set(process, [])
-
                             colValue.offsetMap := Map()
                             for o in StrSplit(colValue.offset, "|") {
                                 screenNum := SubStr(o, 1, 1)
@@ -480,7 +477,7 @@ createProcessMenuGui(meta, *) {
                                     y: posPart[2]
                                 })
                             }
-                            var._previewOffsetMap.Get(process).Push(colValue)
+                            var._previewOffsetMap.Set(process, colValue)
                         }
                     }
                 }
@@ -606,6 +603,9 @@ createProcessMenuGui(meta, *) {
                     try IniDelete(configFile, section)
                 }
             }
+
+            g.OnEvent("Close", (*) => var._previewOffsetMap.Clear())
+
             return g
         }
 

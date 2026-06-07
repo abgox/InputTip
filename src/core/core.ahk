@@ -14,6 +14,8 @@ updateCursorDelay()
 if isJAB {
     loop {
         Sleep(var.pollInterval)
+        if var._paused
+            continue
 
         if !var.caretSymbolType {
             hideCaretSymbol()
@@ -75,6 +77,8 @@ if isJAB {
 } else {
     loop {
         Sleep(var.pollInterval)
+        if var._paused
+            continue
         if (A_TimeIdle < leaveDelay) {
             needShow := var.caretSymbolType
             try {
@@ -161,25 +165,25 @@ if isJAB {
                             if IsSet(activeBorderTimer) {
                                 SetTimer(activeBorderTimer, 0)
                             }
-                            ShowMaximizedBorders(targetColor, targetWidth, hwnd)
+                            showBorder(targetColor, targetWidth, hwnd)
                             if var.borderHideDelay {
-                                activeBorderTimer := DestroyMaximizedBorders.Bind(hwnd)
+                                activeBorderTimer := hideBorder.Bind(hwnd)
                                 SetTimer(activeBorderTimer, -var.borderHideDelay)
                             }
                         } else {
                             if IsSet(activeBorderTimer)
                                 SetTimer(activeBorderTimer, 0)
-                            DestroyMaximizedBorders(hwnd)
+                            hideBorder(hwnd)
                         }
                         lastBorderState := currentBorderFingerprint
                     }
                 } catch {
-                    DestroyMaximizedBorders()
+                    hideBorder()
                     lastBorderState := ""
                 }
             } else {
                 if lastBorderState != "" {
-                    try DestroyMaximizedBorders(WinExist("A"))
+                    try hideBorder(WinExist("A"))
                     lastBorderState := ""
                 }
             }

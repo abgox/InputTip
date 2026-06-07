@@ -77,19 +77,19 @@ e_border(*) {
     }
 }
 
-ShowMaximizedBorders(finalColor, finalWidth, hwnd) {
-    static lastHwnd := 0
+var._lastBorderHwnd := 0
 
-    if lastHwnd && lastHwnd != hwnd {
-        if WinExist(lastHwnd) {
-            DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", lastHwnd, "UInt", 34, "Ptr*", -1, "UInt", 4)
-            DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", lastHwnd, "UInt", 37, "Ptr*", -1, "UInt", 4)
+showBorder(finalColor, finalWidth, hwnd) {
+    if var._lastBorderHwnd && var._lastBorderHwnd != hwnd {
+        if WinExist(var._lastBorderHwnd) {
+            try DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", var._lastBorderHwnd, "UInt", 34, "Ptr*", -1, "UInt", 4)
+            try DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", var._lastBorderHwnd, "UInt", 37, "Ptr*", -1, "UInt", 4)
         }
     }
-    lastHwnd := hwnd
+    var._lastBorderHwnd := hwnd
 
     if (WinGetMinMax(hwnd) == 1) {
-        DestroyMaximizedBorders()
+        hideBorder()
         var.maximizedBorders := []
 
         scr := isWhichScreen(hwnd)
@@ -131,27 +131,27 @@ ShowMaximizedBorders(finalColor, finalWidth, hwnd) {
         }
     }
     else {
-        DestroyMaximizedBorders()
-        DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 34, "Ptr*", RGBtoBGR(finalColor), "UInt", 4)
-        DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 37, "Ptr*", finalWidth, "UInt", 4)
+        hideBorder()
+        try DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 34, "Ptr*", RGBtoBGR(finalColor), "UInt", 4)
+        try DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 37, "Ptr*", finalWidth, "UInt", 4)
     }
 }
 
 
-DestroyMaximizedBorders(hwnd := 0) {
+hideBorder(hwnd := 0) {
     if var.HasProp("maximizedBorders") && var.maximizedBorders.Length > 0 {
         for box in var.maximizedBorders
             try box.Hide()
-
         while (var.maximizedBorders.Length > 0) {
             box := var.maximizedBorders.Pop()
             try box.Destroy()
         }
     }
-    var.maximizedBorders := []
-
-    if hwnd && WinExist(hwnd) {
-        DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 34, "Ptr*", -1, "UInt", 4)
-        DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", hwnd, "UInt", 37, "Ptr*", -1, "UInt", 4)
+    targetHwnd := hwnd ? hwnd : var._lastBorderHwnd
+    if targetHwnd && WinExist(targetHwnd) {
+        try DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", targetHwnd, "UInt", 34, "Ptr*", -1, "UInt", 4)
+        try DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", targetHwnd, "UInt", 37, "Ptr*", -1, "UInt", 4)
     }
+    var.maximizedBorders := []
+    global lastBorderState := ""
 }

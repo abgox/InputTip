@@ -711,9 +711,13 @@ getFontList() {
     return list
 }
 
+var._paused := 0
+
 pauseApp(*) {
     updateTrayTip(!A_IsPaused)
     if (A_IsPaused) {
+        var._paused := 0
+        Sleep(var.pollInterval + 10)
         setTrayIcon(var.iconRunning, 0)
         if var.cursorActive
             loadCursor(currentState, 1)
@@ -721,9 +725,14 @@ pauseApp(*) {
             showOverlay(currentState)
         if var.caretSymbolType
             reloadCaretSymbol()
+        if var.cursorSymbolType
+            reloadCursorSymbol()
         if var.symbolJABActive
             restartJAB()
     } else {
+        var._paused := 1
+        Sleep(var.pollInterval + 10)
+        global lastBorderState := ""
         setTrayIcon(var.iconPaused, 1)
         if var.cursorActive
             revertCursor()
@@ -731,6 +740,11 @@ pauseApp(*) {
             hideOverlay()
         if var.caretSymbolType
             hideCaretSymbol()
+        if var.cursorSymbolType
+            hideCursorSymbol()
+        if var.borderActive
+            hideBorder()
+
         if var.symbolJABActive
             killJAB(0)
     }

@@ -31,11 +31,42 @@ runUpdater() {
 setTrayIcon(var.iconRunning)
 
 checkIni()
+
+var._shiftAloneFlags := Map()
+var._shiftWildcardRegistered := false
+
 registerHotkey()
 
 setHotkeyTrigger(key, trigger) {
-    try Hotkey(key, runTriggers.Bind([trigger]), "On")
+    isShiftUp := RegExMatch(key, "i)~?(L|R)?Shift\s+Up")
+    if (isShiftUp) {
+        downKey := Trim(RegExReplace(key, "i)\s*Up$", ""))
+        downKey := LTrim(downKey, "~")
+        flagKey := downKey
+        var._shiftAloneFlags[flagKey] := false
+        try Hotkey("~" downKey, setShiftAloneFlag.Bind(flagKey), "On")
+        try Hotkey("~" downKey " Up", checkAndRunShiftTrigger.Bind(flagKey, trigger), "On")
+        return ["~" downKey, "~" downKey " Up"]
+    } else {
+        try Hotkey(key, runTriggers.Bind([trigger]), "On")
+        return [key]
+    }
 }
+
+setShiftAloneFlag(flagKey, *) {
+    var._shiftAloneFlags[flagKey] := true
+}
+
+checkAndRunShiftTrigger(flagKey, trigger, *) {
+    priorKey := A_PriorKey
+    if (var._shiftAloneFlags[flagKey] && priorKey = flagKey) {
+        var._shiftAloneFlags[flagKey] := false
+        runTriggers([trigger])
+    } else {
+        var._shiftAloneFlags[flagKey] := false
+    }
+}
+
 registerHotkey() {
     static lastHotkeyList := []
     if lastHotkeyList.Length {
@@ -44,15 +75,11 @@ registerHotkey() {
         lastHotkeyList := []
     }
     for rule in var.hotkeyRule.Get("", []) {
-        if rule.hotkey == ""
+        if rule.hotkey == "" || rule.trigger == ""
             continue
-        hk := rule.hotkey
-        trigger := rule.trigger
-        if trigger == ""
-            continue
-
-        setHotkeyTrigger(hk, trigger)
-        lastHotkeyList.Push(hk)
+        registered := setHotkeyTrigger(rule.hotkey, rule.trigger)
+        for hk in registered
+            lastHotkeyList.Push(hk)
     }
 }
 updateWindowHotkey() {
@@ -79,14 +106,12 @@ updateWindowHotkey() {
 
     for ruleList in ruleLists {
         for rule in ruleList {
-            if rule.hotkey == ""
+            if rule.hotkey == "" || rule.trigger == ""
                 continue
-
             if matchCondition(rule, exeTitle, exeClass) {
-                hk := rule.hotkey
-                trigger := rule.trigger
-                setHotkeyTrigger(hk, trigger)
-                lastWindowHotkeyList.Push(hk)
+                registered := setHotkeyTrigger(rule.hotkey, rule.trigger)
+                for hk in registered
+                    lastWindowHotkeyList.Push(hk)
             }
         }
     }

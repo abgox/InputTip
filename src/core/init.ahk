@@ -700,9 +700,10 @@ migrateConfig2() {
                         IniWrite(offset, configFile, "Window.CaretSymbol.Rule." key, "offset")
                         IniWrite("offset", configFile, "Window.CaretSymbol.Rule." key, "trigger")
                     }
-                    title := valuePart[5]
-                    if title != "" {
-                        IniWrite(title, configFile, "Window.CaretSymbol.Rule." key, "title")
+                    try {
+                        title := valuePart[5]
+                        if title != ""
+                            IniWrite(title, configFile, "Window.CaretSymbol.Rule." key, "title")
                     }
                 }
             case "Screen.Symbol.Offset":
@@ -765,9 +766,10 @@ migrateConfig2() {
                         conditionVal := valuePart[3] == 1 ? "titleRegex" : "titleEqual"
                         IniWrite(conditionVal, configFile, section key, "condition")
                     }
-                    title := valuePart[4]
-                    if title != "" {
-                        IniWrite(title, configFile, section key, "title")
+                    try {
+                        title := valuePart[4]
+                        if title != ""
+                            IniWrite(title, configFile, section key, "title")
                     }
 
                     if InStr(v, ".Show") || v == "Window.Symbol.NearCursor" {

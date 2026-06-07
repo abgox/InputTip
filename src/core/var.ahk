@@ -119,6 +119,8 @@ var := {
     keyStatsTemplate: readIni("keyStatsTemplate", i18n("keyStatsTemplate.content"))
 }
 
+var._paused := 0
+
 ; 自定义模式下定义的模式规则
 var.inputMethodDetectionRule := readIni("inputMethodDetectionRule", "")
 var.inputMethodDetectionRules := StrSplit(var.inputMethodDetectionRule, "|")
@@ -192,7 +194,7 @@ switchTriggerKeyList := [
     "switchKeyboardCN", "switchKeyboardEN", "switchKeyboardJP", "switchKeyboardKR",
 ]
 triggerKeyList := switchTriggerKeyList.Clone()
-triggerKeyList.Push("setWindowTop", "cancelWindowTop", "pause", "exit", "restart", "showStateCode")
+triggerKeyList.Push("setWindowTop", "cancelWindowTop", "pause", "resume", "exit", "restart", "showStateCode")
 
 windowTriggerKeyList := triggerKeyList.Clone()
 windowTriggerKeyList.InsertAt(10, "ignoreStateSwitch")
@@ -218,7 +220,8 @@ runTriggers(triggers, *) {
             case "switchKeyboardEN": switchKeyboard("EN")
             case "switchKeyboardJP": switchKeyboard("JP")
             case "switchKeyboardKR": switchKeyboard("KR")
-            case "pause": pauseApp()
+            case "pause": suspendApp()
+            case "resume": resumeApp()
             case "exit": SetTimer(fn_exit, -500)
             case "restart": SetTimer(fn_restart, -500)
             case "showStateCode": showStateCode(1)
@@ -446,7 +449,8 @@ getMatchingRuleLists(exeName, triggerMap, hotkey := 0) {
             result.Push(ruleList)
     }
 
-    var._matchCache.Set(cacheKey, result)
+    if result.Length > 0
+        var._matchCache.Set(cacheKey, result)
     return result
 }
 

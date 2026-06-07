@@ -6,7 +6,7 @@
 
 #Include core\init.ahk
 
-OnMessage(0x404, (wParam, lParam, *) => lParam == 0x202 ? pauseApp() : "")
+OnMessage(0x404, (wParam, lParam, *) => lParam == 0x202 ? toggleApp() : "")
 
 if (A_IsCompiled) {
     favicon := A_ScriptFullPath
@@ -34,6 +34,8 @@ checkIni()
 
 var._shiftAloneFlags := Map()
 var._shiftWildcardRegistered := false
+var._lastHotkeyList := []
+var._lastWindowHotkeyList := []
 
 registerHotkey()
 
@@ -67,26 +69,28 @@ checkAndRunShiftTrigger(flagKey, trigger, *) {
     }
 }
 
+
 registerHotkey() {
-    static lastHotkeyList := []
-    if lastHotkeyList.Length {
-        for v in lastHotkeyList
+    if var._lastHotkeyList.Length {
+        for v in var._lastHotkeyList
             try Hotkey(v, "Off")
-        lastHotkeyList := []
+        var._lastHotkeyList := []
     }
     for rule in var.hotkeyRule.Get("", []) {
         if rule.hotkey == "" || rule.trigger == ""
             continue
         registered := setHotkeyTrigger(rule.hotkey, rule.trigger)
         for hk in registered
-            lastHotkeyList.Push(hk)
+            var._lastHotkeyList.Push(hk)
     }
 }
-updateWindowHotkey() {
-    static lastWindowHotkeyList := []
 
-    if lastWindowHotkeyList.Length {
-        for hk in lastWindowHotkeyList {
+updateWindowHotkey() {
+    if (var._paused) {
+        return
+    }
+    if var._lastWindowHotkeyList.Length {
+        for hk in var._lastWindowHotkeyList {
             try Hotkey(hk, "Off")
             for rule in var.hotkeyRule.Get("", []) {
                 if rule.hotkey == hk {
@@ -95,7 +99,7 @@ updateWindowHotkey() {
                 }
             }
         }
-        lastWindowHotkeyList := []
+        var._lastWindowHotkeyList := []
     }
     if !exeName
         return
@@ -111,11 +115,60 @@ updateWindowHotkey() {
             if matchCondition(rule, exeTitle, exeClass) {
                 registered := setHotkeyTrigger(rule.hotkey, rule.trigger)
                 for hk in registered
-                    lastWindowHotkeyList.Push(hk)
+                    var._lastWindowHotkeyList.Push(hk)
             }
         }
     }
 }
+
+clearAllRegisteredHotkeys() {
+    if var._lastHotkeyList.Length {
+        remainingHotkeys := []
+        for hk in var._lastHotkeyList {
+            if isResumeTrigger(hk, "", "global") {
+                remainingHotkeys.Push(hk)
+                continue
+            }
+            try Hotkey(hk, "Off")
+        }
+        var._lastHotkeyList := remainingHotkeys
+    }
+
+    if var._lastWindowHotkeyList.Length {
+        remainingWindowHotkeys := []
+        for hk in var._lastWindowHotkeyList {
+            if isResumeTrigger(hk, exeName, "window") {
+                remainingWindowHotkeys.Push(hk)
+                continue
+            }
+            try Hotkey(hk, "Off")
+        }
+        var._lastWindowHotkeyList := remainingWindowHotkeys
+    }
+}
+
+isResumeTrigger(hk, exeName := "", type := "global") {
+    cleanHk := RegExReplace(hk, "i)^~|(?:\s+Up)$", "")
+
+    if (type == "global") {
+        for rule in var.hotkeyRule.Get("", []) {
+            cleanRuleHk := RegExReplace(rule.hotkey, "i)^~|(?:\s+Up)$", "")
+            if (cleanHk == cleanRuleHk && rule.trigger == "resume")
+                return true
+        }
+    } else if (type == "window" && exeName != "") {
+        ruleLists := getMatchingRuleLists(exeName, var.hotkeyRule, 1)
+        for ruleList in ruleLists {
+            for rule in ruleList {
+                cleanRuleHk := RegExReplace(rule.hotkey, "i)^~|(?:\s+Up)$", "")
+                if (cleanHk == cleanRuleHk && rule.trigger == "resume")
+                    return true
+            }
+        }
+    }
+    return false
+}
+
 
 makeTrayMenu()
 updateTrayTip()

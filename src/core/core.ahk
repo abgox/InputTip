@@ -14,8 +14,11 @@ updateCursorDelay()
 if isJAB {
     loop {
         Sleep(var.pollInterval)
-        if var._paused
+        if var._paused {
+            lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := ""
+            lastTitle := "", lastClass := "", lastProcess := ""
             continue
+        }
 
         if !var.caretSymbolType {
             hideCaretSymbol()
@@ -77,8 +80,6 @@ if isJAB {
 } else {
     loop {
         Sleep(var.pollInterval)
-        if var._paused
-            continue
         if (A_TimeIdle < leaveDelay) {
             needShow := var.caretSymbolType
             try {
@@ -86,6 +87,7 @@ if isJAB {
                 exeName := ProcessGetName(exePid)
                 exeTitle := WinGetTitle("A")
                 exeClass := WinGetClass("A")
+
 
                 hasProcessChange := lastProcess != exeName
                 hasTitleChange := lastTitle != exeTitle
@@ -103,8 +105,7 @@ if isJAB {
                         }
                     }
 
-                    ; 等待窗口完成聚焦，防止切换状态冲突，导致状态切换失败
-                    WinWaitActive(exeTitle " ahk_exe " exeName, , 5)
+                    WinWaitActive(exeTitle " ahk_exe " exeName, , 3)
 
                     lastCaretSymbol := ""
                     lastCursorSymbol := ""
@@ -119,6 +120,12 @@ if isJAB {
             } catch {
                 hideCaretSymbol()
                 needShow := 0
+            }
+
+            if var._paused {
+                lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := ""
+                lastTitle := "", lastClass := "", lastProcess := ""
+                continue
             }
 
             try {

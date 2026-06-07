@@ -59,36 +59,47 @@ createShortcut(dir) {
     }
 }
 
-updateTrayTip(paused := A_IsPaused) {
+updateTrayTip(paused := var._paused) {
     trayTipTemplate := var.enableCustomTrayTip ? var.trayTipTemplate : i18n("trayTipTemplate.content")
     keyStatsTemplate := var.enableKeyStats ? var.keyStatsTemplate : ""
 
-    replaceTip()
+    tip := StrReplace(trayTipTemplate keyStatsTemplate, "%appState%", paused ? i18n("Paused") : i18n("Running"))
+    tip := StrReplace(tip, "%keyCount%", keyCount)
+    tip := StrReplace(tip, "%\n%", "`n")
+    A_IconTip := tip
 
-    if (var.enableKeyStats) {
-        SetTimer(countTimer, 50)
-        countTimer() {
-            static last := ""
-            global keyCount
-            if (!var.enableKeyStats) {
-                SetTimer(, 0)
-                last := ""
-                return
-            }
-            if (A_PriorKey != last) {
-                keyCount++
-                try IniWrite(keyCount, A_ScriptDir "\data\stats.ini", "DailyKeystrokes", FormatTime(, "yyyy-MM-dd"))
-                last := A_PriorKey
-                replaceTip()
-            }
+    if var.enableKeyStats {
+        static timerInitialized := false
+        if (!timerInitialized) {
+            SetTimer(globalKeyStatsWorker, 50)
+            timerInitialized := true
         }
+    } else {
+        SetTimer(globalKeyStatsWorker, 0)
+        timerInitialized := false
+    }
+}
+
+globalKeyStatsWorker() {
+    static last := ""
+    global keyCount
+
+    if !var.enableKeyStats {
+        SetTimer(, 0)
+        last := ""
+        return
     }
 
-    replaceTip() {
-        tip := StrReplace(trayTipTemplate keyStatsTemplate, "%appState%", paused ? i18n("Paused") : i18n("Running"))
-        tip := StrReplace(tip, "%keyCount%", keyCount)
-        tip := StrReplace(tip, "%\n%", "`n")
-        A_IconTip := tip
+    if var._paused {
+        last := A_PriorKey
+        return
+    }
+
+    if A_PriorKey != last {
+        keyCount++
+        try IniWrite(keyCount, A_ScriptDir "\data\stats.ini", "DailyKeystrokes", FormatTime(, "yyyy-MM-dd"))
+        last := A_PriorKey
+        updateTrayTip()
     }
 }
 

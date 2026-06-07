@@ -362,7 +362,9 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_capture
                 fn_capture() {
                     captureList := ["", "", "", "", "", "", "", ""]
-                    modeNameList := ["GUI", "UIA", "HOOK", "HOOK_DLL", "MSAA", "WPF", "ACC", "JAB"]
+                    modeNameList := ["GUI", "UIA", "HOOK", "HOOK_DLL", "MSAA", "WPF", "ACC"]
+                    if var.symbolJABActive
+                        modeNameList.Push("JAB")
                     ddlControls := captureList.Clone()
                     renderGroupBox(g, "symbolCaretCapture", "xs h120 w" bw)
                     for i, v in captureList {
@@ -711,14 +713,28 @@ getFontList() {
     return list
 }
 
-var._paused := 0
+toggleApp(*) {
+    if var._paused
+        resumeApp()
+    else
+        suspendApp()
+}
 
-pauseApp(*) {
-    updateTrayTip(!A_IsPaused)
-    if (A_IsPaused) {
+resumeApp() {
+    if !var._paused
+        return
+
+    SetTimer(_resumeAppWorker, -200)
+    _resumeAppWorker() {
+        if !var._paused
+            return
+
+        Critical("On")
         var._paused := 0
-        Sleep(var.pollInterval + 10)
+
+        updateTrayTip()
         setTrayIcon(var.iconRunning, 0)
+
         if var.cursorActive
             loadCursor(currentState, 1)
         if var.overlayActive
@@ -729,11 +745,27 @@ pauseApp(*) {
             reloadCursorSymbol()
         if var.symbolJABActive
             restartJAB()
-    } else {
+
+        Critical("Off")
+    }
+}
+suspendApp() {
+    if var._paused
+        return
+    SetTimer(_suspendAppWorker, -200)
+    _suspendAppWorker() {
+        if var._paused
+            return
+
+        Critical("On")
         var._paused := 1
-        Sleep(var.pollInterval + 10)
+
+        updateTrayTip()
+        clearAllRegisteredHotkeys()
+
         global lastBorderState := ""
         setTrayIcon(var.iconPaused, 1)
+
         if var.cursorActive
             revertCursor()
         if var.overlayActive
@@ -744,14 +776,12 @@ pauseApp(*) {
             hideCursorSymbol()
         if var.borderActive
             hideBorder()
-
         if var.symbolJABActive
             killJAB(0)
-    }
-    Suspend(-1)
-    Pause(-1)
-}
 
+        Critical("Off")
+    }
+}
 
 ; 显示状态码和转换码
 showStateCode(show, *) {

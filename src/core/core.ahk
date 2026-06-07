@@ -126,36 +126,6 @@ if isJAB {
             if !currentState
                 continue
 
-            switch var.cursorSymbolShowMode {
-                case "blacklist":
-                    matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["hide"]) ? hideCursorSymbol() : ShowCursorSymbolEx(currentState)
-                case "whitelist":
-                    matchWindowRules(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["show"]) ? ShowCursorSymbolEx(currentState) : hideCursorSymbol()
-                default:
-                    hideCursorSymbol()
-            }
-
-            if !InStr(getCursorCapture(), "JAB") {
-                ShowCaretSymbolEx(currentState)
-            } else {
-                hideCaretSymbol()
-            }
-
-            loadCursor(currentState)
-            if var.overlayActive {
-                if currentState != lastInputState || (var.overlayReshowOnTitleChange && hasTitleChange) || (var.overlayReshowOnClassChange && hasClassChange) || (var.overlayReshowOnProcessChange && hasProcessChange) {
-                    switch var.overlayShowMode {
-                        case "blacklist":
-                            matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowOverlayRule["hide"]) ? hideOverlay() : showOverlay(currentState)
-                        case "whitelist":
-                            matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowOverlayRule["show"]) ? showOverlay(currentState) : hideOverlay()
-                        default:
-                            showOverlay(currentState)
-                    }
-                    lastInputState := currentState
-                }
-            }
-
             if var.borderActive {
                 try {
                     hwnd := WinExist("A")
@@ -210,6 +180,36 @@ if isJAB {
                 if lastBorderState != "" {
                     try DestroyMaximizedBorders(WinExist("A"))
                     lastBorderState := ""
+                }
+            }
+
+            switch var.cursorSymbolShowMode {
+                case "blacklist":
+                    matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["hide"]) ? hideCursorSymbol() : ShowCursorSymbolEx(currentState)
+                case "whitelist":
+                    matchWindowRules(exeName, exeTitle, exeClass, var.WindowCursorSymbolRule["show"]) ? ShowCursorSymbolEx(currentState) : hideCursorSymbol()
+                default:
+                    hideCursorSymbol()
+            }
+
+            if !InStr(getCursorCapture(), "JAB") {
+                ShowCaretSymbolEx(currentState)
+            } else {
+                hideCaretSymbol()
+            }
+
+            loadCursor(currentState)
+            if var.overlayActive {
+                if currentState != lastInputState || (var.overlayReshowOnTitleChange && hasTitleChange) || (var.overlayReshowOnClassChange && hasClassChange) || (var.overlayReshowOnProcessChange && hasProcessChange) {
+                    switch var.overlayShowMode {
+                        case "blacklist":
+                            matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowOverlayRule["hide"]) ? hideOverlay() : showOverlay(currentState)
+                        case "whitelist":
+                            matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowOverlayRule["show"]) ? showOverlay(currentState) : hideOverlay()
+                        default:
+                            showOverlay(currentState)
+                    }
+                    lastInputState := currentState
                 }
             }
 

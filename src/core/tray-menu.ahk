@@ -38,7 +38,7 @@ makeTrayMenu() {
             link: getDocsLink("rule/window"),
             section: "Window.Rule",
             trigger: windowTriggerKeyList,
-            cols: ["process", "trigger", "condition", "idleTimer", "textMonitor", "hotkeyMonitor", "class", "title"],
+            cols: ["process", "trigger", "condition", "textMonitor", "hotkeyMonitor", "idleTimer", "class", "title"],
             conditions: windowConditionKeyList
         }
         )
@@ -244,6 +244,9 @@ createProcessMenuGui(meta, *) {
                         "~LShift Up",
                         "~RShift Up",
                         "~Shift Up",
+                        "~Esc Up",
+                        "~^/",
+                        "~!+a",
                         "~^Space",
                         "~!Space",
                         "~+Space",
@@ -321,12 +324,12 @@ createProcessMenuGui(meta, *) {
                             try var._tthEditCtrl.Text := colValue.hotkeyMonitor
                             try var._tthEditCtrl.Opt("-Number")
                         default:
-                            try var._tthGroupCtrl.Text := i18n("match.idleTimer/textMonitor/hotkeyMonitor")
+                            try var._tthGroupCtrl.Text := i18n("match.textMonitorOrHotkeyMonitorOrIdleTimer")
                             try var._tthEditCtrl.Text := arrJoin([
-                                colValue.idleTimer != "" ? colValue.idleTimer : i18n("none"),
                                 colValue.textMonitor ? colValue.textMonitor : i18n("none"),
-                                colValue.hotkeyMonitor ? colValue.hotkeyMonitor : i18n("none")
-                            ], " / ")
+                                colValue.hotkeyMonitor ? colValue.hotkeyMonitor : i18n("none"),
+                                colValue.idleTimer != "" ? colValue.idleTimer : i18n("none")
+                            ], "     ")
                             try var._tthEditCtrl.Opt("-Number")
                     }
                 }
@@ -486,7 +489,7 @@ createProcessMenuGui(meta, *) {
             if meta.section == "Window.Rule" {
                 sectionList.InsertAt(4, fn_content)
                 fn_content() {
-                    var._tthGroupCtrl := renderGroupBox(g, "match.idleTimer/textMonitor/hotkeyMonitor", "xs h70 w" bw)
+                    var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs h70 w" bw)
                     var._tthEditCtrl := _ := g.AddEdit(opt)
 
                     switch colValue.condition {

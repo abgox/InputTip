@@ -25,7 +25,7 @@ langStrings.Set("en-US", Map(
     "match.hotkeyMonitor", "Hotkey Monitor",
     "match.hotkey", "Hotkey",
     "match.condition", "Extra Condition",
-    "match.idleTimer/textMonitor/hotkeyMonitor", "Idle Timer / Text Monitor / Hotkey Monitor",
+    "match.textMonitorOrHotkeyMonitorOrIdleTimer", "Text Monitor / Hotkey Monitor / Idle Timer",
     "match.trigger", "Trigger Behavior",
     "match.title", "Window Title",
     "match.class", "Window Class",

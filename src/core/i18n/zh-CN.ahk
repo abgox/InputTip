@@ -25,7 +25,7 @@ langStrings.Set("zh-CN", Map(
     "match.hotkeyMonitor", "热键监控",
     "match.hotkey", "热键",
     "match.condition", "附加条件",
-    "match.idleTimer/textMonitor/hotkeyMonitor", "空闲计时器 / 文本监控 / 热键监控",
+    "match.textMonitorOrHotkeyMonitorOrIdleTimer", "文本监控 / 热键监控 / 空闲计时器",
     "match.trigger", "触发行为",
     "match.title", "窗口标题",
     "match.class", "窗口类名",

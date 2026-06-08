@@ -209,10 +209,13 @@ class IME {
 /**
  * 切换键盘布局
  * @param {"CN"|"US"|"JP"|"KR"} state 要切换的键盘布局
+ * @param ignoreKeepCaps
  */
-switchKeyboard(state) {
+switchKeyboard(state, ignoreKeepCaps := 0) {
     if matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule["ignoreKeyboardSwitch"]).Length
         return 0
+    if !ignoreKeepCaps && IME.GetInputModeText() == "Caps" && !var.keepCapsLockWhenKeyboardSwitch
+        SendInput("{CapsLock}")
     return IME.SwitchKeyboard(state)
 }
 

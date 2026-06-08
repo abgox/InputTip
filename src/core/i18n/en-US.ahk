@@ -132,6 +132,7 @@ langStrings.Set("en-US", Map(
     "inputMethodDetectionMode.general", "General",
     "inputMethodDetectionMode.custom", "Custom",
     "keepCapsLockWhenStateSwitch", "Keep CapsLock State when State Switch",
+    "keepCapsLockWhenKeyboardSwitch", "Keep CapsLock State when Keyboard Switch",
     "exportState", "Export Input Method State",
     "inputMethodBaseState", "Default State",
     "inputMethodDetectionMode.matchOrder", "Match Order",

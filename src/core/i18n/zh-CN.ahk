@@ -132,6 +132,7 @@ langStrings.Set("zh-CN", Map(
     "inputMethodDetectionMode.general", "通用",
     "inputMethodDetectionMode.custom", "自定义",
     "keepCapsLockWhenStateSwitch", "状态切换时保持大写锁定",
+    "keepCapsLockWhenKeyboardSwitch", "键盘切换时保持大写锁定",
     "exportState", "导出输入法状态",
     "inputMethodBaseState", "默认状态",
     "inputMethodDetectionMode.matchOrder", "匹配的顺序",

@@ -18,7 +18,9 @@ e_inputMethod(*) {
 
         renderRadioGroup(g, "inputMethodDetectionMode", [[".custom", "custom"], [".general", "general"]])
         renderRadioGroup(g, "keepCapsLockWhenStateSwitch", [["yes", 1], ["no", 0]])
+        renderRadioGroup(g, "keepCapsLockWhenKeyboardSwitch", [["yes", 1], ["no", 0]])
         renderRadioGroup(g, "exportState", [["yes", 1], ["no", 0]])
+        g.AddLink("yp", getDocsLink("inputtip-for-vscode", "InputTip for VSCode"))
 
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("input-method/state-detection-mode"))
@@ -26,7 +28,9 @@ e_inputMethod(*) {
         renderText(g, "inputMethodBaseState", "xs", "")
         renderDropDownList(g, "inputMethodBaseState", ["EN", "CN"], "yp", "w" bw / 3)
         g.AddText("yp w20")
-        g.AddCheckbox("yp", i18n("inputMethodDetectionMode.showCode")).OnEvent("Click", (ctrl, *) => (
+        _ := g.AddCheckbox("yp", i18n("inputMethodDetectionMode.showCode"))
+        _.Value := var._showStateCode
+        _.OnEvent("Click", (ctrl, *) => (
             val := ctrl.Value, var._showStateCode := val, showStateCode(val)
         ))
 
@@ -34,7 +38,7 @@ e_inputMethod(*) {
             i18n("inputMethodDetectionMode.matchOrder"), i18n("inputMethodDetectionMode.stateCodeRule"), i18n("inputMethodDetectionMode.conversionCodeRule"), i18n("inputMethodDetectionMode.imeState")
         ]
 
-        LV := _ := g.AddListView("xs -LV0x10 -Multi r5 NoSortHdr Grid w" bw, columns)
+        LV := _ := g.AddListView("xs -LV0x10 -Multi r6 NoSortHdr Grid w" bw, columns)
         reloadLV(_)
         _.OnEvent("DoubleClick", (LV, RowNumber, *) => fn_edit(LV, RowNumber))
 

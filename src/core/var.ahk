@@ -55,6 +55,7 @@ var := {
     inputMethodDetectionTimeout: readIni("inputMethodDetectionTimeout", 200),
     ; 是否保持大写锁定状态
     keepCapsLockWhenStateSwitch: readIni("keepCapsLockWhenStateSwitch", 0),
+    keepCapsLockWhenKeyboardSwitch: readIni("keepCapsLockWhenKeyboardSwitch", 0),
     ; 是否将输入法状态导出
     exportState: readIni("exportState", 0),
     exportStateFile: A_Temp "\abgox.InputTip.State",
@@ -249,7 +250,7 @@ runTriggers(triggers, *) {
         }
     }
     _switchState(state, key) {
-        switchKeyboard("CN"), Sleep(50), switchState(state, key)
+        switchKeyboard("CN", 1), Sleep(50), switchState(state, key)
     }
 }
 

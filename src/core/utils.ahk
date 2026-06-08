@@ -74,6 +74,14 @@ MapKeyOf(map, value) {
     return ""
 }
 
+safeRegexMatch(Haystack, NeedleRegEx) {
+    try {
+        return RegExMatch(Haystack, NeedleRegEx)
+    } catch {
+        return 0
+    }
+}
+
 ; 从字符串中提取出数字，支持负数和小数
 returnNumber(value) {
     if (value == "" || !(value ~= "\d")) {

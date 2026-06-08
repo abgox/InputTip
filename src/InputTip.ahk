@@ -199,7 +199,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         rules := []
         previewTimes := Map()
         for key, item in var._previewOffsetMap {
-            if RegExMatch(exeName, key) {
+            if safeRegexMatch(exeName, key) {
                 previewTimes.Set(item.time, 1)
                 rules.Push(item)
             }

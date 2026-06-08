@@ -445,7 +445,7 @@ getMatchingRuleLists(exeName, triggerMap, hotkey := 0) {
     for key, ruleList in triggerMap {
         if (key == "" && !hotkey) || key == exeName
             continue
-        if RegExMatch(exeName, key)
+        if safeRegexMatch(exeName, key)
             result.Push(ruleList)
     }
 
@@ -457,11 +457,11 @@ getMatchingRuleLists(exeName, triggerMap, hotkey := 0) {
 matchCondition(rule, exeTitle, exeClass) {
     switch rule.condition {
         case "class":
-            return RegExMatch(exeClass, rule.class)
+            return safeRegexMatch(exeClass, rule.class)
         case "title":
-            return RegExMatch(exeTitle, rule.title)
+            return safeRegexMatch(exeTitle, rule.title)
         case "classAndTitle":
-            return RegExMatch(exeClass, rule.class) && RegExMatch(exeTitle, rule.title)
+            return safeRegexMatch(exeClass, rule.class) && safeRegexMatch(exeTitle, rule.title)
         default:
             return true
     }
@@ -809,7 +809,7 @@ onTextMonitorChar(ih, char) {
         textMonitorState.buffer := SubStr(textMonitorState.buffer, -50)
 
     for rule in textMonitorState.rules {
-        if RegExMatch(textMonitorState.buffer, rule.regex) {
+        if safeRegexMatch(textMonitorState.buffer, rule.regex) {
             textMonitorState.buffer := ""
             runTriggers([rule.trigger])
             return

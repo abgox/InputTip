@@ -24,7 +24,9 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     left := 0, top := 0, right := 0, bottom := 0
     try {
         GetCaretPosFromJAB(&left, &top, &right, &bottom)
+        var._lastCaptureMode := "JAB"
     } catch {
+        var._lastCaptureMode := ""
         return 0
     }
     if !left

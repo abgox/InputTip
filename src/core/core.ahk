@@ -36,7 +36,7 @@ if isJAB {
                 exeTitle := WinGetTitle("A")
                 exeClass := WinGetClass("A")
 
-                if !InStr(getCursorCapture(), "JAB") {
+                if !InStr(getCaretCapture(), "JAB") {
                     hideCaretSymbol()
                     lastCaretSymbol := ""
                     lastCursorSymbol := ""
@@ -213,7 +213,7 @@ if isJAB {
                     hideCursorSymbol()
             }
 
-            if !InStr(getCursorCapture(), "JAB") {
+            if !InStr(getCaretCapture(), "JAB") {
                 ShowCaretSymbolEx(currentState)
             } else {
                 hideCaretSymbol()

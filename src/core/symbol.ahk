@@ -121,7 +121,7 @@ showCaretSymbol(state, left, top, right, bottom) {
     s := isWhichScreen()
     scale := getMonitorScale(s)
 
-    if (InStr(getCursorCapture(), "JAB")) {
+    if (InStr(getCaretCapture(), "JAB") && var._lastCaptureMode == "JAB") {
         ; 对于 JAB 应用，垂直偏移量参考原点无法使用上方，上方坐标有误
         offsetY := top + bottom
     } else {

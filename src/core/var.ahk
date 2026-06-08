@@ -573,7 +573,7 @@ updateScreenOffset(prefix) {
     }
 }
 
-getCursorCapture() {
+getCaretCapture() {
     rule := var.WindowCaretSymbolRule.Get("capture").Get(exeName, "")
     if rule
         return rule.capture
@@ -946,6 +946,7 @@ matchSequence(buffer, seq) {
     return true
 }
 
+var._lastCaptureMode := ""
 
 /**
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
@@ -954,22 +955,36 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     try DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr")
 
     hwnd := 0
-    captureModeChain := getCursorCapture()
+    captureModeChain := getCaretCapture()
     modes := StrSplit(captureModeChain, ">")
-    for mode in modes {
-        if _trySingleCaptureMode(mode)
+    if modes.Length {
+        for mode in modes {
+            if _trySingleCaptureMode(mode) {
+                var._lastCaptureMode := mode
+                return 1
+            }
+        }
+    } else {
+        if getCaretPosFromGui(&hwnd) {
+            var._lastCaptureMode := "GUI"
             return 1
+        }
+        if getCaretPosFromHook(0) {
+            var._lastCaptureMode := "HOOK"
+            return 1
+        }
+        if getCaretPosFromUIA() {
+            var._lastCaptureMode := "UIA"
+            return 1
+        }
+        if !hwnd
+            hwnd := getHwnd()
+        if getCaretPosFromMSAA() {
+            var._lastCaptureMode := "MSAA"
+            return 1
+        }
     }
-    if getCaretPosFromGui(&hwnd)
-        return 1
-    if getCaretPosFromHook(0)
-        return 1
-    if getCaretPosFromUIA()
-        return 1
-    if !hwnd
-        hwnd := getHwnd()
-    if getCaretPosFromMSAA()
-        return 1
+    var._lastCaptureMode := ""
     return 0
 
     _trySingleCaptureMode(mode) {

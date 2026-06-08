@@ -26,7 +26,7 @@ jobs:
           git clone --depth 1 https://${{ secrets.PAT_TOKEN }}@github.com/abgox/winget-pkgs.git winget-pkgs
           cd winget-pkgs
 
-          $info = ..\InputTip\scripts\create-winget-manifest.ps1
+          $info = ..\InputTip\.github\scripts\create-winget-manifest.ps1
 
           $new_branch = $info.new_branch
           $commit_msg = $info.commit_msg

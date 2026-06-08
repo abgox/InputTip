@@ -3,14 +3,14 @@
 #Requires AutoHotkey v2.0
 
 if (A_IsCompiled) {
-    currentVersion := "3.3.0"
+    currentVersion := "3.5.3"
     versionType := "exe"
 } else {
-    currentVersion := "3.3.0"
+    currentVersion := "3.5.3"
     versionType := "zip"
 }
 
-;@AHK2Exe-SetVersion 3.3.0
+;@AHK2Exe-SetVersion 3.5.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon temp\icon\default-app.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox
@@ -29,10 +29,7 @@ SetStoreCapsLockMode(0)
 OnError((*) => 0)
 
 isJAB := 0
-OnMessage(0x007E, OnDisplayChange)
-OnDisplayChange(wParam, lParam, msg, hwnd) {
-    SetTimer(updateScreenInfo, -500)
-}
+OnMessage(0x007E, (*) => SetTimer(updateScreenInfo, -500))
 updateScreenInfo() {
     try {
         var.screenNum := MonitorGetCount()
@@ -56,6 +53,8 @@ appid := author "." appname
 taskNameNoUAC := appid ".noUAC"
 taskNameJAB := appid ".JAB.JetBrains"
 
+appPid := DllCall("GetCurrentProcessId")
+
 dataDir := A_ScriptDir "\data"
 configFile := dataDir "\config.ini"
 pluginDir := dataDir "\plugin"
@@ -71,3 +70,30 @@ baseUrl := [
     "https://raw.githubusercontent.com/abgox/InputTip/main/",
     "https://gh-proxy.org/https://raw.githubusercontent.com/abgox/InputTip/main/"
 ]
+
+
+stateList := ["CN", "EN", "Caps", "JP", "KR"]
+stateVal := {
+    CN: {
+        id: 1,
+        color: "0xFF0000",
+        colorText: "red",
+    },
+    EN: {
+        id: 0,
+        color: "0x0000FF",
+        colorText: "blue",
+    },
+    Caps: {
+        color: "0x008000",
+        colorText: "green",
+    },
+    JP: {
+        color: "0xCCCC00",
+        colorText: "yellow",
+    },
+    KR: {
+        color: "0x800080",
+        colorText: "purple",
+    },
+}

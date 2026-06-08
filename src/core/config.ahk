@@ -2,8 +2,8 @@
 
 normalizeConfig(key, value) {
     if InStr(key, "color") {
-        if !RegExMatch(value, "i)^0x[0-9a-f]{6}$")
-            value := "0xffffff"
+        if value != "" && !RegExMatch(value, "i)^0x[0-9a-f]{6}$")
+            value := "0xFFFFFF"
     } else if InStr(key, "size") {
         value := Abs(returnNumber(value))
         if value < 8 || value > 200
@@ -13,7 +13,7 @@ normalizeConfig(key, value) {
         value := Round(value / 100) * 100
         if value < 100 || value > 900
             value := 400
-    } else if InStr(key, "offset") && !InStr(key, "symbolOffsetBaseY") {
+    } else if InStr(key, "offset") && !InStr(key, "SymbolScreenOffset") {
         value := returnNumber(value)
     } else if InStr(key, "transparent") {
         value := Abs(returnNumber(value))
@@ -40,7 +40,7 @@ normalizeConfig(key, value) {
 changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJAB()) {
     if value == "" {
         ; 允许空值的配置
-        allowNullVal := InStr(key, "hotkey") || InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "symbolPicturePath") || InStr(key, "overlayText") || InStr(key, "symbolText")
+        allowNullVal := InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "SymbolPicturePath") || InStr(key, "overlayText") || InStr(key, "color") || InStr(key, "SymbolText")
         if !allowNullVal
             return
     }
@@ -79,8 +79,7 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
             hideOverlay()
         }
     } else if InStr(key, "symbol") {
-        global lastWindow := ""
-        global lastSymbol := ""
+        global lastCaretSymbol := "", lastCursorSymbol := ""
 
         if InStr(key, "symbolPicture") {
             symType := "Picture"
@@ -90,38 +89,28 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
             symType := "Shape"
         }
 
-        if var.symbolType {
-            updateSymbol()
-            if var.symbolNearCursorActive {
-                hideSymbol()
-                reloadSymbol()
-            }
-            if key == "symbolOffsetBaseY" || key == "symbolType" {
-                if !var.symbolNearCursorActive
-                    gc.previewSymbol.Focus()
-            }
+        isCaret := InStr(key, "caret")
+        if var.caretSymbolType || var.cursorSymbolType {
+            isCaret ? updateSymbol("caret") : updateSymbol("cursor")
 
             if InStr(key, "cornerPreference") || InStr(key, "edgeStyle") {
-                reloadSymbol()
-                if !var.symbolNearCursorActive
-                    try gc.%"previewSymbol" symType%.Focus()
+                isCaret ? reloadCaretSymbol() : reloadCursorSymbol()
             }
 
             if InStr(key, "path") || InStr(key, "color") || InStr(key, "font") {
                 if (value) {
-                    reloadSymbol()
-                    if !var.symbolNearCursorActive
-                        try gc.%"previewSymbol" symType%.Focus()
+                    isCaret ? reloadCaretSymbol() : reloadCursorSymbol()
                 } else {
-                    hideSymbol()
+                    isCaret ? hideCaretSymbol() : hideCursorSymbol()
                 }
             }
         } else {
-            hideSymbol()
+            isCaret ? hideCaretSymbol() : hideCursorSymbol()
         }
 
         if InStr(key, "HideDelay") {
             updateSymbolDelay()
+            updateCursorDelay()
         }
         if InStr(key, "JAB") {
             if var.symbolJABActive {
@@ -146,24 +135,5 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
         case "enableCustomTrayTip", "trayTipTemplate", "enableKeyStats", "keyStatsTemplate":
             SetTimer(updateTrayTip, -1000)
         default:
-    }
-}
-
-changeSectionConfig(key, value, section, delete := 0) {
-    if delete {
-        try IniDelete(configFile, section, key)
-    } else {
-        writeIni(key, value, section)
-    }
-    restartJAB()
-    switch section {
-        case "Window.Symbol.Offset":
-            global windowSymbolOffset := parseOffsetRules(StrSplit(readIniSection("Window.Symbol.Offset"), "`n"))
-        case "Screen.Symbol.Offset":
-            updateScreenOffset()
-        case "Window.Symbol.CursorCapture":
-            updateCursorMode()
-        default:
-            var.%StrReplace(section, ".", "")% := parseMatchRules(StrSplit(readIniSection(section), "`n"))
     }
 }

@@ -3,7 +3,7 @@
 updateOverlay()
 
 hideOverlay() {
-    for v in var.stateList {
+    for v in stateList {
         i := var.screenNum
         while (i > 0) {
             try var.%"overlayGui" v i%.Hide()
@@ -19,56 +19,115 @@ showOverlay(state) {
         return
 
     hideDelay := var.overlayHideDelay
-    if (hideDelay == "") {
+    if hideDelay == ""
         hideDelay := 0
-    }
+
     Ypos := var.%"overlayOffsetY" state%
     Xpos := var.%"overlayOffsetX" state%
     basePosition := var.%"overlayBasePosition" state%
+
+    win := getWinPhysicalRect()
+    WinX := win.x, WinY := win.y, WinW := win.w, WinH := win.h
+
+    overlayAnimation := ""
+    switch var.overlayAnimation {
+        case 1: overlayAnimation := "fade"
+        case 2: overlayAnimation := "slideOverlay"
+    }
 
     try {
         i := var.screenNum
         while (i > 0) {
             g := var.%"overlayGui" state i%
-            MonitorGet(i, &Left, &Top, &Right, &Bottom)
-            pt := Buffer(8, 0)
-            NumPut("Int", (Left + Right) // 2, pt, 0)
-            NumPut("Int", (Top + Bottom) // 2, pt, 4)
-            hMonitor := DllCall("MonitorFromPoint", "Ptr", pt, "Int", 2, "Ptr")
-            DllCall("Shcore\GetDpiForMonitor", "Ptr", hMonitor, "Int", 0, "UInt*", &dpiX := 0, "UInt*", &dpiY := 0)
-            scale := dpiX / 96
-            scaledW := g.w * scale
-            scaledH := g.h * scale
+            screen := var.screenList[i]
+
+            scale := getMonitorScale(screen)
+            scaledW := toPhysical(g.w, scale)
+            scaledH := toPhysical(g.h, scale)
+            scaledXpos := toPhysical(Xpos, scale)
+            scaledYpos := toPhysical(Ypos, scale)
+
+            if InStr(basePosition, "Window") {
+                Left := 0, Top := 0, Right := 0, Bottom := 0
+                WALeft := 0, WATop := 0, WARight := 0, WABottom := 0
+            } else {
+                Left := screen.left
+                Top := screen.top
+                Right := screen.right
+                Bottom := screen.bottom
+                WALeft := screen.workLeft
+                WATop := screen.workTop
+                WARight := screen.workRight
+                WABottom := screen.workBottom
+            }
             switch basePosition {
                 case "top":
-                    x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
-                    y := Top + Ypos
+                    x := Left + (Right - Left) / 2 - scaledW / 2
+                    y := Top
                 case "bottom":
-                    x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
-                    y := Bottom - scaledH + Ypos
+                    x := Left + (Right - Left) / 2 - scaledW / 2
+                    y := Bottom - scaledH
                 case "left":
-                    x := Left + Xpos
-                    y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+                    x := Left
+                    y := Top + (Bottom - Top) / 2 - scaledH / 2
                 case "right":
-                    x := Right - scaledW + Xpos
-                    y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+                    x := Right - scaledW
+                    y := Top + (Bottom - Top) / 2 - scaledH / 2
                 case "topLeft":
-                    x := Left + Xpos
-                    y := Top + Ypos
+                    x := Left
+                    y := Top
                 case "topRight":
-                    x := Right - scaledW + Xpos
-                    y := Top + Ypos
+                    x := Right - scaledW
+                    y := Top
                 case "bottomLeft":
-                    x := Left + Xpos
-                    y := Bottom - scaledH + Ypos
+                    x := Left
+                    y := Bottom - scaledH
                 case "bottomRight":
-                    x := Right - scaledW + Xpos
-                    y := Bottom - scaledH + Ypos
+                    x := Right - scaledW
+                    y := Bottom - scaledH
+                case "bottomWorkArea":
+                    x := WALeft + (WARight - WALeft) / 2 - scaledW / 2
+                    y := WABottom - scaledH
+                case "bottomLeftWorkArea":
+                    x := WALeft
+                    y := WABottom - scaledH
+                case "bottomRightWorkArea":
+                    x := WARight - scaledW
+                    y := WABottom - scaledH
+                case "topWindow":
+                    x := WinX + WinW / 2 - scaledW / 2
+                    y := WinY
+                case "bottomWindow":
+                    x := WinX + WinW / 2 - scaledW / 2
+                    y := WinY + WinH - scaledH
+                case "leftWindow":
+                    x := WinX
+                    y := WinY + WinH / 2 - scaledH / 2
+                case "rightWindow":
+                    x := WinX + WinW - scaledW
+                    y := WinY + WinH / 2 - scaledH / 2
+                case "topLeftWindow":
+                    x := WinX
+                    y := WinY
+                case "topRightWindow":
+                    x := WinX + WinW - scaledW
+                    y := WinY
+                case "bottomLeftWindow":
+                    x := WinX
+                    y := WinY + WinH - scaledH
+                case "bottomRightWindow":
+                    x := WinX + WinW - scaledW
+                    y := WinY + WinH - scaledH
+                case "centerWindow":
+                    x := WinX + WinW / 2 - scaledW / 2
+                    y := WinY + WinH / 2 - scaledH / 2
                 default: ; center
-                    x := Left + Abs(Right - Left) / 2 - scaledW / 2 + Xpos
-                    y := Top + Abs(Bottom - Top) / 2 - scaledH / 2 + Ypos
+                    x := Left + (Right - Left) / 2 - scaledW / 2
+                    y := Top + (Bottom - Top) / 2 - scaledH / 2
             }
-            showGui(g, "AutoSize X" x " Y" y " NA", var.overlayAnimation, 1, var.overlayTransparent)
+            showGui(g, "AutoSize NA", overlayAnimation, 1, var.overlayTransparent)
+            setGuiPhysicalPos(g.Hwnd, x + scaledXpos, y + scaledYpos)
+
             i--
         }
     }
@@ -80,7 +139,7 @@ showOverlay(state) {
 }
 
 updateOverlay() {
-    for state in var.stateList {
+    for state in stateList {
         text := var.%"overlayText" state%
         textFont := var.overlayTextFont
         textSize := var.overlayTextSize
@@ -122,13 +181,13 @@ e_overlay(*) {
         g := createGuiOpt(i18n("overlay"))
 
         if (info.i) {
-            g.AddText(, line70)
+            g.AddText(, isChinese ? line80 : line90)
             return g
         }
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        tab := renderTab(g, [i18n("basicConfig"), i18n("basicConfig") 2, i18n("basicConfig") 3, i18n("stateStyle"), i18n("stateStyle") 2])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("basicConfig") 2, i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/overlay"))
@@ -140,17 +199,55 @@ e_overlay(*) {
             ])
 
         renderEditGroup(g, "overlayHideDelay", "Number Limit5")
-        renderRadioGroup(g, "overlayShowOnProcessChange", [["yes", 1], ["no", 0]])
-        renderRadioGroup(g, "overlayShowOnWindowChange", [["yes", 1], ["no", 0]])
+        renderGroupBox(g, "overlayReshowOnChange", , "h80 w" bw)
+        g.AddCheckbox("xs+20 yp+40 Disabled", i18n("overlayReshowOnChange.state")).Value := 1
+        for v in ["Process", "Title", "Class"] {
+            _ := g.AddCheckbox("yp", i18n("overlayReshowOnChange." StrLower(v)))
+            _.Value := var.%"overlayReshowOn" v "Change"%
+            _.OnEvent("Click", e_change.Bind(v))
+        }
+        e_change(type, ctrl, *) {
+            key := "overlayReshowOn" type "Change"
+            val := ctrl.Value
+            var.%key% := val
+            writeIni(key, val)
+        }
+
+        renderRadioGroup(g, "overlayShowMode",
+            [
+                ["blacklist", "blacklist"],
+                ["whitelist", "whitelist"]
+            ])
+        _w := bw / 2 - g.MarginX / 4
+        for v in [
+            ["hide", "xs", "blacklistBtn"],
+            ["show", "yp", "whitelistBtn"],
+        ] {
+            g.AddButton(v[2] " w" _w, i18n(v[3])).OnEvent("Click",
+                createProcessMenuGui.Bind({
+                    title: i18n("overlay") " - " i18n(v[3]),
+                    tab: [i18n(v[3])],
+                    trigger: [v[1]],
+                    link: getDocsLink("tip/overlay/list-mechanism"),
+                    section: "Window.Overlay.Rule",
+                    cols: ["process", "condition", "class", "title"],
+                    conditions: conditionKeyList
+                })
+            )
+        }
 
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/overlay"))
+        renderGroupBox(g, "overlayBaseStyle", , "h80 w" bw)
+        renderEditLabel(g, "overlayTextSize", "Number Limit2 w" bw / 8)
+        renderEditLabel(g, "overlayTextWeight", "Number Limit3 w" bw / 8, , "yp")
+        renderEditLabel(g, "overlayTransparent", "Number Limit3 w" bw / 8, , "yp")
+        renderDropDownListGroup(g, "overlayTextFont", fontList)
         renderRadioGroup(g, "overlayAnimation",
             [
                 ["none", 0],
                 ["animation.fade", 1],
                 ["animation.slide", 2],
-                ["animation.scale", 3]
             ])
 
         renderRadioGroup(g, "overlayCornerPreference",
@@ -168,78 +265,37 @@ e_overlay(*) {
                 ["edgeStyle.static", 3]
             ])
 
-        renderRadioGroup(g, "overlayShowMode",
-            [
-                ["overlayBlacklist", "blacklist"],
-                ["overlayWhitelist", "whitelist"]
-            ])
-
-        _w := bw / 2 - g.MarginX / 4
-        g.AddButton("xs w" _w, i18n("overlayBlacklistBtn")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("overlay") " - " i18n("overlayBlacklistBtn"),
-                [
-                    i18n("overlayBlacklistBtn"),
-                ],
-                getDocsLink("tip/overlay/list-mechanism"),
-                [
-                    "Window.Overlay.Hide"
-                ]
-            )
-        )
-        g.AddButton("yp w" _w, i18n("overlayWhitelistBtn")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("overlay") " - " i18n("overlayWhitelistBtn"),
-                [
-                    i18n("overlayWhitelistBtn"),
-                ],
-                getDocsLink("tip/overlay/list-mechanism"),
-                [
-                    "Window.Overlay.Show"
-                ]
-            )
-        )
-
-        tab.UseTab(3)
-        g.AddLink("Section", getDocsLink("tip/overlay"))
-        renderDropDownListGroup(g, "overlayTextFont", fontList)
-        renderEditGroup(g, "overlayTextSize", "Number Limit2")
-        renderEditGroup(g, "overlayTextWeight", "Number Limit3")
-        renderEditGroup(g, "overlayTransparent", "Number Limit3")
-
         posTextMap := Map()  ; text -> value
         posValueMap := Map() ; value -> text
-        posList := ["center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight"]
+        posList := [
+            "topWindow", "bottomWindow", "leftWindow", "rightWindow", "centerWindow", "topLeftWindow", "topRightWindow", "bottomLeftWindow", "bottomRightWindow",
+            "top", "bottom", "left", "right", "center", "topLeft", "topRight", "bottomLeft", "bottomRight",
+            "bottomWorkArea", "bottomLeftWorkArea", "bottomRightWorkArea"
+        ]
         for i, v in posList {
             text := i18n("overlayBasePosition." v)
             posTextMap.Set(text, v)
             posValueMap.Set(v, text)
             posList[i] := text
         }
-
-        editOpt := " w" bw / 6
-
-        for i, v in var.stateList {
+        for i, v in stateList {
             if (Mod(i - 1, 3) == 0) {
-                tab.UseTab(((i - 1) // 3) + 4)
+                tab.UseTab(((i - 1) // 3) + 3)
                 g.AddLink("Section", getDocsLink("tip/overlay"))
             }
 
-            g.SetFont("Bold")
-            g.AddGroupBox("xs h120 w" bw, i18n("state." v))
-            g.SetFont("Norm")
-
-            renderEditLabel(g, "overlayText" v, editOpt, "overlayText")
-            renderEditLabel(g, "overlayOffsetX" v, editOpt, "overlayOffsetX", "yp")
+            renderGroupBox(g, v, , "h120 w" bw)
+            renderEditLabel(g, "overlayText" v, "w" bw / 3, "overlayText")
+            renderEditLabel(g, "overlayOffsetX" v, "Limit5 w" bw / 10, "overlayOffsetX", "yp")
             renderColorPicker(g, "overlayTextColor" v, "overlayTextColor")
 
             g.AddText("xs+20 yp+40", i18n("overlayBasePosition"))
-            _ := g.AddDropDownList("yp w" bw / 6, posList)
+            _ := g.AddDropDownList("yp r9 w" bw / 3, posList)
             try _.Text := posValueMap.Get(var.%"overlayBasePosition" v%)
             _.state := v
             _.OnEvent("Change", (i, *) => changeConfig("overlayBasePosition" i.state, posTextMap.Get(i.Text), 1))
 
-            renderEditLabel(g, "overlayOffsetY" v, editOpt, "overlayOffsetY", "yp")
+            renderEditLabel(g, "overlayOffsetY" v, "Limit5 w" bw / 10, "overlayOffsetY", "yp")
             renderColorPicker(g, "overlayBgColor" v, "overlayBgColor")
 
         }

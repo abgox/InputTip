@@ -12,7 +12,7 @@ e_moreSettings(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        tab := renderTab(g, [i18n("moreSettings"), i18n("moreSettings") 2])
+        tab := renderTab(g, [i18n("moreSettings")])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("more-settings"))
@@ -28,21 +28,16 @@ e_moreSettings(*) {
                 "menuAnimation",
                 [
                     ["none", 0],
-                    ["animation.fade", 1],
-                    ["animation.slide", 2],
-                    ["animation.scale", 3]
+                    ["animation.fade", 1]
                 ]
             ],
         ])
 
-        renderEditGroup(g, "pollInterval", "Number limit2")
+        ; renderEditGroup(g, "pollInterval", "Number limit2")
 
-        tab.UseTab(2)
-        g.AddLink("Section", getDocsLink("more-settings"))
-
-        _w := bw / 2
-        g.AddButton("xs w" _w, i18n("openDataDirectory")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data"))
-        g.AddButton("yp w" _w, i18n("updateCheck")).OnEvent("Click", e_updateCheck)
+        optW := " w" bw / 2 - g.MarginX / 4
+        g.AddButton("xs w" bw, i18n("openDataDirectory")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data"))
+        g.AddButton("xs" optW, i18n("updateCheck")).OnEvent("Click", e_updateCheck)
         e_updateCheck(*) {
             showGui(createUniqueGui(checkUpdateGui))
             checkUpdateGui(info) {
@@ -55,7 +50,11 @@ e_moreSettings(*) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                renderRadioGroup(g, "checkUpdateOnStartup", [["yes", 1], ["no", 0]])
+                renderRadioGroup(g, "checkUpdateOnStartup", [
+                    ["yes", 1, (key, value, *) => (changeConfig(key, value), runUpdater())],
+                    ["no", 0]
+                ]
+                )
 
                 if (A_IsCompiled) {
                     g.AddButton("xs w" bw, i18n("checkUpdateNow")).OnEvent("Click", update)
@@ -73,32 +72,7 @@ e_moreSettings(*) {
                 return g
             }
         }
-        g.AddButton("xs w" _w, i18n("autoPause.window")).OnEvent("Click", (*) => (
-            createProcessMenuGui(
-                i18n("autoPause.window"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("auto-pause"),
-                [
-                    "Window.AutoPause"
-                ]
-            )
-        ))
-        g.AddButton("yp w" _w, i18n("createDesktopShortcut")).OnEvent("Click", (*) => createShortcut(A_Desktop))
-        g.AddButton("xs w" _w, i18n("autoExit.window")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("autoExit.window"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("auto-exit"),
-                [
-                    "Window.AutoExit"
-                ]
-            )
-        )
-        g.AddButton("yp w" _w, i18n("customizeTrayIcon")).OnEvent("Click", (*) => showGui(createUniqueGui(customizeTrayIconGui)))
+        g.AddButton("yp" optW, i18n("customizeTrayIcon")).OnEvent("Click", (*) => showGui(createUniqueGui(customizeTrayIconGui)))
         customizeTrayIconGui(info) {
             g := createGuiOpt(i18n("customizeTrayIcon"))
 
@@ -117,19 +91,8 @@ e_moreSettings(*) {
             g.AddButton("xs w" bw, i18n("icon.open")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data\icon"))
             return g
         }
-        g.AddButton("xs w" _w, i18n("ignoreStateSwitch.window")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("ignoreStateSwitch.window"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("switch/ignore-state-switch"),
-                [
-                    "Window.IgnoreStateSwitch"
-                ]
-            )
-        )
-        g.AddButton("yp w" _w, i18n("customizeTrayTip")).OnEvent("Click", (*) => showGui(createUniqueGui(customizeTrayTipGui)))
+        g.AddButton("xs" optW, i18n("createDesktopShortcut")).OnEvent("Click", (*) => createShortcut(A_Desktop))
+        g.AddButton("yp" optW, i18n("customizeTrayTip")).OnEvent("Click", (*) => showGui(createUniqueGui(customizeTrayTipGui)))
 
         customizeTrayTipGui(info) {
             g := createGuiOpt(i18n("customizeTrayTip"))
@@ -151,12 +114,7 @@ e_moreSettings(*) {
 
             return g
         }
-        g.OnEvent("Close", e_close)
-        e_close(*) {
-            g.Destroy()
-            gc.tab := 0
-            gc.timer := 0
-        }
+        g.OnEvent("Close", (*) => g.Destroy())
         return g
     }
 }

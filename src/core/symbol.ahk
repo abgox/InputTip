@@ -1,18 +1,19 @@
 ; InputTip
 
-updateSymbol()
+updateSymbol("caret")
+updateSymbol("cursor")
 
-updateSymbol() {
+updateSymbol(prefix) {
     symbolGui(title, info) {
         return createGuiOpt(title, , "-Caption AlwaysOnTop ToolWindow LastFound E0x20", , 0)
     }
-    switch var.symbolType {
+    switch var.%prefix "SymbolType"% {
         case 1:
-            for state in var.stateList {
-                key := "symbolPictureGui" state
-                w := var.%"symbolPictureWidth" state%
-                h := var.%"symbolPictureHeight" state%
-                path := var.%"symbolPicturePath" state%
+            for state in stateList {
+                key := prefix "SymbolPictureGui" state
+                w := var.%prefix "SymbolPictureWidth" state%
+                h := var.%prefix "SymbolPictureHeight" state%
+                path := var.%prefix "SymbolPicturePath" state%
                 if (defaultSymbolMap.Has(path)) {
                     path := defaultSymbolDir "\" path
                 } else {
@@ -28,14 +29,14 @@ updateSymbol() {
                 }
             }
         case 2:
-            for state in var.stateList {
-                key := "symbolShapeGui" state
-                color := var.%"symbolShapeColor" state%
+            for state in stateList {
+                key := prefix "SymbolShapeGui" state
+                color := var.%prefix "SymbolShapeColor" state%
                 if (color) {
-                    var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.symbolShapeCornerPreference)
+                    var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.%prefix "SymbolShapeCornerPreference"%)
                     try _.BackColor := color
                     _.Opt("-LastFound")
-                    switch var.symbolShapeEdgeStyle {
+                    switch var.%prefix "SymbolShapeEdgeStyle"% {
                         case 1: _.Opt("-LastFound +e0x00000001")
                         case 2: _.Opt("-LastFound +e0x00000200")
                         case 3: _.Opt("-LastFound +e0x00020000")
@@ -46,23 +47,23 @@ updateSymbol() {
                 }
             }
         case 3:
-            for state in var.stateList {
-                key := "symbolTextGui" state
-                text := var.%"symbolTextContent" state%
-                textFont := var.symbolTextFont
-                textSize := var.%"symbolTextSize" state%
-                textWeight := var.symbolTextWeight
-                textColor := var.%"symbolTextColor" state%
-                bgColor := var.%"symbolTextBgColor" state%
+            for state in stateList {
+                key := prefix "SymbolTextGui" state
+                text := var.%prefix "SymbolTextContent" state%
+                textFont := var.%prefix "SymbolTextFont"%
+                textSize := var.%prefix "SymbolTextSize" state%
+                textWeight := var.%prefix "SymbolTextWeight"%
+                textColor := var.%prefix "SymbolTextColor" state%
+                bgColor := var.%prefix "SymbolTextBgColor" state%
                 if (text) {
-                    var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.symbolTextCornerPreference)
+                    var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.%prefix "SymbolTextCornerPreference"%)
                     _.MarginX := 0, _.MarginY := 0
                     try {
                         _.SetFont("s" textSize " c" textColor " w" textWeight, textFont)
                         _.BackColor := bgColor
                     }
                     _.AddText(, text)
-                    switch var.symbolTextEdgeStyle {
+                    switch var.%prefix "SymbolTextEdgeStyle"% {
                         case 1: _.Opt("-LastFound +e0x00000001")
                         case 2: _.Opt("-LastFound +e0x00000200")
                         case 3: _.Opt("-LastFound +e0x00020000")
@@ -75,488 +76,609 @@ updateSymbol() {
     }
 }
 
-ShowSymbolEx(state) {
+ShowCaretSymbolEx(state) {
     static windowNeedShow := 0
-    global canShowSymbol, lastWindow
 
-    if (delayState.needHide) {
+    if !var.caretSymbolType {
+        hideCaretSymbol()
         return
     }
 
-    if (hasWindowChange) {
-        lastWindow := exeName ":" exeTitle
+    if delayState.needHide
+        return
+
+    if hasTitleChange || hasClassChange || hasProcessChange
         windowNeedShow := needShow
-    }
 
-    if (windowNeedShow) {
-        select := showBesideCursor(exeName, exeTitle)
+    if !windowNeedShow
+        return
 
-        if (select) {
-            try {
-                MouseGetPos(&left, &top)
-                canShowSymbol := 1
-                showSymbol(state, left, top, left, top, 1)
-            } catch {
-                hideSymbol()
-            }
+    try {
+        if !returnCanShowSymbol(&left, &top, &right, &bottom) {
+            hideCaretSymbol()
             return
         }
-        try {
-            canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
-            WinGetPos(&x, &y, &w, &h, "A")
-            if (top < y || top > y + h) {
-                hideSymbol()
-                return
-            }
-            showSymbol(state, left, top, right, bottom)
-        } catch {
-            hideSymbol()
+        win := getWinPhysicalRect()
+        if top < win.y || top > win.y + win.h {
+            hideCaretSymbol()
+            return
         }
+        showCaretSymbol(state, left, top, right, bottom)
+    } catch {
+        hideCaretSymbol()
     }
 }
 
-showSymbol(state, left, top, right, bottom, nearCursor := 0) {
-    global lastSymbol
+showCaretSymbol(state, left, top, right, bottom) {
+    global lastCaretSymbol
     static old_left := 0, old_top := 0
 
-    if (!var.symbolType || !canShowSymbol) {
-        hideSymbol()
-        return
+    if left == old_left && top == old_top {
+        if state == lastCaretSymbol
+            return
     }
-
-    if (!nearCursor) {
-        if (left == old_left && top == old_top) {
-            if (state == lastSymbol) {
-                return
-            }
-        }
-    }
-
     old_top := top
     old_left := left
 
-    cursorDeltaX := 0
-    cursorDeltaY := 0
+    ; 获取当前屏幕scale
+    s := isWhichScreen()
+    scale := getMonitorScale(s)
 
-    if (nearCursor) {
-        offsetY := top
-        cursorDeltaX := var.symbolNearCursorOffsetX
-        cursorDeltaY := var.symbolNearCursorOffsetY
-    } else if (var.modeList.JAB.Has(exeName) && false) {
+    if (InStr(getCursorCapture(), "JAB")) {
+        ; 对于 JAB 应用，垂直偏移量参考原点无法使用上方，上方坐标有误
         offsetY := top + bottom
     } else {
-        offsetY := var.symbolOffsetBaseY == "below" ? bottom : top
+        offsetY := var.caretSymbolOriginY == "below" ? bottom : top
     }
 
-    hideSymbol(0)
-    switch var.symbolType {
+    hideCaretSymbol()
+    switch var.caretSymbolType {
         case 1:
-            x := var.%"symbolPictureOffsetX" state% +cursorDeltaX
-            y := var.%"symbolPictureOffsetY" state% +cursorDeltaY
-            showGui(var.%"symbolPictureGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1)
+            x := toPhysical(var.%"caretSymbolPictureOffsetX" state%, scale)
+            y := toPhysical(var.%"caretSymbolPictureOffsetY" state%, scale)
+            g := var.%"caretSymbolPictureGui" state%
+            try {
+                showGui(g, "NA AutoSize", 0, 1)
+                setGuiPhysicalPos(g.Hwnd, left + x, offsetY + y)
+            }
         case 2:
-            x := var.%"symbolShapeOffsetX" state% +cursorDeltaX
-            y := var.%"symbolShapeOffsetY" state% +cursorDeltaY
-            w := var.%"symbolShapeWidth" state%
-            h := var.%"symbolShapeHeight" state%
-            showGui(var.%"symbolShapeGui" state%, "NA w" w " h" h " x" left + x " y" y + offsetY, 0, 1, var.%'symbolShapeTransparent' state%)
+            x := toPhysical(var.%"caretSymbolShapeOffsetX" state%, scale)
+            y := toPhysical(var.%"caretSymbolShapeOffsetY" state%, scale)
+            w := toPhysical(var.%"caretSymbolShapeWidth" state%, scale)
+            h := toPhysical(var.%"caretSymbolShapeHeight" state%, scale)
+            g := var.%"caretSymbolShapeGui" state%
+            try {
+                showGui(g, "NA", 0, 1, var.%'caretSymbolShapeTransparent' state%)
+                setGuiPhysicalPos(g.Hwnd, left + x, offsetY + y, w, h)
+            }
         case 3:
-            x := var.%"symbolTextOffsetX" state% +cursorDeltaX
-            y := var.%"symbolTextOffsetY" state% +cursorDeltaY
-            showGui(var.%"symbolTextGui" state%, "NA AutoSize x" left + x " y" y + offsetY, 0, 1, var.symbolTextTransparent)
+            x := toPhysical(var.%"caretSymbolTextOffsetX" state%, scale)
+            y := toPhysical(var.%"caretSymbolTextOffsetY" state%, scale)
+            g := var.%"caretSymbolTextGui" state%
+            try {
+                showGui(g, "NA AutoSize", 0, 1, var.caretSymbolTextTransparent)
+                setGuiPhysicalPos(g.Hwnd, left + x, offsetY + y)
+            }
     }
 
-    lastSymbol := state
+    lastCaretSymbol := state
 }
 
-reloadSymbol() {
-    if (var.symbolType) {
-        canShowSymbol := returnCanShowSymbol(&left, &top, &right, &bottom)
-        type := IME.GetInputModeText()
-        if (type && canShowSymbol) {
-            showSymbol(type, left, top, right, bottom)
-        }
+reloadCaretSymbol() {
+    global lastProcess := "", lastTitle := "", lastClass := "", lastCaretSymbol := ""
+    if var.caretSymbolType {
+        if returnCanShowSymbol(&left, &top, &right, &bottom)
+            showCaretSymbol(currentState, left, top, right, bottom)
     }
 }
 
-hideSymbol(all := 1) {
+hideCaretSymbol(all := 1) {
     for type in ["Picture", "Shape", "Text"] {
-        for v in var.stateList {
+        for v in stateList {
             if (all || currentState != v) {
-                try var.%"symbol" type "Gui" v%.Hide()
+                try var.%"caretSymbol" type "Gui" v%.Hide()
             }
         }
     }
-    global lastSymbol := ""
+    global lastCaretSymbol := ""
+}
+
+ShowCursorSymbolEx(state := currentState) {
+    try {
+        MouseGetPos(&left, &top)
+        showCursorSymbol(state, left, top)
+    } catch {
+        hideCursorSymbol()
+    }
+}
+
+showCursorSymbol(state, left, top) {
+    global lastCursorSymbol
+    if lastCursorSymbol != state {
+        hideCursorSymbol()
+    }
+
+    s := isWhichScreen()
+    scale := getMonitorScale(s)
+
+    if (s.num) {
+        try {
+            offset := symbolScreenOffset.cursor.%s.num%
+            left += toPhysical(offset.x, scale)
+            top += toPhysical(offset.y, scale)
+        }
+    }
+    switch var.cursorSymbolType {
+        case 1:
+            x := toPhysical(var.%"cursorSymbolPictureOffsetX" state%, scale)
+            y := toPhysical(var.%"cursorSymbolPictureOffsetY" state%, scale)
+            g := var.%"cursorSymbolPictureGui" state%
+            showGui(g, "NA AutoSize", 0, 0)
+            setGuiPhysicalPos(g.Hwnd, left + x, top + y)
+        case 2:
+            x := toPhysical(var.%"cursorSymbolShapeOffsetX" state%, scale)
+            y := toPhysical(var.%"cursorSymbolShapeOffsetY" state%, scale)
+            w := toPhysical(var.%"cursorSymbolShapeWidth" state%, scale)
+            h := toPhysical(var.%"cursorSymbolShapeHeight" state%, scale)
+            g := var.%"cursorSymbolShapeGui" state%
+            applyTransparency(g, var.%'cursorSymbolShapeTransparent' state%)
+            showGui(g, "NA", 0, 0)
+            setGuiPhysicalPos(g.Hwnd, left + x, top + y, w, h)
+        case 3:
+            x := toPhysical(var.%"cursorSymbolTextOffsetX" state%, scale)
+            y := toPhysical(var.%"cursorSymbolTextOffsetY" state%, scale)
+            g := var.%"cursorSymbolTextGui" state%
+            applyTransparency(g, var.cursorSymbolTextTransparent)
+            showGui(g, "NA AutoSize", 0, 0)
+            setGuiPhysicalPos(g.Hwnd, left + x, top + y)
+    }
+
+    lastCursorSymbol := state
+}
+
+reloadCursorSymbol() {
+    global lastProcess := "", lastTitle := "", lastClass := "", lastCursorSymbol := ""
+
+    if var.cursorSymbolType {
+        try {
+            MouseGetPos(&left, &top)
+            hideCursorSymbol()
+            showCursorSymbol(currentState, left, top)
+        } catch {
+            hideCursorSymbol()
+        }
+    }
+}
+
+hideCursorSymbol(all := 1) {
+    for type in ["Picture", "Shape", "Text"] {
+        for v in stateList {
+            if (all || currentState != v) {
+                try var.%"cursorSymbol" type "Gui" v%.Hide()
+            }
+        }
+    }
+    global lastCursorSymbol := ""
 }
 
 getSymbolPicturePath() {
     symbolPicList := []
-    for state in var.stateList {
-        symbolPicList.Push("default-triangle-" var.stateVal.%state%.colorText ".png")
-    }
+    for state in stateList
+        symbolPicList.Push("default-triangle-" stateVal.%state%.colorText ".png")
     return getPicList(symbolDir, symbolPicList)
 }
 
 e_symbol(*) {
     showGui(createUniqueGui(symbolStyleGui))
     symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbol"))
-        tab := renderTab(g, [i18n("basicConfig"), i18n("symbolNearCursor")])
+        g := createGuiOpt(i18n("caretSymbol"))
+        tab := renderTab(g, [i18n("basicConfig"), i18n("basicConfig") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("tip/symbol"))
+        g.AddLink("Section", getDocsLink("tip/symbol-caret"))
 
         if (info.i) {
-            g.AddText(, line80)
+            g.AddText(, isChinese ? line70 : line80)
             return g
         }
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        g.AddText("yp w20")
+        symbolTypeBtns := []
         gc.previewSymbol := g.AddEdit("yp cGray", i18n("symbol.preview"))
+        previewSymbol := (key, value, *) => (changeConfig(key, value), var.caretSymbolType ? gc.previewSymbol.Focus() : "", reloadCaretSymbol(), toggleState())
+        toggleState() {
+            opt := var.caretSymbolType ? "-Disabled" : "+Disabled"
+            for v in symbolTypeBtns
+                v.Opt(opt)
+        }
 
-        renderRadioGroup(g, "symbolType", [
-            ["none", 0, ""],
-            [".picture", 1],
-            [".shape", 2],
-            [".text", 3]
-        ])
+        renderRadioGroup(g, "caretSymbolType", [["none", 0, previewSymbol], ["symbolType.picture", 1, previewSymbol], ["symbolType.shape", 2, previewSymbol], ["symbolType.text", 3, previewSymbol]])
 
-        _w := bw / 3 - g.MarginX / 2.5
-        g.AddButton("xs w" _w, i18n("symbolPicture")).OnEvent("Click", symbolPictureConfig)
-        g.AddButton("yp w" _w, i18n("symbolShape")).OnEvent("Click", symbolShapeConfig)
-        g.AddButton("yp w" _w, i18n("symbolText")).OnEvent("Click", symbolTextConfig)
+        g.AddLink("yp", getDocsLink("tip/symbol-caret/list-mechanism", i18n("symbol.whitelist.tip")))
 
-        renderRadioGroup(g, "symbolOffsetBaseY", [[".above", "above"], [".below", "below"]])
-
-        renderRadioGroup(g, "symbolJABActive", [["yes", 1], ["no", 0]])
-        g.AddLink("yp", getHelpLink("tip/symbol/use-inputtip-in-jetbrains"))
-
-        renderEditGroup(g, "symbolHideDelay", "Number Limit5")
-
-        _w := bw / 4 - g.MarginX / 2.5
-        g.AddButton("xs w" _w, i18n("symbol.white/blacklist")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("symbol") " - " i18n("symbol.white/blacklist"),
-                [
-                    i18n("symbol.whitelist"),
-                    i18n("symbol.blacklist"),
-                ],
-                getDocsLink("tip/symbol/list-mechanism"),
-                [
-                    "Window.Symbol.Show",
-                    "Window.Symbol.Hide"
-                ]
-            )
+        btnOpt := " w" bw / 2 - g.MarginX / 4 (var.caretSymbolType ? "" : " Disabled")
+        _ := g.AddButton("xs" btnOpt, i18n("symbolConfig"))
+        _.OnEvent("Click", e_symbolConfig.Bind("caret"))
+        symbolTypeBtns.Push(_)
+        _ := g.AddButton("yp" btnOpt, i18n("symbolCaretCapture"))
+        _.OnEvent("Click",
+            createProcessMenuGui.Bind({
+                title: i18n("caretSymbol") " - " i18n("symbolCaretCapture"),
+                tab: [i18n("symbolCaretCapture")],
+                trigger: ["capture"],
+                link: getDocsLink("tip/symbol-caret/caret-capture-mode"),
+                section: "Window.CaretSymbol.Rule",
+                cols: ["process", "capture"],
+                conditions: []
+            })
         )
-        g.AddButton("yp w" _w, i18n("symbolScreenOffset")).OnEvent("Click", e_screenOffset)
-        g.AddButton("yp w" _w, i18n("symbolWindowOffset")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("symbol") " - " i18n("symbolWindowOffset"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("tip/symbol/window-offset"),
-                [
-                    "Window.Symbol.Offset"
-                ], Map(
-                    "exe", { config: 1, gui: 1 },
-                    "range", { config: 2, gui: 2 },
-                    "mode", { config: 3, gui: 3 },
-                    "offset", { config: 4, gui: 5 },
-                    "title", { config: 5, gui: 4 },
-                    "time", { config: 6, gui: 6 },
-                )
-            )
+        symbolTypeBtns.Push(_)
+        _ := g.AddButton("xs" btnOpt, i18n("symbol.whitelist"))
+        _.OnEvent("Click",
+            createProcessMenuGui.Bind({
+                title: i18n("caretSymbol") " - " i18n("symbol.whitelist"),
+                tab: [i18n("symbol.whitelist")],
+                trigger: ["show"],
+                link: getDocsLink("tip/symbol-caret/list-mechanism"),
+                section: "Window.CaretSymbol.Rule",
+                cols: ["process", "condition", "class", "title"],
+                conditions: conditionKeyList
+            })
         )
-        g.AddButton("yp w" _w, i18n("symbolCursorCapture")).OnEvent("Click", (*) =>
-            createProcessMenuGui(
-                i18n("symbol") " - " i18n("symbolCursorCapture"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("tip/symbol/cursor-capture-mode"),
-                [
-                    "Window.Symbol.CursorCapture"
-                ], Map(
-                    "exe", { config: 1, gui: 1 },
-                    "capture", { config: 2, gui: 2 },
-                    "time", { config: 3, gui: 3 },
-                )
-            )
+        symbolTypeBtns.Push(_)
+        _ := g.AddButton("yp" btnOpt, i18n("symbolWindowOffset"))
+        _.OnEvent("Click",
+            createProcessMenuGui.Bind({
+                title: i18n("caretSymbol") " - " i18n("symbolWindowOffset"),
+                tab: [i18n("symbolWindowOffset")],
+                trigger: ["offset"],
+                link: getDocsLink("tip/symbol-caret/window-offset"),
+                section: "Window.CaretSymbol.Rule",
+                cols: ["process", "offset", "condition", "class", "title"],
+                conditions: conditionKeyList
+            })
         )
+        symbolTypeBtns.Push(_)
+        _ := g.AddButton("xs" btnOpt, i18n("symbol.blacklist"))
+        _.OnEvent("Click",
+            createProcessMenuGui.Bind({
+                title: i18n("caretSymbol") " - " i18n("symbol.blacklist"),
+                tab: [i18n("symbol.blacklist")],
+                trigger: ["hide"],
+                link: getDocsLink("tip/symbol-caret/list-mechanism"),
+                section: "Window.CaretSymbol.Rule",
+                cols: ["process", "condition", "class", "title"],
+                conditions: conditionKeyList
+            })
+        )
+        symbolTypeBtns.Push(_)
+        _ := g.AddButton("yp" btnOpt, i18n("symbolScreenOffset"))
+        _.OnEvent("Click", e_screenOffset.Bind("caret"))
+        symbolTypeBtns.Push(_)
 
         tab.UseTab(2)
-        g.AddLink("Section", getDocsLink("tip/symbol/show-it-near-cursor"))
+        g.AddLink("Section", getDocsLink("tip/symbol-caret"))
+        renderEditGroup(g, "caretSymbolHideDelay", "Number Limit5")
 
-        renderRadioGroup(g, "symbolNearCursorActive", [["yes", 1], ["no", 0]])
-        renderRadioGroup(g, "symbolNearCursorWindow", [[".specify", "specify"], [".all", "all"]])
-        renderEditGroup(g, "symbolNearCursorOffsetX", "")
-        renderEditGroup(g, "symbolNearCursorOffsetY", "")
+        renderRadioGroup(g, "caretSymbolOriginY", [[".above", "above", previewSymbol], [".below", "below", previewSymbol]])
 
-        g.AddButton("xs w" bw, i18n("symbolNearCursor.window")).OnEvent("Click", set_app_list)
-        set_app_list(*) {
-            createProcessMenuGui(
-                i18n("symbolNearCursorActive") " - " i18n("symbolNearCursor.window"),
-                [
-                    i18n("windowRule")
-                ],
-                getDocsLink("tip/symbol/show-it-near-cursor"),
-                [
-                    "Window.Symbol.NearCursor"
-                ]
+        renderRadioGroup(g, "symbolJABActive", [["yes", 1], ["no", 0]])
+        g.AddLink("yp", getHelpLink("tip/symbol-caret/use-inputtip-in-jetbrains"))
+
+        return g
+    }
+}
+
+e_cursorSymbol(*) {
+    showGui(createUniqueGui(symbolStyleGui))
+    symbolStyleGui(info) {
+        g := createGuiOpt(i18n("cursorSymbol"))
+        tab := renderTab(g, [i18n("basicConfig")])
+        loseFocusOnTab(tab)
+        tab.UseTab(1)
+        g.AddLink("Section", getDocsLink("tip/symbol-cursor"))
+
+        if (info.i) {
+            g.AddText(, isChinese ? line70 : line80)
+            return g
+        }
+        g.w := w := info.w
+        g.bw := bw := w - g.MarginX * 2
+
+        symbolTypeBtns := []
+        previewSymbol := (key, value, *) => (changeConfig(key, value), reloadCursorSymbol(), toggleState())
+        toggleState() {
+            opt := var.cursorSymbolType ? "-Disabled" : "+Disabled"
+            for v in symbolTypeBtns
+                v.Opt(opt)
+        }
+
+        renderRadioGroup(g, "cursorSymbolType", [["none", 0, previewSymbol], ["symbolType.picture", 1, previewSymbol], ["symbolType.shape", 2, previewSymbol], ["symbolType.text", 3, previewSymbol]])
+
+        btnOpt := " w" bw / 2 - g.MarginX / 4 (var.cursorSymbolType ? "" : " Disabled")
+
+        _ := g.AddButton("xs" btnOpt, i18n("symbolConfig"))
+        _.OnEvent("Click", e_symbolConfig.Bind("cursor"))
+        symbolTypeBtns.Push(_)
+
+        _ := g.AddButton("yp" btnOpt, i18n("symbolScreenOffset"))
+        _.OnEvent("Click", e_screenOffset.Bind("cursor"))
+        symbolTypeBtns.Push(_)
+
+        renderEditGroup(g, "cursorSymbolHideDelay", "Number Limit5")
+
+        renderRadioGroup(g, "cursorSymbolShowMode",
+            [
+                ["blacklist", "blacklist"],
+                ["whitelist", "whitelist"]
+            ])
+        for v in [
+            ["hide", "xs", "blacklistBtn"],
+            ["show", "yp", "whitelistBtn"],
+        ] {
+            _ := g.AddButton(v[2] btnOpt, i18n(v[3]))
+            _.OnEvent("Click",
+                createProcessMenuGui.Bind({
+                    title: i18n("cursorSymbol") " - " i18n(v[3]),
+                    tab: [i18n(v[3])],
+                    trigger: [v[1]],
+                    link: getDocsLink("tip/symbol-cursor"),
+                    section: "Window.CursorSymbol.Rule",
+                    cols: ["process", "condition", "class", "title"],
+                    conditions: conditionKeyList
+                })
             )
+            symbolTypeBtns.Push(_)
         }
         return g
     }
 }
 
-symbolPictureConfig(*) {
-    showGui(createUniqueGui(symbolStyleGui))
-    symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbol") " - " i18n("symbolPicture"))
-        tab := renderTab(g, [i18n("stateStyle"), i18n("stateStyle") 2])
-        loseFocusOnTab(tab)
-        tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("tip/symbol/picture"))
+e_symbolConfig(prefix, *) {
+    switch var.%prefix "SymbolType"% {
+        case 1:
+            showGui(createUniqueGui(symbolStyleGui1))
+            symbolStyleGui1(info) {
+                g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolPicture"))
+                tab := renderTab(g, [i18n("stateStyle"), i18n("stateStyle") 2])
+                loseFocusOnTab(tab)
+                tab.UseTab(1)
+                g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
 
-        if (info.i) {
-            g.AddText(, line80)
-            return g
-        }
-        g.w := w := info.w
-        g.bw := bw := w - g.MarginX * 2
+                if (info.i) {
+                    g.AddText(, isChinese ? line70 : line80)
+                    return g
+                }
+                g.w := w := info.w
+                g.bw := bw := w - g.MarginX * 2
 
-        g.AddText("yp w20")
-        gc.previewSymbolPicture := g.AddEdit("yp cGray", i18n("symbol.preview"))
+                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
 
-        picList := getSymbolPicturePath()
-        picList.InsertAt(1, "")
+                gc.%prefix "PreviewSymbolPicture1"% := previewCtrl
 
-        editOpt := " w" bw / 8
+                picList := getSymbolPicturePath()
+                picList.InsertAt(1, "")
 
-        for i, state in var.stateList {
-            if (i == 4) {
-                addBtn()
-                tab.UseTab(2)
-                g.AddLink("Section", getDocsLink("tip/symbol/picture"))
+                editOpt := " w" bw / 10
+
+                page := 1
+                for i, state in stateList {
+                    if (i == 4) {
+                        page := 2
+                        addBtn()
+                        tab.UseTab(2)
+                        g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
+                        gc.%prefix "PreviewSymbolPicture" page% := previewCtrl
+                    }
+                    renderGroupBox(g, state, "xs", "h120 w" bw)
+                    _ := prefix "SymbolPictureOffsetX"
+                    renderEditLabel(g, _ state, "Limit5 " editOpt, _)
+                    _ := prefix "SymbolPictureOffsetY"
+                    renderEditLabel(g, _ state, "Limit5 " editOpt, _, "yp")
+                    _ := prefix "SymbolPictureWidth"
+                    renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
+                    _ := prefix "SymbolPictureHeight"
+                    renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
+
+                    _ := g.AddDropDownList("xs+20 yp+40 AltSubmit r9 w" bw - 40, picList)
+                    key := prefix "SymbolPicturePath" state
+                    _.key := key
+                    _.page := page
+                    try _.Text := var.%key%
+                    _.OnEvent("Change", (ctrl, *) => changeConfig(ctrl.key, ctrl.Text, , (*) => gc.%prefix "PreviewSymbolPicture" ctrl.page%.Focus()))
+
+                    if i > 4
+                        addBtn()
+                }
+                addBtn() {
+                    _w := bw / 2 - g.MarginX / 4
+                    g.AddButton("xs w" _w, i18n("symbolPicture.open")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data\symbol"))
+                    g.AddButton("yp w" _w, i18n("symbolPicture.download")).OnEvent("Click", (*) => Run("https://inputtip.abgox.com/download/extra"))
+                }
+
+                return g
             }
-            renderGroupBox(g, "state." state, "xs", "h120 w" bw)
-            renderEditLabel(g, "symbolPictureOffsetX" state, editOpt, "symbolPictureOffsetX")
-            renderEditLabel(g, "symbolPictureOffsetY" state, editOpt, "symbolPictureOffsetY", "yp")
-            renderEditLabel(g, "symbolPictureWidth" state, "Number Limit3" editOpt, "symbolPictureWidth", "yp")
-            renderEditLabel(g, "symbolPictureHeight" state, "Number Limit3" editOpt, "symbolPictureHeight", "yp")
+        case 2:
+            showGui(createUniqueGui(symbolStyleGui2))
+            symbolStyleGui2(info) {
+                g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolShape"))
+                tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+                loseFocusOnTab(tab)
+                tab.UseTab(1)
+                g.AddLink("Section", getDocsLink("tip/symbol-caret/shape"))
 
-            _ := g.AddDropDownList("xs+20 yp+40 AltSubmit r9 w" bw - 40, picList)
-            key := "symbolPicturePath" state
-            _.key := key
-            try _.Text := var.%key%
-            _.OnEvent("Change", (ctrl, *) => changeConfig(ctrl.key, ctrl.Text, , (*) => gc.previewSymbolPicture.Focus()))
 
-            if (i > 4) {
-                addBtn()
+                if (info.i) {
+                    g.AddText(, isChinese ? line60 : line70)
+                    return g
+                }
+                g.w := w := info.w
+                g.bw := bw := w - g.MarginX * 2
+
+                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+
+                gc.%prefix "PreviewSymbolShape"% := previewCtrl
+
+                list := [
+                    [prefix "SymbolShapeCornerPreference", [["none", 0], ["cornerPreference.sharp", 1], ["cornerPreference.round", 2], ["cornerPreference.roundSmall", 3]]],
+                    [prefix "SymbolShapeEdgeStyle", [["none", 0], ["edgeStyle.modal", 1], ["edgeStyle.client", 2], ["edgeStyle.static", 3]]]
+                ]
+                for i, v in list
+                    for item in v[2]
+                        item.Push((key, value, *) => (changeConfig(key, value), gc.%prefix "PreviewSymbolShape"%.Focus(), reloadCaretSymbol()))
+                renderRadioGroupList(g, list)
+
+                editOpt := " w" bw / 8
+
+                for i, state in stateList {
+                    if (Mod(i - 1, 3) == 0) {
+                        tab.UseTab(((i - 1) // 3) + 2)
+                        g.AddLink("Section", getDocsLink("tip/symbol-caret/shape"))
+                    }
+                    renderGroupBox(g, state, , "h120 w" bw)
+
+                    _ := prefix "SymbolShapeOffsetX"
+                    renderEditLabel(g, _ state, "Limit5 " editOpt, _)
+                    _ := prefix "SymbolShapeWidth"
+                    renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
+                    _ := prefix "SymbolShapeColor"
+                    renderColorPicker(g, _ state, _)
+                    _ := prefix "SymbolShapeOffsetY"
+                    renderEditLabel(g, _ state, "Limit5 " editOpt, _, "xs+20 yp+40")
+                    _ := prefix "SymbolShapeHeight"
+                    renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
+                    _ := prefix "SymbolShapeTransparent"
+                    renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
+                }
+
+                return g
             }
-        }
-        addBtn() {
-            _w := bw / 2 - g.MarginX / 4
-            g.AddButton("xs w" _w, i18n("symbolPicture.open")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data\symbol"))
-            g.AddButton("yp w" _w, i18n("symbolPicture.download")).OnEvent("Click", (*) => Run("https://inputtip.abgox.com/download/extra"))
-        }
+        case 3:
+            showGui(createUniqueGui(symbolStyleGui3))
+            symbolStyleGui3(info) {
+                g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolText"))
+                tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+                loseFocusOnTab(tab)
+                tab.UseTab(1)
+                g.AddLink("Section", getDocsLink("tip/symbol-caret/text"))
 
-        return g
+                if (info.i) {
+                    g.AddText(, line70)
+                    return g
+                }
+                g.w := w := info.w
+                g.bw := bw := w - g.MarginX * 2
+
+                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+
+                gc.%prefix "previewSymbolText"% := previewCtrl
+
+                renderDropDownListGroup(g, prefix "SymbolTextFont", fontList)
+
+                renderEditGroup(g, prefix "SymbolTextWeight", "Number Limit3")
+                renderEditGroup(g, prefix "SymbolTextTransparent", "Number Limit3")
+
+                list := [
+                    [prefix "SymbolTextCornerPreference", [["none", 0], ["cornerPreference.sharp", 1], ["cornerPreference.round", 2], ["cornerPreference.roundSmall", 3]]],
+                    [prefix "SymbolTextEdgeStyle", [["none", 0], ["edgeStyle.modal", 1], ["edgeStyle.client", 2], ["edgeStyle.static", 3]]]
+                ]
+                for i, v in list
+                    for item in v[2]
+                        item.Push((key, value, *) => (changeConfig(key, value), gc.%prefix "previewSymbolText"% .Focus(), reloadCaretSymbol()))
+                renderRadioGroupList(g, list)
+
+                editOpt := " w" bw / 6
+
+                for i, state in stateList {
+                    if (Mod(i - 1, 3) == 0) {
+                        tab.UseTab(((i - 1) // 3) + 2)
+                        g.AddLink("Section", getDocsLink("tip/symbol-caret/text"))
+                    }
+
+                    renderGroupBox(g, state, , "h130 w" bw)
+
+                    renderEditLabel(g, prefix "SymbolTextContent" state, editOpt, prefix "SymbolTextContent")
+                    renderEditLabel(g, prefix "SymbolTextOffsetX" state, "Limit5 " editOpt, prefix "SymbolTextOffsetX", "yp")
+                    renderColorPicker(g, prefix "SymbolTextColor" state, prefix "SymbolTextColor")
+                    renderEditLabel(g, prefix "SymbolTextSize" state, "Number Limit2" editOpt, prefix "SymbolTextSize", "xs+20 yp+35")
+                    renderEditLabel(g, prefix "SymbolTextOffsetY" state, "Limit5 " editOpt, prefix "SymbolTextOffsetY", "yp")
+                    renderColorPicker(g, prefix "SymbolTextBgColor" state, prefix "SymbolTextBgColor")
+                }
+
+                return g
+            }
     }
 }
 
-symbolShapeConfig(*) {
-    showGui(createUniqueGui(symbolStyleGui))
-    symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbol") " - " i18n("symbolShape"))
-        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
-        loseFocusOnTab(tab)
-        tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("tip/symbol/shape"))
-
-
-        if (info.i) {
-            g.AddText(, line70)
-            return g
-        }
-        g.w := w := info.w
-        g.bw := bw := w - g.MarginX * 2
-
-        g.AddText("yp w20")
-        gc.previewSymbolShape := g.AddEdit("yp cGray", i18n("symbol.preview"))
-
-        renderRadioGroupList(g, [
-            ["symbolShapeCornerPreference",
-                [
-                    ["none", 0],
-                    ["cornerPreference.sharp", 1],
-                    ["cornerPreference.round", 2],
-                    ["cornerPreference.roundSmall", 3]
-                ]
-            ],
-            ["symbolShapeEdgeStyle",
-                [
-                    ["none", 0],
-                    ["edgeStyle.modal", 1],
-                    ["edgeStyle.client", 2],
-                    ["edgeStyle.static", 3]
-                ]
-            ]
-        ])
-
-        editOpt := " w" bw / 6
-
-        for i, state in var.stateList {
-            if (Mod(i - 1, 3) == 0) {
-                tab.UseTab(((i - 1) // 3) + 2)
-                g.AddLink("Section", getDocsLink("tip/symbol/shape"))
-            }
-            g.SetFont("Bold")
-            g.AddGroupBox("xs h130 w" bw, i18n("state." state))
-            g.SetFont("Norm")
-
-            renderEditLabel(g, "symbolShapeOffsetX" state, editOpt, "symbolShapeOffsetX")
-            renderEditLabel(g, "symbolShapeWidth" state, "Number Limit3" editOpt, "symbolShapeWidth", "yp")
-            renderColorPicker(g, "symbolShapeColor" state, "symbolShapeColor")
-            renderEditLabel(g, "symbolShapeOffsetY" state, editOpt, "symbolShapeOffsetY", "xs+20 yp+35")
-            renderEditLabel(g, "symbolShapeHeight" state, "Number Limit3" editOpt, "symbolShapeHeight", "yp")
-            renderEditLabel(g, "symbolShapeTransparent" state, "Number Limit3" editOpt, "symbolShapeTransparent", "yp")
-        }
-
-        return g
-    }
-}
-
-symbolTextConfig(*) {
-    showGui(createUniqueGui(symbolStyleGui))
-    symbolStyleGui(info) {
-        g := createGuiOpt(i18n("symbol") " - " i18n("symbolText"))
-        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
-        loseFocusOnTab(tab)
-        tab.UseTab(1)
-        g.AddLink("Section", getDocsLink("tip/symbol/text"))
-
-        if (info.i) {
-            g.AddText(, line70)
-            return g
-        }
-        g.w := w := info.w
-        g.bw := bw := w - g.MarginX * 2
-
-        g.AddText("yp w20")
-        gc.previewSymbolText := g.AddEdit("yp cGray", i18n("symbol.preview"))
-
-        renderDropDownListGroup(g, "symbolTextFont", fontList)
-
-        renderEditGroup(g, "symbolTextWeight", "Number Limit3")
-        renderEditGroup(g, "symbolTextTransparent", "Number Limit3")
-
-        renderRadioGroupList(g, [
-            ["symbolTextCornerPreference",
-                [
-                    ["none", 0],
-                    ["cornerPreference.sharp", 1],
-                    ["cornerPreference.round", 2],
-                    ["cornerPreference.roundSmall", 3]
-                ]
-            ],
-            ["symbolTextEdgeStyle",
-                [
-                    ["none", 0],
-                    ["edgeStyle.modal", 1],
-                    ["edgeStyle.client", 2],
-                    ["edgeStyle.static", 3]
-                ]
-            ]
-        ])
-
-        editOpt := " w" bw / 6
-
-        for i, state in var.stateList {
-            if (Mod(i - 1, 3) == 0) {
-                tab.UseTab(((i - 1) // 3) + 2)
-                g.AddLink("Section", getDocsLink("tip/symbol/shape"))
-            }
-            g.SetFont("Bold")
-            g.AddGroupBox("xs h130 w" bw, i18n("state." state))
-            g.SetFont("Norm")
-
-            renderEditLabel(g, "symbolTextContent" state, editOpt, "symbolTextContent")
-            renderEditLabel(g, "symbolTextOffsetX" state, editOpt, "symbolTextOffsetX", "yp")
-            renderColorPicker(g, "symbolTextColor" state, "symbolTextColor")
-            renderEditLabel(g, "symbolTextSize" state, "Number Limit2" editOpt, "symbolTextSize", "xs+20 yp+35")
-            renderEditLabel(g, "symbolTextOffsetY" state, editOpt, "symbolTextOffsetY", "yp")
-            renderColorPicker(g, "symbolTextBgColor" state, "symbolTextBgColor")
-        }
-
-        return g
-    }
-}
-
-e_screenOffset(*) {
+e_screenOffset(prefix, *) {
     showGui(createUniqueGui(offsetScreenGui))
     offsetScreenGui(info) {
-        g := createGuiOpt(i18n("symbol") " - " i18n("symbolScreenOffset"))
+        g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolScreenOffset"))
 
-        g.AddLink("Section", getDocsLink("tip/symbol/screen-offset"))
+        g.AddLink("Section", getDocsLink("tip/symbol-caret/screen-offset"))
+
+        if info.i {
+            g.AddText(, line60)
+            return g
+        }
+
         pages := []
         for v in var.screenList {
             pages.push(i18n("offset.screen") " " v.num)
         }
-        tab := renderTab(g, pages)
+        tab := renderTab(g, pages, "w" info.w)
+
+        offsetMap := Map()
+        for o in StrSplit(readIni(prefix "SymbolScreenOffset", ""), "|") {
+            if (o == "")
+                continue
+            p := StrSplit(o, "/")
+            try offsetMap.Set(p[1], { x: p[2], y: p[3] })
+        }
 
         for v in var.screenList {
             tab.UseTab(v.num)
+            n := String(v.num)
+
             g.AddText("Section", i18n("offset.coordinate") "(X,Y): " i18n("offset.topLeft") "(" v.left ", " v.top "), " i18n("offset.bottomRight") "(" v.right ", " v.bottom ")")
 
-            try {
-                x := screenSymbolOffset.%v.num%.x
-                y := screenSymbolOffset.%v.num%.y
-            } catch {
-                screenSymbolOffset.%v.num% := { x: 0, y: 0 }
-                x := 0, y := 0
+            x := 0, y := 0
+            if offsetMap.Has(n) {
+                x := offsetMap.Get(n).x
+                y := offsetMap.Get(n).y
+            } else {
+                offsetMap.Set(n, { x: 0, y: 0 })
             }
 
             g.SetFont("Bold")
             g.AddText("xs", i18n("offset.offset_x"))
             g.SetFont("Norm")
-            _ := g.AddEdit("yp")
+            _ := g.AddEdit("yp Limit5")
             _.Value := x
-            _.OnEvent("Change", e_changeOffset.Bind(v.num, "x"))
-            _.OnEvent("LoseFocus", e_changeOffset.Bind(v.num, "x"))
-
-            if (info.i) {
-                return g
-            }
+            _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
 
             g.SetFont("Bold")
             g.AddText("xs", i18n("offset.offset_y"))
             g.SetFont("Norm")
-            _ := g.AddEdit("yp")
+            _ := g.AddEdit("yp Limit5")
             _.Value := y
-            _.OnEvent("Change", e_changeOffset.Bind(v.num, "y"))
-            _.OnEvent("LoseFocus", e_changeOffset.Bind(v.num, "y"))
-            e_changeOffset(num, pos, item, *) {
-                if (item.value == "") {
-                    item.value := 0
+            _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
+            e_changeOffset(n, pos, item, *) {
+                if !offsetMap.Has(n)
+                    offsetMap.Set(n, { x: 0, y: 0 })
+                offsetMap.Get(n).%pos% := returnNumber(item.value)
+
+                offsets := ""
+                for k, v in offsetMap {
+                    offsets .= "|" k "/" v.x "/" v.y
                 }
 
-                value := returnNumber(item.value)
-                if (pos == "x") {
-                    val := value "/" screenSymbolOffset.%num%.y
-                } else {
-                    val := screenSymbolOffset.%num%.x "/" value
-                }
-
-                writeIniDebounced(num, val, (*) => (
-                    updateScreenOffset(),
-                    reloadSymbol(),
+                writeIniDebounced(prefix "SymbolScreenOffset", SubStr(offsets, 2), (*) => (
+                    updateScreenOffset(prefix),
+                    prefix == "caret" ? reloadCaretSymbol() : reloadCursorSymbol(),
                     restartJAB()
-                ), "Screen.Symbol.Offset")
+                ))
             }
         }
 

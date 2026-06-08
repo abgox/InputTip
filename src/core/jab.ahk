@@ -9,7 +9,7 @@ runJAB() {
         return
     if (A_IsCompiled) {
         try {
-            if (hasNewVersion(currentVersion, FileGetVersion("InputTip.JAB.JetBrains.exe"))) {
+            if (currentVersion != FileGetVersion("InputTip.JAB.JetBrains.exe")) {
                 killJAB(1)
                 FileInstall("InputTip.JAB.JetBrains.exe", "InputTip.JAB.JetBrains.exe", 1)
             }

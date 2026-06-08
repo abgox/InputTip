@@ -266,7 +266,30 @@ createProcessMenuGui(meta, *) {
                     _ := g.AddEdit(opt, "")
                     try _.Text := colValue.process
                     colValue.process := _.Text
-                    _.OnEvent("Change", (i, *) => colValue.process := i.Text)
+                    _.OnEvent("Change", (i, *) => (colValue.process := i.Text, updateProcessState(i.Text)))
+                }
+
+                updateProcessState(value) {
+                    static lastCondition := ""
+                    if !column.Get("hotkey", 0)
+                        return
+
+                    if value == "" {
+                        var._conditionCtrl.Opt("+Disabled")
+                        if var._conditionCtrl.Text != "" {
+                            lastCondition := var._conditionCtrl.Text
+                            colValue.condition := var._conditionCtrl.Text := ""
+                        }
+                        color := "cC0C0C0"
+                    } else {
+                        var._conditionCtrl.Opt("-Disabled")
+                        if var._conditionCtrl.Text == "" && lastCondition
+                            colValue.condition := var._conditionCtrl.Text := lastCondition
+
+                        color := "cDefault"
+                    }
+                    var._classEditCtrl.Opt(color)
+                    var._titleEditCtrl.Opt(color)
                 }
             }
 
@@ -279,7 +302,7 @@ createProcessMenuGui(meta, *) {
                         triggerList.Push(i18n("trigger." v))
                     }
                     renderGroupBox(g, "match.trigger", "xs h70 w" bw)
-                    _ := g.AddDropDownList(opt, triggerList)
+                    _ := g.AddDropDownList(opt " r9", triggerList)
                     try _.Text := colValue.trigger
                     colValue.trigger := _.Text
                     _.OnEvent("Change", (i, *) => colValue.trigger := i.Text)
@@ -295,7 +318,7 @@ createProcessMenuGui(meta, *) {
                         conditionList.Push(i18n("condition." v))
                     }
                     renderGroupBox(g, "match.condition", "xs h70 w" bw)
-                    var._conditionCtrl := _ := g.AddDropDownList(opt, conditionList)
+                    var._conditionCtrl := _ := g.AddDropDownList(opt " r9", conditionList)
                     try _.Text := colValue.condition
                     colValue.condition := _.Text
                     _.OnEvent("Change", (i, *) => (updateConditionState(i.Text), colValue.condition := i.Text))
@@ -374,7 +397,7 @@ createProcessMenuGui(meta, *) {
                             _opt := "yp"
                             g.AddText("yp", ">")
                         }
-                        ddlControls[i] := _ := g.AddDropDownList(_opt " w" bw / 5 - 5, ["", modeNameList*])
+                        ddlControls[i] := _ := g.AddDropDownList(_opt " r9 w" bw / 5 - 5, ["", modeNameList*])
                         try _.Text := StrSplit(colValue.capture, ">")[i]
                         captureList[i] := _.Text
                         _.num := i
@@ -524,6 +547,7 @@ createProcessMenuGui(meta, *) {
                     v()
             }
             try updateConditionState(colValue.condition)
+            try updateProcessState(colValue.process)
 
             tab.UseTab(0)
 

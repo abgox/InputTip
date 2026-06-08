@@ -478,7 +478,7 @@ e_symbolConfig(prefix, *) {
                     _ := prefix "SymbolPictureHeight"
                     renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
 
-                    _ := g.AddDropDownList("xs+20 yp+40 AltSubmit r9 w" bw - 40, picList)
+                    _ := g.AddDropDownList("xs+20 yp+40 r9 w" bw - 40, picList)
                     key := prefix "SymbolPicturePath" state
                     _.key := key
                     _.page := page

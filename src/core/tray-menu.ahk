@@ -47,7 +47,7 @@ makeTrayMenu() {
         createProcessMenuGui.Bind({
             title: i18n("hotkey"),
             tab: [i18n("hotkeyRule")],
-            trigger: triggerKeyList,
+            trigger: hotkeyTriggerKeyList,
             link: getDocsLink("rule/hotkey"),
             section: "Hotkey.Rule",
             cols: ["hotkey", "trigger", "process", "condition", "class", "title"],
@@ -737,12 +737,6 @@ resumeApp() {
 
         if var.cursorActive
             loadCursor(currentState, 1)
-        if var.overlayActive
-            showOverlay(currentState)
-        if var.caretSymbolType
-            reloadCaretSymbol()
-        if var.cursorSymbolType
-            reloadCursorSymbol()
         if var.symbolJABActive
             restartJAB()
 

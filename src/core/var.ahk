@@ -187,21 +187,33 @@ conditionTextMap := Map()
 for v in windowConditionKeyList
     conditionTextMap.Set(i18n("condition." v), v)
 
+
+allTriggerKeyList := ["hotkey"]
 switchTriggerKeyList := [
     "switchStateCaps-CapsLock",
     "switchStateCN-LShift", "switchStateCN-RShift", "switchStateCN-CtrlSpace", "switchStateCN-IME",
     "switchStateEN-LShift", "switchStateEN-RShift", "switchStateEN-CtrlSpace", "switchStateEN-IME",
     "switchKeyboardCN", "switchKeyboardUS", "switchKeyboardJP", "switchKeyboardKR",
 ]
+allTriggerKeyList.Push(switchTriggerKeyList.Clone()*)
+
 triggerKeyList := switchTriggerKeyList.Clone()
-triggerKeyList.Push("setWindowTop", "cancelWindowTop", "pause", "resume", "exit", "restart", "showStateCode")
+_ := ["setWindowTop", "cancelWindowTop", "toggleWindowTop", "exit", "restart", "pause", "resume", "toggle"]
+triggerKeyList.Push(_*)
+allTriggerKeyList.Push(_*)
+
+hotkeyTriggerKeyList := triggerKeyList.Clone()
+hotkeyTriggerKeyList.InsertAt(1, "none")
+hotkeyTriggerKeyList.Push("showStateCode")
+allTriggerKeyList.Push("none", "showStateCode")
 
 windowTriggerKeyList := triggerKeyList.Clone()
 windowTriggerKeyList.InsertAt(10, "ignoreStateSwitch")
 windowTriggerKeyList.InsertAt(15, "ignoreKeyboardSwitch")
+allTriggerKeyList.Push("ignoreStateSwitch", "ignoreKeyboardSwitch")
 
 triggerTextMap := Map()
-for v in ["ignoreStateSwitch", "ignoreKeyboardSwitch", "hotkey", triggerKeyList*]
+for v in allTriggerKeyList
     triggerTextMap.Set(i18n("trigger." v), v)
 
 runTriggers(triggers, *) {
@@ -220,11 +232,13 @@ runTriggers(triggers, *) {
             case "switchKeyboardUS": switchKeyboard("US")
             case "switchKeyboardJP": switchKeyboard("JP")
             case "switchKeyboardKR": switchKeyboard("KR")
+            case "toggle": toggleApp()
             case "pause": suspendApp()
             case "resume": resumeApp()
             case "exit": SetTimer(closeApp, -500)
             case "restart": SetTimer(restartApp, -500)
-            case "showStateCode": showStateCode(1)
+            case "showStateCode": showStateCode(var._showStateCode := !var._showStateCode)
+            case "toggleWindowTop": try WinSetAlwaysOnTop((WinGetExStyle("A") & 0x8) ? 0 : 1, "A")
             case "setWindowTop":
                 if !(WinGetExStyle("A") & 0x8)
                     try WinSetAlwaysOnTop(1, "A")
@@ -243,7 +257,7 @@ returnTriggers(exeName, exeTitle, exeClass) {
     conditionalTriggers := []
     unconditionalTriggers := []
 
-    for trigger in triggerKeyList {
+    for trigger in windowTriggerKeyList {
         rules := matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule[trigger])
 
         for rule in rules {
@@ -282,9 +296,9 @@ parseWindowRule()
 
 parseWindowRule() {
     newWindowRule := Map()
-    for v in ["", "ignoreStateSwitch", "ignoreKeyboardSwitch", triggerKeyList*] {
+    for v in ["", windowTriggerKeyList*]
         newWindowRule.Set(v, Map())
-    }
+
     newWindowOverlayRule := Map(
         "show", Map(),
         "hide", Map(),
@@ -312,6 +326,8 @@ parseWindowRule() {
     newWindowIdleTimerRule := Map()
     newWindowTextMonitorRule := Map()
     newWindowHotkeyMonitorRule := Map()
+    for v in hotkeyTriggerKeyList
+        newHotkeyRule.Set(v, Map())
 
     for name in StrSplit(IniRead(configFile, , , ""), "`n") {
         rule := {}
@@ -415,7 +431,7 @@ parseWindowRule() {
                 try IniWrite("switchKeyboardUS", configFile, name, "trigger")
                 rule.trigger := "switchKeyboardUS"
             }
-            if !newWindowRule.Has(rule.trigger) {
+            if !newHotkeyRule.Has(rule.trigger) {
                 try IniDelete(configFile, name)
                 continue
             }
@@ -423,7 +439,7 @@ parseWindowRule() {
                 rule.%k% := IniRead(configFile, name, k, "")
             if !newHotkeyRule.Has(rule.process)
                 newHotkeyRule.Set(rule.process, [])
-            newHotkeyRule.Get(rule.process).Push(rule)
+            try newHotkeyRule.Get(rule.process).Push(rule)
         }
     }
 

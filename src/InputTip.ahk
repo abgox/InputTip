@@ -151,7 +151,7 @@ isResumeTrigger(hk, exeName := "", type := "global") {
     if (type == "global") {
         for rule in var.hotkeyRule.Get("", []) {
             cleanRuleHk := RegExReplace(rule.hotkey, "i)^~|(?:\s+Up)$", "")
-            if (cleanHk == cleanRuleHk && rule.trigger == "resume")
+            if (cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle"))
                 return true
         }
     } else if (type == "window" && exeName != "") {
@@ -159,7 +159,7 @@ isResumeTrigger(hk, exeName := "", type := "global") {
         for ruleList in ruleLists {
             for rule in ruleList {
                 cleanRuleHk := RegExReplace(rule.hotkey, "i)^~|(?:\s+Up)$", "")
-                if (cleanHk == cleanRuleHk && rule.trigger == "resume")
+                if (cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle"))
                     return true
             }
         }

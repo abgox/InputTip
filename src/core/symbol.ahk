@@ -466,7 +466,7 @@ e_symbolConfig(prefix, *) {
                         addBtn()
                         tab.UseTab(2)
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
-                        gc.%prefix "PreviewSymbolPicture" page% := previewCtrl
+                        gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
                     }
                     renderGroupBox(g, state, "xs", "h120 w" bw)
                     _ := prefix "SymbolPictureOffsetX"
@@ -485,7 +485,7 @@ e_symbolConfig(prefix, *) {
                     try _.Text := var.%key%
                     _.OnEvent("Change", (ctrl, *) => changeConfig(ctrl.key, ctrl.Text, , (*) => gc.%prefix "PreviewSymbolPicture" ctrl.page%.Focus()))
 
-                    if i > 4
+                    if i > 5
                         addBtn()
                 }
                 addBtn() {
@@ -513,7 +513,7 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "PreviewSymbolShape"% := previewCtrl
 

@@ -72,21 +72,23 @@ baseUrl := [
 ]
 
 
-stateList := ["CN", "EN", "Caps", "JP", "KR"]
+stateList := ["CN", "EN", "Caps", "US", "JP", "KR"]
 stateVal := {
     CN: {
-        id: 1,
         color: "0xFF0000",
         colorText: "red",
     },
     EN: {
-        id: 0,
         color: "0x0000FF",
         colorText: "blue",
     },
     Caps: {
         color: "0x008000",
         colorText: "green",
+    },
+    US: {
+        color: "0x0000FF",
+        colorText: "blue",
     },
     JP: {
         color: "0xCCCC00",

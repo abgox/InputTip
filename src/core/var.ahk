@@ -191,7 +191,7 @@ switchTriggerKeyList := [
     "switchStateCaps-CapsLock",
     "switchStateCN-LShift", "switchStateCN-RShift", "switchStateCN-CtrlSpace", "switchStateCN-IME",
     "switchStateEN-LShift", "switchStateEN-RShift", "switchStateEN-CtrlSpace", "switchStateEN-IME",
-    "switchKeyboardCN", "switchKeyboardEN", "switchKeyboardJP", "switchKeyboardKR",
+    "switchKeyboardCN", "switchKeyboardUS", "switchKeyboardJP", "switchKeyboardKR",
 ]
 triggerKeyList := switchTriggerKeyList.Clone()
 triggerKeyList.Push("setWindowTop", "cancelWindowTop", "pause", "resume", "exit", "restart", "showStateCode")
@@ -217,7 +217,7 @@ runTriggers(triggers, *) {
             case "switchStateEN-CtrlSpace": _switchState("EN", "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}")
             case "switchStateEN-IME": _switchState("EN", "IME")
             case "switchKeyboardCN": switchKeyboard("CN")
-            case "switchKeyboardEN": switchKeyboard("EN")
+            case "switchKeyboardUS": switchKeyboard("US")
             case "switchKeyboardJP": switchKeyboard("JP")
             case "switchKeyboardKR": switchKeyboard("KR")
             case "pause": suspendApp()
@@ -327,6 +327,10 @@ parseWindowRule() {
         for k in windowRuleKeys
             rule.%k% := IniRead(configFile, name, k, "")
         if InStr(name, "Window.Rule.") {
+            if rule.trigger == "switchKeyboardEN" {
+                try IniWrite("switchKeyboardUS", configFile, name, "trigger")
+                rule.trigger := "switchKeyboardUS"
+            }
             if !newWindowRule.Has(rule.trigger) {
                 try IniDelete(configFile, name)
                 continue
@@ -407,6 +411,10 @@ parseWindowRule() {
             }
             triggerMap.Get(rule.process).Push(rule)
         } else if InStr(name, "Hotkey.Rule.") {
+            if rule.trigger == "switchKeyboardEN" {
+                try IniWrite("switchKeyboardUS", configFile, name, "trigger")
+                rule.trigger := "switchKeyboardUS"
+            }
             if !newWindowRule.Has(rule.trigger) {
                 try IniDelete(configFile, name)
                 continue

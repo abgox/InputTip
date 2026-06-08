@@ -23,7 +23,7 @@ makeTrayMenu() {
         A_TrayMenu.Add(i18n("runCodeWithAdmin"), (*) => (
             A_TrayMenu.ToggleCheck(i18n("runCodeWithAdmin")),
             changeConfig("runCodeWithAdmin", !var.runCodeWithAdmin, 0),
-            var.runCodeWithAdmin ? fn_restart() : 0
+            var.runCodeWithAdmin ? restartApp() : 0
         ))
         if (A_IsAdmin && var.runCodeWithAdmin) {
             A_TrayMenu.Check(i18n("runCodeWithAdmin"))
@@ -67,19 +67,19 @@ makeTrayMenu() {
     A_TrayMenu.Add(i18n("moreSettings"), e_moreSettings)
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("about"), e_about)
-    A_TrayMenu.Add(i18n("Restart"), fn_restart)
+    A_TrayMenu.Add(i18n("Restart"), restartApp)
 
     A_TrayMenu.Add()
-    A_TrayMenu.Add(i18n("Exit"), fn_exit)
+    A_TrayMenu.Add(i18n("Exit"), closeApp)
 }
 
-fn_exit(*) {
+closeApp(*) {
     try ProcessClose(updaterPID)
     killJAB()
     revertCursor()
     ExitApp()
 }
-fn_restart(*) {
+restartApp(*) {
     try ProcessClose(updaterPID)
     if (var.symbolJABActive) {
         killJAB()

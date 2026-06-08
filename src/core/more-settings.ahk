@@ -83,7 +83,7 @@ e_moreSettings(*) {
             g.w := w := info.w
             g.bw := bw := w - g.MarginX * 2
 
-            g.AddLink("Section", getDocsLink("more-settings"))
+            g.AddLink("Section", getDocsLink("customize-tray-icon"))
             iconList := getPicList(iconDir, ["default-app.png", "default-app-paused.png"])
             renderDropDownListGroup(g, "iconRunning", iconList)
             renderDropDownListGroup(g, "iconPaused", iconList)
@@ -103,7 +103,7 @@ e_moreSettings(*) {
             g.w := w := info.w
             g.bw := bw := w - g.MarginX * 2
 
-            g.AddLink("Section", getDocsLink("more-settings"))
+            g.AddLink("Section", getDocsLink("customize-tray-tip"))
 
             renderRadioGroup(g, "enableCustomTrayTip", [["yes", 1], ["no", 0]])
             renderRadioGroup(g, "enableKeyStats", [["yes", 1], ["no", 0]])

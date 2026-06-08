@@ -51,7 +51,7 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
 
     if (key == "language") {
         writeIni(key, value)
-        fn_restart()
+        restartApp()
     }
 
     value := normalizeConfig(key, value)

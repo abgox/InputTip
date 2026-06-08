@@ -222,8 +222,8 @@ runTriggers(triggers, *) {
             case "switchKeyboardKR": switchKeyboard("KR")
             case "pause": suspendApp()
             case "resume": resumeApp()
-            case "exit": SetTimer(fn_exit, -500)
-            case "restart": SetTimer(fn_restart, -500)
+            case "exit": SetTimer(closeApp, -500)
+            case "restart": SetTimer(restartApp, -500)
             case "showStateCode": showStateCode(1)
             case "setWindowTop":
                 if !(WinGetExStyle("A") & 0x8)

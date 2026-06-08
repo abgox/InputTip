@@ -5,7 +5,7 @@ updateSymbol("cursor")
 
 updateSymbol(prefix) {
     symbolGui(title, info) {
-        return createGuiOpt(title, , "-Caption AlwaysOnTop ToolWindow LastFound E0x20", , 0)
+        return createGuiOpt(title, , "-Caption AlwaysOnTop ToolWindow E0x20", , 0)
     }
     switch var.%prefix "SymbolType"% {
         case 1:
@@ -35,12 +35,10 @@ updateSymbol(prefix) {
                 if (color) {
                     var.%key% := _ := createUniqueGui(symbolGui.Bind(key), var.%prefix "SymbolShapeCornerPreference"%)
                     try _.BackColor := color
-                    _.Opt("-LastFound")
                     switch var.%prefix "SymbolShapeEdgeStyle"% {
-                        case 1: _.Opt("-LastFound +e0x00000001")
-                        case 2: _.Opt("-LastFound +e0x00000200")
-                        case 3: _.Opt("-LastFound +e0x00020000")
-                        default: _.Opt("-LastFound")
+                        case 1: _.Opt("e0x00000001")
+                        case 2: _.Opt("e0x00000200")
+                        case 3: _.Opt("e0x00020000")
                     }
                 } else {
                     try var.%key%.Destroy()
@@ -64,10 +62,9 @@ updateSymbol(prefix) {
                     }
                     _.AddText(, text)
                     switch var.%prefix "SymbolTextEdgeStyle"% {
-                        case 1: _.Opt("-LastFound +e0x00000001")
-                        case 2: _.Opt("-LastFound +e0x00000200")
-                        case 3: _.Opt("-LastFound +e0x00020000")
-                        default: _.Opt("-LastFound")
+                        case 1: _.Opt("e0x00000001")
+                        case 2: _.Opt("e0x00000200")
+                        case 3: _.Opt("e0x00020000")
                     }
                 } else {
                     try var.%key%.Destroy()

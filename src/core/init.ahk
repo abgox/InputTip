@@ -309,14 +309,12 @@ if A_IsCompiled {
 checkIni() {
     try {
         oldVersion := IniRead(configFile, "Settings", "version-" versionType)
-        if (currentVersion != oldVersion) {
+        if currentVersion != oldVersion
             writeIni("version-" versionType, currentVersion)
-        }
     } catch {
         showGui(createUniqueGui(cursorGuideGui))
         cursorGuideGui(info) {
-            g := Gui(, "InputTip - " i18n("init.title"))
-            g.SetFont(fontOpt*)
+            g := createGuiOpt(i18n("init.title"))
             for i, v in i18n("init.cursor", 1) {
                 if (i == 1) {
                     g.AddLink(, v)

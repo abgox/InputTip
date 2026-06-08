@@ -113,7 +113,7 @@ showBorder(finalColor, finalWidth, hwnd) {
         ]
 
         for cfg in borderConfigs {
-            box := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x20")
+            box := Gui("-Caption AlwaysOnTop ToolWindow E0x20")
             box.BackColor := finalColor
             box.Show("W1 H1 NoActivate")
             SWP_NOACTIVATE := 0x10

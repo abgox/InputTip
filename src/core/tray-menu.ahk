@@ -601,7 +601,7 @@ createProcessMenuGui(meta, *) {
                         }
                         cols.Push(col)
                         if val {
-                            IniWrite(val, configFile, section, v)
+                            writeIni(v, val, section)
                         } else {
                             IniDelete(configFile, section, v)
                         }
@@ -613,7 +613,7 @@ createProcessMenuGui(meta, *) {
                     } catch {
                         trigger := LV.trigger
                     }
-                    IniWrite(trigger, configFile, section, "trigger")
+                    writeIni("trigger", trigger, section)
                     restartJAB()
                     parseWindowRule()
                     registerHotkey()

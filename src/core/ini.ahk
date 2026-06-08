@@ -7,11 +7,7 @@ readIni(key, default, section := "Settings", path := configFile) {
 }
 
 writeIni(key, value, section := "Settings", path := configFile) {
-    try IniWrite(value, path, section, key)
-}
-
-readIniSection(section, default := "", path := configFile) {
-    return IniRead(path, section, , default)
+    try IniWrite("`"" value "`"", path, section, key)
 }
 
 writeIniDebounced(key, value, callback := "", section := "Settings", path := configFile) {

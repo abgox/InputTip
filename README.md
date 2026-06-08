@@ -29,8 +29,8 @@
 ## ✨ 功能
 
 - **状态提示（视觉感知）**
-  - **支持 6 种输入状态**：中文状态 `CN` · 英文状态 `EN` · 大写锁定 `Caps` · 英文键盘 `US` · 日文键盘 `JP` · 韩文键盘 `KR`
-  - **提供 5 种提示方案**：[鼠标样式](https://inputtip.abgox.com/docs/tip/cursor) · [悬浮小窗](https://inputtip.abgox.com/docs/tip/overlay) · [光标符号](https://inputtip.abgox.com/docs/tip/symbol-caret) · [鼠标符号](https://inputtip.abgox.com/docs/tip/symbol-cursor) · [窗口边框](https://inputtip.abgox.com/docs/tip/border)
+  - **6 种输入状态**：中文状态 `CN` · 英文状态 `EN` · 大写锁定 `Caps` · 英文键盘 `US` · 日文键盘 `JP` · 韩文键盘 `KR`
+  - **5 种提示方案**：[鼠标样式](https://inputtip.abgox.com/docs/tip/cursor) · [悬浮小窗](https://inputtip.abgox.com/docs/tip/overlay) · [光标符号](https://inputtip.abgox.com/docs/tip/symbol-caret) · [鼠标符号](https://inputtip.abgox.com/docs/tip/symbol-cursor) · [窗口边框](https://inputtip.abgox.com/docs/tip/border)
 - **规则调度（智能切换）**
   - **多维感知**：通过 `窗口匹配`、`动态热键`、`计时器`、`文本/热键监控` 等机制实时捕捉上下文
   - **精准调度**：基于规则触发 `状态切换`、`键盘布局切换`、`热键注册`、`窗口置顶` 等特定行为

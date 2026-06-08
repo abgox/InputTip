@@ -6,7 +6,8 @@ on:
     types: [published]
 
 jobs:
-  create-pr-branch:
+  publish:
+    name: Publish winget-pkgs
     runs-on: windows-latest
     env:
       REPO: ${{ github.repository }}

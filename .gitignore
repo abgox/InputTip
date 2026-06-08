@@ -4,4 +4,3 @@ temp
 *.new
 test
 todo
-src/core/app-update/target/*

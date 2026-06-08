@@ -95,5 +95,4 @@ GetCaretPosFromJAB(&X?, &Y?, &W?, &H?) {
     }
 }
 
-#Include returnCanShowSymbolN.ahk
 #Include core\core.ahk

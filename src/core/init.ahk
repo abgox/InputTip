@@ -816,8 +816,9 @@ migrateConfig2() {
 
     migrateHotkey(key, trigger) {
         if val := IniRead(configFile, "Settings", key, "") {
-            IniWrite(val, configFile, "Hotkey.Rule." returnTime(), "hotkey")
-            IniWrite(trigger, configFile, "Hotkey.Rule." returnTime(), "trigger")
+            id := FormatTime(A_Now, "yyyy-MM-dd") "." Format("{:05x}", Random(0, 1048575))
+            IniWrite(val, configFile, "Hotkey.Rule." id, "hotkey")
+            IniWrite(trigger, configFile, "Hotkey.Rule." id, "trigger")
         }
         try IniDelete(configFile, "Settings", key)
     }

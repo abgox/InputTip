@@ -1,5 +1,14 @@
 ; InputTip
 
+returnTimeId(ids := Map()) {
+    loop {
+        id := Format("{:05x}", Random(0, 1048575))
+        if !ids.Has(id)
+            break
+    }
+    return FormatTime(A_Now, "yyyy-MM-dd") "." id
+}
+
 runAsAdmin() {
     try {
         Run('*RunAs "' A_AhkPath '" /restart "' A_ScriptFullPath '" ' keyCount)

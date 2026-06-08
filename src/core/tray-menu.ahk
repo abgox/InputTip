@@ -670,7 +670,7 @@ createProcessMenuGui(meta, *) {
 
         e_add(LV, *) {
             colValue := {
-                time: returnTime()
+                time: returnTimeId(var._ruleIds)
             }
             for k, v in column {
                 if (!colValue.HasProp(k)) {

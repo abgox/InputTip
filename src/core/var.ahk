@@ -276,6 +276,7 @@ textToState(stateText) {
 
 var._previewOffsetMap := Map() ; 用于窗口偏移量的实时预览
 var._matchCache := Map()
+var._ruleIds := Map()
 
 parseWindowRule()
 
@@ -314,6 +315,15 @@ parseWindowRule() {
 
     for name in StrSplit(IniRead(configFile, , , ""), "`n") {
         rule := {}
+
+        rulePos := InStr(name, ".Rule.")
+        if !rulePos
+            continue
+        timeStr := SubStr(name, rulePos + 6)
+        rule.time := timeStr
+        id := InStr(timeStr, ":") ? timeStr : StrSplit(timeStr, ".")[2]
+        var._ruleIds.Set(id, 1)
+
         for k in windowRuleKeys
             rule.%k% := IniRead(configFile, name, k, "")
         if InStr(name, "Window.Rule.") {
@@ -321,8 +331,6 @@ parseWindowRule() {
                 try IniDelete(configFile, name)
                 continue
             }
-
-            rule.time := StrReplace(name, "Window.Rule.")
             triggerMap := newWindowRule[rule.trigger]
             if !triggerMap.Has(rule.process)
                 triggerMap.Set(rule.process, [])
@@ -348,7 +356,6 @@ parseWindowRule() {
                 try IniDelete(configFile, name)
                 continue
             }
-            rule.time := StrReplace(name, "Window.Overlay.Rule.")
             triggerMap := newWindowOverlayRule[rule.trigger]
             if !triggerMap.Has(rule.process)
                 triggerMap.Set(rule.process, [])
@@ -358,7 +365,6 @@ parseWindowRule() {
                 try IniDelete(configFile, name)
                 continue
             }
-            rule.time := StrReplace(name, "Window.Border.Rule.")
             triggerMap := newWindowBorderRule[rule.trigger]
             if !triggerMap.Has(rule.process)
                 triggerMap.Set(rule.process, [])
@@ -368,7 +374,6 @@ parseWindowRule() {
                 try IniDelete(configFile, name)
                 continue
             }
-            rule.time := StrReplace(name, "Window.CursorSymbol.Rule.")
             triggerMap := newWindowCursorSymbolRule[rule.trigger]
             if !triggerMap.Has(rule.process)
                 triggerMap.Set(rule.process, [])
@@ -378,7 +383,6 @@ parseWindowRule() {
                 try IniDelete(configFile, name)
                 continue
             }
-            rule.time := StrReplace(name, "Window.CaretSymbol.Rule.")
             triggerMap := newWindowCaretSymbolRule[rule.trigger]
 
             if rule.trigger == "capture" {
@@ -407,7 +411,6 @@ parseWindowRule() {
                 try IniDelete(configFile, name)
                 continue
             }
-            rule.time := StrReplace(name, "Hotkey.Rule.")
             for k in windowRuleKeys
                 rule.%k% := IniRead(configFile, name, k, "")
             if !newHotkeyRule.Has(rule.process)

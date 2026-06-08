@@ -91,10 +91,6 @@ returnNumber(value) {
     return Number(numbers[1])
 }
 
-; 返回当前的时间，作为唯一标识符
-returnTime() {
-    return FormatTime(A_Now, "yyyy-MM-dd-HH:mm:ss") "." A_MSec
-}
 
 ; 将 RGB 转换为 Windows 底层认识的 BGR (COLORREF) 格式
 RGBtoBGR(rgb) {

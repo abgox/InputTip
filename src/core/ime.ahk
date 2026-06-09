@@ -19,15 +19,6 @@ class IME {
         0, "EN",
     )
 
-    static GetInputMode(hwnd := this.GetFocusedWindow()) {
-        if !this.GetOpenStatus(hwnd)
-            return false
-        convMode := this.GetConversionMode(hwnd)
-        if convMode & 0x100 ; IME_CMODE_NOCONVERSION
-            return false
-        return convMode & 3 ; IME_CMODE_LANGUAGE
-    }
-
     /**
      * 获取当前输入法输入模式
      * @returns {"CN"|"EN"|"Caps"|"US"|"JP"|"KR"}
@@ -39,36 +30,49 @@ class IME {
      * - "KR": 韩文键盘
      */
     static GetInputModeText(hwnd := this.GetFocusedWindow()) {
-        if GetKeyState("CapsLock", "T")
+        static lastState := "EN"
+        if GetKeyState("CapsLock", "T") {
+            lastState := "Caps"
             return "Caps"
-
-        langID := this.GetKeyboardLayout(hwnd) & 0xFF
-        for state, info in this.LangMap {
-            if langID == info.langId {
-                ; CN 需要走后续状态判断
-                if state != "CN"
-                    return state
-                break
-            }
         }
-
-        opened := this.GetOpenStatus(hwnd)
-        convMode := this.GetConversionMode(hwnd)
-
-        if convMode & 0x100 ; IME_CMODE_NOCONVERSION
-            opened := false
-
-        if var.inputMethodDetectionMode == "general"
-            return this.OpenStateMap.Get(opened && (convMode & 3) ? 1 : 0, "EN")
-
-        baseState := var.inputMethodBaseState
-
-        for v in var.inputMethodDetectionRules {
-            r := StrSplit(v, ",")
-            if matchRule(opened, r[1]) && matchRule(convMode, r[2]) {
-                baseState := r[3]
-                break
+        try {
+            langID := this.GetKeyboardLayout(hwnd) & 0xFF
+            for state, info in this.LangMap {
+                if langID == info.langId {
+                    ; CN 需要走后续状态判断
+                    if state != "CN" {
+                        lastState := state
+                        return state
+                    }
+                    break
+                }
             }
+
+            opened := this.GetOpenStatus(hwnd)
+            convMode := this.GetConversionMode(hwnd)
+
+            if convMode & 0x100 ; IME_CMODE_NOCONVERSION
+                opened := false
+
+            if var.inputMethodDetectionMode == "general" {
+                state := this.OpenStateMap.Get(opened && (convMode & 3) ? 1 : 0, lastState)
+                lastState := state
+                return state
+            }
+
+            state := var.inputMethodBaseState
+
+            for v in var.inputMethodDetectionRules {
+                r := StrSplit(v, ",")
+                if matchRule(opened, r[1]) && matchRule(convMode, r[2]) {
+                    state := r[3]
+                    break
+                }
+            }
+
+            return lastState := state
+        } catch {
+            return lastState
         }
 
         matchRule(value, ruleValue) {
@@ -81,8 +85,6 @@ class IME {
             }
             return isMatch
         }
-
-        return baseState
     }
 
     static CheckInputMode(hwnd := this.GetFocusedWindow()) {
@@ -238,6 +240,9 @@ switchState(state, method) {
             if GetKeyState(mod, "P")
                 return
         }
+        if GetKeyState("LButton", "P") || GetKeyState("RButton", "P")
+            return
+
         SetTimer(onRun, 0)
         stateText := IME.GetInputModeText()
         if !stateText

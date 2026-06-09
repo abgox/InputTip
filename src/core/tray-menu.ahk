@@ -263,7 +263,7 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_process
                 fn_process() {
                     renderGroupBox(g, "match.process", groupLayout " h70 w" bw)
-                    _ := g.AddEdit(opt, "")
+                    _ := g.AddEdit(opt " r1", "")
                     try _.Text := colValue.process
                     colValue.process := _.Text
                     _.OnEvent("Change", (i, *) => (colValue.process := i.Text, updateProcessState(i.Text)))
@@ -363,7 +363,7 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_class
                 fn_class() {
                     renderGroupBox(g, "match.class", "xs h70 w" bw)
-                    var._classEditCtrl := _ := g.AddEdit(opt)
+                    var._classEditCtrl := _ := g.AddEdit(opt " r1")
                     try _.Text := colValue.class
                     _.OnEvent("Change", (i, *) => colValue.class := i.Text)
                 }
@@ -374,7 +374,7 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_title
                 fn_title() {
                     renderGroupBox(g, "match.title", "xs h70 w" bw)
-                    var._titleEditCtrl := _ := g.AddEdit(opt)
+                    var._titleEditCtrl := _ := g.AddEdit(opt " r1")
                     try _.Text := colValue.title
                     _.OnEvent("Change", (i, *) => colValue.title := i.Text)
                 }
@@ -469,14 +469,14 @@ createProcessMenuGui(meta, *) {
                         g.SetFont("Bold")
                         g.AddText("xs", i18n("offset.offset_x"))
                         g.SetFont("Norm")
-                        _ := g.AddEdit("yp Limit5")
+                        _ := g.AddEdit("yp Limit5 r1")
                         _.Value := x
                         _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
 
                         g.SetFont("Bold")
                         g.AddText("xs", i18n("offset.offset_y"))
                         g.SetFont("Norm")
-                        _ := g.AddEdit("yp Limit5")
+                        _ := g.AddEdit("yp Limit5 r1")
                         _.Value := y
                         _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
                     }
@@ -512,7 +512,7 @@ createProcessMenuGui(meta, *) {
                 sectionList.InsertAt(4, fn_content)
                 fn_content() {
                     var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs h70 w" bw)
-                    var._tthEditCtrl := _ := g.AddEdit(opt)
+                    var._tthEditCtrl := _ := g.AddEdit(opt " r1")
 
                     switch colValue.condition {
                         case i18n("condition.idleTimer"):

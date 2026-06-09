@@ -282,7 +282,7 @@ e_symbol(*) {
         g.bw := bw := w - g.MarginX * 2
 
         symbolTypeBtns := []
-        gc.previewSymbol := g.AddEdit("yp cGray", i18n("symbol.preview"))
+        gc.previewSymbol := g.AddEdit("yp cGray r1", i18n("symbol.preview"))
         previewSymbol := (key, value, *) => (changeConfig(key, value), var.caretSymbolType ? gc.previewSymbol.Focus() : "", reloadCaretSymbol(), toggleState())
         toggleState() {
             opt := var.caretSymbolType ? "-Disabled" : "+Disabled"
@@ -450,7 +450,7 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "PreviewSymbolPicture1"% := previewCtrl
 
@@ -466,7 +466,7 @@ e_symbolConfig(prefix, *) {
                         addBtn()
                         tab.UseTab(2)
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
-                        gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+                        gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("yp cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
                     }
                     renderGroupBox(g, state, "xs", "h120 w" bw)
                     _ := prefix "SymbolPictureOffsetX"
@@ -513,7 +513,7 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "PreviewSymbolShape"% := previewCtrl
 
@@ -567,7 +567,7 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "previewSymbolText"% := previewCtrl
 
@@ -651,14 +651,14 @@ e_screenOffset(prefix, *) {
             g.SetFont("Bold")
             g.AddText("xs", i18n("offset.offset_x"))
             g.SetFont("Norm")
-            _ := g.AddEdit("yp Limit5")
+            _ := g.AddEdit("yp Limit5 r1")
             _.Value := x
             _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
 
             g.SetFont("Bold")
             g.AddText("xs", i18n("offset.offset_y"))
             g.SetFont("Norm")
-            _ := g.AddEdit("yp Limit5")
+            _ := g.AddEdit("yp Limit5 r1")
             _.Value := y
             _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
             e_changeOffset(n, pos, item, *) {

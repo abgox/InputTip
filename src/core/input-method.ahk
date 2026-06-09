@@ -10,7 +10,7 @@ e_inputMethod(*) {
         g.AddLink("Section", getDocsLink("input-method"))
 
         if (info.i) {
-            g.AddText(, isChinese ? line70 : line80)
+            g.AddText(, isChinese ? line70 : line90)
             return g
         }
         g.w := w := info.w
@@ -26,7 +26,7 @@ e_inputMethod(*) {
         g.AddLink("Section", getDocsLink("input-method/state-detection-mode"))
 
         renderText(g, "inputMethodBaseState", "xs", "")
-        renderDropDownList(g, "inputMethodBaseState", ["EN", "CN"], "yp", "w" bw / 3)
+        renderDropDownList(g, "inputMethodBaseState", ["EN", "CN"], "yp", "w" bw / 2.45)
         g.AddText("yp w20")
         _ := g.AddCheckbox("yp", i18n("inputMethodDetectionMode.showCode"))
         _.Value := var._showStateCode
@@ -110,7 +110,7 @@ e_inputMethod(*) {
                 renderGroupBox(g, "inputMethodDetectionMode.stateCodeRule", , "h110 w" bw)
                 g.AddText("xs+20 yp+30", i18n("inputMethodDetectionMode.number"))
 
-                _gc.stateNum := _ := g.AddEdit("yp", "")
+                _gc.stateNum := _ := g.AddEdit("yp r1", "")
 
                 if !InStr(ruleInfo.stateRule, "oddNum") && !InStr(ruleInfo.stateRule, "evenNum")
                     _.Value := ruleInfo.stateRule
@@ -136,7 +136,7 @@ e_inputMethod(*) {
 
                 renderGroupBox(g, "inputMethodDetectionMode.conversionCodeRule", , "h110 w" bw)
                 g.AddText("xs+20 yp+30", i18n("inputMethodDetectionMode.number"))
-                _gc.conversionNum := _ := g.AddEdit("yp", "")
+                _gc.conversionNum := _ := g.AddEdit("yp r1", "")
                 if !InStr(ruleInfo.conversionRule, "oddNum") && !InStr(ruleInfo.conversionRule, "evenNum")
                     _.Value := ruleInfo.conversionRule
 

@@ -250,7 +250,7 @@ runTriggers(triggers, *) {
         }
     }
     _switchState(state, key) {
-        switchKeyboard("CN", 1), Sleep(50), switchState(state, key)
+        switchKeyboard("CN", 1), SetTimer(switchState.Bind(state, key), -20)
     }
 }
 
@@ -516,8 +516,6 @@ matchWindowRules(exeName, exeTitle, exeClass, triggerMap) {
     if ruleLists.Length == 0
         return unconditionalTriggers
 
-    triggers := Map()
-
     for ruleList in ruleLists {
         for rule in ruleList {
             if !rule.trigger
@@ -528,14 +526,11 @@ matchWindowRules(exeName, exeTitle, exeClass, triggerMap) {
             if !isMatch
                 continue
 
-            if !triggers.Has(rule.trigger) {
-                if rule.condition {
-                    conditionalTriggers.Push(rule)
-                } else {
-                    if hasProcessChange
-                        unconditionalTriggers.Push(rule)
-                }
-                triggers.Set(rule.trigger, 1)
+            if rule.condition {
+                conditionalTriggers.Push(rule)
+            } else {
+                if hasProcessChange
+                    unconditionalTriggers.Push(rule)
             }
         }
     }

@@ -444,6 +444,8 @@ parseWindowRule() {
         }
     }
 
+    Critical("On")
+
     var.WindowRule := newWindowRule
     var.WindowOverlayRule := newWindowOverlayRule
     var.WindowBorderRule := newWindowBorderRule
@@ -460,6 +462,8 @@ parseWindowRule() {
     var._showStateCode := 0
 
     var._matchCache.Clear()
+
+    Critical("Off")
 }
 getMatchingRuleLists(exeName, triggerMap, hotkey := 0) {
     cacheKey := exeName . "|" . ObjPtr(triggerMap)

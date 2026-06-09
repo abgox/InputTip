@@ -34,12 +34,30 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     if !left
         return
 
+    capture := getCaretCapture()
+    captureOffsetMap := Map()
+    if capture.captureOffset && capture.capture {
+        captureMode := StrSplit(capture.capture, ">")
+        for i, c in StrSplit(capture.captureOffset, ">") {
+            try {
+                pos := StrSplit(c, "/")
+                captureOffsetMap.Set(captureMode[i], { x: pos[1], y: pos[2] })
+            }
+        }
+    }
+
     s := isWhichScreen()
     if s.num {
+        scale := getMonitorScale(s)
         try {
             offset := symbolScreenOffset.caret.%s.num%
-            left += offset.x
-            top += offset.y
+            left += toPhysical(offset.x, scale)
+            if captureOffset := captureOffsetMap.Get(var._lastCaptureMode, { x: 0, y: 0 })
+                left += toPhysical(captureOffset.x, scale)
+            if var.caretSymbolOriginY == "below"
+                bottom += toPhysical(offset.y, scale) + toPhysical(captureOffset.y, scale)
+            else
+                top += toPhysical(offset.y, scale) + toPhysical(captureOffset.y, scale)
         }
         rules := []
         for ruleList in getMatchingRuleLists(exeName, var.WindowCaretSymbolRule["offset"])

@@ -385,6 +385,7 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_capture
                 fn_capture() {
                     captureList := ["", "", "", "", "", "", "", ""]
+                    captureOffsetList := ["", "", "", "", "", "", "", ""]
                     modeNameList := ["GUI", "UIA", "HOOK", "HOOK_DLL", "MSAA", "WPF", "ACC"]
                     if var.symbolJABActive
                         modeNameList.Push("JAB")
@@ -403,7 +404,26 @@ createProcessMenuGui(meta, *) {
                         _.num := i
                     }
 
+                    renderGroupBox(g, "symbolCaretCapture.offset", "xs h120 w" bw)
+                    for i, v in captureOffsetList {
+                        if i == 1 || i == 5 {
+                            _opt := "xs+20 yp+40"
+                        } else {
+                            _opt := "yp"
+                            g.AddText("yp", ">")
+                        }
+                        _ := g.AddEdit(_opt " r1 w" bw / 5 - 5)
+                        try _.Text := StrSplit(colValue.captureOffset, ">")[i]
+                        captureOffsetList[i] := _.Text
+                        _.num := i
+                        _.OnEvent("Change", (ctrl, *) => (
+                            val := ctrl.Text,
+                            RegExMatch(val, "^-?\d+/-?\d+$") || val == "" ? (captureOffsetList[ctrl.num] := ctrl.Text, colValue.captureOffset := arrJoin(captureOffsetList, ">", 1)) : ""
+                        ))
+                    }
+
                     colValue.capture := arrJoin(captureList, ">", 1)
+                    colValue.captureOffset := arrJoin(captureOffsetList, ">", 1)
 
                     for ctrl in ddlControls
                         (ctrl == "") ? 0 : ctrl.OnEvent("Change", e_changeDDL)

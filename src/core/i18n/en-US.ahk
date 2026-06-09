@@ -32,6 +32,7 @@ langStrings.Set("en-US", Map(
     "match.time", "Create Time",
     "match.offset", "Offset",
     "match.capture", "Caret Capture Mode",
+    "match.captureOffset", "Offset",
     "condition.class", "Match Class",
     "condition.title", "Match Title",
     "condition.classAndTitle", "Match Class and Title",
@@ -242,9 +243,7 @@ langStrings.Set("en-US", Map(
     "symbolWindowOffset", "Window Offset",
     "symbolScreenOffset", "Screen Offset",
     "symbolCaretCapture", "Caret Capture Mode",
-    "symbolCaretCapture.1", "Caret Capture Mode 1",
-    "symbolCaretCapture.2", "Caret Capture Mode 2",
-    "symbolCaretCapture.3", "Caret Capture Mode 3",
+    "symbolCaretCapture.offset", "Caret Capture Mode Offset (x/y)",
     "symbolJABActive", "JAB/JetBrains IDE Support",
     "symbolJAB.error", [
         "Failed to start the InputTip.JAB.JetBrains process!",

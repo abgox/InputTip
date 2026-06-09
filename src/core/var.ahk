@@ -180,7 +180,7 @@ for v in stateList {
     defaultSymbolMap.Set("default-triangle-" stateVal.%v%.colorText ".png", 1)
 }
 
-windowRuleKeys := ["process", "condition", "class", "trigger", "title", "offset", "capture", "hotkey", "idleTimer", "textMonitor", "hotkeyMonitor"]
+windowRuleKeys := ["process", "condition", "class", "trigger", "title", "offset", "capture", "captureOffset", "hotkey", "idleTimer", "textMonitor", "hotkeyMonitor"]
 
 conditionKeyList := ["title", "class", "classAndTitle"]
 windowConditionKeyList := ["textMonitor", "hotkeyMonitor", "idleTimer", conditionKeyList*]
@@ -574,10 +574,16 @@ updateScreenOffset(prefix) {
 }
 
 getCaretCapture() {
-    rule := var.WindowCaretSymbolRule.Get("capture").Get(exeName, "")
-    if rule
-        return rule.capture
-    return ""
+    captureMap := var.WindowCaretSymbolRule["capture"]
+    if captureMap.Has(exeName)
+        return captureMap[exeName]
+    for key, rule in captureMap {
+        if key == ""
+            continue
+        if RegExMatch(exeName, key)
+            return rule
+    }
+    return { capture: "", captureOffset: "" }
 }
 
 getScreenInfo() {
@@ -955,7 +961,7 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     try DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr")
 
     hwnd := 0
-    captureModeChain := getCaretCapture()
+    captureModeChain := getCaretCapture().capture
     modes := StrSplit(captureModeChain, ">")
     if modes.Length {
         for mode in modes {

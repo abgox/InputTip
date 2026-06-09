@@ -121,12 +121,10 @@ showCaretSymbol(state, left, top, right, bottom) {
     s := isWhichScreen()
     scale := getMonitorScale(s)
 
-    if (InStr(getCaretCapture(), "JAB") && var._lastCaptureMode == "JAB") {
-        ; 对于 JAB 应用，垂直偏移量参考原点无法使用上方，上方坐标有误
-        offsetY := top + bottom
-    } else {
-        offsetY := var.caretSymbolOriginY == "below" ? bottom : top
-    }
+    if var.caretSymbolOriginY == "below"
+        offsetY := var._lastCaptureMode == "JAB" ? top + bottom : bottom
+    else
+        offsetY := top
 
     hideCaretSymbol()
     switch var.caretSymbolType {
@@ -306,7 +304,7 @@ e_symbol(*) {
                 trigger: ["capture"],
                 link: getDocsLink("tip/symbol-caret/caret-capture-mode"),
                 section: "Window.CaretSymbol.Rule",
-                cols: ["process", "capture"],
+                cols: ["process", "capture", "captureOffset"],
                 conditions: []
             })
         )

@@ -32,6 +32,7 @@ langStrings.Set("zh-CN", Map(
     "match.time", "创建时间",
     "match.offset", "偏移量",
     "match.capture", "光标捕获模式",
+    "match.captureOffset", "偏移量",
     "condition.class", "匹配类名",
     "condition.title", "匹配标题",
     "condition.classAndTitle", "匹配类名和标题",
@@ -242,9 +243,7 @@ langStrings.Set("zh-CN", Map(
     "symbolWindowOffset", "窗口偏移量",
     "symbolScreenOffset", "屏幕偏移量",
     "symbolCaretCapture", "光标捕获模式",
-    "symbolCaretCapture.1", "光标捕获模式 1",
-    "symbolCaretCapture.2", "光标捕获模式 2",
-    "symbolCaretCapture.3", "光标捕获模式 3",
+    "symbolCaretCapture.offset", "光标捕获模式的偏移量 (x/y)",
     "symbolJABActive", "JAB/JetBrains IDE 支持",
     "symbolJAB.error", [
         "启动 InputTip.JAB.JetBrains 进程失败!",

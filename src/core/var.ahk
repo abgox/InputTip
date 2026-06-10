@@ -670,7 +670,7 @@ onDelayTick() {
     if (GetKeyState("LButton", "P")) {
         delayState.needHide := 0
         delayState.isWait := 1
-        SetTimer(() => delayState.isWait := 0, -var.caretSymbolHideDelay)
+        SetTimer(() => delayState.isWait := 0, -returnMaxTimerNumber(var.caretSymbolHideDelay))
     }
 
     if A_TimeIdleKeyboard <= leaveDelay

@@ -91,6 +91,12 @@ returnNumber(value) {
     return Number(numbers[1])
 }
 
+returnMaxTimerNumber(num) {
+    if !IsNumber(num)
+        return 0
+    return Min(num, 4294967295)
+}
+
 
 ; 将 RGB 转换为 Windows 底层认识的 BGR (COLORREF) 格式
 RGBtoBGR(rgb) {

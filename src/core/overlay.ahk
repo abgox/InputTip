@@ -18,10 +18,6 @@ showOverlay(state) {
     if var.%"overlayText" state% == ""
         return
 
-    hideDelay := var.overlayHideDelay
-    if hideDelay == ""
-        hideDelay := 0
-
     Ypos := var.%"overlayOffsetY" state%
     Xpos := var.%"overlayOffsetX" state%
     basePosition := var.%"overlayBasePosition" state%
@@ -132,7 +128,7 @@ showOverlay(state) {
         }
     }
 
-    SetTimer(RemoveTip, -hideDelay)
+    SetTimer(RemoveTip, -returnMaxTimerNumber(var.overlayHideDelay))
     RemoveTip() {
         try hideOverlay()
     }

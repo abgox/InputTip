@@ -169,13 +169,12 @@ if isJAB {
 
                     if currentBorderFingerprint != lastBorderState || (var.borderReshowOnTitleChange && hasTitleChange) || (var.borderReshowOnClassChange && hasClassChange) || (var.borderReshowOnProcessChange && hasProcessChange) {
                         if allowShow {
-                            if IsSet(activeBorderTimer) {
+                            if IsSet(activeBorderTimer)
                                 SetTimer(activeBorderTimer, 0)
-                            }
                             showBorder(targetColor, targetWidth, hwnd)
                             if var.borderHideDelay {
                                 activeBorderTimer := hideBorder.Bind(hwnd)
-                                SetTimer(activeBorderTimer, -var.borderHideDelay)
+                                SetTimer(activeBorderTimer, -returnMaxTimerNumber(var.borderHideDelay))
                             }
                         } else {
                             if IsSet(activeBorderTimer)

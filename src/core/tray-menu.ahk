@@ -244,6 +244,9 @@ createProcessMenuGui(meta, *) {
                         "~LShift Up",
                         "~RShift Up",
                         "~Shift Up",
+                        "~Ctrl Up",
+                        "~Alt Up",
+                        "~Win Up",
                         "~Esc Up",
                         "~^/",
                         "~!+a",
@@ -251,6 +254,7 @@ createProcessMenuGui(meta, *) {
                         "~!Space",
                         "~+Space",
                         "~#Space",
+                        "#w",
                     ])
                     try _.Text := colValue.hotkey
                     colValue.hotkey := _.Text
@@ -263,7 +267,13 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_process
                 fn_process() {
                     renderGroupBox(g, "match.process", groupLayout " h70 w" bw)
-                    _ := g.AddEdit(opt " r1", "")
+                    _ := g.AddComboBox(opt, [
+                        "",
+                        "aaa.exe",
+                        "bbb.exe|ccc.exe",
+                        "xxx\.exe|yyy\.exe",
+                        ".*"
+                    ])
                     try _.Text := colValue.process
                     colValue.process := _.Text
                     _.OnEvent("Change", (i, *) => (colValue.process := i.Text, updateProcessState(i.Text)))
@@ -333,19 +343,20 @@ createProcessMenuGui(meta, *) {
                     try var._classEditCtrl.Opt(isClass ? "cDefault" : "cC0C0C0")
                     try var._titleEditCtrl.Opt(isTitle ? "cDefault" : "cC0C0C0")
 
+                    var._tthEditCtrl.Delete()
                     switch conditionText {
                         case i18n("condition.idleTimer"):
                             try var._tthGroupCtrl.Text := i18n("condition.idleTimer.label")
                             try var._tthEditCtrl.Text := colValue.idleTimer
-                            try var._tthEditCtrl.Opt("Number")
+                            try var._tthEditCtrl.Add(["", "60000", "600000"])
                         case i18n("condition.textMonitor"):
                             try var._tthGroupCtrl.Text := i18n("condition.textMonitor.label")
                             try var._tthEditCtrl.Text := colValue.textMonitor
-                            try var._tthEditCtrl.Opt("-Number")
+                            try var._tthEditCtrl.Add(["", "a{1}b{2}c{3}", "//\s|\n{2}", "abcdefg"])
                         case i18n("condition.hotkeyMonitor"):
                             try var._tthGroupCtrl.Text := i18n("condition.hotkeyMonitor")
                             try var._tthEditCtrl.Text := colValue.hotkeyMonitor
-                            try var._tthEditCtrl.Opt("-Number")
+                            try var._tthEditCtrl.Add(["", "^a", "^/|!+a", "^a>^s|^a>^f"])
                         default:
                             try var._tthGroupCtrl.Text := i18n("match.textMonitorOrHotkeyMonitorOrIdleTimer")
                             try var._tthEditCtrl.Text := arrJoin([
@@ -412,7 +423,7 @@ createProcessMenuGui(meta, *) {
                             _opt := "yp"
                             g.AddText("yp", ">")
                         }
-                        _ := g.AddEdit(_opt " r1 w" bw / 5 - 5)
+                        _ := g.AddComboBox(_opt " w" bw / 5 - 5, ["", "0/0"])
                         try _.Text := StrSplit(colValue.captureOffset, ">")[i]
                         captureOffsetList[i] := _.Text
                         _.num := i
@@ -439,7 +450,8 @@ createProcessMenuGui(meta, *) {
                                 idx := indexOfArr(captureList, v)
                                 (idx && idx != i) ? 0 : cleanList.Push(v)
                             }
-                            currentText := targetCtrl.Text
+                            currentText := ""
+                            try currentText := targetCtrl.Text
                             targetCtrl.Delete()
                             targetCtrl.Add(["", cleanList*])
                             targetCtrl.Text := currentText
@@ -532,21 +544,21 @@ createProcessMenuGui(meta, *) {
                 sectionList.InsertAt(4, fn_content)
                 fn_content() {
                     var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs h70 w" bw)
-                    var._tthEditCtrl := _ := g.AddEdit(opt " r1")
+                    var._tthEditCtrl := _ := g.AddComboBox(opt)
 
                     switch colValue.condition {
                         case i18n("condition.idleTimer"):
                             try _.Text := colValue.idleTimer
                             var._tthGroupCtrl.Text := i18n("condition.idleTimer.label")
-                            var._tthEditCtrl.Opt("Number")
+                            var._tthEditCtrl.Add(["", "60000", "600000"])
                         case i18n("condition.textMonitor"):
                             try _.Text := colValue.textMonitor
                             var._tthGroupCtrl.Text := i18n("condition.textMonitor.label")
-                            var._tthEditCtrl.Opt("-Number")
+                            var._tthEditCtrl.Add(["", "a{1}b{2}c{3}", "//\s|\n{2}", "abcdefg"])
                         case i18n("condition.hotkeyMonitor"):
                             try _.Text := colValue.hotkeyMonitor
                             var._tthGroupCtrl.Text := colValue.condition
-                            var._tthEditCtrl.Opt("-Number")
+                            var._tthEditCtrl.Add(["", "^a", "^/|!+a", "^a>^s|^a>^f"])
                     }
                     _.OnEvent("Change", e_content)
                     e_content(i, *) {

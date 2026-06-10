@@ -137,8 +137,8 @@ _list := [
     ["SymbolShapeColor", "", ""],
     ["SymbolShapeOffsetX", 0, 0],
     ["SymbolShapeOffsetY", 0, 30],
-    ["SymbolShapeWidth", 9, 9],
-    ["SymbolShapeHeight", 9, 9],
+    ["SymbolShapeWidth", 11, 11],
+    ["SymbolShapeHeight", 11, 11],
     ["SymbolShapeTransparent", 255, 255],
     ["SymbolTextContent", "", ""],
     ["SymbolTextBgColor", "", ""],
@@ -958,8 +958,6 @@ var._lastCaptureMode := ""
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
-    try DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr")
-
     hwnd := 0
     captureModeChain := getCaretCapture().capture
     modes := StrSplit(captureModeChain, ">")

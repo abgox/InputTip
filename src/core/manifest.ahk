@@ -29,6 +29,7 @@ SetStoreCapsLockMode(0)
 OnError((*) => 0)
 
 isJAB := 0
+try DllCall("SetThreadDpiAwarenessContext", "ptr", -4, "ptr") ; -4 (DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)
 OnMessage(0x007E, (*) => SetTimer(updateScreenInfo, -500))
 updateScreenInfo() {
     try {

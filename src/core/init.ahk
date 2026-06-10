@@ -644,6 +644,25 @@ migrateConfig2() {
         renameConfigKey(param*)
     }
 
+    _list := [
+        ["overlayTextSize", 16],
+        ["overlayTextWeight", 700],
+        ["overlayTransparent", 255],
+    ]
+
+    for v in [["SymbolTextFont", "Microsoft YaHei"], ["SymbolTextWeight", 700], ["SymbolTextTransparent", 255]]
+        _list.Push(["caret" v[1], v[2]]), _list.Push(["cursor" v[1], v[2]])
+
+    for v in _list {
+        if val := IniRead(configFile, "Settings", v[1], "") {
+            if val != v[2] {
+                for _v in stateList
+                    IniWrite(val, configFile, "Settings", v[1] _v)
+            }
+            try IniDelete(configFile, "Settings", v[1])
+        }
+    }
+
     if val := IniRead(configFile, "Settings", "symbolNearCursorWindow", "") {
         IniWrite(val == "all" ? "blacklist" : "whitelist", configFile, "Settings", "cursorSymbolShowMode")
         try IniDelete(configFile, "Settings", "symbolNearCursorWindow")

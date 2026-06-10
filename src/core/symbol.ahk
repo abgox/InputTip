@@ -48,9 +48,9 @@ updateSymbol(prefix) {
             for state in stateList {
                 key := prefix "SymbolTextGui" state
                 text := var.%prefix "SymbolTextContent" state%
-                textFont := var.%prefix "SymbolTextFont"%
+                textFont := var.%prefix "SymbolTextFont" state%
                 textSize := var.%prefix "SymbolTextSize" state%
-                textWeight := var.%prefix "SymbolTextWeight"%
+                textWeight := var.%prefix "SymbolTextWeight" state%
                 textColor := var.%prefix "SymbolTextColor" state%
                 bgColor := var.%prefix "SymbolTextBgColor" state%
                 if (text) {
@@ -151,7 +151,7 @@ showCaretSymbol(state, left, top, right, bottom) {
             y := toPhysical(var.%"caretSymbolTextOffsetY" state%, scale)
             g := var.%"caretSymbolTextGui" state%
             try {
-                showGui(g, "NA AutoSize", 0, 1, var.caretSymbolTextTransparent)
+                showGui(g, "NA AutoSize", 0, 1, var.%"caretSymbolTextTransparent" state%)
                 setGuiPhysicalPos(g.Hwnd, left + x, offsetY + y)
             }
     }
@@ -223,7 +223,7 @@ showCursorSymbol(state, left, top) {
             x := toPhysical(var.%"cursorSymbolTextOffsetX" state%, scale)
             y := toPhysical(var.%"cursorSymbolTextOffsetY" state%, scale)
             g := var.%"cursorSymbolTextGui" state%
-            applyTransparency(g, var.cursorSymbolTextTransparent)
+            applyTransparency(g, var.%"cursorSymbolTextTransparent" state%)
             showGui(g, "NA AutoSize", 0, 0)
             setGuiPhysicalPos(g.Hwnd, left + x, top + y)
     }
@@ -280,7 +280,7 @@ e_symbol(*) {
         g.bw := bw := w - g.MarginX * 2
 
         symbolTypeBtns := []
-        gc.previewSymbol := g.AddEdit("yp cGray r1", i18n("symbol.preview"))
+        gc.previewSymbol := g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview"))
         previewSymbol := (key, value, *) => (changeConfig(key, value), var.caretSymbolType ? gc.previewSymbol.Focus() : "", reloadCaretSymbol(), toggleState())
         toggleState() {
             opt := var.caretSymbolType ? "-Disabled" : "+Disabled"
@@ -436,7 +436,7 @@ e_symbolConfig(prefix, *) {
             showGui(createUniqueGui(symbolStyleGui1))
             symbolStyleGui1(info) {
                 g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolPicture"))
-                tab := renderTab(g, [i18n("stateStyle"), i18n("stateStyle") 2])
+                tab := renderTab(g, [i18n("stateStyle"), i18n("stateStyle") 2, i18n("stateStyle") 3])
                 loseFocusOnTab(tab)
                 tab.UseTab(1)
                 g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
@@ -448,7 +448,7 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "PreviewSymbolPicture1"% := previewCtrl
 
@@ -459,12 +459,12 @@ e_symbolConfig(prefix, *) {
 
                 page := 1
                 for i, state in stateList {
-                    if (i == 4) {
-                        page := 2
+                    if (i == 3 || i == 5) {
+                        page++
                         addBtn()
-                        tab.UseTab(2)
+                        tab.UseTab(page)
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
-                        gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("yp cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
+                        gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview")) : { Focus: (*) => "" }
                     }
                     renderGroupBox(g, state, "xs", "h120 w" bw)
                     _ := prefix "SymbolPictureOffsetX"
@@ -498,7 +498,7 @@ e_symbolConfig(prefix, *) {
             showGui(createUniqueGui(symbolStyleGui2))
             symbolStyleGui2(info) {
                 g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolShape"))
-                tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+                tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2, i18n("stateStyle") 3])
                 loseFocusOnTab(tab)
                 tab.UseTab(1)
                 g.AddLink("Section", getDocsLink("tip/symbol-caret/shape"))
@@ -511,7 +511,7 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "PreviewSymbolShape"% := previewCtrl
 
@@ -527,8 +527,8 @@ e_symbolConfig(prefix, *) {
                 editOpt := " w" bw / 8
 
                 for i, state in stateList {
-                    if (Mod(i - 1, 3) == 0) {
-                        tab.UseTab(((i - 1) // 3) + 2)
+                    if (Mod(i - 1, 2) == 0) {
+                        tab.UseTab(((i - 1) // 2) + 2)
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/shape"))
                     }
                     renderGroupBox(g, state, , "h120 w" bw)
@@ -553,7 +553,7 @@ e_symbolConfig(prefix, *) {
             showGui(createUniqueGui(symbolStyleGui3))
             symbolStyleGui3(info) {
                 g := createGuiOpt(i18n(prefix "Symbol") " - " i18n("symbolText"))
-                tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
+                tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2, i18n("stateStyle") 3])
                 loseFocusOnTab(tab)
                 tab.UseTab(1)
                 g.AddLink("Section", getDocsLink("tip/symbol-caret/text"))
@@ -565,14 +565,9 @@ e_symbolConfig(prefix, *) {
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
-                previewCtrl := prefix == "caret" ? g.AddEdit("yp cGray r1", i18n("symbol.preview")) : { Focus: (*) => "" }
+                previewCtrl := prefix == "caret" ? g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview")) : { Focus: (*) => "" }
 
                 gc.%prefix "previewSymbolText"% := previewCtrl
-
-                renderDropDownListGroup(g, prefix "SymbolTextFont", fontList)
-
-                renderEditGroup(g, prefix "SymbolTextWeight", "Number Limit3")
-                renderEditGroup(g, prefix "SymbolTextTransparent", "Number Limit3")
 
                 list := [
                     [prefix "SymbolTextCornerPreference", [["none", 0], ["cornerPreference.sharp", 1], ["cornerPreference.round", 2], ["cornerPreference.roundSmall", 3]]],
@@ -586,19 +581,24 @@ e_symbolConfig(prefix, *) {
                 editOpt := " w" bw / 6
 
                 for i, state in stateList {
-                    if (Mod(i - 1, 3) == 0) {
-                        tab.UseTab(((i - 1) // 3) + 2)
+                    if (Mod(i - 1, 2) == 0) {
+                        tab.UseTab(((i - 1) // 2) + 2)
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/text"))
                     }
 
-                    renderGroupBox(g, state, , "h130 w" bw)
+                    renderGroupBox(g, state, , "h210 w" bw)
 
                     renderEditLabel(g, prefix "SymbolTextContent" state, editOpt, prefix "SymbolTextContent")
                     renderEditLabel(g, prefix "SymbolTextOffsetX" state, "Limit5 " editOpt, prefix "SymbolTextOffsetX", "yp")
                     renderColorPicker(g, prefix "SymbolTextColor" state, prefix "SymbolTextColor")
-                    renderEditLabel(g, prefix "SymbolTextSize" state, "Number Limit2" editOpt, prefix "SymbolTextSize", "xs+20 yp+35")
+                    renderEditLabel(g, prefix "SymbolTextSize" state, "Number Limit2" editOpt, prefix "SymbolTextSize", "xs+20 yp+40")
                     renderEditLabel(g, prefix "SymbolTextOffsetY" state, "Limit5 " editOpt, prefix "SymbolTextOffsetY", "yp")
                     renderColorPicker(g, prefix "SymbolTextBgColor" state, prefix "SymbolTextBgColor")
+
+                    renderText(g, prefix "SymbolTextFont", "xs+20 yp+50", "")
+                    renderDropDownList(g, prefix "SymbolTextFont" state, fontList, "yp", "w" bw / 1.2)
+                    renderEditLabel(g, prefix "SymbolTextWeight" state, "Number Limit3" editOpt, prefix "SymbolTextWeight")
+                    renderEditLabel(g, prefix "SymbolTextTransparent" state, "Number Limit3" editOpt, prefix "SymbolTextTransparent", "yp")
                 }
 
                 return g

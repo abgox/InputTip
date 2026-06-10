@@ -30,12 +30,18 @@ showOverlay(state) {
         case 1: overlayAnimation := "fade"
         case 2: overlayAnimation := "slideOverlay"
     }
+    num := isWhichScreen().num
 
     try {
         i := var.screenNum
         while (i > 0) {
             g := var.%"overlayGui" state i%
             screen := var.screenList[i]
+
+            if var.overlayOnlyFocusScreen && num != screen.num {
+                i--
+                continue
+            }
 
             scale := getMonitorScale(screen)
             scaledW := toPhysical(g.w, scale)
@@ -187,13 +193,10 @@ e_overlay(*) {
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/overlay"))
 
-        renderRadioGroup(g, "overlayActive",
-            [
-                ["yes", 1],
-                ["no", 0]
-            ])
+        renderRadioGroup(g, "overlayActive", [["yes", 1], ["no", 0]])
 
         renderEditGroup(g, "overlayHideDelay", "Number Limit5")
+        renderRadioGroup(g, "overlayOnlyFocusScreen", [["yes", 1], ["no", 0]])
         renderGroupBox(g, "overlayReshowOnChange", , "h80 w" bw)
         g.AddCheckbox("xs+20 yp+40 Disabled", i18n("overlayReshowOnChange.state")).Value := 1
         for v in ["Process", "Title", "Class"] {

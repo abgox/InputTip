@@ -63,6 +63,7 @@ var := {
     cursorActive: readIni("cursorActive", 0),
     ; 是否显示状态悬浮小窗
     overlayActive: readIni("overlayActive", 0),
+    overlayOnlyFocusScreen: readIni("overlayOnlyFocusScreen", 0),
     overlayCornerPreference: readIni("overlayCornerPreference", 3),
     overlayAnimation: readIni("overlayAnimation", 1),
     overlayReshowOnProcessChange: readIni("overlayReshowOnProcessChange", 0),
@@ -610,7 +611,9 @@ getScreenInfo() {
     }
     return list
 }
+
 isWhichScreen(hwnd := 0) {
+
     try {
         if hwnd
             WinGetPos(&x, &y, &w, &h, hwnd)

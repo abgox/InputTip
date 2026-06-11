@@ -123,15 +123,15 @@ defaultSymbolMap := Map()
 
 _list := [
     ["SymbolPicturePath", "", ""],
-    ["SymbolPictureOffsetX", 0, 0],
+    ["SymbolPictureOffsetX", -25, -30],
     ["SymbolPictureOffsetY", 0, 30],
-    ["SymbolPictureWidth", 15, 15],
-    ["SymbolPictureHeight", 15, 15],
+    ["SymbolPictureWidth", 20, 20],
+    ["SymbolPictureHeight", 20, 20],
     ["SymbolShapeColor", "", ""],
     ["SymbolShapeOffsetX", 0, 0],
     ["SymbolShapeOffsetY", 0, 30],
-    ["SymbolShapeWidth", 11, 11],
-    ["SymbolShapeHeight", 11, 11],
+    ["SymbolShapeWidth", 12, 12],
+    ["SymbolShapeHeight", 12, 12],
     ["SymbolShapeTransparent", 255, 255],
     ["SymbolTextContent", "", ""],
     ["SymbolTextBgColor", "", ""],
@@ -590,10 +590,29 @@ getScreenInfo() {
     list := []
     MonitorCount := MonitorGetCount()
     MonitorPrimary := MonitorGetPrimary()
+
+    probeHwnd := DllCall("CreateWindowEx", "UInt", 0x08000000 ; WS_EX_NOACTIVATE
+        , "Str", "Static", "Str", ""
+        , "UInt", 0x80000000 ; WS_POPUP
+        , "Int", 0, "Int", 0, "Int", 0, "Int", 0
+        , "Ptr", 0, "Ptr", 0, "Ptr", 0, "Ptr", 0, "Ptr")
+
     Loop MonitorCount
     {
         MonitorGet(A_Index, &L, &T, &R, &B)
         MonitorGetWorkArea(A_Index, &WL, &WT, &WR, &WB)
+
+        currentScale := 1.0
+        if probeHwnd {
+            midX := (L + R) // 2
+            midY := (T + B) // 2
+            DllCall("SetWindowPos", "Ptr", probeHwnd, "Ptr", 0
+                , "Int", midX, "Int", midY, "Int", 0, "Int", 0
+                , "UInt", 0x0001 | 0x0004 | 0x0010 | 0x0040)
+            realDpi := DllCall("GetDpiForWindow", "Ptr", probeHwnd, "UInt")
+            currentScale := realDpi / 96
+        }
+
         list.Push({
             main: MonitorPrimary,
             count: MonitorCount,
@@ -606,8 +625,12 @@ getScreenInfo() {
             workTop: WT,
             workRight: WR,
             workBottom: WB,
+            scale: currentScale ;
         })
     }
+    if probeHwnd
+        DllCall("DestroyWindow", "Ptr", probeHwnd)
+
     return list
 }
 

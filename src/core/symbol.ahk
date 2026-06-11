@@ -117,9 +117,8 @@ showCaretSymbol(state, left, top, right, bottom) {
     old_top := top
     old_left := left
 
-    ; 获取当前屏幕scale
     s := isWhichScreen()
-    scale := getMonitorScale(s)
+    scale := s.scale
 
     if var.caretSymbolOriginY == "below"
         offsetY := var._lastCaptureMode == "JAB" ? top + bottom : bottom
@@ -133,7 +132,7 @@ showCaretSymbol(state, left, top, right, bottom) {
             y := toPhysical(var.%"caretSymbolPictureOffsetY" state%, scale)
             g := var.%"caretSymbolPictureGui" state%
             try {
-                showGui(g, "NA AutoSize", 0, 1)
+                showGui(g, "NA", 0, 1)
                 setGuiPhysicalPos(g.Hwnd, left + x, offsetY + y)
             }
         case 2:
@@ -151,7 +150,7 @@ showCaretSymbol(state, left, top, right, bottom) {
             y := toPhysical(var.%"caretSymbolTextOffsetY" state%, scale)
             g := var.%"caretSymbolTextGui" state%
             try {
-                showGui(g, "NA AutoSize", 0, 1, var.%"caretSymbolTextTransparent" state%)
+                showGui(g, "NA", 0, 1, var.%"caretSymbolTextTransparent" state%)
                 setGuiPhysicalPos(g.Hwnd, left + x, offsetY + y)
             }
     }
@@ -194,7 +193,7 @@ showCursorSymbol(state, left, top) {
     }
 
     s := isWhichScreen()
-    scale := getMonitorScale(s)
+    scale := s.scale
 
     if (s.num) {
         try {

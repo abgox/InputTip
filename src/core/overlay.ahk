@@ -43,13 +43,15 @@ showOverlay(state) {
                 continue
             }
 
-            scale := getMonitorScale(screen)
-            scaledW := toPhysical(g.w, scale)
-            scaledH := toPhysical(g.h, scale)
+            scale := screen.scale
+            scaledW := g.w
+            scaledH := g.h
             scaledXpos := toPhysical(Xpos, scale)
             scaledYpos := toPhysical(Ypos, scale)
 
-            if InStr(basePosition, "Window") {
+            showOnWindow := 0
+
+            if showOnWindow := InStr(basePosition, "Window") {
                 Left := 0, Top := 0, Right := 0, Bottom := 0
                 WALeft := 0, WATop := 0, WARight := 0, WABottom := 0
             } else {
@@ -130,6 +132,8 @@ showOverlay(state) {
             showGui(g, "AutoSize NA", overlayAnimation, 1, var.%"overlayTransparent" state%)
             setGuiPhysicalPos(g.Hwnd, x + scaledXpos, y + scaledYpos)
 
+            if showOnWindow
+                break
             i--
         }
     }

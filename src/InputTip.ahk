@@ -196,7 +196,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
 
     s := isWhichScreen()
     if (s.num) {
-        scale := getMonitorScale(s)
+        scale := s.scale
         try {
             offset := symbolScreenOffset.caret.%s.num%
             left += toPhysical(offset.x, scale)

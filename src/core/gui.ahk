@@ -72,7 +72,7 @@ createUniqueGui(callback, cornerPreference := 0, useImmersiveDarkMode := 1) {
  * @returns {Gui} 返回 Gui 对象
  */
 createGuiOpt(title, fontOption := fontOpt, guiOption := "", prefix := "InputTip - ", clearFocus := 1) {
-    g := Gui(guiOption, prefix title)
+    g := Gui(guiOption " -DPIScale", prefix title)
     g.SetFont(fontOption*)
     if (clearFocus) {
         g.OnEvent("Size", OnFirstShow)

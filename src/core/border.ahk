@@ -24,8 +24,8 @@ e_border(*) {
             ])
 
         renderEditGroup(g, "borderHideDelay", "Number Limit5")
-        renderGroupBox(g, "borderReshowOnChange", , "h80 w" bw)
-        g.AddCheckbox("xs+20 yp+40 Disabled", i18n("borderReshowOnChange.state")).Value := 1
+        renderGroupBox(g, "borderReshowOnChange", , "h110 w" bw)
+        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("borderReshowOnChange.state")).Value := 1
         for v in ["Process", "Title", "Class"] {
             _ := g.AddCheckbox("yp", i18n("borderReshowOnChange." StrLower(v)))
             _.Value := var.%"borderReshowOn" v "Change"%
@@ -67,10 +67,10 @@ e_border(*) {
                 g.AddLink("Section", getDocsLink("tip/border"))
             }
 
-            renderGroupBox(g, v, , "h80 w" bw)
+            renderGroupBox(g, v, , "h110 w" bw)
 
             ; renderEditLabel(g, "borderWidth" v, "w" bw / 3, "borderWidth")
-            renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+35")
+            renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+50")
         }
 
         return g
@@ -113,7 +113,7 @@ showBorder(finalColor, finalWidth, hwnd) {
         ]
 
         for cfg in borderConfigs {
-            box := Gui("-Caption AlwaysOnTop ToolWindow E0x20")
+            box := Gui("-Caption AlwaysOnTop ToolWindow E0x20 -DPIScale")
             box.BackColor := finalColor
             box.Show("W1 H1 NoActivate")
             SWP_NOACTIVATE := 0x10

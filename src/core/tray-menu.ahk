@@ -106,8 +106,8 @@ e_windowInfo(*) {
 
         g.AddLink("Section", getDocsLink("menu/window-info"))
         for v in i18n("windowInfo.list", 1) {
-            renderGroupBox(g, v, , "h70 w" bw)
-            gc.%v% := _ := g.AddEdit("xs+20 yp+30 ReadOnly cGray -VScroll w" bw - 40)
+            renderGroupBox(g, v, , "h120 w" bw)
+            gc.%v% := _ := g.AddEdit("xs+20 yp+55 ReadOnly cGray -VScroll w" bw - 40)
             _.Text := i18n("windowInfo.tip")
         }
         g.OnEvent("Close", (*) => timer := 0)
@@ -223,7 +223,8 @@ createProcessMenuGui(meta, *) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            opt := "xs+20 yp+30 w" bw - 40
+            opt := "xs+20 yp+55 w" bw - 40
+            layout := " h120 w" bw
 
             sectionList := []
             i := 0
@@ -238,7 +239,7 @@ createProcessMenuGui(meta, *) {
                 groupLayout := "xs"
                 sectionList[num] := fn_hotkey
                 fn_hotkey() {
-                    renderGroupBox(g, "match.hotkey", "h70 w" bw)
+                    renderGroupBox(g, "match.hotkey", layout)
                     _ := g.AddComboBox(opt, [
                         "",
                         "~LShift Up",
@@ -266,7 +267,7 @@ createProcessMenuGui(meta, *) {
             if (num) {
                 sectionList[num] := fn_process
                 fn_process() {
-                    renderGroupBox(g, "match.process", groupLayout " h70 w" bw)
+                    renderGroupBox(g, "match.process", groupLayout layout)
                     _ := g.AddComboBox(opt, [
                         "",
                         "aaa.exe",
@@ -311,7 +312,7 @@ createProcessMenuGui(meta, *) {
                     for v in meta.trigger {
                         triggerList.Push(i18n("trigger." v))
                     }
-                    renderGroupBox(g, "match.trigger", "xs h70 w" bw)
+                    renderGroupBox(g, "match.trigger", "xs" layout)
                     _ := g.AddDropDownList(opt " r9", triggerList)
                     try _.Text := colValue.trigger
                     colValue.trigger := _.Text
@@ -324,10 +325,10 @@ createProcessMenuGui(meta, *) {
                 sectionList[num] := fn_condition
                 fn_condition() {
                     conditionList := [""]
-                    for v in meta.conditions {
+                    for v in meta.conditions
                         conditionList.Push(i18n("condition." v))
-                    }
-                    renderGroupBox(g, "match.condition", "xs h70 w" bw)
+
+                    renderGroupBox(g, "match.condition", "xs" layout)
                     var._conditionCtrl := _ := g.AddDropDownList(opt " r9", conditionList)
                     try _.Text := colValue.condition
                     colValue.condition := _.Text
@@ -343,7 +344,7 @@ createProcessMenuGui(meta, *) {
                     try var._classEditCtrl.Opt(isClass ? "cDefault" : "cC0C0C0")
                     try var._titleEditCtrl.Opt(isTitle ? "cDefault" : "cC0C0C0")
 
-                    var._tthEditCtrl.Delete()
+                    try var._tthEditCtrl.Delete()
                     switch conditionText {
                         case i18n("condition.idleTimer"):
                             try var._tthGroupCtrl.Text := i18n("condition.idleTimer.label")
@@ -373,7 +374,7 @@ createProcessMenuGui(meta, *) {
             if (num) {
                 sectionList[num] := fn_class
                 fn_class() {
-                    renderGroupBox(g, "match.class", "xs h70 w" bw)
+                    renderGroupBox(g, "match.class", "xs" layout)
                     var._classEditCtrl := _ := g.AddEdit(opt " r1")
                     try _.Text := colValue.class
                     _.OnEvent("Change", (i, *) => colValue.class := i.Text)
@@ -384,7 +385,7 @@ createProcessMenuGui(meta, *) {
             if (num) {
                 sectionList[num] := fn_title
                 fn_title() {
-                    renderGroupBox(g, "match.title", "xs h70 w" bw)
+                    renderGroupBox(g, "match.title", "xs" layout)
                     var._titleEditCtrl := _ := g.AddEdit(opt " r1")
                     try _.Text := colValue.title
                     _.OnEvent("Change", (i, *) => colValue.title := i.Text)
@@ -401,10 +402,10 @@ createProcessMenuGui(meta, *) {
                     if var.symbolJABActive
                         modeNameList.Push("JAB")
                     ddlControls := captureList.Clone()
-                    renderGroupBox(g, "symbolCaretCapture", "xs h120 w" bw)
+                    renderGroupBox(g, "symbolCaretCapture", "xs h180 w" bw)
                     for i, v in captureList {
                         if i == 1 || i == 5 {
-                            _opt := "xs+20 yp+35"
+                            _opt := "xs+20 yp+55"
                         } else {
                             _opt := "yp"
                             g.AddText("yp", ">")
@@ -415,10 +416,10 @@ createProcessMenuGui(meta, *) {
                         _.num := i
                     }
 
-                    renderGroupBox(g, "symbolCaretCapture.offset", "xs h120 w" bw)
+                    renderGroupBox(g, "symbolCaretCapture.offset", "xs h180 w" bw)
                     for i, v in captureOffsetList {
                         if i == 1 || i == 5 {
-                            _opt := "xs+20 yp+40"
+                            _opt := "xs+20 yp+55"
                         } else {
                             _opt := "yp"
                             g.AddText("yp", ">")
@@ -454,7 +455,7 @@ createProcessMenuGui(meta, *) {
                             try currentText := targetCtrl.Text
                             targetCtrl.Delete()
                             targetCtrl.Add(["", cleanList*])
-                            targetCtrl.Text := currentText
+                            try targetCtrl.Text := currentText
                         }
                         colValue.capture := arrJoin(captureList, ">", 1)
                     }
@@ -543,7 +544,7 @@ createProcessMenuGui(meta, *) {
             if meta.section == "Window.Rule" {
                 sectionList.InsertAt(4, fn_content)
                 fn_content() {
-                    var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs h70 w" bw)
+                    var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs" layout)
                     var._tthEditCtrl := _ := g.AddComboBox(opt)
 
                     switch colValue.condition {
@@ -574,10 +575,9 @@ createProcessMenuGui(meta, *) {
                 }
             }
 
-            for v in sectionList {
-                if v
-                    v()
-            }
+            for v in sectionList
+                v ? v() : ""
+
             try updateConditionState(colValue.condition)
             try updateProcessState(colValue.process)
 
@@ -585,17 +585,17 @@ createProcessMenuGui(meta, *) {
 
             needWindowInfo := InStr(meta.section, "Window.") || InStr(meta.section, "Hotkey.")
 
-            if needWindowInfo {
+            if needWindowInfo
                 opt := " w" bw / 3 - g.MarginX / 3
-            } else {
+            else
                 opt := " w" bw / 2 - g.MarginX / 4
-            }
+
             g.AddButton(btnLayout opt, i18n("ok")).OnEvent("Click", fn_set.Bind(LV, RowNumber, action, colValue))
-            if action == "edit" {
+            if action == "edit"
                 g.AddButton("yp" opt, i18n("delete")).OnEvent("Click", fn_set.Bind(LV, RowNumber, "delete", colValue))
-            } else {
+            else
                 g.AddButton("yp" opt, i18n("cancel")).OnEvent("Click", (*) => (g.Destroy(), var._previewOffsetMap.Clear()))
-            }
+
             if needWindowInfo
                 g.AddButton("yp" opt, i18n("windowInfo")).OnEvent("Click", e_windowInfo)
 

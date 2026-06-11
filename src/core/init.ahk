@@ -352,7 +352,7 @@ checkIni() {
         showOverlayGuide() {
             showGui(createUniqueGui(overlayGuideGui))
             overlayGuideGui(info) {
-                g := Gui(, "InputTip - " i18n("init.title"))
+                g := Gui("-DPIScale", "InputTip - " i18n("init.title"))
                 g.SetFont(fontOpt*)
                 for i, v in i18n("init.overlay", 1) {
                     if (i == 1) {
@@ -395,7 +395,7 @@ checkIni() {
         showDonateGui() {
             showGui(createUniqueGui(donateGui))
             donateGui(info) {
-                g := Gui(, "InputTip - " i18n("init.title"))
+                g := Gui("-DPIScale", "InputTip - " i18n("init.title"))
                 g.SetFont(fontOpt*)
                 for i, v in i18n("init.donate", 1) {
                     if (i <= 2) {

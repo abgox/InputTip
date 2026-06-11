@@ -88,8 +88,8 @@ e_inputMethod(*) {
                     order: RowNumber,
                 }
 
-                renderGroupBox(g, "inputMethodDetectionMode.matchOrder", "", "h70 w" bw)
-                g.AddText("xs+20 yp+30", i18n("inputMethodDetectionMode.matchOrder.specifyOrder"))
+                renderGroupBox(g, "inputMethodDetectionMode.matchOrder", "", "h110 w" bw)
+                g.AddText("xs+20 yp+50", i18n("inputMethodDetectionMode.matchOrder.specifyOrder"))
 
                 num := 1
                 list := []
@@ -101,14 +101,14 @@ e_inputMethod(*) {
                 _.Value := _gc.order
                 _.OnEvent("Change", (i, *) => _gc.order := Trim(i.Value))
 
-                renderGroupBox(g, "inputMethodDetectionMode.imeState", , "h70 w" bw)
-                g.AddText("xs+20 yp+30", i18n("inputMethodDetectionMode.imeState.specifyState"))
+                renderGroupBox(g, "inputMethodDetectionMode.imeState", , "h110 w" bw)
+                g.AddText("xs+20 yp+50", i18n("inputMethodDetectionMode.imeState.specifyState"))
                 _ := g.AddDropDownList("yp Disabled", [i18n("EN"), i18n("CN")])
                 _.Text := ruleInfo.state
                 ; _.OnEvent("Change", (i, *) => ruleInfo.state := i.Text)
 
-                renderGroupBox(g, "inputMethodDetectionMode.stateCodeRule", , "h110 w" bw)
-                g.AddText("xs+20 yp+30", i18n("inputMethodDetectionMode.number"))
+                renderGroupBox(g, "inputMethodDetectionMode.stateCodeRule", , "h170 w" bw)
+                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
 
                 _gc.stateNum := _ := g.AddEdit("yp r1", "")
 
@@ -117,7 +117,7 @@ e_inputMethod(*) {
 
                 _.OnEvent("Change", (i, *) => (ruleInfo.stateRule := i.Value, _gc.stateRule.value := 0))
 
-                g.AddText("xs+20 yp+40", i18n("inputMethodDetectionMode.rule"))
+                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.rule"))
                 _gc.stateRule := _ := g.AddDropDownList("yp",
                     [
                         "", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")
@@ -134,15 +134,15 @@ e_inputMethod(*) {
                     _gc.stateNum.value := ""
                 ))
 
-                renderGroupBox(g, "inputMethodDetectionMode.conversionCodeRule", , "h110 w" bw)
-                g.AddText("xs+20 yp+30", i18n("inputMethodDetectionMode.number"))
+                renderGroupBox(g, "inputMethodDetectionMode.conversionCodeRule", , "h170 w" bw)
+                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
                 _gc.conversionNum := _ := g.AddEdit("yp r1", "")
                 if !InStr(ruleInfo.conversionRule, "oddNum") && !InStr(ruleInfo.conversionRule, "evenNum")
                     _.Value := ruleInfo.conversionRule
 
                 _.OnEvent("Change", (i, *) => (ruleInfo.conversionRule := i.value, _gc.conversionRule.value := 0))
 
-                g.AddText("xs+20 yp+40", i18n("inputMethodDetectionMode.rule"))
+                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.rule"))
                 _gc.conversionRule := _ := g.AddDropDownList("yp",
                     [
                         "", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")

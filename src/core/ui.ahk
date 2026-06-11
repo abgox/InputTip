@@ -56,8 +56,8 @@ renderEdit(g, key, layout := "yp", options := "") {
  * @param {"Number"|"Number Limit2"|String} options 编辑框的额外选项
  */
 renderEditGroup(g, key, options) {
-    _ := renderGroupBox(g, key, "xs", "h80 w" g.bw)
-    __ := renderEdit(g, key, "xs+20 yp+35", "w" g.bw - 40 " " options)
+    _ := renderGroupBox(g, key, "xs", "h120 w" g.bw)
+    __ := renderEdit(g, key, "xs+20 yp+55", "w" g.bw - 40 " " options)
     return { group: _, edit: __ }
 }
 
@@ -69,7 +69,7 @@ renderEditGroup(g, key, options) {
  * @param {String} labelKey 标签的 i18n key
  * @param {String} textLayout 标签的布局配置
  */
-renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+20 yp+35") {
+renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+20 yp+55") {
     _ := renderText(g, labelKey, textLayout, "")
     __ := renderEdit(g, editKey, "yp", editOptions)
     return { text: _, edit: __ }
@@ -80,10 +80,10 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
  * @param {Gui} g
  * @param {String} key 绑定控件的 key
  * @param {Array} list 选项数组 (i18n key)
- * @param {"xs+20 yp+35"|"yp"|"xs"} layout 布局配置
+ * @param {"xs+20 yp+60"|"yp"|"xs"} layout 布局配置
  * @param {String} options 额外选项
  */
-renderDropDownList(g, key, list, layout := "xs+20 yp+35", options := "") {
+renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
     static subclassProc := CallbackCreate(ComboBoxSubclass, "F", 6)
     valMap := Map()
     _list := []
@@ -118,8 +118,8 @@ ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
  * @param {String} listOptions 列表的额外选项
  */
 renderDropDownListGroup(g, groupLabelKey, list, listLabelKey := groupLabelKey, groupLayout := "xs", listOptions := "") {
-    _ := renderGroupBox(g, groupLabelKey, groupLayout, "h80 w" g.bw)
-    __ := renderDropDownList(g, listLabelKey, list, "xs+20 yp+35", "w" g.bw - 40 " " listOptions)
+    _ := renderGroupBox(g, groupLabelKey, groupLayout, "h120 w" g.bw)
+    __ := renderDropDownList(g, listLabelKey, list, "xs+20 yp+60", "w" g.bw - 40 " " listOptions)
     return { group: _, dropDownList: __ }
 }
 
@@ -129,7 +129,7 @@ renderDropDownListGroup(g, groupLabelKey, list, listLabelKey := groupLabelKey, g
  * @param {String} key 绑定控件的 key
  * @param {String} textKey 按钮文本 (i18n key)
  * @param {String|Number} value 选中时写入的值
- * @param {"xs+20 yp+35"|"yp"} layout 布局配置
+ * @param {"xs+20 yp+50"|"yp"} layout 布局配置
  * @param {Func} callback 点击按钮后的回调
  */
 renderRadio(g, key, textKey, value, layout, callback := (key, value, *) => changeConfig(key, value)) {
@@ -147,9 +147,9 @@ renderRadio(g, key, textKey, value, layout, callback := (key, value, *) => chang
  * @param {Array} radios 单选按钮列表 (i18n key)
  */
 renderRadioGroup(g, key, radios) {
-    _ := renderGroupBox(g, key, "xs", "h70 w" g.bw)
+    _ := renderGroupBox(g, key, "xs", "h100 w" g.bw)
     for i, k in radios {
-        layout := i == 1 ? "xs+20 yp+35" : "yp"
+        layout := i == 1 ? "xs+20 yp+50" : "yp"
         param := [g, key, k[1], k[2], layout]
         if k.Length == 3
             param.Push(k[3])
@@ -173,7 +173,7 @@ renderRadioGroupList(g, list) {
  * @param {Gui} g
  * @param {String} key 绑定控件的 key
  * @param {String} labelKey 标签的 i18n key
- * @param {"yp"|"xs+20 yp+35"|String} layout
+ * @param {"yp"|"xs+20 yp+50"|String} layout
  */
 renderColorPicker(g, key, labelKey := key, layout := "yp") {
     ctrlKey := key A_Now
@@ -182,7 +182,7 @@ renderColorPicker(g, key, labelKey := key, layout := "yp") {
     _.key := key
     _.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
     _.OnEvent("ContextMenu", (ctrl, *) => _clearColor(ctrl.ctrl, ctrl.key))
-    var.%ctrlKey% := pickerCtrl := g.AddText("yp w120")
+    var.%ctrlKey% := pickerCtrl := g.AddText("yp w180")
     pickerCtrl.Text := var.%key%
     pickerCtrl.ctrl := ctrlKey
     pickerCtrl.key := key

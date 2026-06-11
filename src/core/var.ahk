@@ -1034,7 +1034,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
             if hwnd := NumGet(guiThreadInfo, x64 ? 48 : 28, "ptr") {
                 getRect(guiThreadInfo.Ptr + (x64 ? 56 : 32), &left, &top, &right, &bottom)
-                scaleRect(getWindowScale(hwnd), &left, &top, &right, &bottom)
                 clientToScreenRect(hwnd, &left, &top, &right, &bottom)
                 return true
             }
@@ -1058,14 +1057,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
                 hr := ComCall(22, accCaret, "int*", &x := 0, "int*", &y := 0, "int*", &w := 0, "int*", &h := 0, "int64", 3, "int64", 0, "int")
             }
             if !hr {
-                pt := x | y << 32
-                DllCall("ScreenToClient", "ptr", hwnd, "int64*", &pt)
-                left := pt & 0xffffffff
-                top := pt >> 32
-                right := left + w
-                bottom := top + h
-                scaleRect(getWindowScale(hwnd), &left, &top, &right, &bottom)
-                clientToScreenRect(hwnd, &left, &top, &right, &bottom)
+                left := x
+                top := y
+                right := x + w
+                bottom := y + h
                 return true
             }
         }
@@ -1237,7 +1232,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         if !DllCall("ReadProcessMemory", "ptr", hProcess, "ptr", pRect, "ptr", rect, "uptr", rect.Size, "uptr*", &bytesRead := 0) || bytesRead !== rect.Size
             return false
         getRect(rect, &left, &top, &right, &bottom)
-        scaleRect(getWindowScale(hwnd), &left, &top, &right, &bottom)
         return true
 
         static isX64Process(hProcess) {
@@ -1332,8 +1326,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
                 , "ptr*", oAcc := ComValue(9, 0)) == 0 {
                 x := Buffer(4), y := Buffer(4), w := Buffer(4), h := Buffer(4)
                 oAcc.accLocation(ComValue(0x4003, x.ptr, 1), ComValue(0x4003, y.ptr, 1), ComValue(0x4003, w.ptr, 1), ComValue(0x4003, h.ptr, 1), 0)
-                left := NumGet(x, 0, "int"), top := NumGet(y, 0, "int")
-                right := left + NumGet(w, 0, "int"), bottom := top + NumGet(h, 0, "int")
+                left := NumGet(x, 0, "int")
+                top := NumGet(y, 0, "int")
+                right := left + NumGet(w, 0, "int")
+                bottom := top + NumGet(h, 0, "int")
                 if (left | top) != 0
                     return 1
                 return 0
@@ -1351,19 +1347,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         top := NumGet(buf, 4, "int")
         right := NumGet(buf, 8, "int")
         bottom := NumGet(buf, 12, "int")
-    }
-
-    static getWindowScale(hwnd) {
-        if winDpi := DllCall("GetDpiForWindow", "ptr", hwnd, "uint")
-            return A_ScreenDPI / winDpi
-        return 1
-    }
-
-    static scaleRect(scale, &left, &top, &right, &bottom) {
-        left := Round(left * scale)
-        top := Round(top * scale)
-        right := Round(right * scale)
-        bottom := Round(bottom * scale)
     }
 
     static clientToScreenRect(hwnd, &left, &top, &right, &bottom) {

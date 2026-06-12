@@ -51,11 +51,68 @@ class IME {
             opened := this.GetOpenStatus(hwnd)
             convMode := this.GetConversionMode(hwnd)
 
-            if convMode & 0x100 ; IME_CMODE_NOCONVERSION
-                opened := false
 
             if var.inputMethodDetectionMode == "general" {
-                state := this.OpenStateMap.Get(opened && (convMode & 3) ? 1 : 0, lastState)
+                static lastOpened := -1
+                static lastConvMode := -1
+                static strategy := 0 ; 0 = 标准复合兜底, 1 = 纯状态码, 2 = 纯转换码
+
+                static isNonBinaryIME := 0 ; 非二元状态输入法标识
+                static cnValue := 0
+                static enValue := 0
+
+                if lastOpened == -1 || lastConvMode == -1 {
+                    lastOpened := opened
+                    lastConvMode := convMode
+                }
+                else if opened != lastOpened || convMode != lastConvMode {
+                    openedChanged := opened != lastOpened
+                    convModeChanged := convMode != lastConvMode
+
+                    if !openedChanged && convModeChanged {
+                        strategy := 2
+                        isNonBinaryIME := 0
+                    }
+                    else if openedChanged && !convModeChanged {
+                        strategy := 1
+                        if isNonBinaryIME && (strategy == 2 || opened < 1)
+                            isNonBinaryIME := 0
+                        if opened != lastOpened && (opened > 1 || lastOpened > 1)
+                            isNonBinaryIME := 1, cnValue := Max(opened, lastOpened), enValue := Min(opened, lastOpened)
+                    }
+                    else if openedChanged && convModeChanged {
+                        strategy := 0
+                        isNonBinaryIME := 0
+                    }
+
+                    lastOpened := opened
+                    lastConvMode := convMode
+                }
+
+                switch strategy {
+                    case 1:
+                        if isNonBinaryIME
+                            state := opened == cnValue ? "CN" : "EN"
+                        else
+                            state := opened ? "CN" : "EN"
+
+                    case 2:
+                        state := convMode & 1 ? "CN" : "EN"
+
+                    default:
+                        if isNonBinaryIME {
+                            state := opened == cnValue ? "CN" : "EN"
+                        }
+                        else if convMode & 1 {
+                            state := "CN"
+                        }
+                        else {
+                            if (opened == 0) || (opened == 1 && (convMode == 0 || convMode == 1))
+                                state := "EN"
+                            else
+                                state := opened ? "CN" : "EN"
+                        }
+                }
                 lastState := state
                 return state
             }

@@ -3,14 +3,14 @@
 #Requires AutoHotkey v2.0
 
 if (A_IsCompiled) {
-    currentVersion := "3.6.2"
+    currentVersion := "3.6.3"
     versionType := "exe"
 } else {
-    currentVersion := "3.6.2"
+    currentVersion := "3.6.3"
     versionType := "zip"
 }
 
-;@AHK2Exe-SetVersion 3.6.2
+;@AHK2Exe-SetVersion 3.6.3
 ;@AHK2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon temp\icon\default-app.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox

@@ -100,12 +100,14 @@ e_inputMethod(*) {
                 _ := g.AddDropDownList("yp r9", list)
                 _.Value := _gc.order
                 _.OnEvent("Change", (i, *) => _gc.order := Trim(i.Value))
+                SuppressControlWheel(_.Hwnd)
 
                 renderGroupBox(g, "inputMethodDetectionMode.imeState", , "h110 w" bw)
                 g.AddText("xs+20 yp+50", i18n("inputMethodDetectionMode.imeState.specifyState"))
                 _ := g.AddDropDownList("yp Disabled", [i18n("EN"), i18n("CN")])
                 _.Text := ruleInfo.state
                 ; _.OnEvent("Change", (i, *) => ruleInfo.state := i.Text)
+                ; SuppressControlWheel(_.Hwnd)
 
                 renderGroupBox(g, "inputMethodDetectionMode.stateCodeRule", , "h170 w" bw)
                 g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
@@ -133,6 +135,7 @@ e_inputMethod(*) {
                     ruleInfo.stateRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "",
                     _gc.stateNum.value := ""
                 ))
+                SuppressControlWheel(_.Hwnd)
 
                 renderGroupBox(g, "inputMethodDetectionMode.conversionCodeRule", , "h170 w" bw)
                 g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
@@ -158,6 +161,7 @@ e_inputMethod(*) {
                     ruleInfo.conversionRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "",
                     _gc.conversionNum.value := ""
                 ))
+                SuppressControlWheel(_.Hwnd)
 
                 g.AddButton("xs w" bw, i18n("ok")).OnEvent("Click", e_set)
                 e_set(*) {

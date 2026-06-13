@@ -84,7 +84,6 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
  * @param {String} options 额外选项
  */
 renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
-    static subclassProc := CallbackCreate(ComboBoxSubclass, "F", 6)
     valMap := Map()
     _list := []
     for v in list {
@@ -96,9 +95,7 @@ renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
     val := var.%key%
     try _.Text := i18n(val)
     _.OnEvent("Change", (ctrl, *) => changeConfig(key, valMap.Get(ctrl.text)))
-
-    DllCall("comctl32\SetWindowSubclass", "ptr", _.Hwnd, "ptr", subclassProc, "uptr", 1, "uptr", 0)
-
+    SuppressControlWheel(_.Hwnd)
     return _
 }
 
@@ -107,6 +104,12 @@ ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
         return 0
     return DllCall("comctl32\DefSubclassProc", "ptr", hwnd, "uint", uMsg, "uptr", wParam, "uptr", lParam, "uptr")
 }
+
+SuppressControlWheel(hwnd) {
+    static wheelProc := CallbackCreate(ComboBoxSubclass, "F", 6)
+    DllCall("comctl32\SetWindowSubclass", "ptr", hwnd, "ptr", wheelProc, "uptr", 1, "uptr", 0)
+}
+
 
 /**
  * 渲染控件 DropDownList (GroupBox)

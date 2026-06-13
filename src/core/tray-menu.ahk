@@ -260,6 +260,7 @@ createProcessMenuGui(meta, *) {
                     try _.Text := colValue.hotkey
                     colValue.hotkey := _.Text
                     _.OnEvent("Change", (i, *) => colValue.hotkey := i.Text)
+                    SuppressControlWheel(_.Hwnd)
                 }
             }
 
@@ -278,6 +279,7 @@ createProcessMenuGui(meta, *) {
                     try _.Text := colValue.process
                     colValue.process := _.Text
                     _.OnEvent("Change", (i, *) => (colValue.process := i.Text, updateProcessState(i.Text)))
+                    SuppressControlWheel(_.Hwnd)
                 }
 
                 updateProcessState(value) {
@@ -317,6 +319,7 @@ createProcessMenuGui(meta, *) {
                     try _.Text := colValue.trigger
                     colValue.trigger := _.Text
                     _.OnEvent("Change", (i, *) => colValue.trigger := i.Text)
+                    SuppressControlWheel(_.Hwnd)
                 }
             }
 
@@ -333,6 +336,7 @@ createProcessMenuGui(meta, *) {
                     try _.Text := colValue.condition
                     colValue.condition := _.Text
                     _.OnEvent("Change", (i, *) => (updateConditionState(i.Text), colValue.condition := i.Text))
+                    SuppressControlWheel(_.Hwnd)
                 }
                 updateConditionState(conditionText) {
                     isMonitor := conditionText == i18n("condition.idleTimer") || conditionText == i18n("condition.textMonitor") || conditionText == i18n("condition.hotkeyMonitor")
@@ -414,6 +418,7 @@ createProcessMenuGui(meta, *) {
                         try _.Text := StrSplit(colValue.capture, ">")[i]
                         captureList[i] := _.Text
                         _.num := i
+                        SuppressControlWheel(_.Hwnd)
                     }
 
                     renderGroupBox(g, "symbolCaretCapture.offset", "xs h180 w" bw)
@@ -432,6 +437,7 @@ createProcessMenuGui(meta, *) {
                             val := ctrl.Text,
                             RegExMatch(val, "^-?\d+/-?\d+$") || val == "" ? (captureOffsetList[ctrl.num] := ctrl.Text, colValue.captureOffset := arrJoin(captureOffsetList, ">", 1)) : ""
                         ))
+                        SuppressControlWheel(_.Hwnd)
                     }
 
                     colValue.capture := arrJoin(captureList, ">", 1)
@@ -546,6 +552,7 @@ createProcessMenuGui(meta, *) {
                 fn_content() {
                     var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs" layout)
                     var._tthEditCtrl := _ := g.AddComboBox(opt)
+                    SuppressControlWheel(_.Hwnd)
 
                     switch colValue.condition {
                         case i18n("condition.idleTimer"):

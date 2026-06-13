@@ -290,7 +290,7 @@ e_overlay(*) {
             try _.Text := posValueMap.Get(var.%"overlayBasePosition" v%)
             _.state := v
             _.OnEvent("Change", (i, *) => changeConfig("overlayBasePosition" i.state, posTextMap.Get(i.Text), 1))
-            DllCall("comctl32\SetWindowSubclass", "ptr", _.Hwnd, "ptr", CallbackCreate(ComboBoxSubclass, "F", 6), "uptr", 1, "uptr", 0)
+            SuppressControlWheel(_.Hwnd)
 
             renderEditLabel(g, "overlayOffsetY" v, "Limit5 w" bw / 10, "overlayOffsetY", "yp")
             renderColorPicker(g, "overlayBgColor" v, "overlayBgColor")

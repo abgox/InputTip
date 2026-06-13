@@ -481,6 +481,7 @@ e_symbolConfig(prefix, *) {
                     _.page := page
                     try _.Text := var.%key%
                     _.OnEvent("Change", (ctrl, *) => changeConfig(ctrl.key, ctrl.Text, , (*) => gc.%prefix "PreviewSymbolPicture" ctrl.page%.Focus()))
+                    SuppressControlWheel(_.Hwnd)
 
                     if i > 5
                         addBtn()

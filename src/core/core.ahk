@@ -151,8 +151,10 @@ if isJAB {
                         targetColor := var.%"borderColor" currentState%
                         targetWidth := var.%"borderWidth" currentState%
                     }
+                    if !targetColor
+                        targetColor := var.%"borderColor" currentState%
 
-                    allowShow := (targetColor != "")
+                    allowShow := targetColor != ""
 
                     if (allowShow && !isPined) {
                         switch var.borderShowMode {

@@ -261,7 +261,7 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
 
 showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
     tipGui(info) {
-        g := createGuiOpt(i18n(titleKey), , "AlwaysOnTop")
+        g := createGuiOpt(i18n(titleKey), , "AlwaysOnTop Disabled")
         if (info.i) {
             g.AddText(, line60)
             return g
@@ -269,7 +269,7 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
         g.AddText(, i18n(labelKey))
         g.process := g.AddProgress("xm h9 w" info.w, 1)
         g.tip := g.AddText("xs cGray w" info.w)
-        ; WinSetStyle(-0x80000, g.Hwnd)
+        WinSetExStyle("+0x8000000", g.Hwnd)
         hMenu := DllCall("GetSystemMenu", "Ptr", g.Hwnd, "Int", 0)
         DllCall("DeleteMenu", "Ptr", hMenu, "UInt", 0xF060, "UInt", 0)
         return g
@@ -277,7 +277,7 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
     downloadingGui := createUniqueGui(tipGui)
     fileCount := downloadList.Length
     downloadingGui.tip.Text := 1 "/" fileCount " : "
-    showGui(downloadingGui)
+    showGui(downloadingGui, "NoActivate")
     Sleep(500)
     done := 1
     doneFileList := []
@@ -290,17 +290,11 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
         for u in baseUrl {
             downloadingGui.process.Value := i / fileCount * 100
             downloadingGui.tip.Text := i "/" fileCount " : " to
-            if (InStr(out, "/")) {
-                dir := RegExReplace(out, "/[^/]*$", "")
-            } else {
-                dir := ""
-            }
+            dir := InStr(out, "/") ? RegExReplace(out, "/[^/]*$", "") : ""
             try {
-                if (dir) {
-                    if (!DirExist(dir)) {
-                        DirCreate(dir)
-                    }
-                }
+                if dir && !DirExist(dir)
+                    DirCreate(dir)
+
                 Download(pathToUrl(u "/" from), out)
                 if (FileExist(out)) {
                     if (InStr(out, ".ahk") || InStr(out, ".bat")) {
@@ -328,10 +322,8 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
             target := RegExReplace(v, "\.new$", "")
             backup := target ".bak"
             try {
-                if FileExist(target) {
-                    FileCopy(target, backup, 1)
-                    backupList.Push([target, backup])
-                }
+                if FileExist(target)
+                    FileCopy(target, backup, 1), backupList.Push([target, backup])
                 FileMove(v, target, 1)
             } catch {
                 replaceOk := 0
@@ -339,16 +331,11 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
             }
         }
         if (replaceOk) {
-            for item in backupList {
-                backup := item[2]
-                try FileDelete(backup)
-            }
+            for item in backupList
+                try FileDelete(item[2])
         } else {
-            for item in backupList {
-                target := item[1]
-                backup := item[2]
-                try FileMove(backup, target, 1)
-            }
+            for item in backupList
+                try FileMove(item[2], item[1], 1)
         }
     } else {
         for v in doneFileList

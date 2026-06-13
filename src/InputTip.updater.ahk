@@ -100,18 +100,18 @@ checkUpdate() {
                 done := false
 
                 downloadingGui(info, *) {
-                    g := createGuiOpt(i18n("updateCheck"))
+                    g := createGuiOpt(i18n("updateCheck"), , "AlwaysOnTop Disabled")
                     if (info.i) {
                         g.AddText(, line60)
                         return g
                     }
                     g.AddText("Center w" info.w, i18n("update.downloading"))
-                    hMenu := DllCall("GetSystemMenu", "Ptr", g.Hwnd, "Int", 0)
-                    DllCall("DeleteMenu", "Ptr", hMenu, "UInt", 0xF060, "UInt", 0)
+                    g.process := g.AddProgress("xm h12 w" info.w, 1)
                     return g
                 }
                 dlGui := createUniqueGui(downloadingGui)
-                showGui(dlGui)
+                showGui(dlGui, "NoActivate")
+                SetTimer(() => (dlGui.process.Value < 90 ? dlGui.process.Value += 2 : ""), 500)
 
                 out := updater ".new"
                 for v in releases {

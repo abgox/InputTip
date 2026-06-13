@@ -40,7 +40,7 @@ var := {
         "Person", [32672, "aero_person.cur"],  ; 人员选择
         "NWPen", [32631, "aero_pen.cur"],  ; 手写
     ),
-    ; 设置
+    loadOnlyIBeamCursor: readIni("loadOnlyIBeamCursor", 0),
     language: currentLang,
     ; 开机自启动
     launchAtStartup: readIni("launchAtStartup", 0),
@@ -80,7 +80,7 @@ var := {
     borderReshowOnClassChange: readIni("borderReshowOnClassChange", 0),
     borderHideDelay: readIni("borderHideDelay", 0),
     borderShowMode: readIni("borderShowMode", "blacklist"),
-    borderWidthPinned: readIni("borderWidthPinned", 1),
+    borderWidthPinned: readIni("borderWidthPinned", 2),
     borderColorPinned: readIni("borderColorPinned", "0x00CCCC"),
     ; 符号
     caretSymbolType: readIni("caretSymbolType", 0),
@@ -123,7 +123,7 @@ defaultSymbolMap := Map()
 
 _list := [
     ["SymbolPicturePath", "", ""],
-    ["SymbolPictureOffsetX", -25, -30],
+    ["SymbolPictureOffsetX", -25, 0],
     ["SymbolPictureOffsetY", 0, 30],
     ["SymbolPictureWidth", 20, 20],
     ["SymbolPictureHeight", 20, 20],
@@ -146,7 +146,7 @@ _list := [
 
 for v in stateList {
     list := [
-        ["borderWidth", 1],
+        ["borderWidth", 2],
         ["borderColor", ""],
         ["overlayText", ""],
         ["overlayTextFont", "Microsoft YaHei"],

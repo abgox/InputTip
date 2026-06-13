@@ -53,18 +53,16 @@ updateCursor() {
 
 loadCursor(state, change := 0) {
     global lastCursor
-    if (var.cursorActive) {
-        if (state != lastCursor || change) {
-            for k, v in var.cursorInfo {
-                try {
-                    if (v.%state%) {
-                        DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%state%, "Ptr"), "Int", v.id)
-                    }
-                }
-            }
-            lastCursor := state
-        }
+    if !var.cursorActive || (state == lastCursor && !change)
+        return
+    if var.loadOnlyIBeamCursor {
+        if p := var.cursorInfo.Get("IBeam").%state%
+            DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", p, "Ptr"), "Int", "32513")
+    } else {
+        for k, v in var.cursorInfo
+            try v.%state% ? DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%state%, "Ptr"), "Int", v.id) : ""
     }
+    lastCursor := state
 }
 
 revertCursor() {
@@ -120,12 +118,16 @@ e_cursor(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2, i18n("stateStyle") 3])
+        tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/cursor"))
 
         renderRadioGroup(g, "cursorActive", [["yes", 1], ["no", 0]])
+        renderRadioGroup(g, "loadOnlyIBeamCursor", [
+            ["yes", 1, (key, value, *) => (changeConfig(key, value), revertCursor())],
+            ["no", 0, (key, value, *) => (changeConfig(key, value), loadCursor(currentState, 1))]
+        ])
         _ := bw / 2 - g.MarginX / 4
         g.AddButton("xs w" _, i18n("cursor.open")).OnEvent("Click", (*) => Run("explorer.exe data\cursor"))
         g.AddButton("yp w" _, i18n("cursor.download")).OnEvent("Click", (*) => Run("https://inputtip.abgox.com/download/extra"))
@@ -134,8 +136,8 @@ e_cursor(*) {
         list.InsertAt(1, "")
 
         for i, state in stateList {
-            if (Mod(i - 1, 2) == 0) {
-                page := ((i - 1) // 2) + 2
+            if (Mod(i - 1, 3) == 0) {
+                page := ((i - 1) // 3) + 2
                 tab.UseTab(page)
                 opt := "Section"
             } else {

@@ -155,6 +155,7 @@ langStrings.Set("en-US", Map(
     "openDir", "Open Directory",
     "cursor", "Status Tip - Mouse Cursor",
     "cursorActive", "Load Cursor Style",
+    "loadOnlyIBeamCursor", "Load Only IBeam Cursor",
     "cursor.open", "Open Cursor Style Directory",
     "cursor.download", "Download Cursor Style",
     "overlayCornerPreference", "Corner Preference",

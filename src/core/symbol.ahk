@@ -278,23 +278,19 @@ e_symbol(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        symbolTypeBtns := []
+        ctrlList := []
+
         gc.previewSymbol := g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview"))
-        previewSymbol := (key, value, *) => (changeConfig(key, value), var.caretSymbolType ? gc.previewSymbol.Focus() : "", reloadCaretSymbol(), toggleState())
-        toggleState() {
-            opt := var.caretSymbolType ? "-Disabled" : "+Disabled"
-            for v in symbolTypeBtns
-                v.Opt(opt)
-        }
+        previewSymbol := (key, value, *) => (changeConfig(key, value), var.caretSymbolType ? gc.previewSymbol.Focus() : "", reloadCaretSymbol(), disableCtrl(ctrlList, !var.caretSymbolType))
 
         renderRadioGroup(g, "caretSymbolType", [["none", 0, previewSymbol], ["symbolType.picture", 1, previewSymbol], ["symbolType.shape", 2, previewSymbol], ["symbolType.text", 3, previewSymbol]])
 
         g.AddLink("yp", getDocsLink("tip/symbol-caret/list-mechanism", i18n("symbol.whitelist.tip")))
 
-        btnOpt := " w" bw / 2 - g.MarginX / 4 (var.caretSymbolType ? "" : " Disabled")
+        btnOpt := " w" bw / 2 - g.MarginX / 4
         _ := g.AddButton("xs" btnOpt, i18n("symbolConfig"))
         _.OnEvent("Click", e_symbolConfig.Bind("caret"))
-        symbolTypeBtns.Push(_)
+        ctrlList.Push(_)
         _ := g.AddButton("yp" btnOpt, i18n("symbolCaretCapture"))
         _.OnEvent("Click",
             createProcessMenuGui.Bind({
@@ -307,7 +303,7 @@ e_symbol(*) {
                 conditions: []
             })
         )
-        symbolTypeBtns.Push(_)
+        ctrlList.Push(_)
         _ := g.AddButton("xs" btnOpt, i18n("symbol.whitelist"))
         _.OnEvent("Click",
             createProcessMenuGui.Bind({
@@ -320,7 +316,7 @@ e_symbol(*) {
                 conditions: conditionKeyList
             })
         )
-        symbolTypeBtns.Push(_)
+        ctrlList.Push(_)
         _ := g.AddButton("yp" btnOpt, i18n("symbolWindowOffset"))
         _.OnEvent("Click",
             createProcessMenuGui.Bind({
@@ -333,7 +329,7 @@ e_symbol(*) {
                 conditions: conditionKeyList
             })
         )
-        symbolTypeBtns.Push(_)
+        ctrlList.Push(_)
         _ := g.AddButton("xs" btnOpt, i18n("symbol.blacklist"))
         _.OnEvent("Click",
             createProcessMenuGui.Bind({
@@ -346,20 +342,23 @@ e_symbol(*) {
                 conditions: conditionKeyList
             })
         )
-        symbolTypeBtns.Push(_)
+        ctrlList.Push(_)
         _ := g.AddButton("yp" btnOpt, i18n("symbolScreenOffset"))
         _.OnEvent("Click", e_screenOffset.Bind("caret"))
-        symbolTypeBtns.Push(_)
+        ctrlList.Push(_)
 
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/symbol-caret"))
-        renderEditGroup(g, "caretSymbolHideDelay", "Number Limit5")
-
-        renderRadioGroup(g, "caretSymbolOriginY", [[".above", "above", previewSymbol], [".below", "below", previewSymbol]])
-
-        renderRadioGroup(g, "symbolJABActive", [["yes", 1], ["no", 0]])
+        _ := renderEditGroup(g, "caretSymbolHideDelay", "Number Limit5")
+        ctrlList.Push(_.edit)
+        _ := renderRadioGroup(g, "caretSymbolOriginY", [[".above", "above", previewSymbol], [".below", "below", previewSymbol]])
+        ctrlList.Push(_.radios*)
+        _ := renderRadioGroup(g, "symbolJABActive", [["yes", 1], ["no", 0]])
+        ctrlList.Push(_.radios*)
         g.AddLink("yp", getHelpLink("tip/symbol-caret/use-inputtip-in-jetbrains"))
 
+        if !var.caretSymbolType
+            disableCtrl(ctrlList)
         return g
     }
 }
@@ -380,33 +379,28 @@ e_cursorSymbol(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        symbolTypeBtns := []
-        previewSymbol := (key, value, *) => (changeConfig(key, value), reloadCursorSymbol(), toggleState())
-        toggleState() {
-            opt := var.cursorSymbolType ? "-Disabled" : "+Disabled"
-            for v in symbolTypeBtns
-                v.Opt(opt)
-        }
+        ctrlList := []
+        previewSymbol := (key, value, *) => (changeConfig(key, value), reloadCursorSymbol(), disableCtrl(ctrlList, !var.cursorSymbolType))
 
         renderRadioGroup(g, "cursorSymbolType", [["none", 0, previewSymbol], ["symbolType.picture", 1, previewSymbol], ["symbolType.shape", 2, previewSymbol], ["symbolType.text", 3, previewSymbol]])
 
-        btnOpt := " w" bw / 2 - g.MarginX / 4 (var.cursorSymbolType ? "" : " Disabled")
+        btnOpt := " w" bw / 2 - g.MarginX / 4
 
         _ := g.AddButton("xs" btnOpt, i18n("symbolConfig"))
         _.OnEvent("Click", e_symbolConfig.Bind("cursor"))
-        symbolTypeBtns.Push(_)
-
+        ctrlList.Push(_)
         _ := g.AddButton("yp" btnOpt, i18n("symbolScreenOffset"))
         _.OnEvent("Click", e_screenOffset.Bind("cursor"))
-        symbolTypeBtns.Push(_)
-
-        renderEditGroup(g, "cursorSymbolHideDelay", "Number Limit5")
-
-        renderRadioGroup(g, "cursorSymbolShowMode",
+        ctrlList.Push(_)
+        _ := renderEditGroup(g, "cursorSymbolHideDelay", "Number Limit5")
+        ctrlList.Push(_.edit)
+        _ := renderRadioGroup(g, "cursorSymbolShowMode",
             [
                 ["blacklist", "blacklist"],
                 ["whitelist", "whitelist"]
             ])
+        ctrlList.Push(_.radios*)
+
         for v in [
             ["hide", "xs", "blacklistBtn"],
             ["show", "yp", "whitelistBtn"],
@@ -423,8 +417,11 @@ e_cursorSymbol(*) {
                     conditions: conditionKeyList
                 })
             )
-            symbolTypeBtns.Push(_)
+            ctrlList.Push(_)
         }
+
+        if !var.cursorSymbolType
+            disableCtrl(ctrlList)
         return g
     }
 }

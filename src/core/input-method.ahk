@@ -74,7 +74,7 @@ e_inputMethod(*) {
                 g := createGuiOpt(action)
 
                 if (info.i) {
-                    g.AddText(, line50)
+                    g.AddText(, isChinese ? line50 : line60)
                     return g
                 }
                 w := info.w
@@ -104,64 +104,26 @@ e_inputMethod(*) {
 
                 renderGroupBox(g, "inputMethodDetectionMode.imeState", , "h110 w" bw)
                 g.AddText("xs+20 yp+50", i18n("inputMethodDetectionMode.imeState.specifyState"))
-                _ := g.AddDropDownList("yp Disabled", [i18n("EN"), i18n("CN")])
-                _.Text := ruleInfo.state
-                ; _.OnEvent("Change", (i, *) => ruleInfo.state := i.Text)
-                ; SuppressControlWheel(_.Hwnd)
+                g.AddText("yp cGray", ruleInfo.state)
 
-                renderGroupBox(g, "inputMethodDetectionMode.stateCodeRule", , "h170 w" bw)
-                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
-
-                _gc.stateNum := _ := g.AddEdit("yp r1", "")
-
-                if !InStr(ruleInfo.stateRule, "oddNum") && !InStr(ruleInfo.stateRule, "evenNum")
-                    _.Value := ruleInfo.stateRule
-
-                _.OnEvent("Change", (i, *) => (ruleInfo.stateRule := i.Value, _gc.stateRule.value := 0))
-
-                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.rule"))
-                _gc.stateRule := _ := g.AddDropDownList("yp",
-                    [
-                        "", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")
-                    ]
-                )
-                switch ruleInfo.stateRule {
-                    case "oddNum":
-                        _.Value := 2
-                    case "evenNum":
-                        _.Value := 3
+                for v in ["state", "conversion"] {
+                    renderGroupBox(g, "inputMethodDetectionMode." v "CodeRule", , "h170 w" bw)
+                    g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
+                    _gc.%v "Num"% := _ := g.AddComboBox("yp", v == "state" ? ["", "0", "1", "1/3"] : ["", "0", "1", "1/1025"])
+                    _.v := v
+                    if !InStr(ruleInfo.%v "Rule"%, "oddNum") && !InStr(ruleInfo.%v "Rule"%, "evenNum")
+                        _.Value := ruleInfo.%v "Rule"%
+                    _.OnEvent("Change", (i, *) => (v := i.v, ruleInfo.%v "Rule"% := i.Value, _gc.%v "Rule"%.value := 0))
+                    g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.rule"))
+                    _gc.%v "Rule"% := _ := g.AddDropDownList("yp", ["", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")])
+                    _.v := v
+                    switch ruleInfo.%v "Rule"% {
+                        case "oddNum": _.Value := 2
+                        case "evenNum": _.Value := 3
+                    }
+                    _.OnEvent("Change", (i, *) => (v := i.v, ruleInfo.%v "Rule"% := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "", _gc.%v "Num"%.value := ""))
+                    SuppressControlWheel(_.Hwnd)
                 }
-                _.OnEvent("Change", (i, *) => (
-                    ruleInfo.stateRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "",
-                    _gc.stateNum.value := ""
-                ))
-                SuppressControlWheel(_.Hwnd)
-
-                renderGroupBox(g, "inputMethodDetectionMode.conversionCodeRule", , "h170 w" bw)
-                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.number"))
-                _gc.conversionNum := _ := g.AddEdit("yp r1", "")
-                if !InStr(ruleInfo.conversionRule, "oddNum") && !InStr(ruleInfo.conversionRule, "evenNum")
-                    _.Value := ruleInfo.conversionRule
-
-                _.OnEvent("Change", (i, *) => (ruleInfo.conversionRule := i.value, _gc.conversionRule.value := 0))
-
-                g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.rule"))
-                _gc.conversionRule := _ := g.AddDropDownList("yp",
-                    [
-                        "", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")
-                    ]
-                )
-                switch ruleInfo.conversionRule {
-                    case "oddNum":
-                        _.Value := 2
-                    case "evenNum":
-                        _.Value := 3
-                }
-                _.OnEvent("Change", (i, *) => (
-                    ruleInfo.conversionRule := i.value == 2 ? "oddNum" : i.value == 3 ? "evenNum" : "",
-                    _gc.conversionNum.value := ""
-                ))
-                SuppressControlWheel(_.Hwnd)
 
                 g.AddButton("xs w" bw, i18n("ok")).OnEvent("Click", e_set)
                 e_set(*) {

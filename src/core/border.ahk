@@ -12,24 +12,27 @@ e_border(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
+        ctrlList := []
+
         tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/border"))
 
-        renderRadioGroup(g, "borderActive",
-            [
-                ["yes", 1],
-                ["no", 0]
-            ])
+        renderRadioGroup(g, "borderActive", [
+            ["yes", 1, (key, value, *) => (changeConfig(key, value), disableCtrl(ctrlList, 0))],
+            ["no", 0, (key, value, *) => (changeConfig(key, value), disableCtrl(ctrlList))]
+        ])
 
-        renderEditGroup(g, "borderHideDelay", "Number Limit5")
+        _ := renderEditGroup(g, "borderHideDelay", "Number Limit5")
+        ctrlList.Push(_.edit)
         renderGroupBox(g, "borderReshowOnChange", , "h110 w" bw)
         g.AddCheckbox("xs+20 yp+50 Disabled", i18n("borderReshowOnChange.state")).Value := 1
         for v in ["Process", "Title", "Class"] {
             _ := g.AddCheckbox("yp", i18n("borderReshowOnChange." StrLower(v)))
             _.Value := var.%"borderReshowOn" v "Change"%
             _.OnEvent("Click", e_change.Bind(v))
+            ctrlList.Push(_)
         }
         e_change(type, ctrl, *) {
             key := "borderReshowOn" type "Change"
@@ -38,17 +41,16 @@ e_border(*) {
             writeIni(key, val)
         }
 
-        renderRadioGroup(g, "borderShowMode",
-            [
-                ["blacklist", "blacklist"],
-                ["whitelist", "whitelist"]
-            ])
+        _ := renderRadioGroup(g, "borderShowMode", [["blacklist", "blacklist"], ["whitelist", "whitelist"]])
+        ctrlList.Push(_.radios*)
+
         _w := bw / 2 - g.MarginX / 4
         for v in [
             ["hide", "xs", "blacklistBtn"],
             ["show", "yp", "whitelistBtn"],
         ] {
-            g.AddButton(v[2] " w" _w, i18n(v[3])).OnEvent("Click",
+            _ := g.AddButton(v[2] " w" _w, i18n(v[3]))
+            _.OnEvent("Click",
                 createProcessMenuGui.Bind({
                     title: i18n("border") " - " i18n(v[3]),
                     tab: [i18n(v[3])],
@@ -59,6 +61,7 @@ e_border(*) {
                     conditions: conditionKeyList
                 })
             )
+            ctrlList.Push(_)
         }
 
         for i, v in ["Pinned", stateList*] {
@@ -70,9 +73,12 @@ e_border(*) {
             renderGroupBox(g, v, , "h110 w" bw)
 
             ; renderEditLabel(g, "borderWidth" v, "w" bw / 3, "borderWidth")
-            renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+50")
+            _ := renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+50")
+            ctrlList.Push(_.picker)
         }
 
+        if !var.borderActive
+            disableCtrl(ctrlList)
         return g
     }
 }
@@ -101,8 +107,7 @@ showBorder(finalColor, finalWidth, hwnd) {
         WR := scr.workRight
         WB := scr.workBottom
 
-        ; t := finalWidth
-        t := 2
+        t := finalWidth
         W := WR - WL
         H := WB - WT
 

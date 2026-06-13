@@ -118,19 +118,29 @@ e_cursor(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
+        ctrlList := []
+
         tab := renderTab(g, [i18n("basicConfig"), i18n("stateStyle"), i18n("stateStyle") 2])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("tip/cursor"))
 
-        renderRadioGroup(g, "cursorActive", [["yes", 1], ["no", 0]])
-        renderRadioGroup(g, "loadOnlyIBeamCursor", [
+        renderRadioGroup(g, "cursorActive", [
+            ["yes", 1, (key, value, *) => (changeConfig(key, value), disableCtrl(ctrlList, 0))],
+            ["no", 0, (key, value, *) => (changeConfig(key, value), disableCtrl(ctrlList))]
+        ])
+        _ := renderRadioGroup(g, "loadOnlyIBeamCursor", [
             ["yes", 1, (key, value, *) => (changeConfig(key, value), revertCursor())],
             ["no", 0, (key, value, *) => (changeConfig(key, value), loadCursor(currentState, 1))]
         ])
-        _ := bw / 2 - g.MarginX / 4
-        g.AddButton("xs w" _, i18n("cursor.open")).OnEvent("Click", (*) => Run("explorer.exe data\cursor"))
-        g.AddButton("yp w" _, i18n("cursor.download")).OnEvent("Click", (*) => Run("https://inputtip.abgox.com/download/extra"))
+        ctrlList.Push(_.radios*)
+        _w := bw / 2 - g.MarginX / 4
+        _ := g.AddButton("xs w" _w, i18n("cursor.open"))
+        _.OnEvent("Click", (*) => Run("explorer.exe data\cursor"))
+        ctrlList.Push(_)
+        _ := g.AddButton("yp w" _w, i18n("cursor.download"))
+        _.OnEvent("Click", (*) => Run("https://inputtip.abgox.com/download/extra"))
+        ctrlList.Push(_)
 
         list := getCursorPath()
         list.InsertAt(1, "")
@@ -143,8 +153,12 @@ e_cursor(*) {
             } else {
                 opt := "xs"
             }
-            renderDropDownListGroup(g, state, list, "cursorPath" state, opt)
+            _ := renderDropDownListGroup(g, state, list, "cursorPath" state, opt)
+            ctrlList.Push(_.dropDownList)
         }
+
+        if !var.cursorActive
+            disableCtrl(ctrlList)
         return g
     }
 }

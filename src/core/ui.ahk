@@ -86,11 +86,8 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
 renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
     valMap := Map()
     _list := []
-    for v in list {
-        val := i18n(v)
-        _list.Push(val)
-        valMap.Set(val, v)
-    }
+    for v in list
+        val := i18n(v), _list.Push(val), valMap.Set(val, v)
     _ := g.AddDropDownList(layout " r9 " options, _list)
     val := var.%key%
     try _.Text := i18n(val)
@@ -98,18 +95,6 @@ renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
     SuppressControlWheel(_.Hwnd)
     return _
 }
-
-ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
-    if uMsg == 0x20A ; WM_MOUSEWHEEL
-        return 0
-    return DllCall("comctl32\DefSubclassProc", "ptr", hwnd, "uint", uMsg, "uptr", wParam, "uptr", lParam, "uptr")
-}
-
-SuppressControlWheel(hwnd) {
-    static wheelProc := CallbackCreate(ComboBoxSubclass, "F", 6)
-    DllCall("comctl32\SetWindowSubclass", "ptr", hwnd, "ptr", wheelProc, "uptr", 1, "uptr", 0)
-}
-
 
 /**
  * 渲染控件 DropDownList (GroupBox)
@@ -151,14 +136,15 @@ renderRadio(g, key, textKey, value, layout, callback := (key, value, *) => chang
  */
 renderRadioGroup(g, key, radios) {
     _ := renderGroupBox(g, key, "xs", "h100 w" g.bw)
+    radiosList := []
     for i, k in radios {
         layout := i == 1 ? "xs+20 yp+50" : "yp"
         param := [g, key, k[1], k[2], layout]
         if k.Length == 3
             param.Push(k[3])
-        renderRadio(param*)
+        radiosList.Push(renderRadio(param*))
     }
-    return _
+    return { group: _, radios: radiosList }
 }
 
 /**
@@ -202,4 +188,23 @@ renderColorPicker(g, key, labelKey := key, layout := "yp") {
         var.%cKey%.Value := ""
         changeConfig(oKey, "")
     }
+
+    return { text: _, picker: pickerCtrl }
+}
+
+ComboBoxSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) {
+    if uMsg == 0x20A ; WM_MOUSEWHEEL
+        return 0
+    return DllCall("comctl32\DefSubclassProc", "ptr", hwnd, "uint", uMsg, "uptr", wParam, "uptr", lParam, "uptr")
+}
+
+SuppressControlWheel(hwnd) {
+    static wheelProc := CallbackCreate(ComboBoxSubclass, "F", 6)
+    DllCall("comctl32\SetWindowSubclass", "ptr", hwnd, "ptr", wheelProc, "uptr", 1, "uptr", 0)
+}
+
+disableCtrl(ctrlList, disable := 1) {
+    state := disable ? "+Disabled" : "-Disabled"
+    for v in ctrlList
+        try v.Opt(state)
 }

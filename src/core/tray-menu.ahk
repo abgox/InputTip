@@ -271,9 +271,9 @@ createProcessMenuGui(meta, *) {
                     renderGroupBox(g, "match.process", groupLayout layout)
                     _ := g.AddComboBox(opt, [
                         "",
-                        "aaa.exe",
-                        "bbb.exe|ccc.exe",
-                        "xxx\.exe|yyy\.exe",
+                        "Code.exe",
+                        "Code.exe|WindowsTerminal.exe",
+                        "msedge\.exe|chrome\.exe|firefox\.exe",
                         ".*"
                     ])
                     try _.Text := colValue.process
@@ -287,19 +287,20 @@ createProcessMenuGui(meta, *) {
                     if !column.Get("hotkey", 0)
                         return
 
+                    color := "cC0C0C0"
                     if value == "" {
                         var._conditionCtrl.Opt("+Disabled")
                         if var._conditionCtrl.Text != "" {
                             lastCondition := var._conditionCtrl.Text
                             colValue.condition := var._conditionCtrl.Text := ""
                         }
-                        color := "cC0C0C0"
                     } else {
                         var._conditionCtrl.Opt("-Disabled")
                         if var._conditionCtrl.Text == "" && lastCondition
                             colValue.condition := var._conditionCtrl.Text := lastCondition
 
-                        color := "cDefault"
+                        if colValue.condition
+                            color := "cDefault"
                     }
                     var._classEditCtrl.Opt(color)
                     var._titleEditCtrl.Opt(color)
@@ -357,11 +358,11 @@ createProcessMenuGui(meta, *) {
                         case i18n("condition.textMonitor"):
                             try var._tthGroupCtrl.Text := i18n("condition.textMonitor.label")
                             try var._tthEditCtrl.Text := colValue.textMonitor
-                            try var._tthEditCtrl.Add(["", "a{1}b{2}c{3}", "//\s|\n{2}", "abcdefg"])
+                            try var._tthEditCtrl.Add(["", "abc", "a.*c", "a\w{5}c", "//\s|\n{2}"])
                         case i18n("condition.hotkeyMonitor"):
                             try var._tthGroupCtrl.Text := i18n("condition.hotkeyMonitor")
                             try var._tthEditCtrl.Text := colValue.hotkeyMonitor
-                            try var._tthEditCtrl.Add(["", "^a", "^/|!+a", "^a>^s|^a>^f"])
+                            try var._tthEditCtrl.Add(["", "^a", "^s", "^/|!+a", "^a>^s|^a>^f"])
                         default:
                             try var._tthGroupCtrl.Text := i18n("match.textMonitorOrHotkeyMonitorOrIdleTimer")
                             try var._tthEditCtrl.Text := arrJoin([
@@ -562,11 +563,11 @@ createProcessMenuGui(meta, *) {
                         case i18n("condition.textMonitor"):
                             try _.Text := colValue.textMonitor
                             var._tthGroupCtrl.Text := i18n("condition.textMonitor.label")
-                            var._tthEditCtrl.Add(["", "a{1}b{2}c{3}", "//\s|\n{2}", "abcdefg"])
+                            var._tthEditCtrl.Add(["", "abc", "a.*c", "a\w{5}c", "//\s|\n{2}"])
                         case i18n("condition.hotkeyMonitor"):
                             try _.Text := colValue.hotkeyMonitor
                             var._tthGroupCtrl.Text := colValue.condition
-                            var._tthEditCtrl.Add(["", "^a", "^/|!+a", "^a>^s|^a>^f"])
+                            var._tthEditCtrl.Add(["", "^a", "^s", "^/|!+a", "^a>^s|^a>^f"])
                     }
                     _.OnEvent("Change", e_content)
                     e_content(i, *) {

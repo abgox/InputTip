@@ -14,10 +14,6 @@ class IME {
         "JP", { langId: 0x11, klid: 0x0411, convMode: 9 },
         "KR", { langId: 0x12, klid: 0x0412, convMode: 0 },
     )
-    static OpenStateMap := Map(
-        1, "CN",
-        0, "EN",
-    )
 
     /**
      * 获取当前输入法输入模式

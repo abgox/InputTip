@@ -192,9 +192,11 @@ for v in windowConditionKeyList
 allTriggerKeyList := ["hotkey"]
 switchTriggerKeyList := [
     "switchStateCaps-CapsLock",
-    "switchStateCN-LShift", "switchStateCN-RShift", "switchStateCN-CtrlSpace", "switchStateCN-IME",
-    "switchStateEN-LShift", "switchStateEN-RShift", "switchStateEN-CtrlSpace", "switchStateEN-IME",
-    "switchKeyboardCN", "switchKeyboardUS", "switchKeyboardJP", "switchKeyboardKR",
+    "switchStateCN-IME", "switchStateCN-LShift", "switchStateCN-RShift", "switchStateCN-CtrlSpace",
+    "switchStateEN-IME", "switchStateEN-LShift", "switchStateEN-RShift", "switchStateEN-CtrlSpace",
+    "switchKeyboardCN", "switchKeyboardUS",
+    "switchKeyboardJP", "switchKeyboardJPHiragana", "switchKeyboardJPKatakana", "switchKeyboardJPHalfKana", "switchKeyboardJPFullAlpha", "switchKeyboardJPHalfAlpha",
+    "switchKeyboardKR", "switchKeyboardKRHangul", "switchKeyboardKRAlpha",
 ]
 allTriggerKeyList.Push(switchTriggerKeyList.Clone()*)
 
@@ -210,7 +212,8 @@ allTriggerKeyList.Push("none", "showStateCode")
 
 windowTriggerKeyList := triggerKeyList.Clone()
 windowTriggerKeyList.InsertAt(10, "ignoreStateSwitch")
-windowTriggerKeyList.InsertAt(15, "ignoreKeyboardSwitch")
+windowTriggerKeyList.InsertAt(22, "ignoreKeyboardSwitch")
+windowTriggerKeyList.Push("showStateCode")
 allTriggerKeyList.Push("ignoreStateSwitch", "ignoreKeyboardSwitch")
 
 triggerTextMap := Map()
@@ -232,7 +235,14 @@ runTriggers(triggers, *) {
             case "switchKeyboardCN": switchKeyboard("CN")
             case "switchKeyboardUS": switchKeyboard("US")
             case "switchKeyboardJP": switchKeyboard("JP")
+            case "switchKeyboardJPHiragana": switchKeyboard("JP", 1, 9)
+            case "switchKeyboardJPKatakana": switchKeyboard("JP", 1, 11)
+            case "switchKeyboardJPHalfKana": switchKeyboard("JP", 1, 3)
+            case "switchKeyboardJPFullAlpha": switchKeyboard("JP", 1, 8)
+            case "switchKeyboardJPHalfAlpha": switchKeyboard("JP", 0, 0)
             case "switchKeyboardKR": switchKeyboard("KR")
+            case "switchKeyboardKRHangul": switchKeyboard("KR", 1, 1)
+            case "switchKeyboardKRAlpha": switchKeyboard("KR", 1, 0)
             case "toggle": toggleApp()
             case "pause": suspendApp()
             case "resume": resumeApp()
@@ -250,7 +260,7 @@ runTriggers(triggers, *) {
         }
     }
     _switchState(state, key) {
-        switchKeyboard("CN", 1), SetTimer(switchState.Bind(state, key), -20)
+        switchKeyboard("CN", , , 1), SetTimer(switchState.Bind(state, key), -20)
     }
 }
 

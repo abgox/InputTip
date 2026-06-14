@@ -150,13 +150,23 @@ class IME {
     /**
      * 切换到指定的输入法状态/布局
      * @param {"CN"|"EN"|"US"|"JP"|"KR"} targetState
+     * @param {0|1} active
      */
-    static SetInputMode(targetState, hwnd := this.GetFocusedWindow()) {
-        if targetState == "US" || targetState == "JP" || targetState == "KR" {
-            this.SwitchKeyboard(targetState)
-            if targetState != "US"
-                Sleep(50), this.SetOpenStatus(true, hwnd)
-            return
+    static SetInputMode(targetState, opened := "", conversionMode := "", hwnd := this.GetFocusedWindow()) {
+        switch targetState {
+            case "US":
+                this.SwitchKeyboard(targetState)
+                return
+            case "JP", "KR":
+                this.SwitchKeyboard(targetState)
+                if opened !== "" || conversionMode !== "" {
+                    Sleep(50)
+                    if opened !== ""
+                        this.SetOpenStatus(opened, hwnd)
+                    if conversionMode !== ""
+                        this.SetConversionMode(conversionMode, hwnd)
+                }
+                return
         }
         this.SwitchKeyboard("CN")
 
@@ -289,14 +299,15 @@ class IME {
 /**
  * 切换键盘布局
  * @param {"CN"|"US"|"JP"|"KR"} state 要切换的键盘布局
- * @param ignoreKeepCaps
+ * @param {""|0|1} active
+ * @param {0|1} ignoreKeepCaps
  */
-switchKeyboard(state, ignoreKeepCaps := 0) {
+switchKeyboard(state, opened := "", conversionMode := "", ignoreKeepCaps := 0) {
     if matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule["ignoreKeyboardSwitch"]).Length
         return 0
     if !ignoreKeepCaps && IME.GetInputModeText() == "Caps" && !var.keepCapsLockWhenKeyboardSwitch
         SendInput("{CapsLock}")
-    return IME.SwitchKeyboard(state)
+    return opened != "" || conversionMode != "" ? IME.SetInputMode(state, opened, conversionMode) : IME.SwitchKeyboard(state)
 }
 
 /**

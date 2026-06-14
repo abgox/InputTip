@@ -15,6 +15,16 @@ class IME {
         "KR", { langId: 0x12, klid: 0x0412, convMode: 0 },
     )
 
+    static GeneralStrategy := {
+        strategy: 0, ; 0(复合兜底) 1(纯状态码) 2(纯转换码)
+        lastHwnd: 0,
+        lastOpened: -1,
+        lastConvMode: -1,
+        isNonBinaryIME: 0,
+        cnValue: 0,
+        enValue: 0
+    }
+
     /**
      * 获取当前输入法输入模式
      * @returns {"CN"|"EN"|"Caps"|"US"|"JP"|"KR"}
@@ -47,67 +57,57 @@ class IME {
             opened := this.GetOpenStatus(hwnd)
             convMode := this.GetConversionMode(hwnd)
 
-
             if var.inputMethodDetectionMode == "general" {
-                static lastOpened := -1
-                static lastConvMode := -1
-                static strategy := 0 ; 0 = 标准复合兜底, 1 = 纯状态码, 2 = 纯转换码
+                gs := this.GeneralStrategy
 
-                static isNonBinaryIME := 0 ; 非二元状态输入法标识
-                static cnValue := 0
-                static enValue := 0
-
-                if lastOpened == -1 || lastConvMode == -1 {
-                    lastOpened := opened
-                    lastConvMode := convMode
-                }
-                else if opened != lastOpened || convMode != lastConvMode {
-                    openedChanged := opened != lastOpened
-                    convModeChanged := convMode != lastConvMode
-
-                    if !openedChanged && convModeChanged {
-                        strategy := 2
-                        isNonBinaryIME := 0
-                    }
-                    else if openedChanged && !convModeChanged {
-                        strategy := 1
-                        if isNonBinaryIME && (strategy == 2 || opened < 1)
-                            isNonBinaryIME := 0
-                        if opened != lastOpened && (opened > 1 || lastOpened > 1)
-                            isNonBinaryIME := 1, cnValue := Max(opened, lastOpened), enValue := Min(opened, lastOpened)
-                    }
-                    else if openedChanged && convModeChanged {
-                        strategy := 0
-                        isNonBinaryIME := 0
-                    }
-
-                    lastOpened := opened
-                    lastConvMode := convMode
+                if gs.lastHwnd != hwnd {
+                    gs.lastHwnd := hwnd
+                    gs.lastOpened := opened
+                    gs.lastConvMode := convMode
+                    goto SKIP_STRATEGY_LEARNING
                 }
 
-                switch strategy {
-                    case 1:
-                        if isNonBinaryIME
-                            state := opened == cnValue ? "CN" : "EN"
+                if opened != gs.lastOpened || convMode != gs.lastConvMode {
+                    openedChanged := opened != gs.lastOpened
+                    convModeChanged := convMode != gs.lastConvMode
+
+                    if openedChanged {
+                        if gs.isNonBinaryIME && gs.strategy == 2
+                            gs.isNonBinaryIME := 0
+                        gs.strategy := 1
+                        if opened > 1 || gs.lastOpened > 1
+                            gs.isNonBinaryIME := 1, gs.cnValue := Max(opened, gs.lastOpened), gs.enValue := Min(opened, gs.lastOpened)
                         else
-                            state := opened ? "CN" : "EN"
+                            gs.isNonBinaryIME := 0
+                    }
+                    else if convModeChanged {
+                        if convMode & 1 != gs.lastConvMode & 1 {
+                            if gs.isNonBinaryIME && gs.strategy == 1
+                                gs.isNonBinaryIME := 0
+                            gs.strategy := 2
+                        }
+                    }
+                    gs.lastOpened := opened
+                    gs.lastConvMode := convMode
+                }
 
+                SKIP_STRATEGY_LEARNING:
+                switch gs.strategy {
+                    case 1:
+                        state := gs.isNonBinaryIME ? (opened == gs.cnValue ? "CN" : "EN") : (opened ? "CN" : "EN")
                     case 2:
                         state := convMode & 1 ? "CN" : "EN"
-
                     default:
-                        if isNonBinaryIME {
-                            state := opened == cnValue ? "CN" : "EN"
-                        }
-                        else if convMode & 1 {
+                        if gs.isNonBinaryIME
+                            state := opened == gs.cnValue ? "CN" : "EN"
+                        else if convMode == 0
+                            state := opened ? "CN" : "EN"
+                        else if opened == 0
+                            state := "EN"
+                        else if convMode & 1
                             state := "CN"
-                        }
-                        else {
-                            if (opened == 0) || (opened == 1 && (convMode == 0 || convMode == 1))
-                                state := "EN"
-                            else
-                                state := opened ? "CN" : "EN"
-                        }
+                        else
+                            state := "EN"
                 }
                 lastState := state
                 return state
@@ -159,15 +159,40 @@ class IME {
             return
         }
         this.SwitchKeyboard("CN")
-        switch targetState {
-            case "CN": this.SetOpenStatus(true, hwnd), this.SetConversionMode(this.LangMap["CN"].convMode, hwnd)
-            case "EN": this.SetOpenStatus(false, hwnd)
-        }
-    }
 
-    static ToggleInputMode(hwnd := this.GetFocusedWindow()) {
-        current := this.GetInputModeText(hwnd)
-        this.SetInputMode((current == "US" || current == "EN") ? "CN" : "EN", hwnd)
+        if var.inputMethodDetectionMode != "general" {
+            switch targetState {
+                case "CN": this.SetOpenStatus(true, hwnd), this.SetConversionMode(this.LangMap["CN"].convMode, hwnd)
+                case "EN": this.SetOpenStatus(false, hwnd)
+            }
+            return
+        }
+
+        ; CN/EN
+        gs := this.GeneralStrategy
+        switch gs.strategy {
+            case 1:
+                if targetState == "CN"
+                    s := gs.isNonBinaryIME ? gs.cnValue : 1
+                else
+                    s := gs.isNonBinaryIME ? gs.enValue : 0
+                this.SetOpenStatus(s, hwnd)
+            case 2:
+                this.SetConversionMode(targetState == "CN" ? this.LangMap["CN"].convMode : 0, hwnd)
+            default:
+                if gs.isNonBinaryIME {
+                    this.SetOpenStatus(targetState == "CN" ? gs.cnValue : gs.enValue, hwnd)
+                } else {
+                    if targetState == "CN"
+                        this.SetOpenStatus(true, hwnd), this.SetConversionMode(this.LangMap["CN"].convMode, hwnd)
+                    else
+                        this.SetOpenStatus(false, hwnd), this.SetConversionMode(0, hwnd)
+                }
+        }
+
+        Sleep(20)
+        gs.lastOpened := this.GetOpenStatus(hwnd)
+        gs.lastConvMode := this.GetConversionMode(hwnd)
     }
 
     static GetOpenStatus(hwnd := this.GetFocusedWindow()) {

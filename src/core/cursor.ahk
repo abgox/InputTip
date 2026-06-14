@@ -3,12 +3,9 @@
 for k, v in var.cursorInfo {
     o := ""
     try o := replaceEnvVariables(RegRead("HKEY_CURRENT_USER\Control Panel\Cursors", k))
-    if (!o) {
+    if !o
         o := "C:\Windows\Cursors\" v[2]
-    }
-    if (o) {
-        var.cursorInfo[k] := { id: v[1], origin: o }
-    }
+    var.cursorInfo[k] := { id: v[1], origin: o }
 }
 
 updateCursor()
@@ -39,7 +36,7 @@ updateCursor() {
                 }
             }
             Loop Files loopDir "\*.*" {
-                n := SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4)
+                n := StrUpper(SubStr(A_LoopFileName, 1, StrLen(A_LoopFileName) - 4))
                 if var.cursorInfo.Has(n)
                     var.cursorInfo[n].%state% := A_LoopFileFullPath
             }
@@ -56,7 +53,7 @@ loadCursor(state, change := 0) {
     if !var.cursorActive || (state == lastCursor && !change)
         return
     if var.loadOnlyIBeamCursor {
-        if p := var.cursorInfo.Get("IBeam").%state%
+        if p := var.cursorInfo.Get("IBEAM").%state%
             DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", p, "Ptr"), "Int", "32513")
     } else {
         for k, v in var.cursorInfo
@@ -66,13 +63,8 @@ loadCursor(state, change := 0) {
 }
 
 revertCursor() {
-    for k, v in var.cursorInfo {
-        try {
-            if (v.origin) {
-                DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.id)
-            }
-        }
-    }
+    for k, v in var.cursorInfo
+        try (v.origin ? DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.id) : "")
 }
 
 getCursorPath() {

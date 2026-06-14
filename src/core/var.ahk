@@ -22,23 +22,23 @@ var := {
     screenNum: MonitorGetCount(),
     screenList: getScreenInfo(),
     cursorInfo: Map(
-        "Arrow", [32512, "aero_arrow.cur"],  ; 普通选择
-        "IBeam", [32513, "beam_m.cur"],  ; 文本选择/文本输入
-        "Wait", [32514, "aero_busy.ani"],  ; 繁忙
-        "Crosshair", [32515, "cross_m.cur"],  ; 精度选择
-        "UpArrow", [32516, "aero_up.cur"],  ; 备用选择
-        "SizeNWSE", [32642, "aero_nwse.cur"],  ; 对角线调整大小 左上=>右下
-        "SizeNESW", [32643, "aero_nesw.cur"],  ; 对角线调整大小 左下=>右上
-        "SizeWE", [32644, "aero_ew.cur"],  ; 水平调整大小
-        "SizeNS", [32645, "aero_ns.cur"],  ; 垂直调整大小
-        "SizeAll", [32646, "aero_move.cur"],  ; 移动
-        "No", [32648, "aero_unavail.cur"],  ; 无法(禁用)
-        "Hand", [32649, "aero_link.cur"],  ; 链接选择
-        "AppStarting", [32650, "aero_working.ani"],  ; 在后台工作
-        "Help", [32651, "aero_helpsel.cur"],  ; 帮助选择
-        "Pin", [32671, "aero_pin.cur"],  ; 位置选择
-        "Person", [32672, "aero_person.cur"],  ; 人员选择
-        "NWPen", [32631, "aero_pen.cur"],  ; 手写
+        "ARROW", [32512, "aero_arrow.cur"],  ; 普通选择
+        "IBEAM", [32513, "beam_m.cur"],  ; 文本选择/文本输入
+        "WAIT", [32514, "aero_busy.ani"],  ; 繁忙
+        "CROSSHAIR", [32515, "cross_m.cur"],  ; 精度选择
+        "UPARROW", [32516, "aero_up.cur"],  ; 备用选择
+        "SIZENWSE", [32642, "aero_nwse.cur"],  ; 对角线调整大小 左上=>右下
+        "SIZENESW", [32643, "aero_nesw.cur"],  ; 对角线调整大小 左下=>右上
+        "SIZEWE", [32644, "aero_ew.cur"],  ; 水平调整大小
+        "SIZENS", [32645, "aero_ns.cur"],  ; 垂直调整大小
+        "SIZEALL", [32646, "aero_move.cur"],  ; 移动
+        "NO", [32648, "aero_unavail.cur"],  ; 无法(禁用)
+        "HAND", [32649, "aero_link.cur"],  ; 链接选择
+        "APPSTARTING", [32650, "aero_working.ani"],  ; 在后台工作
+        "HELP", [32651, "aero_helpsel.cur"],  ; 帮助选择
+        "PIN", [32671, "aero_pin.cur"],  ; 位置选择
+        "PERSON", [32672, "aero_person.cur"],  ; 人员选择
+        "NWPEN", [32631, "aero_pen.cur"],  ; 手写
     ),
     loadOnlyIBeamCursor: readIni("loadOnlyIBeamCursor", 0),
     language: currentLang,

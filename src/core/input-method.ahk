@@ -112,8 +112,8 @@ e_inputMethod(*) {
                     _gc.%v "Num"% := _ := g.AddComboBox("yp", v == "state" ? ["", "0", "1", "1/3"] : ["", "0", "1", "1/1025"])
                     _.v := v
                     if !InStr(ruleInfo.%v "Rule"%, "oddNum") && !InStr(ruleInfo.%v "Rule"%, "evenNum")
-                        _.Value := ruleInfo.%v "Rule"%
-                    _.OnEvent("Change", (i, *) => (v := i.v, ruleInfo.%v "Rule"% := i.Value, _gc.%v "Rule"%.value := 0))
+                        _.Text := ruleInfo.%v "Rule"%
+                    _.OnEvent("Change", (i, *) => (v := i.v, ruleInfo.%v "Rule"% := i.Text, _gc.%v "Rule"%.Value := 0))
                     g.AddText("xs+20 yp+55", i18n("inputMethodDetectionMode.rule"))
                     _gc.%v "Rule"% := _ := g.AddDropDownList("yp", ["", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")])
                     _.v := v

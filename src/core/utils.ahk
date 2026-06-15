@@ -213,3 +213,18 @@ isLocked() {
     DllCall("CloseDesktop", "Ptr", hDesktop)
     return 0
 }
+
+isFullScreen(hwnd) {
+    if !hwnd || (WinGetStyle(hwnd) & 0x00C00000)
+        return false
+    try {
+        WinGetPos(&winX, &winY, &winW, &winH, hwnd)
+        scr := isWhichScreen(hwnd)
+        if scr {
+            scrW := scr.right - scr.left
+            scrH := scr.bottom - scr.top
+            return (winW >= scrW * 0.98 && winH >= scrH * 0.98)
+        }
+    }
+    return false
+}

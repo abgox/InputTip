@@ -167,7 +167,7 @@ if isJAB {
                         }
                     }
 
-                    currentBorderFingerprint := targetColor "_" targetWidth "_" isMaximized "_" allowShow "_" hwnd
+                    currentBorderFingerprint := targetColor "_" targetWidth "_" isMaximized "_" isFullScreen(hwnd) "_" allowShow "_" hwnd
 
                     if currentBorderFingerprint != lastBorderState || (var.borderReshowOnTitleChange && hasTitleChange) || (var.borderReshowOnClassChange && hasClassChange) || (var.borderReshowOnProcessChange && hasProcessChange) {
                         if allowShow {

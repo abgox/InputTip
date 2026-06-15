@@ -203,22 +203,10 @@ e_overlay(*) {
             ["no", 0, (key, value, *) => (changeConfig(key, value), disableCtrl(ctrlList))]
         ])
 
+        _ := renderRadioGroup(g, "overlayOnlyFocusScreen", [["yes", 1], ["no", 0]])
+        ctrlList.Push(_.radios*)
         _ := renderEditGroup(g, "overlayHideDelay", "Number Limit5")
         ctrlList.Push(_.edit)
-        renderGroupBox(g, "overlayReshowOnChange", , "h110 w" bw)
-        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("overlayReshowOnChange.state")).Value := 1
-        for v in ["Process", "Title", "Class"] {
-            _ := g.AddCheckbox("yp", i18n("overlayReshowOnChange." StrLower(v)))
-            _.Value := var.%"overlayReshowOn" v "Change"%
-            _.OnEvent("Click", e_change.Bind(v))
-            ctrlList.Push(_)
-        }
-        e_change(type, ctrl, *) {
-            key := "overlayReshowOn" type "Change"
-            val := ctrl.Value
-            var.%key% := val
-            writeIni(key, val)
-        }
 
         _ := renderRadioGroup(g, "overlayShowMode",
             [
@@ -248,8 +236,22 @@ e_overlay(*) {
 
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/overlay"))
-        _ := renderRadioGroup(g, "overlayOnlyFocusScreen", [["yes", 1], ["no", 0]])
-        ctrlList.Push(_.radios*)
+
+        renderGroupBox(g, "overlayReshowOnChange", , "h110 w" bw)
+        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("overlayReshowOnChange.state")).Value := 1
+        for v in ["Process", "Title", "Class"] {
+            _ := g.AddCheckbox("yp", i18n("overlayReshowOnChange." StrLower(v)))
+            key := "overlayReshowOn" v "Change"
+            _.Value := var.%key%
+            _.OnEvent("Click", e_change.Bind(key))
+            ctrlList.Push(_)
+        }
+        e_change(key, ctrl, *) {
+            val := ctrl.Value
+            var.%key% := val
+            writeIni(key, val)
+        }
+
         _ := renderRadioGroup(g, "overlayAnimation",
             [
                 ["none", 0],

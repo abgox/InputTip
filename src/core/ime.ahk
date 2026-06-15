@@ -57,7 +57,7 @@ class IME {
             opened := this.GetOpenStatus(hwnd)
             convMode := this.GetConversionMode(hwnd)
 
-            if var.inputMethodDetectionMode == "general" {
+            if var.inputMethodDetectionMode == "general" || !var.inputMethodDetectionRules.Length {
                 gs := this.GeneralStrategy
 
                 if gs.lastHwnd != hwnd {

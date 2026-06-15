@@ -3,7 +3,7 @@
 currentState := "EN"
 lastInputState := "", lastExportState := ""
 hasTitleChange := 1, hasClassChange := 1, hasProcessChange := 1
-exeName := "", exeTitle := "", exeClass := "", leaveDelay := var.pollInterval + 500
+exePid := "", exeName := "", exeTitle := "", exeClass := "", leaveDelay := var.pollInterval + 500
 lastProcess := "", lastTitle := "", lastClass := ""
 lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := "", lastBorderState := ""
 

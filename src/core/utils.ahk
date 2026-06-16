@@ -171,10 +171,16 @@ runScheduleTask(taskName) {
 }
 
 
-getWinPhysicalRect(hwnd := 0) {
+getWinPhysicalRect(hwnd := WinExist("A")) {
     rc := Buffer(16, 0)
-    if !hwnd
-        hwnd := WinExist("A")
+    if !DllCall("dwmapi\DwmGetWindowAttribute", "Ptr", hwnd, "UInt", 9, "Ptr", rc, "UInt", 16) {
+        x := NumGet(rc, 0, "Int")
+        y := NumGet(rc, 4, "Int")
+        w := NumGet(rc, 8, "Int") - x
+        h := NumGet(rc, 12, "Int") - y
+        return { x: x, y: y, w: w, h: h }
+    }
+
     DllCall("GetWindowRect", "Ptr", hwnd, "Ptr", rc)
     x := NumGet(rc, 0, "Int")
     y := NumGet(rc, 4, "Int")

@@ -17,6 +17,8 @@ class IME {
 
     static GeneralStrategy := {
         strategy: 0, ; 0(复合兜底) 1(纯状态码) 2(纯转换码)
+        lastChangedTime: 0,
+        pendingState: "",
         lastHwnd: 0,
         lastOpened: -1,
         lastConvMode: -1,
@@ -64,12 +66,25 @@ class IME {
                     gs.lastHwnd := hwnd
                     gs.lastOpened := opened
                     gs.lastConvMode := convMode
+                    gs.lastChangedTime := 0
+                    gs.pendingState := ""
                     goto SKIP_STRATEGY_LEARNING
                 }
 
-                if opened != gs.lastOpened || convMode != gs.lastConvMode {
-                    openedChanged := opened != gs.lastOpened
-                    convModeChanged := convMode != gs.lastConvMode
+                openedChanged := opened != gs.lastOpened
+                convModeChanged := convMode != gs.lastConvMode
+
+                if openedChanged || convModeChanged {
+                    currentFeature := opened "," convMode
+                    if (gs.pendingState != currentFeature) {
+                        gs.pendingState := currentFeature
+                        gs.lastChangedTime := A_TickCount
+                        goto SKIP_STRATEGY_LEARNING
+                    }
+                    else {
+                        if A_TickCount - gs.lastChangedTime < 200
+                            goto SKIP_STRATEGY_LEARNING
+                    }
 
                     if openedChanged {
                         if gs.isNonBinaryIME && gs.strategy == 2
@@ -89,6 +104,11 @@ class IME {
                     }
                     gs.lastOpened := opened
                     gs.lastConvMode := convMode
+                    gs.pendingState := ""
+                    gs.lastChangedTime := 0
+                } else {
+                    gs.pendingState := ""
+                    gs.lastChangedTime := 0
                 }
 
                 SKIP_STRATEGY_LEARNING:

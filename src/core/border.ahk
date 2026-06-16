@@ -88,11 +88,11 @@ e_border(*) {
         for i, v in ["Pinned", stateList*] {
             if (Mod(i - 1, 4) == 0) {
                 tab.UseTab(((i - 1) // 3) + 3)
-                g.AddLink("Section", getDocsLink("tip/border"))
+                opt := "Section"
+            } else {
+                opt := "xs"
             }
-
-            renderGroupBox(g, v, , "h110 w" bw)
-
+            renderGroupBox(g, v, opt, "h110 w" bw)
             ; renderEditLabel(g, "borderWidth" v, "w" bw / 3, "borderWidth")
             _ := renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+50")
             ctrlList.Push(_.picker)

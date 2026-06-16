@@ -292,10 +292,12 @@ e_overlay(*) {
         for i, v in stateList {
             if Mod(i - 1, 2) == 0 {
                 tab.UseTab(((i - 1) // 2) + 3)
-                g.AddLink("Section", getDocsLink("tip/overlay"))
+                opt := "Section"
+            } else {
+                opt := "xs"
             }
 
-            renderGroupBox(g, v, , "h280 w" bw)
+            renderGroupBox(g, v, opt, "Section h300 w" bw)
             _ := renderEditLabel(g, "overlayText" v, "w" bw / 3, "overlayText")
             ctrlList.Push(_.edit)
             _ := renderEditLabel(g, "overlayOffsetX" v, "Limit5 w" bw / 10, "overlayOffsetX", "yp")
@@ -316,7 +318,7 @@ e_overlay(*) {
             _ := renderColorPicker(g, "overlayBgColor" v, "overlayBgColor")
             ctrlList.Push(_.picker)
 
-            renderText(g, "overlayTextFont", "xs+20 yp+55", "")
+            renderText(g, "overlayTextFont", "xs+20 yp+60", "")
             _ := renderDropDownList(g, "overlayTextFont" v, fontList, "yp", "w" bw / 1.2)
             ctrlList.Push(_)
             _ := renderEditLabel(g, "overlayTextSize" v, "Number Limit2 w" bw / 3, "overlayTextSize", "xs+20 yp+55")

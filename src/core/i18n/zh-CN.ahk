@@ -378,6 +378,7 @@ langStrings.Set("zh-CN", Map(
     "about.privilege", "运行权限: ",
     "about.privilege.admin", "管理员",
     "about.privilege.user", "用户",
+    "about.runtime", "运行环境: ",
     "about.link", "相关链接",
     "donate", "赞赏以支持我的开发工作",
 ))

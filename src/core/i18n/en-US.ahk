@@ -378,6 +378,7 @@ langStrings.Set("en-US", Map(
     "about.privilege", "Privilege: ",
     "about.privilege.admin", "Admin",
     "about.privilege.user", "User",
+    "about.runtime", "Runtime: ",
     "about.link", "App Link",
     "donate", "Donate to Support Development",
 ))

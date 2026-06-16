@@ -19,10 +19,12 @@ e_about(*) {
         g.AddLink(opt, i18n("about.version") getLink("inputtip.abgox.com/download", currentVersion))
         g.AddLink(opt, i18n("about.developer") getLink("www.abgox.com", author))
 
-        renderGroupBox(g, "about.status", "xs", "h150 w" w)
+        renderGroupBox(g, "about.status", "xs", "h200 w" w)
         g.AddLink(opt, i18n("about.type") getLink("inputtip.abgox.com/docs/zip-vs-exe", versionType))
         privilege := A_IsAdmin ? i18n("about.privilege.admin") : i18n("about.privilege.user")
         g.AddLink(opt, i18n("about.privilege") getLink("inputtip.abgox.com/docs/privilege", privilege))
+        if versionType == "zip"
+            g.AddLink(opt, i18n("about.runtime") getLink("inputtip.abgox.com/docs/runtime", "AutoHotkey " A_AhkVersion))
 
         renderGroupBox(g, "about.link", "xs", "h180 w" w)
         g.AddLink(opt, getLink("inputtip.abgox.com"))

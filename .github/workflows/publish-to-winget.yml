@@ -8,6 +8,7 @@ on:
 jobs:
   publish:
     name: Publish winget-pkgs
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
     runs-on: windows-latest
     env:
       REPO: ${{ github.repository }}

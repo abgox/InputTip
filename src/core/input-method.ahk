@@ -30,9 +30,7 @@ e_inputMethod(*) {
         g.AddText("yp w20")
         _ := g.AddCheckbox("yp", i18n("inputMethodDetectionMode.showCode"))
         _.Value := var._showStateCode
-        _.OnEvent("Click", (ctrl, *) => (
-            val := ctrl.Value, var._showStateCode := val, showStateCode(val)
-        ))
+        _.OnEvent("Click", (ctrl, *) => (val := ctrl.Value, showStateCode(var._showStateCode := val)))
 
         columns := [
             i18n("inputMethodDetectionMode.matchOrder"), i18n("inputMethodDetectionMode.stateCodeRule"), i18n("inputMethodDetectionMode.conversionCodeRule"), i18n("inputMethodDetectionMode.imeState")
@@ -192,8 +190,6 @@ e_inputMethod(*) {
             colList.Push(i18n(state))
             return colList
         }
-
-        g.OnEvent("Close", (*) => (g.Destroy(), var._showStateCode := 0, showStateCode(0)))
 
         return g
     }

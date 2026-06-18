@@ -68,6 +68,7 @@ langStrings.Set("zh-CN", Map(
     "trigger.exit", "应用控制 - 退出",
     "trigger.restart", "应用控制 - 重启",
     "trigger.showStateCode", "显示/隐藏状态码和转换码",
+    "trigger.showCaptureMode", "显示/隐藏光标捕获模式",
     "trigger.toggleWindowTop", "窗口状态 - 切换置顶",
     "trigger.setWindowTop", "窗口状态 - 置顶",
     "trigger.cancelWindowTop", "窗口状态 - 取消置顶",

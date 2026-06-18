@@ -68,6 +68,7 @@ langStrings.Set("en-US", Map(
     "trigger.exit", "App Control - Exit",
     "trigger.restart", "App Control - Restart",
     "trigger.showStateCode", "Show/Hide State/Conversion Code",
+    "trigger.showCaptureMode", "Show/Hide Caret Capture Mode",
     "trigger.toggleWindowTop", "Window State - Toggle Always-on-Top",
     "trigger.setWindowTop", "Window State - Enable Always-on-Top",
     "trigger.cancelWindowTop", "Window State - Disable Always-on-Top",

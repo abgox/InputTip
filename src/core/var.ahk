@@ -215,13 +215,13 @@ allTriggerKeyList.Push(_*)
 
 hotkeyTriggerKeyList := triggerKeyList.Clone()
 hotkeyTriggerKeyList.InsertAt(1, "none")
-hotkeyTriggerKeyList.Push("showStateCode")
-allTriggerKeyList.Push("none", "showStateCode")
+hotkeyTriggerKeyList.Push("showStateCode", "showCaptureMode")
+allTriggerKeyList.Push("none", "showStateCode", "showCaptureMode")
 
 windowTriggerKeyList := triggerKeyList.Clone()
 windowTriggerKeyList.InsertAt(10, "ignoreStateSwitch")
 windowTriggerKeyList.InsertAt(22, "ignoreKeyboardSwitch")
-windowTriggerKeyList.Push("showStateCode")
+windowTriggerKeyList.Push("showStateCode", "showCaptureMode")
 allTriggerKeyList.Push("ignoreStateSwitch", "ignoreKeyboardSwitch")
 
 triggerTextMap := Map()
@@ -256,7 +256,8 @@ runTriggers(triggers, *) {
             case "resume": resumeApp()
             case "exit": SetTimer(closeApp, -500)
             case "restart": SetTimer(restartApp, -500)
-            case "showStateCode": showStateCode(var._showStateCode := !var._showStateCode)
+            case "showStateCode": showCaptureMode(0), showStateCode(var._showStateCode := !var._showStateCode)
+            case "showCaptureMode": showStateCode(0), showCaptureMode(var._showCaptureMode := !var._showCaptureMode)
             case "toggleWindowTop": try WinSetAlwaysOnTop((WinGetExStyle("A") & 0x8) ? 0 : 1, "A")
             case "setWindowTop":
                 if !(WinGetExStyle("A") & 0x8)
@@ -265,6 +266,8 @@ runTriggers(triggers, *) {
             default:
                 if !var._showStateCode
                     showStateCode(0)
+                if !var._showCaptureMode
+                    showCaptureMode(0)
         }
     }
     _switchState(state, key) {
@@ -478,6 +481,7 @@ parseWindowRule() {
     var.hotkeyRule := newHotkeyRule
 
     var._showStateCode := 0
+    var._showCaptureMode := 0
 
     var._matchCache.Clear()
 

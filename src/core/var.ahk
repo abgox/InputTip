@@ -69,6 +69,8 @@ var := {
     overlayReshowOnProcessChange: readIni("overlayReshowOnProcessChange", 0),
     overlayReshowOnTitleChange: readIni("overlayReshowOnTitleChange", 0),
     overlayReshowOnClassChange: readIni("overlayReshowOnClassChange", 0),
+    overlayShowOnMaximized: readIni("overlayShowOnMaximized", 1),
+    overlayShowOnFullscreen: readIni("overlayShowOnFullscreen", 1),
     overlayHideDelay: readIni("overlayHideDelay", 2000),
     overlayShowMode: readIni("overlayShowMode", "blacklist"),
     overlayTextWeight: readIni("overlayTextWeight", 700),

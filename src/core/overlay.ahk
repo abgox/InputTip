@@ -251,6 +251,15 @@ e_overlay(*) {
             var.%key% := val
             writeIni(key, val)
         }
+        renderGroupBox(g, "overlayShowOnWindowState", , "h110 w" bw)
+        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("overlayShowOnWindowState.normal")).Value := 1
+        for v in ["Maximized", "Fullscreen"] {
+            _ := g.AddCheckbox("yp", i18n("overlayShowOnWindowState." StrLower(v)))
+            key := "overlayShowOn" v
+            _.Value := var.%key%
+            _.OnEvent("Click", e_change.Bind(key))
+            ctrlList.Push(_)
+        }
 
         _ := renderRadioGroup(g, "overlayAnimation",
             [

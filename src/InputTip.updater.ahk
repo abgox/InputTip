@@ -25,11 +25,11 @@ if A_IsCompiled {
 }
 
 keyCount := 0
-precessId := ""
+precessIds := []
 updater := ""
 
 try keyCount := A_Args[1]
-try precessId := A_Args[2]
+try precessIds := StrSplit(A_Args[2], ",")
 try updater := A_Args[3]
 
 updater == "getRepoCode" ? getRepoCode() : checkUpdate()
@@ -125,8 +125,8 @@ checkUpdate() {
                 dlGui.Destroy()
                 if (done) {
                     try {
-                        ProcessClose(precessId)
-                        ProcessWaitClose(precessId, 10)
+                        for id in precessIds
+                            ProcessClose(id), ProcessWaitClose(id, 10)
                         FileMove(out, updater, 1)
                         try FileDelete(logFile)
                         Run('"' updater '" ' keyCount, , "Hide")
@@ -224,10 +224,23 @@ getRepoCode() {
         }
     }
     if (downloadIni) {
-        done := showDownloadProcessGui(i18n("update.downloading"), StrSplit(IniRead(out, "files"), "`n"), "updateVersion")
-        if (done) {
+        fileList := StrSplit(IniRead(out, "files"), "`n")
+        if runtimeVersion != FileGetVersion(runtime)
+            fileList.Push("src/AutoHotkey/AutoHotkey64.exe=AutoHotkey/AutoHotkey64.runtime.exe")
+        done := showDownloadProcessGui(i18n("update.downloading"), fileList, "updateVersion")
+        if done {
             try FileDelete(logFile)
-            Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.ahk" ' keyCount)
+            for id in precessIds
+                ProcessClose(id), ProcessWaitClose(id, 10)
+            newRuntime := A_ScriptDir "\AutoHotkey\AutoHotkey64.runtime.exe"
+            try {
+                if FileExist(newRuntime) && FileGetVersion(newRuntime) == runtimeVersion
+                    Sleep(50), FileMove(newRuntime, runtime, 1)
+            } catch {
+                try FileDelete(newRuntime)
+            }
+            Sleep(50)
+            Run('"' runtime '" "' A_ScriptDir '\InputTip.ahk" ' keyCount)
         }
     } else {
         done := 0

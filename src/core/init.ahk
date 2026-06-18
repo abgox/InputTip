@@ -228,8 +228,12 @@ if A_IsCompiled {
         FileInstall("temp/cursor/default-purple/Wait.ani", "temp/cursor/default-purple/Wait.ani", 1)
 } else {
     pluginFile := "data/plugin/InputTip.plugin.ahk"
-    if (!FileExist(pluginFile)) {
+    if !FileExist(pluginFile)
         FileAppend("; https://inputtip.abgox.com/docs/plugin`n", pluginFile)
+
+    try {
+        if !FileExist(runtime2) || FileGetVersion(runtime2) != FileGetVersion(runtime)
+            FileCopy(runtime, runtime2, 1)
     }
 
     fileList := [
@@ -300,7 +304,7 @@ if A_IsCompiled {
         }
         done := showDownloadProcessGui("missingFile.downloading", missFileList)
         if (done) {
-            Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' 0)
+            Run('"' runtime2 '" "' A_ScriptFullPath '" ' 0)
             ExitApp()
         }
     }

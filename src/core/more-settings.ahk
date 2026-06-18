@@ -65,7 +65,7 @@ e_moreSettings(*) {
                 } else {
                     g.AddButton("xs w" bw, i18n("updateNow")).OnEvent("Click", (*) => (
                         g.Destroy(),
-                        Run('"' A_AhkPath '" "' A_ScriptDir '\InputTip.updater.ahk" ' keyCount " " ProcessExist() " `"getRepoCode`"")
+                        Run('"' runtime2 '" "' A_ScriptDir '\InputTip.updater.ahk" ' keyCount " " ProcessExist() "," JAB_PID " `"getRepoCode`"")
                     )
                     )
                 }

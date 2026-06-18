@@ -25,7 +25,8 @@ runUpdater() {
         try Run("`"" A_Temp "\abgox.InputTip.updater.exe`" " keyCount " " ProcessExist() " `"" A_ScriptFullPath "`"")
         return
     }
-    try Run("`"" A_AhkPath "`" `"" A_ScriptDir "\InputTip.updater.ahk`" " keyCount " " ProcessExist())
+    global updaterPID
+    try Run("`"" runtime2 "`" `"" A_ScriptDir "\InputTip.updater.ahk`" " keyCount " " ProcessExist() "," JAB_PID, , "Hide", &updaterPID)
 }
 
 setTrayIcon(var.iconRunning)

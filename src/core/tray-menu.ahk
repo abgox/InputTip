@@ -74,13 +74,13 @@ makeTrayMenu() {
 }
 
 closeApp(*) {
-    try ProcessClose(updaterPID)
+    ProcessClose(updaterPID)
     killJAB()
     revertCursor()
     ExitApp()
 }
 restartApp(*) {
-    try ProcessClose(updaterPID)
+    ProcessClose(updaterPID)
     if (var.symbolJABActive) {
         killJAB()
     }

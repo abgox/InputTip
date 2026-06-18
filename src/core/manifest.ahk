@@ -2,6 +2,7 @@
 
 #Requires AutoHotkey v2.0
 
+runtimeVersion := "2.0.26.0"
 if (A_IsCompiled) {
     currentVersion := "3.6.6"
     versionType := "exe"
@@ -55,6 +56,8 @@ taskNameNoUAC := appid ".noUAC"
 taskNameJAB := appid ".JAB.JetBrains"
 
 appPid := DllCall("GetCurrentProcessId")
+runtime := A_ScriptDir "\AutoHotkey\AutoHotkey64.exe"
+runtime2 := A_ScriptDir "\AutoHotkey\_AutoHotkey64.exe"
 
 dataDir := A_ScriptDir "\data"
 configFile := dataDir "\config.ini"

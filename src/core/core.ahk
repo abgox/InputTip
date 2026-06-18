@@ -90,7 +90,7 @@ if isJAB {
                 exeTitle := WinGetTitle("A")
                 exeClass := WinGetClass("A")
                 exeMaximized := WinGetMinMax("A") == 1
-                exeFullscreen := isFullScreen(hwnd)
+                exeFullscreen := isFullscreen(hwnd)
 
                 hasProcessChange := lastProcess != exeName
                 hasTitleChange := lastTitle != exeTitle

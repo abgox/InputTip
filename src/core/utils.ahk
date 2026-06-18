@@ -220,7 +220,7 @@ isLocked() {
     return 0
 }
 
-isFullScreen(hwnd) {
+isFullscreen(hwnd) {
     if !hwnd || (WinGetStyle(hwnd) & 0x00C00000)
         return false
     try {

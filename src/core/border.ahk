@@ -68,18 +68,18 @@ e_border(*) {
             writeIni(key, val)
         }
 
-        renderGroupBox(g, "borderShowOnMaxScreen", , "h110 w" bw)
+        renderGroupBox(g, "borderShowOnMaximized", , "h110 w" bw)
         for i, v in ["Top", "Bottom", "Left", "Right"] {
             _ := g.AddCheckbox(i == 1 ? "xs+20 yp+50" : "yp", i18n("position." v))
-            key := "borderShowOnMaxScreen" v
+            key := "borderShowOnMaximized" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
             ctrlList.Push(_)
         }
-        renderGroupBox(g, "borderShowOnFullScreen", , "h110 w" bw)
+        renderGroupBox(g, "borderShowOnFullscreen", , "h110 w" bw)
         for i, v in ["Top", "Bottom", "Left", "Right"] {
             _ := g.AddCheckbox(i == 1 ? "xs+20 yp+50" : "yp", i18n("position." v))
-            key := "borderShowOnFullScreen" v
+            key := "borderShowOnFullscreen" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
             ctrlList.Push(_)
@@ -117,7 +117,7 @@ showBorder(finalColor, finalWidth, hwnd) {
 
     scr := isWhichScreen(hwnd)
 
-    if (isFullScreen(hwnd)) {
+    if (isFullscreen(hwnd)) {
         hideBorder()
         var.maximizedBorders := []
 
@@ -138,7 +138,7 @@ showBorder(finalColor, finalWidth, hwnd) {
 
         borderConfigs := []
         for cfg in rawConfigs {
-            if var.%"borderShowOnFullScreen" cfg.side%
+            if var.%"borderShowOnFullscreen" cfg.side%
                 borderConfigs.Push(cfg)
         }
 
@@ -182,7 +182,7 @@ showBorder(finalColor, finalWidth, hwnd) {
         ]
         borderConfigs := []
         for cfg in rawConfigs {
-            if var.%"borderShowOnMaxScreen" cfg.side%
+            if var.%"borderShowOnMaximized" cfg.side%
                 borderConfigs.Push(cfg)
         }
 

@@ -614,7 +614,11 @@ migrateConfig2() {
         ["symbolShapeCornerPreference", "caretSymbolShapeCornerPreference"],
         ["symbolOffsetBaseY", "caretSymbolOriginY"],
         ["symbolHideDelay", "caretSymbolHideDelay"],
-        ["symbolNearCursorActive", "cursorSymbolType"]
+        ["symbolNearCursorActive", "cursorSymbolType"],
+        ["borderShowOnMaxScreenTop", "borderShowOnMaximizedTop"],
+        ["borderShowOnMaxScreenBottom", "borderShowOnMaximizedBottom"],
+        ["borderShowOnMaxScreenLeft", "borderShowOnMaximizedLeft"],
+        ["borderShowOnMaxScreenRight", "borderShowOnMaximizedRight"],
     ]
 
     _list := [

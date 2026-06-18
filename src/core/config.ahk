@@ -29,10 +29,9 @@ normalizeConfig(key, value) {
             value := 0
     } else if key == "pollInterval" {
         value := Abs(returnNumber(value))
-        if value < 1
-            value := 1
-        if value > 99
-            value := 99
+        value += value <= 0
+        if value > 100
+            value := 100
     }
     return value
 }
@@ -49,9 +48,15 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
     if value == oldVal
         return
 
-    if (key == "language") {
+    if key == "language"
+        writeIni(key, value), restartApp()
+
+    if key == "menuFontSize" {
         writeIni(key, value)
-        restartApp()
+        var.menuFontSize := Number(value)
+        fontOpt[1] := "s" value
+        updateUIC()
+        return
     }
 
     value := normalizeConfig(key, value)
@@ -125,15 +130,9 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
     }
 
     switch key {
-        case "pollInterval":
-            value += value <= 0
-            if (value > 100) {
-                value := 100
-            }
         case "iconRunning", "iconPaused":
             setTrayIcon(value)
         case "enableCustomTrayTip", "trayTipTemplate", "enableKeyStats", "keyStatsTemplate":
             SetTimer(updateTrayTip, -1000)
-        default:
     }
 }

@@ -110,6 +110,7 @@ var := {
     cursorSymbolTextCornerPreference: readIni("cursorSymbolTextCornerPreference", 3),
     cursorSymbolShapeCornerPreference: readIni("cursorSymbolShapeCornerPreference", 3),
     menuAnimation: readIni("menuAnimation", 1),
+    menuFontSize: Max(readIni("menuFontSize", 16), 12),
     ; 轮询响应间隔
     pollInterval: readIni("pollInterval", 20),
     ; 托盘菜单图标
@@ -124,6 +125,12 @@ var := {
 }
 
 var._paused := 0
+
+if indexOfArr([12, 14, 16, 18, 20], var.menuFontSize)
+    fontOpt[1] := "s" Max(var.menuFontSize, 12)
+else
+    var.menuFontSize := 16
+try updateUIC()
 
 ; 自定义模式下定义的模式规则
 var.inputMethodDetectionRule := readIni("inputMethodDetectionRule", "")

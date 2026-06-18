@@ -462,7 +462,7 @@ e_symbolConfig(prefix, *) {
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
                         gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview")) : { Focus: (*) => "" }
                     }
-                    renderGroupBox(g, state, "xs", "h180 w" bw)
+                    renderGroupBox(g, state, "xs", "h" uicDDL.h * 1.5 " w" bw)
                     _ := prefix "SymbolPictureOffsetX"
                     renderEditLabel(g, _ state, "Limit5 " editOpt, _)
                     _ := prefix "SymbolPictureOffsetY"
@@ -472,7 +472,7 @@ e_symbolConfig(prefix, *) {
                     _ := prefix "SymbolPictureHeight"
                     renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
 
-                    _ := g.AddDropDownList("xs+20 yp+60 r9 w" bw - 40, picList)
+                    _ := g.AddDropDownList("xs+20 yp+" uicDDL.yp " r9 w" bw - 40, picList)
                     key := prefix "SymbolPicturePath" state
                     _.key := key
                     _.page := page
@@ -530,7 +530,7 @@ e_symbolConfig(prefix, *) {
                     } else {
                         opt := "xs"
                     }
-                    renderGroupBox(g, state, opt, "h170 w" bw)
+                    renderGroupBox(g, state, opt, "h" uicDDL.h * 1.5 " w" bw)
                     _ := prefix "SymbolShapeOffsetX"
                     renderEditLabel(g, _ state, "Limit5 " editOpt, _)
                     _ := prefix "SymbolShapeWidth"
@@ -585,7 +585,7 @@ e_symbolConfig(prefix, *) {
                     } else {
                         opt := "xs"
                     }
-                    renderGroupBox(g, state, opt, "h300 w" bw)
+                    renderGroupBox(g, state, opt, "h" uicDDL.h * 2.5 " w" bw)
                     renderEditLabel(g, prefix "SymbolTextContent" state, editOpt, prefix "SymbolTextContent")
                     renderEditLabel(g, prefix "SymbolTextOffsetX" state, "Limit5 " editOpt, prefix "SymbolTextOffsetX", "yp")
                     renderColorPicker(g, prefix "SymbolTextColor" state, prefix "SymbolTextColor")
@@ -593,7 +593,7 @@ e_symbolConfig(prefix, *) {
                     renderEditLabel(g, prefix "SymbolTextOffsetY" state, "Limit5 " editOpt, prefix "SymbolTextOffsetY", "yp")
                     renderColorPicker(g, prefix "SymbolTextBgColor" state, prefix "SymbolTextBgColor")
 
-                    renderText(g, prefix "SymbolTextFont", "xs+20 yp+60", "")
+                    renderText(g, prefix "SymbolTextFont", "xs+20 yp+" uicDDL.yp, "")
                     renderDropDownList(g, prefix "SymbolTextFont" state, fontList, "yp", "w" bw / 1.2)
                     renderEditLabel(g, prefix "SymbolTextWeight" state, "Number Limit3" editOpt, prefix "SymbolTextWeight")
                     renderEditLabel(g, prefix "SymbolTextTransparent" state, "Number Limit3" editOpt, prefix "SymbolTextTransparent", "yp")

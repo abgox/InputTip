@@ -106,8 +106,8 @@ e_windowInfo(*) {
 
         g.AddLink("Section", getDocsLink("menu/window-info"))
         for v in i18n("windowInfo.list", 1) {
-            renderGroupBox(g, v, , "h120 w" bw)
-            gc.%v% := _ := g.AddEdit("xs+20 yp+55 ReadOnly cGray -VScroll w" bw - 40)
+            renderGroupBox(g, v, , "h" uicEdit.h " w" bw)
+            gc.%v% := _ := g.AddEdit("xs+20 yp+" uicEdit.yp " ReadOnly cGray -VScroll w" bw - 40)
             _.Text := i18n("windowInfo.tip")
         }
         g.OnEvent("Close", (*) => timer := 0)
@@ -223,8 +223,8 @@ createProcessMenuGui(meta, *) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            opt := "xs+20 yp+55 w" bw - 40
-            layout := " h120 w" bw
+            opt := "xs+20 yp+" uicEdit.yp " w" bw - 40
+            layout := " h" uicEdit.h " w" bw
 
             sectionList := []
             i := 0
@@ -407,10 +407,10 @@ createProcessMenuGui(meta, *) {
                     if var.symbolJABActive
                         modeNameList.Push("JAB")
                     ddlControls := captureList.Clone()
-                    renderGroupBox(g, "symbolCaretCapture", "xs h180 w" bw)
+                    renderGroupBox(g, "symbolCaretCapture", "xs h" uicDDL.h * 1.5 " w" bw)
                     for i, v in captureList {
                         if i == 1 || i == 5 {
-                            _opt := "xs+20 yp+55"
+                            _opt := "xs+20 yp+" uicDDL.yp
                         } else {
                             _opt := "yp"
                             g.AddText("yp", ">")
@@ -422,10 +422,10 @@ createProcessMenuGui(meta, *) {
                         SuppressControlWheel(_.Hwnd)
                     }
 
-                    renderGroupBox(g, "symbolCaretCapture.offset", "xs h180 w" bw)
+                    renderGroupBox(g, "symbolCaretCapture.offset", "xs h" uicDDL.h * 1.5 " w" bw)
                     for i, v in captureOffsetList {
                         if i == 1 || i == 5 {
-                            _opt := "xs+20 yp+55"
+                            _opt := "xs+20 yp+" uicDDL.yp
                         } else {
                             _opt := "yp"
                             g.AddText("yp", ">")

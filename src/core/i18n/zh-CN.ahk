@@ -344,6 +344,7 @@ langStrings.Set("zh-CN", Map(
     "language.chinese", "简体中文 (zh-CN)",
     "language.english", "英文 (en-US)",
     "menuAnimation", "菜单的动画效果",
+    "menuFontSize", "菜单的字体大小",
     "openDataDirectory", "打开数据目录",
     "pollInterval", "轮询响应间隔时间 (毫秒)",
     "iconRunning", "运行中",

@@ -32,6 +32,7 @@ e_moreSettings(*) {
                 ]
             ],
         ])
+        renderDropDownListGroup(g, "menuFontSize", [12, 14, 16, 18, 20])
 
         ; renderEditGroup(g, "pollInterval", "Number limit2")
 
@@ -109,8 +110,8 @@ e_moreSettings(*) {
             renderRadioGroup(g, "enableKeyStats", [["yes", 1], ["no", 0]])
             renderEditGroup(g, "trayTipTemplate", "")
             renderEditGroup(g, "keyStatsTemplate", "")
-            renderGroupBox(g, "templateVar", , "xs h120 w" bw)
-            g.AddEdit("xs+20 yp+55 ReadOnly w" bw - 40, "%\n%          %appState%          %keyCount%")
+            renderGroupBox(g, "templateVar", , "xs h" uicEdit.h " w" bw)
+            g.AddEdit("xs+20 yp+" uicEdit.yp " ReadOnly w" bw - 40, "%\n%          %appState%          %keyCount%")
 
             return g
         }

@@ -1,5 +1,19 @@
 ; InputTip
 
+updateUIC() {
+    global
+    static ui := Map(
+        12, { text: { h: 80, yp: 35 }, edit: { h: 110, yp: 45 }, ddl: { h: 100, yp: 45 } },
+        14, { text: { h: 100, yp: 45 }, edit: { h: 110, yp: 45 }, ddl: { h: 110, yp: 50 } },
+        16, { text: { h: 120, yp: 55 }, edit: { h: 130, yp: 55 }, ddl: { h: 130, yp: 60 } }, ; base
+        18, { text: { h: 140, yp: 65 }, edit: { h: 150, yp: 65 }, ddl: { h: 150, yp: 70 } },
+        20, { text: { h: 160, yp: 75 }, edit: { h: 170, yp: 75 }, ddl: { h: 170, yp: 80 } }
+    )
+    uicText := ui.Get(var.menuFontSize).text
+    uicEdit := ui.Get(var.menuFontSize).edit
+    uicDDL := ui.Get(var.menuFontSize).ddl
+}
+
 /**
  * 渲染控件 GroupBox
  * @param {Gui} g
@@ -56,8 +70,8 @@ renderEdit(g, key, layout := "yp", options := "") {
  * @param {"Number"|"Number Limit2"|String} options 编辑框的额外选项
  */
 renderEditGroup(g, key, options) {
-    _ := renderGroupBox(g, key, "xs", "h120 w" g.bw)
-    __ := renderEdit(g, key, "xs+20 yp+55", "w" g.bw - 40 " " options)
+    _ := renderGroupBox(g, key, "xs", "h" uicEdit.h " w" g.bw)
+    __ := renderEdit(g, key, "xs+20 yp+" uicEdit.yp, "w" g.bw - 40 " " options)
     return { group: _, edit: __ }
 }
 
@@ -69,7 +83,7 @@ renderEditGroup(g, key, options) {
  * @param {String} labelKey 标签的 i18n key
  * @param {String} textLayout 标签的布局配置
  */
-renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+20 yp+55") {
+renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+20 yp+" uicEdit.yp) {
     _ := renderText(g, labelKey, textLayout, "")
     __ := renderEdit(g, editKey, "yp", editOptions)
     return { text: _, edit: __ }
@@ -83,7 +97,7 @@ renderEditLabel(g, editKey, editOptions, labelKey := editKey, textLayout := "xs+
  * @param {"xs+20 yp+60"|"yp"|"xs"} layout 布局配置
  * @param {String} options 额外选项
  */
-renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
+renderDropDownList(g, key, list, layout := "xs+20 yp+" uicDDL.yp, options := "") {
     valMap := Map()
     _list := []
     for v in list
@@ -91,7 +105,7 @@ renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
     _ := g.AddDropDownList(layout " r9 " options, _list)
     val := var.%key%
     try _.Text := i18n(val)
-    _.OnEvent("Change", (ctrl, *) => changeConfig(key, valMap.Get(ctrl.text)))
+    _.OnEvent("Change", (ctrl, *) => changeConfig(key, valMap.Get(ctrl.text, ctrl.text)))
     SuppressControlWheel(_.Hwnd)
     return _
 }
@@ -106,8 +120,8 @@ renderDropDownList(g, key, list, layout := "xs+20 yp+60", options := "") {
  * @param {String} listOptions 列表的额外选项
  */
 renderDropDownListGroup(g, groupLabelKey, list, listLabelKey := groupLabelKey, groupLayout := "xs", listOptions := "") {
-    _ := renderGroupBox(g, groupLabelKey, groupLayout, "h120 w" g.bw)
-    __ := renderDropDownList(g, listLabelKey, list, "xs+20 yp+60", "w" g.bw - 40 " " listOptions)
+    _ := renderGroupBox(g, groupLabelKey, groupLayout, "h" uicDDL.h " w" g.bw)
+    __ := renderDropDownList(g, listLabelKey, list, "xs+20 yp+" uicDDL.yp, "w" g.bw - 40 " " listOptions)
     return { group: _, dropDownList: __ }
 }
 
@@ -135,10 +149,10 @@ renderRadio(g, key, textKey, value, layout, callback := (key, value, *) => chang
  * @param {Array} radios 单选按钮列表 (i18n key)
  */
 renderRadioGroup(g, key, radios) {
-    _ := renderGroupBox(g, key, "xs", "h100 w" g.bw)
+    _ := renderGroupBox(g, key, "xs", "h" uicText.h " w" g.bw)
     radiosList := []
     for i, k in radios {
-        layout := i == 1 ? "xs+20 yp+50" : "yp"
+        layout := i == 1 ? "xs+20 yp+" uicText.yp : "yp"
         param := [g, key, k[1], k[2], layout]
         if k.Length == 3
             param.Push(k[3])
@@ -171,8 +185,7 @@ renderColorPicker(g, key, labelKey := key, layout := "yp") {
     _.key := key
     _.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
     _.OnEvent("ContextMenu", (ctrl, *) => _clearColor(ctrl.ctrl, ctrl.key))
-    var.%ctrlKey% := pickerCtrl := g.AddText("yp w180")
-    pickerCtrl.Text := var.%key%
+    var.%ctrlKey% := pickerCtrl := g.AddText("yp", StrReplace(var.%key%, "0x", " ") " ")
     pickerCtrl.ctrl := ctrlKey
     pickerCtrl.key := key
     pickerCtrl.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
@@ -180,7 +193,7 @@ renderColorPicker(g, key, labelKey := key, layout := "yp") {
         if !color
             return
         try {
-            var.%cKey%.Value := color
+            var.%cKey%.Value := StrReplace(color, "0x", " ") " "
             changeConfig(oKey, color)
         }
     }

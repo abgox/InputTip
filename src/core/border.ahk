@@ -53,8 +53,8 @@ e_border(*) {
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/border"))
 
-        renderGroupBox(g, "borderReshowOnChange", , "h110 w" bw)
-        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("borderReshowOnChange.state")).Value := 1
+        renderGroupBox(g, "borderReshowOnChange", , "h" uicText.h " w" bw)
+        g.AddCheckbox("xs+20 yp+" uicText.yp " Disabled", i18n("borderReshowOnChange.state")).Value := 1
         for v in ["Process", "Title", "Class"] {
             _ := g.AddCheckbox("yp", i18n("borderReshowOnChange." StrLower(v)))
             key := "borderReshowOn" v "Change"
@@ -68,17 +68,17 @@ e_border(*) {
             writeIni(key, val)
         }
 
-        renderGroupBox(g, "borderShowOnMaximized", , "h110 w" bw)
+        renderGroupBox(g, "borderShowOnMaximized", , "h" uicText.h " w" bw)
         for i, v in ["Top", "Bottom", "Left", "Right"] {
-            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+50" : "yp", i18n("position." v))
+            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("position." v))
             key := "borderShowOnMaximized" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
             ctrlList.Push(_)
         }
-        renderGroupBox(g, "borderShowOnFullscreen", , "h110 w" bw)
+        renderGroupBox(g, "borderShowOnFullscreen", , "h" uicText.h " w" bw)
         for i, v in ["Top", "Bottom", "Left", "Right"] {
-            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+50" : "yp", i18n("position." v))
+            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("position." v))
             key := "borderShowOnFullscreen" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
@@ -92,9 +92,9 @@ e_border(*) {
             } else {
                 opt := "xs"
             }
-            renderGroupBox(g, v, opt, "h110 w" bw)
+            renderGroupBox(g, v, opt, "h" uicText.h " w" bw)
             ; renderEditLabel(g, "borderWidth" v, "w" bw / 3, "borderWidth")
-            _ := renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+50")
+            _ := renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+" uicText.yp)
             ctrlList.Push(_.picker)
         }
 

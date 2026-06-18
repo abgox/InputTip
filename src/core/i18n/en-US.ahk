@@ -344,6 +344,7 @@ langStrings.Set("en-US", Map(
     "language.chinese", "Simplified Chinese (zh-CN)",
     "language.english", "English (en-US)",
     "menuAnimation", "Menu Animation Effect",
+    "menuFontSize", "Menu Font Size",
     "openDataDirectory", "Open Data Directory",
     "pollInterval", "Poll Interval (ms)",
     "iconRunning", "Running",

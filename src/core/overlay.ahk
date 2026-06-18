@@ -237,8 +237,8 @@ e_overlay(*) {
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/overlay"))
 
-        renderGroupBox(g, "overlayReshowOnChange", , "h110 w" bw)
-        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("overlayReshowOnChange.state")).Value := 1
+        renderGroupBox(g, "overlayReshowOnChange", , "h" uicText.h " w" bw)
+        g.AddCheckbox("xs+20 yp+" uicText.yp " Disabled", i18n("overlayReshowOnChange.state")).Value := 1
         for v in ["Process", "Title", "Class"] {
             _ := g.AddCheckbox("yp", i18n("overlayReshowOnChange." StrLower(v)))
             key := "overlayReshowOn" v "Change"
@@ -251,8 +251,8 @@ e_overlay(*) {
             var.%key% := val
             writeIni(key, val)
         }
-        renderGroupBox(g, "overlayShowOnWindowState", , "h110 w" bw)
-        g.AddCheckbox("xs+20 yp+50 Disabled", i18n("overlayShowOnWindowState.normal")).Value := 1
+        renderGroupBox(g, "overlayShowOnWindowState", , "h" uicText.h " w" bw)
+        g.AddCheckbox("xs+20 yp+" uicText.yp " Disabled", i18n("overlayShowOnWindowState.normal")).Value := 1
         for v in ["Maximized", "Fullscreen"] {
             _ := g.AddCheckbox("yp", i18n("overlayShowOnWindowState." StrLower(v)))
             key := "overlayShowOn" v
@@ -306,7 +306,7 @@ e_overlay(*) {
                 opt := "xs"
             }
 
-            renderGroupBox(g, v, opt, "Section h300 w" bw)
+            renderGroupBox(g, v, opt, "Section h" uicDDL.h * 2.5 " w" bw)
             _ := renderEditLabel(g, "overlayText" v, "w" bw / 3, "overlayText")
             ctrlList.Push(_.edit)
             _ := renderEditLabel(g, "overlayOffsetX" v, "Limit5 w" bw / 10, "overlayOffsetX", "yp")
@@ -314,7 +314,7 @@ e_overlay(*) {
             _ := renderColorPicker(g, "overlayTextColor" v, "overlayTextColor")
             ctrlList.Push(_.picker)
 
-            g.AddText("xs+20 yp+55", i18n("overlayBasePosition"))
+            g.AddText("xs+20 yp+" uicDDL.yp, i18n("overlayBasePosition"))
             _ := g.AddDropDownList("yp r9 w" bw / 3, posList)
             try _.Text := posValueMap.Get(var.%"overlayBasePosition" v%)
             _.state := v
@@ -327,10 +327,10 @@ e_overlay(*) {
             _ := renderColorPicker(g, "overlayBgColor" v, "overlayBgColor")
             ctrlList.Push(_.picker)
 
-            renderText(g, "overlayTextFont", "xs+20 yp+60", "")
+            renderText(g, "overlayTextFont", "xs+20 yp+" uicDDL.yp, "")
             _ := renderDropDownList(g, "overlayTextFont" v, fontList, "yp", "w" bw / 1.2)
             ctrlList.Push(_)
-            _ := renderEditLabel(g, "overlayTextSize" v, "Number Limit2 w" bw / 3, "overlayTextSize", "xs+20 yp+55")
+            _ := renderEditLabel(g, "overlayTextSize" v, "Number Limit2 w" bw / 3, "overlayTextSize", "xs+20 yp+" uicEdit.yp)
             ctrlList.Push(_.edit)
             _ := renderEditLabel(g, "overlayTextWeight" v, "Number Limit3 w" bw / 10, "overlayTextWeight", "yp")
             ctrlList.Push(_.edit)

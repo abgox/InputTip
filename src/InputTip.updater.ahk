@@ -251,12 +251,12 @@ getRepoCode() {
 }
 
 showLog(g) {
-    g.SetFont("s14")
+    g.SetFont("s" Max(var.menuFontSize - 2, 12))
     try {
         logContent := FileRead(logFile, "UTF-8")
         g.AddEdit("ReadOnly cGray VScroll r11 w" g.w, SubStr(logContent, InStr(logContent, "#")))
     } catch {
         g.AddText("cGray", i18n("update.logFailed"))
     }
-    g.SetFont("s16")
+    g.SetFont("s" var.menuFontSize)
 }

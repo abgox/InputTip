@@ -68,6 +68,15 @@ e_border(*) {
             writeIni(key, val)
         }
 
+        renderGroupBox(g, "showOnWindowState", , "h" uicText.h " w" bw)
+        for i, v in ["Normal", "Maximized", "Fullscreen"] {
+            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("showOnWindowState." StrLower(v)))
+            key := "borderShowOn" v
+            _.Value := var.%key%
+            _.OnEvent("Click", e_change.Bind(key))
+            ctrlList.Push(_)
+        }
+
         renderGroupBox(g, "borderShowOnMaximized", , "h" uicText.h " w" bw)
         for i, v in ["Top", "Bottom", "Left", "Right"] {
             _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("position." v))

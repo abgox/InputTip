@@ -251,10 +251,9 @@ e_overlay(*) {
             var.%key% := val
             writeIni(key, val)
         }
-        renderGroupBox(g, "overlayShowOnWindowState", , "h" uicText.h " w" bw)
-        g.AddCheckbox("xs+20 yp+" uicText.yp " Disabled", i18n("overlayShowOnWindowState.normal")).Value := 1
-        for v in ["Maximized", "Fullscreen"] {
-            _ := g.AddCheckbox("yp", i18n("overlayShowOnWindowState." StrLower(v)))
+        renderGroupBox(g, "showOnWindowState", , "h" uicText.h " w" bw)
+        for i, v in ["Normal", "Maximized", "Fullscreen"] {
+            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("showOnWindowState." StrLower(v)))
             key := "overlayShowOn" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))

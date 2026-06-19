@@ -6,7 +6,7 @@ hasTitleChange := 1, hasClassChange := 1, hasProcessChange := 1
 exePid := "", exeName := "", exeTitle := "", exeClass := "", leaveDelay := var.pollInterval + 500
 lastProcess := "", lastTitle := "", lastClass := ""
 lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := "", lastBorderState := ""
-hwnd := 0, exeMaximized := "", exeFullscreen := ""
+hwnd := 0, exeMaximized := "", exeFullscreen := "", exeNormal := ""
 
 updateSymbolDelay()
 updateCursorDelay()
@@ -91,6 +91,7 @@ if isJAB {
                 exeClass := WinGetClass("A")
                 exeMaximized := WinGetMinMax("A") == 1
                 exeFullscreen := isFullscreen(hwnd)
+                exeNormal := !exeMaximized && !exeFullscreen
 
                 hasProcessChange := lastProcess != exeName
                 hasTitleChange := lastTitle != exeTitle
@@ -174,7 +175,12 @@ if isJAB {
                         if allowShow {
                             if IsSet(activeBorderTimer)
                                 SetTimer(activeBorderTimer, 0)
-                            showBorder(targetColor, targetWidth, hwnd)
+
+                            if (!var.borderShowOnMaximized && exeMaximized) || (!var.borderShowOnFullscreen && exeFullscreen) || (!var.borderShowOnNormal && exeNormal)
+                                hideBorder(hwnd)
+                            else
+                                showBorder(targetColor, targetWidth, hwnd)
+
                             if var.borderHideDelay {
                                 activeBorderTimer := hideBorder.Bind(hwnd)
                                 SetTimer(activeBorderTimer, -returnMaxTimerNumber(var.borderHideDelay))
@@ -221,7 +227,7 @@ if isJAB {
             loadCursor(currentState)
             if var.overlayActive {
                 if currentState != lastInputState || (var.overlayReshowOnTitleChange && hasTitleChange) || (var.overlayReshowOnClassChange && hasClassChange) || (var.overlayReshowOnProcessChange && hasProcessChange) {
-                    if (!var.overlayShowOnMaximized && exeMaximized) || (!var.overlayShowOnFullscreen && exeFullscreen) {
+                    if (!var.overlayShowOnMaximized && exeMaximized) || (!var.overlayShowOnFullscreen && exeFullscreen) || (!var.overlayShowOnNormal && exeNormal) {
                         hideOverlay()
                     } else {
                         switch var.overlayShowMode {

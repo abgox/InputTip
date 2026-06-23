@@ -16,7 +16,7 @@ e_inputMethod(*) {
         g.w := w := info.w
         g.bw := bw := w - g.MarginX * 2
 
-        renderRadioGroup(g, "inputMethodDetectionMode", [[".custom", "custom"], [".general", "general"]])
+        renderRadioGroup(g, "inputMethodDetectionMode", [[".general", "general"], [".custom", "custom"]])
         renderRadioGroup(g, "keepCapsLockWhenStateSwitch", [["yes", 1], ["no", 0]])
         renderRadioGroup(g, "keepCapsLockWhenKeyboardSwitch", [["yes", 1], ["no", 0]])
         renderRadioGroup(g, "exportState", [["yes", 1], ["no", 0]])

@@ -860,7 +860,7 @@ showStateCode(show, *) {
 
 showStateCodeTimer() {
     info := IME.CheckInputMode()
-    ToolTip(" " i18n("inputMethodDetectionMode.stateCode") ": " info.stateMode "`n " i18n("inputMethodDetectionMode.conversionCode") ": " info.conversionMode)
+    ToolTip(" " i18n("inputMethodDetectionMode.stateCode") ": " info.stateMode "`n " i18n("inputMethodDetectionMode.conversionCode") ": " info.conversionMode "`n CLSID: " info.clsId)
 }
 
 ; 显示当前的光标捕获模式

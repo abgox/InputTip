@@ -15,16 +15,28 @@ class IME {
         "KR", { langId: 0x12, klid: 0x0412, convMode: 0 },
     )
 
-    static GeneralStrategy := {
-        strategy: 0, ; 0(复合兜底) 1(纯状态码) 2(纯转换码)
-        lastChangedTime: 0,
-        pendingState: "",
-        lastHwnd: 0,
-        lastOpened: -1,
-        lastConvMode: -1,
-        isNonBinaryIME: 0,
-        cnValue: 0,
-        enValue: 0
+    static GuidStrategyMap := Map()
+    static DefaultStrategyCN := { open: "oddNum", conv: "" }
+    static StrategyMapCN := Map(
+        "Microsoft Pinyin|Microsoft Wubi", { open: "", conv: "oddNum" },
+        "小狼毫|Rime|小小输入法", { open: "", conv: "oddNum" },
+        "小鹤音形", { open: "", conv: 1025 },
+        "讯飞输入法", { open: 2, conv: "" },
+    )
+
+    static Initialize() {
+        installedIME := this.GetInstalledIME()
+        for configName, strategy in this.StrategyMapCN {
+            names := StrSplit(configName, "|")
+            for key, info in installedIME {
+                for nameInConfig in names {
+                    if InStr(info.name, nameInConfig) {
+                        this.GuidStrategyMap[info.id] := strategy
+                        break
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -39,19 +51,16 @@ class IME {
      */
     static GetInputModeText(hwnd := this.GetFocusedWindow()) {
         static lastState := "EN"
-        if GetKeyState("CapsLock", "T") {
-            lastState := "Caps"
-            return "Caps"
-        }
+        if GetKeyState("CapsLock", "T")
+            return lastState := "Caps"
+
         try {
             langID := this.GetKeyboardLayout(hwnd) & 0xFF
             for state, info in this.LangMap {
                 if langID == info.langId {
                     ; CN 需要走后续状态判断
-                    if state != "CN" {
-                        lastState := state
-                        return state
-                    }
+                    if state != "CN"
+                        return lastState := state
                     break
                 }
             }
@@ -60,110 +69,30 @@ class IME {
             convMode := this.GetConversionMode(hwnd)
 
             if var.inputMethodDetectionMode == "general" || !var.inputMethodDetectionRules.Length {
-                gs := this.GeneralStrategy
-
-                if gs.lastHwnd != hwnd {
-                    gs.lastHwnd := hwnd
-                    gs.lastOpened := opened
-                    gs.lastConvMode := convMode
-                    gs.lastChangedTime := 0
-                    gs.pendingState := ""
-                    goto SKIP_STRATEGY_LEARNING
-                }
-
-                openedChanged := opened != gs.lastOpened
-                convModeChanged := convMode != gs.lastConvMode
-
-                if openedChanged || convModeChanged {
-                    currentFeature := opened "," convMode
-                    if (gs.pendingState != currentFeature) {
-                        gs.pendingState := currentFeature
-                        gs.lastChangedTime := A_TickCount
-                        goto SKIP_STRATEGY_LEARNING
-                    }
-                    else {
-                        if A_TickCount - gs.lastChangedTime < 200
-                            goto SKIP_STRATEGY_LEARNING
-                    }
-
-                    if openedChanged {
-                        if gs.isNonBinaryIME && gs.strategy == 2
-                            gs.isNonBinaryIME := 0
-                        gs.strategy := 1
-                        if opened > 1 || gs.lastOpened > 1
-                            gs.isNonBinaryIME := 1, gs.cnValue := Max(opened, gs.lastOpened), gs.enValue := Min(opened, gs.lastOpened)
-                        else
-                            gs.isNonBinaryIME := 0
-                    }
-                    else if convModeChanged {
-                        if convMode & 1 != gs.lastConvMode & 1 {
-                            if gs.isNonBinaryIME && gs.strategy == 1
-                                gs.isNonBinaryIME := 0
-                            gs.strategy := 2
-                        }
-                    }
-                    gs.lastOpened := opened
-                    gs.lastConvMode := convMode
-                    gs.pendingState := ""
-                    gs.lastChangedTime := 0
-                } else {
-                    gs.pendingState := ""
-                    gs.lastChangedTime := 0
-                }
-
-                SKIP_STRATEGY_LEARNING:
-                switch gs.strategy {
-                    case 1:
-                        state := gs.isNonBinaryIME ? (opened == gs.cnValue ? "CN" : "EN") : (opened ? "CN" : "EN")
-                    case 2:
-                        state := convMode & 1 ? "CN" : "EN"
-                    default:
-                        if gs.isNonBinaryIME
-                            state := opened == gs.cnValue ? "CN" : "EN"
-                        else if convMode == 0
-                            state := opened ? "CN" : "EN"
-                        else if opened == 0
-                            state := "EN"
-                        else if convMode & 1
-                            state := "CN"
-                        else
-                            state := "EN"
-                }
-                lastState := state
-                return state
+                clsId := this.GetActiveIMEClsId()
+                rule := (clsId != "" && this.GuidStrategyMap.Has(clsId)) ? this.GuidStrategyMap[clsId] : this.DefaultStrategyCN
+                return lastState := (this.MatchRule(opened, rule.open) && this.MatchRule(convMode, rule.conv)) ? "CN" : "EN"
             }
 
             state := var.inputMethodBaseState
-
             for v in var.inputMethodDetectionRules {
                 r := StrSplit(v, ",")
-                if matchRule(opened, r[1]) && matchRule(convMode, r[2]) {
+                if this.MatchRule(opened, r[1]) && this.MatchRule(convMode, r[2]) {
                     state := r[3]
                     break
                 }
             }
-
             return lastState := state
         } catch {
             return lastState
-        }
-
-        matchRule(value, ruleValue) {
-            if ruleValue == ""
-                return 1
-            switch ruleValue {
-                case "evenNum": isMatch := !(value & 1)
-                case "oddNum": isMatch := value & 1
-                default: isMatch := InStr("/" ruleValue "/", "/" value "/")
-            }
-            return isMatch
         }
     }
 
     static CheckInputMode(hwnd := this.GetFocusedWindow()) {
         return {
             stateMode: this.GetOpenStatus(hwnd),
-            conversionMode: this.GetConversionMode(hwnd)
+            conversionMode: this.GetConversionMode(hwnd),
+            clsId: this.GetActiveIMEClsId()
         }
     }
 
@@ -198,31 +127,118 @@ class IME {
             return
         }
 
-        ; CN/EN
-        gs := this.GeneralStrategy
-        switch gs.strategy {
-            case 1:
-                if targetState == "CN"
-                    s := gs.isNonBinaryIME ? gs.cnValue : 1
-                else
-                    s := gs.isNonBinaryIME ? gs.enValue : 0
-                this.SetOpenStatus(s, hwnd)
-            case 2:
-                this.SetConversionMode(targetState == "CN" ? this.LangMap["CN"].convMode : 0, hwnd)
-            default:
-                if gs.isNonBinaryIME {
-                    this.SetOpenStatus(targetState == "CN" ? gs.cnValue : gs.enValue, hwnd)
-                } else {
-                    if targetState == "CN"
-                        this.SetOpenStatus(true, hwnd), this.SetConversionMode(this.LangMap["CN"].convMode, hwnd)
-                    else
-                        this.SetOpenStatus(false, hwnd), this.SetConversionMode(0, hwnd)
-                }
+        clsId := this.GetActiveIMEClsId()
+        rule := (clsId != "" && this.GuidStrategyMap.Has(clsId)) ? this.GuidStrategyMap[clsId] : this.DefaultStrategyCN
+        if (targetState == "CN") {
+            targetOpen := (rule.open == "oddNum" || rule.open == "evenNum") ? 1 : rule.open
+            targetConv := (rule.conv == "oddNum" || rule.conv == "evenNum") ? this.LangMap["CN"].convMode : rule.conv
+            if targetOpen !== ""
+                this.SetOpenStatus(targetOpen, hwnd)
+            if targetConv !== ""
+                this.SetConversionMode(targetConv, hwnd)
+        } else {
+            if rule.open !== ""
+                this.SetOpenStatus(0, hwnd)
+            if rule.conv !== ""
+                this.SetConversionMode(0, hwnd)
+        }
+    }
+
+    static MatchRule(value, rule) {
+        if rule == ""
+            return 1
+        switch rule {
+            case "evenNum": isMatch := !(value & 1)
+            case "oddNum": isMatch := value & 1
+            default: isMatch := InStr("/" rule "/", "/" value "/")
+        }
+        return isMatch
+    }
+
+    static GetActiveIMEClsId() {
+        static currentThreadID := DllCall("GetCurrentThreadId", "uint")
+
+        g := Gui()
+        g.Show("Hide")
+
+        imeThreadID := 0
+        if imeHwnd := DllCall("imm32\ImmGetDefaultIMEWnd", "ptr", g.Hwnd, "ptr")
+            imeThreadID := DllCall("GetWindowThreadProcessId", "ptr", imeHwnd, "ptr", 0, "uint")
+        if imeThreadID && imeThreadID != currentThreadID {
+            try DllCall("AttachThreadInput", "uint", currentThreadID, "uint", imeThreadID, "int", 0)
+            DllCall("AttachThreadInput", "uint", currentThreadID, "uint", imeThreadID, "int", 1)
         }
 
-        Sleep(20)
-        gs.lastOpened := this.GetOpenStatus(hwnd)
-        gs.lastConvMode := this.GetConversionMode(hwnd)
+        currentClsId := ""
+        ppv := 0
+        ppMgr := 0
+        try {
+            CLSID := Buffer(16), IID_Unknown := Buffer(16), IID_Mgr := Buffer(16)
+            DllCall("ole32\CLSIDFromString", "str", "{33C53A50-F456-4884-B049-85FD643ECFED}", "ptr", CLSID)
+            DllCall("ole32\CLSIDFromString", "str", "{00000000-0000-0000-C000-000000000046}", "ptr", IID_Unknown)
+            DllCall("ole32\CLSIDFromString", "str", "{71C6E74C-0F28-11D8-A82A-00065B84435C}", "ptr", IID_Mgr)
+
+            if (DllCall("ole32\CoCreateInstance", "ptr", CLSID, "ptr", 0, "uint", 1, "ptr", IID_Unknown, "ptr*", &ppv, "int") == 0 && ppv) {
+                vtable := NumGet(ppv, 0, "ptr")
+                fn := NumGet(vtable, 0, "ptr")
+                if (DllCall(fn, "ptr", ppv, "ptr", IID_Mgr, "ptr*", &ppMgr, "int") == 0 && ppMgr) {
+                    catBuf := Buffer(16)
+                    DllCall("ole32\CLSIDFromString", "str", "{34745C63-B2F0-4784-8B67-5E12C8701A31}", "ptr", catBuf)
+                    profileBuf := Buffer(84, 0)
+                    vtableMgr := NumGet(ppMgr, 0, "ptr")
+                    fnGetActive := NumGet(vtableMgr, 10 * A_PtrSize, "ptr")
+                    if (DllCall(fnGetActive, "ptr", ppMgr, "ptr", catBuf, "ptr", profileBuf, "int") == 0) {
+                        pStr := 0
+                        DllCall("ole32\StringFromCLSID", "ptr", profileBuf.Ptr + 8, "ptr*", &pStr)
+                        currentClsId := StrUpper(StrGet(pStr, "UTF-16"))
+                        DllCall("ole32\CoTaskMemFree", "ptr", pStr)
+                    }
+                }
+            }
+        } finally {
+            if ppMgr
+                ObjRelease(ppMgr)
+            if ppv
+                ObjRelease(ppv)
+
+            g.Destroy()
+        }
+        return currentClsId
+    }
+
+    static GetInstalledIME() {
+        imeMap := Map()
+        paths := [
+            "HKLM\SOFTWARE\Microsoft\CTF\TIP",
+            "HKLM\SOFTWARE\WOW6432Node\Microsoft\CTF\TIP",
+            "HKCU\SOFTWARE\Microsoft\CTF\TIP",
+        ]
+
+        for path in paths {
+            Loop Reg, path, "VR" {
+                val := RegRead()
+                currentPath := A_LoopRegKey
+
+                hkl := ""
+                id := ""
+                if currentPath ~= "i)\\LanguageProfile\\" && RegExMatch(currentPath, "i)\\TIP\\({[^}]+})\\LanguageProfile\\([^\\]+)", &match) {
+                    id := StrUpper(match[1])
+                    hkl := match[2]
+                }
+
+                if hkl == "" || id == "" || !(A_LoopRegName ~= "i)^(Description|Layout Text)$")
+                    continue
+
+                rawName := (Type(val) == "String" && val != "") ? val : hkl
+                name := RegExReplace(rawName, "i).*\\")
+                imeMap[hkl "|" id] := {
+                    hkl: hkl,
+                    id: id,
+                    name: name
+                }
+            }
+        }
+        return imeMap
     }
 
     static GetOpenStatus(hwnd := this.GetFocusedWindow()) {

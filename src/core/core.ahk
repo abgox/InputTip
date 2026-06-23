@@ -7,10 +7,10 @@ exePid := "", exeName := "", exeTitle := "", exeClass := "", leaveDelay := var.p
 lastProcess := "", lastTitle := "", lastClass := ""
 lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := "", lastBorderState := ""
 hwnd := 0, exeMaximized := "", exeFullscreen := "", exeNormal := ""
+initIME := 1
 
 updateSymbolDelay()
 updateCursorDelay()
-
 
 if isJAB {
     loop {
@@ -50,6 +50,8 @@ if isJAB {
                 hasClassChange := lastClass != exeClass
 
                 if hasTitleChange || hasClassChange || hasProcessChange {
+                    if initIME
+                        IME.Initialize(), initIME := 0
                     if matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["hide"]) || !matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["show"])
                         hideCaretSymbol(), needShow := 0
 
@@ -101,6 +103,8 @@ if isJAB {
                     initMonitor()
 
                 if hasTitleChange || hasClassChange || hasProcessChange {
+                    if initIME
+                        IME.Initialize(), initIME := 0
                     if var.caretSymbolType {
                         if exePid != appPid && (matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["hide"]) || !matchWindowDisplay(exeName, exeTitle, exeClass, var.WindowCaretSymbolRule["show"]))
                         {

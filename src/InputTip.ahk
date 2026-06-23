@@ -92,7 +92,7 @@ updateWindowHotkey() {
         for hk in var._lastWindowHotkeyList {
             try Hotkey(hk, "Off")
             for rule in var.hotkeyRule.Get("", []) {
-                if rule.hotkey == hk {
+                if rule.hotkey == hk && rule.trigger {
                     setHotkeyTrigger(hk, rule.trigger)
                     break
                 }

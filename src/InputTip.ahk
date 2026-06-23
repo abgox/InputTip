@@ -16,11 +16,9 @@ if A_IsCompiled {
         runAsAdmin()
 }
 
-if var.checkUpdateOnStartup
-    SetTimer(() => (isLocked() ? 0 : (SetTimer(, 0), runUpdater())), 1000)
+SetTimer(() => (isLocked() ? 0 : (SetTimer(, 0), var.checkUpdateOnStartup ? runUpdater() : "", A_IconHidden := 0)), 1000)
 
 runUpdater() {
-    A_IconHidden := 0
     if A_IsCompiled {
         try Run("`"" A_Temp "\abgox.InputTip.updater.exe`" " keyCount " " ProcessExist() " `"" A_ScriptFullPath "`"")
         return

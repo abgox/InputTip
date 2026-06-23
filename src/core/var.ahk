@@ -215,6 +215,7 @@ switchTriggerKeyList := [
     "switchStateCaps-CapsLock",
     "switchStateCN-IME", "switchStateCN-LShift", "switchStateCN-RShift", "switchStateCN-CtrlSpace",
     "switchStateEN-IME", "switchStateEN-LShift", "switchStateEN-RShift", "switchStateEN-CtrlSpace",
+    "switchStateCN/EN-IME", "switchStateCN/EN-LShift", "switchStateCN/EN-RShift", "switchStateCN/EN-CtrlSpace",
     "switchKeyboardCN", "switchKeyboardUS",
     "switchKeyboardJP", "switchKeyboardJPHiragana", "switchKeyboardJPKatakana", "switchKeyboardJPHalfKana", "switchKeyboardJPFullAlpha", "switchKeyboardJPHalfAlpha",
     "switchKeyboardKR", "switchKeyboardKRHangul", "switchKeyboardKRAlpha",
@@ -232,8 +233,8 @@ hotkeyTriggerKeyList.Push("showStateCode", "showCaptureMode")
 allTriggerKeyList.Push("none", "showStateCode", "showCaptureMode")
 
 windowTriggerKeyList := triggerKeyList.Clone()
-windowTriggerKeyList.InsertAt(10, "ignoreStateSwitch")
-windowTriggerKeyList.InsertAt(22, "ignoreKeyboardSwitch")
+windowTriggerKeyList.InsertAt(1, "ignoreStateSwitch")
+windowTriggerKeyList.InsertAt(15, "ignoreKeyboardSwitch")
 windowTriggerKeyList.Push("showStateCode", "showCaptureMode")
 allTriggerKeyList.Push("ignoreStateSwitch", "ignoreKeyboardSwitch")
 
@@ -245,14 +246,18 @@ runTriggers(triggers, *) {
     for trigger in triggers {
         switch trigger {
             case "switchStateCaps-CapsLock": _switchState("Caps", "{CapsLock}")
+            case "switchStateCN-IME": _switchState("CN", "IME")
             case "switchStateCN-LShift": _switchState("CN", "{LShift}")
             case "switchStateCN-RShift": _switchState("CN", "{RShift}")
             case "switchStateCN-CtrlSpace": _switchState("CN", "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}")
-            case "switchStateCN-IME": _switchState("CN", "IME")
+            case "switchStateEN-IME": _switchState("EN", "IME")
             case "switchStateEN-LShift": _switchState("EN", "{LShift}")
             case "switchStateEN-RShift": _switchState("EN", "{RShift}")
             case "switchStateEN-CtrlSpace": _switchState("EN", "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}")
-            case "switchStateEN-IME": _switchState("EN", "IME")
+            case "switchStateCN/EN-IME": _switchState(currentState == "CN" ? "EN" : "CN", "IME")
+            case "switchStateCN/EN-LShift": _switchState(currentState == "CN" ? "EN" : "CN", "{LShift}")
+            case "switchStateCN/EN-RShift": _switchState(currentState == "CN" ? "EN" : "CN", "{RShift}")
+            case "switchStateCN/EN-CtrlSpace": _switchState(currentState == "CN" ? "EN" : "CN", "{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}")
             case "switchKeyboardCN": switchKeyboard("CN")
             case "switchKeyboardUS": switchKeyboard("US")
             case "switchKeyboardJP": switchKeyboard("JP")

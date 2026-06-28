@@ -7,7 +7,7 @@
  * var.inputMethodDetectionTimeout := 200 ; 超时时间(单位：毫秒)
  * var.inputMethodDetectionRules := [] ; 状态规则
  * var.inputMethodBaseState := "EN" ; 默认状态为英文
-  */
+ */
 class IME {
     static LangMap := Map(
         "US", { langId: 0x09, klid: 0x0409, convMode: 0 },
@@ -147,6 +147,8 @@ class IME {
                 }
 
                 SKIP_STRATEGY_LEARNING:
+                if gs.isHwndInitPending
+                    return lastState
                 switch gs.strategy {
                     case 1:
                         state := gs.isNonBinaryIME ? (opened == gs.cnValue ? "CN" : "EN") : (opened ? "CN" : "EN")
@@ -291,7 +293,12 @@ class IME {
     }
 
     static SetKeyboardLayout(hkl, hwnd := this.GetFocusedWindow()) {
-        try SendMessage(0x50, 1, hkl, hwnd)
+        try {
+            SendMessage(0x50, 1, hkl, hwnd)
+            return 1
+        } catch {
+            return 0
+        }
     }
 
     static GetKeyboardLayoutList() {
@@ -323,18 +330,12 @@ class IME {
         hwnd := this.GetFocusedWindow()
         if !hwnd
             return false
-
         for hkl in this.GetKeyboardLayoutList() {
-            if (hkl & 0xFF) == info.langId {
-                this.SetKeyboardLayout(hkl, hwnd)
-                return true
-            }
+            if (hkl & 0xFF) == info.langId
+                return this.SetKeyboardLayout(hkl, hwnd)
         }
-        hkl := this.LoadKeyboardLayout(info.klid)
-        if hkl {
-            this.SetKeyboardLayout(hkl, hwnd)
-            return true
-        }
+        if hkl := this.LoadKeyboardLayout(info.klid)
+            return this.SetKeyboardLayout(hkl, hwnd)
         return false
     }
 
@@ -373,43 +374,31 @@ switchKeyboard(state, opened := "", conversionMode := "", ignoreKeepCaps := 0) {
 switchState(state, method) {
     if !state || matchWindowRules(var.WindowRule["ignoreStateSwitch"]).Length
         return
-
     SetTimer(onRun, 50)
     onRun() {
-        static modifiers := ["Ctrl", "Alt", "Shift", "LWin", "RWin", "Shift"]
+        static modifiers := ["Ctrl", "Alt", "Shift", "LWin", "RWin"]
         for mod in modifiers {
             if GetKeyState(mod, "P")
                 return
         }
-        if GetKeyState("LButton", "P") || GetKeyState("RButton", "P")
+        if IME.GeneralStrategy.isHwndInitPending || GetKeyState("LButton", "P") || GetKeyState("RButton", "P")
             return
-
         SetTimer(onRun, 0)
         stateText := IME.GetInputModeText()
-        if !stateText
+        if !stateText || state == stateText
             return
-
-        if state == stateText
-            return
-
         if stateText == "Caps" {
             if var.keepCapsLockWhenStateSwitch
                 return
-
             SendInput("{CapsLock}")
             Sleep(50)
             stateText := IME.GetInputModeText()
-            if !stateText
+            if !stateText || state == stateText
                 return
-
-            if state == stateText
-                return
-
         } else if state == "Caps" {
             SendInput("{CapsLock}")
             return
         }
-
         if method == "IME"
             IME.SetInputMode(state)
         else

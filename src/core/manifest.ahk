@@ -61,6 +61,7 @@ runtime2 := A_ScriptDir "\AutoHotkey\_AutoHotkey64.exe"
 
 dataDir := A_ScriptDir "\data"
 configFile := dataDir "\config.ini"
+statsFile := dataDir "\stats.ini"
 pluginDir := dataDir "\plugin"
 cursorDir := dataDir "\cursor"
 symbolDir := dataDir "\symbol"

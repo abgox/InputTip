@@ -1,9 +1,11 @@
 ; InputTip
 
 try {
-    keyCount := A_Args[1]
-    if (!IsNumber(keyCount)) {
-        keyCount := 0
+    keyCount := readIni(FormatTime(, "yyyy-MM-dd"), 0, "DailyKeystrokes", statsFile)
+    if !keyCount {
+        keyCount := A_Args[1]
+        if !IsNumber(keyCount)
+            keyCount := 0
     }
 } catch {
     keyCount := 0

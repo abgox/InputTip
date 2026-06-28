@@ -106,7 +106,7 @@ globalKeyStatsWorker() {
 
     if A_PriorKey != last {
         keyCount++
-        try IniWrite(keyCount, A_ScriptDir "\data\stats.ini", "DailyKeystrokes", FormatTime(, "yyyy-MM-dd"))
+        try IniWrite(keyCount, statsFile, "DailyKeystrokes", FormatTime(, "yyyy-MM-dd"))
         last := A_PriorKey
         updateTrayTip()
     }

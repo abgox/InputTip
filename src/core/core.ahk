@@ -142,6 +142,11 @@ if isJAB {
         if !currentState
             continue
 
+        InStr(getCaretCapture().capture, "JAB") ? hideCaretSymbol() : ShowCaretSymbolEx(currentState)
+
+        if IME.GeneralStrategy.isHwndInitPending
+            continue
+
         if var.borderActive {
             try {
                 isPined := WinGetExStyle("A") & 0x8
@@ -215,8 +220,6 @@ if isJAB {
             default:
                 hideCursorSymbol()
         }
-
-        InStr(getCaretCapture().capture, "JAB") ? hideCaretSymbol() : ShowCaretSymbolEx(currentState)
 
         loadCursor(currentState)
         if var.overlayActive {

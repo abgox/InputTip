@@ -119,6 +119,7 @@ e_windowInfo(*) {
                 list := [
                     WinGetProcessName("A"),
                     WinGetClass("A"),
+                    WinGetClass(getFocusedHwnd()),
                     WinGetTitle("A"),
                     WinGetProcessPath("A"),
                 ]

@@ -318,7 +318,7 @@ returnTriggers() {
             if rule.condition {
                 if rule.condition == "idleTimer" || rule.condition == "textMonitor" || rule.condition == "hotkeyMonitor"
                     continue
-                if trigger == "exit" && exeName == "explorer.exe"
+                if trigger == "exit" && exeProcess == "explorer.exe"
                     continue
                 conditionalTriggers.Push(trigger)
             } else {
@@ -513,18 +513,18 @@ parseWindowRule() {
     Critical("Off")
 }
 getMatchingRuleLists(triggerMap, hotkey := 0) {
-    cacheKey := exeName "|" ObjPtr(triggerMap)
+    cacheKey := exeProcess "|" ObjPtr(triggerMap)
     if var._matchCache.Has(cacheKey)
         return var._matchCache[cacheKey]
 
     result := []
-    if triggerMap.Has(exeName)
-        result.Push(triggerMap[exeName])
+    if triggerMap.Has(exeProcess)
+        result.Push(triggerMap[exeProcess])
 
     for key, ruleList in triggerMap {
-        if (key == "" && !hotkey) || key == exeName
+        if (key == "" && !hotkey) || key == exeProcess
             continue
-        if safeRegexMatch(exeName, key)
+        if safeRegexMatch(exeProcess, key)
             result.Push(ruleList)
     }
 
@@ -536,25 +536,16 @@ getMatchingRuleLists(triggerMap, hotkey := 0) {
 matchCondition(rule) {
     switch rule.condition {
         case "class":
-            return safeRegexMatch(exeClass, rule.class)
+            return safeRegexMatch(exeClass, rule.class) || (exeControl != "" && exeControl != exeClass && safeRegexMatch(exeControl, rule.class))
         case "title":
             return safeRegexMatch(exeTitle, rule.title)
         case "classAndTitle":
-            return safeRegexMatch(exeClass, rule.class) && safeRegexMatch(exeTitle, rule.title)
+            return (safeRegexMatch(exeClass, rule.class) || (exeControl != "" && exeControl != exeClass && safeRegexMatch(exeControl, rule.class))) && safeRegexMatch(exeTitle, rule.title)
         default:
             return true
     }
 }
 
-/**
- * 匹配所有符合条件的规则
- * 规则逻辑：相同 Trigger 下只保留第一个命中的，不同 Trigger 互不影响
- * @param {String} exeName 进程名
- * @param {String} exeTitle 窗口标题
- * @param {String} exeClass 窗口类名
- * @param {Map} triggerMap 包含所有规则的 Map
- * @returns {Array} 命中的规则数组
- */
 matchWindowRules(triggerMap) {
     conditionalTriggers := []
     unconditionalTriggers := []
@@ -622,12 +613,12 @@ updateScreenOffset(prefix) {
 
 getCaretCapture() {
     captureMap := var.WindowCaretSymbolRule["capture"]
-    if captureMap.Has(exeName)
-        return captureMap[exeName]
+    if captureMap.Has(exeProcess)
+        return captureMap[exeProcess]
     for key, rule in captureMap {
         if key == ""
             continue
-        if safeRegexMatch(exeName, key)
+        if safeRegexMatch(exeProcess, key)
             return rule
     }
     return { capture: "", captureOffset: "" }
@@ -1029,7 +1020,7 @@ var._lastCaptureMode := ""
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
-    if !(hwnd := getHwnd())
+    if !(hwnd := getFocusedHwnd())
         return var._lastCaptureMode := ""
     captureModeChain := getCaretCapture().capture
     modes := StrSplit(captureModeChain, ">")
@@ -1071,21 +1062,6 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
             default:
                 return 0
         }
-    }
-
-    getHwnd(hwnd := 0) {
-        x64 := A_PtrSize == 8
-        guiThreadInfo := Buffer(x64 ? 72 : 48)
-        try {
-            NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
-            if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
-                if hwnd := NumGet(guiThreadInfo, x64 ? 48 : 28, "ptr") {
-                    return hwnd
-                }
-                hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
-            }
-        }
-        return hwnd
     }
 
     getCaretPosFromGui(&hwnd) {

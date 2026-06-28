@@ -2,9 +2,11 @@
 
 currentState := "EN"
 lastInputState := "", lastExportState := ""
+leaveDelay := var.pollInterval + 500
 hasTitleChange := 1, hasClassChange := 1, hasProcessChange := 1
-exePid := "", exeName := "", exeTitle := "", exeClass := "", leaveDelay := var.pollInterval + 500
-lastProcess := "", lastTitle := "", lastClass := ""
+exePid := "", exeProcess := "", exeTitle := "", exeClass := "", exeControl := ""
+lastProcess := "", lastTitle := "", lastClass := "", lastControl := ""
+hasProcessChange := "", hasTitleChange := "", hasClassChange := "", hasControlClassChange := ""
 lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := "", lastBorderState := ""
 hwnd := 0, exeMaximized := "", exeFullscreen := "", exeNormal := ""
 
@@ -19,7 +21,7 @@ if isJAB {
 
         if var._paused {
             lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := ""
-            lastTitle := "", lastClass := "", lastProcess := ""
+            lastTitle := "", lastClass := "", lastProcess := "", lastControl := ""
             continue
         }
 
@@ -33,10 +35,13 @@ if isJAB {
 
         needShow := var.caretSymbolType
         try {
+            hwnd := WinExist("A")
             exePid := WinGetPID("A")
-            exeName := ProcessGetName(exePid)
+            exeProcess := ProcessGetName(exePid)
             exeTitle := WinGetTitle("A")
             exeClass := WinGetClass("A")
+            if focusHwnd := getFocusedHwnd()
+                try exeControl := WinGetClass(focusHwnd)
 
             if !InStr(getCaretCapture().capture, "JAB") {
                 hideCaretSymbol()
@@ -46,20 +51,22 @@ if isJAB {
                 continue
             }
 
-            hasProcessChange := lastProcess != exeName
+            hasProcessChange := lastProcess != exeProcess
             hasTitleChange := lastTitle != exeTitle
             hasClassChange := lastClass != exeClass
+            hasControlClassChange := lastControl != exeControl
 
-            if hasTitleChange || hasClassChange || hasProcessChange {
+            if hasControlClassChange || hasTitleChange || hasClassChange || hasProcessChange {
                 if matchWindowDisplay(var.WindowCaretSymbolRule["hide"]) || !matchWindowDisplay(var.WindowCaretSymbolRule["show"])
                     hideCaretSymbol(), needShow := 0
 
                 lastCaretSymbol := ""
                 lastCursorSymbol := ""
                 lastCursor := ""
+                lastProcess := exeProcess
                 lastTitle := exeTitle
                 lastClass := exeClass
-                lastProcess := exeName
+                lastControl := exeControl
             }
         } catch {
             hideCaretSymbol()
@@ -88,9 +95,12 @@ if isJAB {
         try {
             hwnd := WinExist("A")
             exePid := WinGetPID("A")
-            exeName := ProcessGetName(exePid)
+            exeProcess := ProcessGetName(exePid)
             exeTitle := WinGetTitle("A")
             exeClass := WinGetClass("A")
+            exeControl := ""
+            if focusHwnd := getFocusedHwnd()
+                try exeControl := WinGetClass(focusHwnd)
 
             if var.borderActive || var.overlayActive {
                 exeMaximized := WinGetMinMax("A") == 1
@@ -98,25 +108,27 @@ if isJAB {
                 exeNormal := !exeMaximized && !exeFullscreen
             }
 
-            hasProcessChange := lastProcess != exeName
+            hasProcessChange := lastProcess != exeProcess
             hasTitleChange := lastTitle != exeTitle
             hasClassChange := lastClass != exeClass
+            hasControlClassChange := lastControl != exeControl
 
             if hasProcessChange
                 initMonitor()
 
-            if hasTitleChange || hasClassChange || hasProcessChange {
+            if hasControlClassChange || hasTitleChange || hasClassChange || hasProcessChange {
                 if var.caretSymbolType && exePid != appPid && (matchWindowDisplay(var.WindowCaretSymbolRule["hide"]) || !matchWindowDisplay(var.WindowCaretSymbolRule["show"]))
                     hideCaretSymbol(), needShow := 0
 
-                WinWaitActive(exeTitle " ahk_exe " exeName, , 3)
+                WinWaitActive(exeTitle " ahk_exe " exeProcess, , 3)
 
                 lastCaretSymbol := ""
                 lastCursorSymbol := ""
                 lastCursor := ""
+                lastProcess := exeProcess
                 lastTitle := exeTitle
                 lastClass := exeClass
-                lastProcess := exeName
+                lastControl := exeControl
 
                 updateWindowHotkey()
                 runTriggers(returnTriggers())
@@ -128,7 +140,7 @@ if isJAB {
 
         if var._paused {
             lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := ""
-            lastTitle := "", lastClass := "", lastProcess := ""
+            lastTitle := "", lastClass := "", lastProcess := "", lastControl := ""
             continue
         }
 

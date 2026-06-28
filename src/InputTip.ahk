@@ -104,7 +104,7 @@ updateWindowHotkey() {
         }
         var._lastWindowHotkeyList := []
     }
-    if !exeName
+    if !exeProcess
         return
 
     ruleLists := getMatchingRuleLists(var.hotkeyRule, 1)
@@ -140,7 +140,7 @@ clearAllRegisteredHotkeys() {
     if var._lastWindowHotkeyList.Length {
         remainingWindowHotkeys := []
         for hk in var._lastWindowHotkeyList {
-            if isResumeTrigger(hk, exeName, "window") {
+            if isResumeTrigger(hk, exeProcess, "window") {
                 remainingWindowHotkeys.Push(hk)
                 continue
             }
@@ -150,7 +150,7 @@ clearAllRegisteredHotkeys() {
     }
 }
 
-isResumeTrigger(hk, exeName := "", type := "global") {
+isResumeTrigger(hk, exeProcess := "", type := "global") {
     cleanHk := RegExReplace(hk, "i)^~|(?:\s+Up)$", "")
 
     if type == "global" {
@@ -159,7 +159,7 @@ isResumeTrigger(hk, exeName := "", type := "global") {
             if cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle")
                 return true
         }
-    } else if type == "window" && exeName != "" {
+    } else if type == "window" && exeProcess != "" {
         ruleLists := getMatchingRuleLists(var.hotkeyRule, 1)
         for ruleList in ruleLists {
             for rule in ruleList {
@@ -225,7 +225,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         rules := []
         previewTimes := Map()
         for key, item in var._previewOffsetMap {
-            if safeRegexMatch(exeName, key) {
+            if safeRegexMatch(exeProcess, key) {
                 previewTimes.Set(item.time, 1)
                 rules.Push(item)
             }

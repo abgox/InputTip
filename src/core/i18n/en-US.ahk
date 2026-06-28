@@ -28,7 +28,7 @@ langStrings.Set("en-US", Map(
     "match.textMonitorOrHotkeyMonitorOrIdleTimer", "Text Monitor / Hotkey Monitor / Idle Timer",
     "match.trigger", "Trigger Behavior",
     "match.title", "Window Title",
-    "match.class", "Window Class",
+    "match.class", "Window/Control Class",
     "match.time", "Create Time",
     "match.offset", "Offset",
     "match.capture", "Caret Capture Mode",
@@ -340,6 +340,7 @@ langStrings.Set("en-US", Map(
     "windowInfo.list", [
         "Window Process",
         "Window Class",
+        "Control Class",
         "Window Title",
         "Process Path",
     ],

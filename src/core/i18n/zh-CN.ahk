@@ -28,7 +28,7 @@ langStrings.Set("zh-CN", Map(
     "match.textMonitorOrHotkeyMonitorOrIdleTimer", "文本监控 / 热键监控 / 空闲计时器",
     "match.trigger", "触发行为",
     "match.title", "窗口标题",
-    "match.class", "窗口类名",
+    "match.class", "窗口/控件类名",
     "match.time", "创建时间",
     "match.offset", "偏移量",
     "match.capture", "光标捕获模式",
@@ -340,6 +340,7 @@ langStrings.Set("zh-CN", Map(
     "windowInfo.list", [
         "窗口进程",
         "窗口类名",
+        "控件类名",
         "窗口标题",
         "窗口进程路径",
     ],

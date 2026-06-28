@@ -159,6 +159,20 @@ runScheduleTask(taskName) {
     try Run("schtasks /run /tn `"" taskName "`"", , "Hide")
 }
 
+getFocusedHwnd(hwnd := 0) {
+    x64 := A_PtrSize == 8
+    guiThreadInfo := Buffer(x64 ? 72 : 48)
+    try {
+        NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
+        if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
+            if hwnd := NumGet(guiThreadInfo, x64 ? 48 : 28, "ptr") {
+                return hwnd
+            }
+            hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
+        }
+    }
+    return hwnd
+}
 
 getWinPhysicalRect(hwnd := WinExist("A")) {
     rc := Buffer(16, 0)

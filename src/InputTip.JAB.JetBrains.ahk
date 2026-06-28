@@ -19,6 +19,21 @@ isJAB := 1
 #Include core\var.ahk
 #Include core\symbol.ahk
 
+appPid := 0
+try appPid := A_Args[1]
+
+WM_JAB_RELOAD := 0x8001
+WM_JAB_CAPTURE_MODE := 0x8002
+
+captureModeMap := Map()
+for i, name in var.modeNameList
+    captureModeMap[name] := i
+
+OnMessage(WM_JAB_RELOAD, (*) => (loadConfig(), var._matchCache.Clear(), parseWindowRule(), hideCaretSymbol(), updateSymbol("caret")))
+
+notifyCaptureMode(mode) {
+    try PostMessage(WM_JAB_CAPTURE_MODE, captureModeMap.Has(mode) ? captureModeMap[mode] : 1, 0, , "ahk_pid " appPid)
+}
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
     left := 0, top := 0, right := 0, bottom := 0
@@ -29,7 +44,9 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         var._lastCaptureMode := ""
         return 0
     }
-    if !left
+    if left
+        notifyCaptureMode("JAB")
+    else
         GetCaretPosEx(&left, &top, &right, &bottom)
     if !left
         return

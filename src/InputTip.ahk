@@ -8,6 +8,12 @@
 
 OnMessage(0x404, (wParam, lParam, *) => lParam == 0x202 ? toggleApp() : "")
 
+WM_JAB_CAPTURE_MODE := 0x8002
+OnMessage(WM_JAB_CAPTURE_MODE, OnJABCaptureMode)
+OnJABCaptureMode(wParam, lParam, msg, hwnd) {
+    try var._lastCaptureMode := var.modeNameList[wParam]
+}
+
 if A_IsCompiled {
     favicon := A_ScriptFullPath
 } else {

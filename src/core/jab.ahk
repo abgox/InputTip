@@ -1,5 +1,7 @@
 ; InputTip
 
+WM_JAB_RELOAD := 0x8001
+
 /**
  * 启动 JAB 进程
  * @returns {1|0} 是否存在错误
@@ -40,9 +42,18 @@ runJAB() {
         }
     } else {
         global JAB_PID
-        Run('"' A_AhkPath '" "' JABPath '"', , "Hide", &JAB_PID)
+        Run('"' A_AhkPath '" "' JABPath '" ' appPid, , "Hide", &JAB_PID)
     }
     return 0
+}
+
+; 通知 JAB 子进程重新加载配置
+notifyJABReload() {
+    if !var.symbolJABActive
+        return
+    if isJAB
+        return
+    try PostMessage(WM_JAB_RELOAD, 0, 0, , "ahk_pid " JAB_PID)
 }
 
 ; 重启 JAB 程序
@@ -61,7 +72,7 @@ restartJAB() {
                 runScheduleTask(taskNameJAB)
             } else {
                 global JAB_PID
-                Run('"' A_AhkPath '" "' JABPath '"', , "Hide", &JAB_PID)
+                Run('"' A_AhkPath '" "' JABPath '" ' appPid, , "Hide", &JAB_PID)
             }
             done := 1
         }

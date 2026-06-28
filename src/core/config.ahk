@@ -27,7 +27,7 @@ normalizeConfig(key, value) {
     return value
 }
 
-changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJAB()) {
+changeConfig(key, value, debounce := 0, callback := (key, value, *) => (A_IsAdmin ? restartJAB() : notifyJABReload())) {
     if value == "" {
         ; 允许空值的配置
         allowNullVal := InStr(key, "inputMethodDetectionRule") || InStr(key, "cursorPath") || InStr(key, "SymbolPicturePath") || InStr(key, "overlayText") || InStr(key, "color") || InStr(key, "SymbolText")

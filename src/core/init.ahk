@@ -25,10 +25,8 @@ for v in ["CN", "EN", "Caps", "JP", "KR"]
 if !A_IsCompiled
     dirList.Push("data/plugin")
 
-for d in dirList {
-    if !DirExist(d)
-        DirCreate(d)
-}
+for d in dirList
+    DirExist(d) ? "" : DirCreate(d)
 
 if FileExist(oldConfigFile)
     migrateConfig1(configFile, oldConfigFile)
@@ -275,38 +273,31 @@ if A_IsCompiled {
 
     missFileList := []
 
-    for v in fileList {
-        if (!FileExist(v)) {
-            missFileList.Push("src/" v "=" v)
-        }
-    }
+    for v in fileList
+        FileExist(v) ? "" : missFileList.Push("src/" v "=" v)
+
     styleList := [
         "AppStarting.ani", "Arrow.cur", "Cross.cur", "Hand.cur", "Help.cur", "IBeam.cur", "No.cur", "Pen.cur", "SizeAll.cur", "SizeNESW.cur", "SizeNS.cur", "SizeNWSE.cur", "SizeWE.cur", "UpArrow.cur", "Wait.ani"
     ]
     for state in stateList {
         pic := "temp/symbol/default-triangle-" stateVal.%state%.colorText ".png"
-        if (!FileExist(pic)) {
+        if !FileExist(pic)
             missFileList.Push("src/" pic "=" pic)
-        }
         for s in styleList {
             p := "temp/cursor/default-" stateVal.%state%.colorText "/" s
-            if (!FileExist(p)) {
+            if !FileExist(p)
                 missFileList.Push("src/" p "=" p)
-            }
         }
     }
-    if (missFileList.Length) {
+    if missFileList.Length {
         try {
             icon := defaultIconDir "\default-app"
-            if (A_IsPaused)
+            if A_IsPaused
                 icon .= "-paused"
             TraySetIcon(icon ".png", , 1)
         }
-        done := showDownloadProcessGui("missingFile.downloading", missFileList)
-        if (done) {
-            Run('"' runtime2 '" "' A_ScriptFullPath '" ' 0)
-            ExitApp()
-        }
+        if showDownloadProcessGui("missingFile.downloading", missFileList)
+            Run('"' runtime2 '" "' A_ScriptFullPath '" ' 0), ExitApp()
     }
 }
 
@@ -316,40 +307,24 @@ checkIni() {
         if currentVersion != oldVersion
             writeIni("version-" versionType, currentVersion)
     } catch {
+        _change(g, key, val, callback, *) {
+            g.Destroy(), changeConfig(key, val), callback()
+        }
         showGui(createUniqueGui(cursorGuideGui))
         cursorGuideGui(info) {
             g := createGuiOpt(i18n("init.title"))
-            for i, v in i18n("init.cursor", 1) {
-                if (i == 1) {
-                    g.AddLink(, v)
-                } else {
-                    g.AddText("xs cRed", v).Focus()
-                }
-            }
+            for i, v in i18n("init.cursor", 1)
+                i == 1 ? g.AddLink(, v) : g.AddText("xs cRed", v).Focus()
 
-            if (info.i) {
+            if info.i
                 return g
-            }
             w := info.w
             bw := w - g.MarginX * 2
 
-            g.AddButton("xs w" bw, i18n("yes")).OnEvent("Click", e_yes)
-            e_yes(*) {
-                g.Destroy()
-                changeConfig("cursorActive", 1)
-                showOverlayGuide()
-            }
-            g.AddButton("w" bw, i18n("no")).OnEvent("Click", e_no)
-            e_no(*) {
-                g.Destroy()
-                changeConfig("cursorActive", 0)
-                showOverlayGuide()
-            }
-            g.OnEvent("Close", e_exit)
-            e_exit(*) {
-                try IniDelete(configFile, "Settings", "version-" versionType)
-                ExitApp()
-            }
+            for v in [["yes", 1], ["no", 0]]
+                g.AddButton("w" bw, i18n(v[1])).OnEvent("Click", _change.Bind(g, "cursorActive", v[2], showOverlayGuide))
+
+            g.OnEvent("Close", closeApp)
             return g
         }
 
@@ -358,40 +333,18 @@ checkIni() {
             overlayGuideGui(info) {
                 g := Gui("-DPIScale", "InputTip - " i18n("init.title"))
                 g.SetFont(fontOpt*)
-                for i, v in i18n("init.overlay", 1) {
-                    if (i == 1) {
-                        g.AddLink(, v)
-                    } else {
-                        g.AddText("xs cRed", v).Focus()
-                    }
-                }
+                for i, v in i18n("init.overlay", 1)
+                    i == 1 ? g.AddLink(, v) : g.AddText("xs cRed", v).Focus()
 
-                if (info.i) {
+                if info.i
                     return g
-                }
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                g.AddButton("xs cRed w" bw, i18n("yes")).OnEvent("Click", e_yes)
-                e_yes(*) {
-                    g.Destroy()
-                    changeConfig("overlayActive", 1)
-                    showDonateGui()
-                }
-                _ := g.AddButton("w" bw, i18n("no"))
-                _.OnEvent("Click", e_no)
-                e_no(*) {
-                    g.Destroy()
-                    changeConfig("overlayActive", 0)
-                    showDonateGui()
-                }
-                g.OnEvent("Close", e_exit)
-                e_exit(*) {
-                    try {
-                        IniDelete(configFile, "Settings", "version-" versionType)
-                    }
-                    ExitApp()
-                }
+                for v in [["yes", 1], ["no", 0]]
+                    g.AddButton("w" bw, i18n(v[1])).OnEvent("Click", _change.Bind(g, "overlayActive", v[2], showDonateGui))
+
+                g.OnEvent("Close", closeApp)
                 return g
             }
         }
@@ -401,21 +354,15 @@ checkIni() {
             donateGui(info) {
                 g := Gui("-DPIScale", "InputTip - " i18n("init.title"))
                 g.SetFont(fontOpt*)
-                for i, v in i18n("init.donate", 1) {
-                    if (i <= 2) {
-                        g.AddLink(, v)
-                    } else {
-                        g.AddText("xs cRed", v).Focus()
-                    }
-                }
+                for i, v in i18n("init.donate", 1)
+                    (i <= 2) ? g.AddLink(, v) : g.AddText("xs cRed", v).Focus()
 
-                if (info.i) {
+                if info.i
                     return g
-                }
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                g.AddButton("xs cRed w" bw, i18n("goToRepo")).OnEvent("Click", (*) => Run("https://github.com/abgox/InputTip"))
+                g.AddButton("cRed w" bw, i18n("goToRepo")).OnEvent("Click", (*) => Run("https://github.com/abgox/InputTip"))
                 g.AddButton("w" bw, i18n("goToDonate")).OnEvent("Click", (*) => Run("https://www.abgox.com/donate"))
                 g.OnEvent("Close", (*) => (g.Destroy(), writeIni("version-" versionType, currentVersion)))
                 return g
@@ -455,14 +402,12 @@ migrateAsset() {
 }
 
 migrateConfig1(newFile, oldFile) {
-    colorMap := Map(
-        "ffffff", "0xFFFFFF"
-    )
-    for v in stateList {
+    colorMap := Map("ffffff", "0xFFFFFF")
+    for v in stateList
         colorMap.Set(stateVal.%v%.colorText, stateVal.%v%.color)
-    }
+
     _migrateConfig(newKey := "", oldKey := "", newSection := "Settings", oldSection := "Config-v2", valueMap := Map()) {
-        if (newKey) {
+        if newKey {
             try {
                 oldVal := IniRead(oldFile, oldSection, oldKey)
                 switch oldKey {
@@ -476,11 +421,7 @@ migrateConfig1(newFile, oldFile) {
                         newVal := StrReplace(oldVal, "InputTipSymbol\default\triangle-", "default-triangle-")
                         newVal := StrReplace(newVal, "InputTipSymbol\", "data\symbol\")
                     default:
-                        if (valueMap.Count) {
-                            newVal := valueMap.Get(oldVal)
-                        } else {
-                            newVal := oldVal
-                        }
+                        newVal := valueMap.Count ? valueMap.Get(oldVal) : oldVal
                 }
                 if InStr(oldKey, "color") && colorMap.Has(oldVal)
                     newVal := colorMap.Get(oldVal)
@@ -490,11 +431,7 @@ migrateConfig1(newFile, oldFile) {
         } else {
             try {
                 oldVal := IniRead(oldFile, oldSection)
-                if (valueMap.Count) {
-                    newVal := valueMap.Get(oldVal)
-                } else {
-                    newVal := oldVal
-                }
+                newVal := valueMap.Count ? valueMap.Get(oldVal) : oldVal
                 IniWrite(newVal, newFile, newSection)
             }
         }
@@ -676,7 +613,6 @@ migrateConfig2() {
         try IniDelete(configFile, "Settings", "symbolNearCursorWindow")
     }
 
-
     sectionList := [
         "Window.AutoSwitch.CN",
         "Window.AutoSwitch.EN",
@@ -706,11 +642,9 @@ migrateConfig2() {
                     part := StrSplit(kv, "=", , 2)
                     key := part[1]
                     value := part[2]
-
                     valuePart := StrSplit(value, ":", , 5)
-                    process := valuePart[1]
 
-                    if process {
+                    if process := valuePart[1] {
                         IniWrite(process, configFile, "Window.CaretSymbol.Rule." key, "process")
                     } else {
                         continue
@@ -733,31 +667,23 @@ migrateConfig2() {
                 }
             case "Screen.Symbol.Offset":
                 offsetList := []
-                for kv in StrSplit(val, "`n") {
-                    part := StrSplit(kv, "=", , 2)
-                    screen := part[1]
-                    offset := part[2]
-                    offsetList.Push(screen "/" offset)
-                }
-                if offsets := arrJoin(offsetList, "|") {
+                for kv in StrSplit(val, "`n")
+                    part := StrSplit(kv, "=", , 2), screen := part[1], offset := part[2], offsetList.Push(screen "/" offset)
+                if offsets := arrJoin(offsetList, "|")
                     IniWrite(offsets, configFile, "Settings", "caretSymbolScreenOffset")
-                }
             case "Window.Symbol.CursorCapture":
                 for kv in StrSplit(val, "`n") {
                     part := StrSplit(kv, "=", , 2)
                     key := part[1]
                     value := part[2]
-
                     valuePart := StrSplit(value, ":", , 2)
-                    process := valuePart[1]
 
-                    if process {
+                    if process := valuePart[1] {
                         IniWrite(process, configFile, "Window.CaretSymbol.Rule." key, "process")
                     } else {
                         continue
                     }
-                    captureMode := valuePart[2]
-                    if captureMode {
+                    if captureMode := valuePart[2] {
                         captureMode := captureMode == "GUI_UIA" ? "GUI>UIA" : captureMode
                         IniWrite(captureMode, configFile, "Window.CaretSymbol.Rule." key, "capture")
                         IniWrite("capture", configFile, "Window.CaretSymbol.Rule." key, "trigger")
@@ -777,11 +703,9 @@ migrateConfig2() {
                     part := StrSplit(kv, "=", , 2)
                     key := part[1]
                     value := part[2]
-
                     valuePart := StrSplit(value, ":", , 4)
-                    process := valuePart[1]
 
-                    if process {
+                    if process := valuePart[1] {
                         IniWrite(process, configFile, section key, "process")
                     } else {
                         continue
@@ -827,12 +751,10 @@ migrateConfig2() {
                                 IniWrite("exit", configFile, section key, "trigger")
                             case "Window.IgnoreStateSwitch":
                                 IniWrite("ignoreStateSwitch", configFile, section key, "trigger")
-                            default:
                         }
                     }
                 }
         }
-
         try IniDelete(configFile, v)
     }
     migrateHotkey("hotkeyCN", "switchStateCN-LShift")
@@ -850,10 +772,7 @@ migrateConfig2() {
         try IniDelete(configFile, "Settings", key)
     }
 
-    for v in [
-        ["overlayShowOnWindowChange", "overlayReshowOnTitleChange"],
-        ["overlayShowOnProcessChange", "overlayReshowOnProcessChange"]
-    ] {
+    for v in [["overlayShowOnWindowChange", "overlayReshowOnTitleChange"], ["overlayShowOnProcessChange", "overlayReshowOnProcessChange"]] {
         if val := IniRead(configFile, "Settings", v[1], 0) {
             IniWrite(val, configFile, "Settings", v[2])
             try IniDelete(configFile, "Settings", v[1])
@@ -866,10 +785,8 @@ migrateConfig2() {
     val := IniRead(configFile, "Settings", "inputMethodDetectionRule", "")
     if val && !InStr(val, ",") {
         newVal := []
-        for rule in StrSplit(val, ":") {
-            part := StrSplit(rule, "*")
-            newVal.Push(part[1] "," part[2] "," (part[3] ? "CN" : "EN"))
-        }
+        for rule in StrSplit(val, ":")
+            part := StrSplit(rule, "*"), newVal.Push(part[1] "," part[2] "," (part[3] ? "CN" : "EN"))
         newVal := arrJoin(newVal, "|")
         IniWrite(newVal, configFile, "Settings", "inputMethodDetectionRule")
     }

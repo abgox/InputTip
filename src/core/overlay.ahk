@@ -5,7 +5,7 @@ updateOverlay()
 hideOverlay() {
     for v in stateList {
         i := var.screenNum
-        while (i > 0) {
+        while i > 0 {
             try var.%"overlayGui" v i%.Hide()
             i--
         }
@@ -34,7 +34,7 @@ showOverlay(state) {
 
     try {
         i := var.screenNum
-        while (i > 0) {
+        while i > 0 {
             g := var.%"overlayGui" state i%
             screen := var.screenList[i]
 
@@ -154,7 +154,7 @@ updateOverlay() {
         bgColor := var.%"overlayBgColor" state%
 
         i := var.screenNum
-        while (i > 0) {
+        while i > 0 {
             var.%"overlayGui" state i% := createUniqueGui(tipGui.Bind(state, i), var.overlayCornerPreference)
             tipGui(state, num, info) {
                 g := createGuiOpt("overlayGui" state num, , "-Caption AlwaysOnTop ToolWindow E0x20", , 0)
@@ -164,9 +164,9 @@ updateOverlay() {
                     g.BackColor := bgColor
                     g.AddText("c" textColor, text)
                 }
-                if (info.i) {
+                if info.i
                     return g
-                }
+
                 switch var.overlayEdgeStyle {
                     case 1: g.Opt("e0x00000001")
                     case 2: g.Opt("e0x00000200")
@@ -185,7 +185,7 @@ e_overlay(*) {
     overlayStyleGui(info) {
         g := createGuiOpt(i18n("overlay"))
 
-        if (info.i) {
+        if info.i {
             g.AddText(, isChinese ? line80 : line90)
             return g
         }

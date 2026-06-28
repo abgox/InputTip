@@ -35,12 +35,12 @@ createUniqueGui(callback, cornerPreference := 0, useImmersiveDarkMode := 1) {
     static w := Map()
     g := createGui(callback)
     try {
-        if (useImmersiveDarkMode) {
+        if useImmersiveDarkMode {
             ; 深色模式标题栏（DWMWA_USE_IMMERSIVE_DARK_MODE = 20）
             ; 让窗口标题栏跟随深色模式，未来可能扩展到子控件
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 20, "Int*", useImmersiveDarkMode, "Int", 4)
         }
-        if (cornerPreference) {
+        if cornerPreference {
             ; 边角样式（DWMWA_WINDOW_CORNER_PREFERENCE = 33）
             ;
             DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 33, "Int*", cornerPreference, "Int", 4)
@@ -50,14 +50,9 @@ createUniqueGui(callback, cornerPreference := 0, useImmersiveDarkMode := 1) {
         ; DllCall("dwmapi\DwmSetWindowAttribute", "Ptr", g.Hwnd, "Int", 38, "Int*", 3, "Int", 4)
     }
     g.GetPos(, , &width, &height)
-    ; 基本确保唯一性
-    id := g.Title "_" width "_" height
-    if (w.Has(id)) {
-        try {
-            w.Get(id).Destroy()
-            w.Delete(id)
-        }
-    }
+    id := g.Title "_" width "_" height ; 确保唯一性
+    if w.Has(id)
+        try (w.Get(id).Destroy(), w.Delete(id))
     w.Set(id, g)
     return g
 }
@@ -74,7 +69,7 @@ createUniqueGui(callback, cornerPreference := 0, useImmersiveDarkMode := 1) {
 createGuiOpt(title, fontOption := fontOpt, guiOption := "", prefix := "InputTip - ", clearFocus := 1) {
     g := Gui(guiOption " -DPIScale", prefix title)
     g.SetFont(fontOption*)
-    if (clearFocus) {
+    if clearFocus {
         g.OnEvent("Size", OnFirstShow)
         OnFirstShow(g, *) {
             g.OnEvent("Size", OnFirstShow, 0)
@@ -131,13 +126,13 @@ createErrorTipGui(Tips, title := "") {
  * @param {String} options 显示时的选项
  * @param {"fade"} animation 显示动画效果
  * @param {1|0} hideOnTrayMenu 显示托盘菜单时是否隐藏
- * @param {Number} transparency 透明度值
+ * @param {""|"Off"|Number} transparency 透明度值
  */
-showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, transparency := "") {
+showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, transparency := "Off") {
     if hideOnTrayMenu
         hideOnTrayGui.Push(g)
 
-    targetAlpha := transparency != "" ? transparency : 255
+    targetAlpha := IsNumber(transparency) ? transparency : 255
 
     try {
         hwnd := g.Hwnd
@@ -155,14 +150,8 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
                         t := step / total
                         alpha := Integer(targetAlpha * (t ** 0.5))
                         applyTransparency(hwnd, Min(alpha, targetAlpha))
-                        if (step >= total) {
-                            SetTimer(fade, 0)
-                            if (transparency == "") {
-                                WinSetTransparent("Off", hwnd)
-                            } else {
-                                applyTransparency(hwnd, transparency)
-                            }
-                        }
+                        if step >= total
+                            SetTimer(fade, 0), applyTransparency(hwnd, transparency)
                     } catch {
                         SetTimer(fade, 0)
                         applyTransparency(hwnd, transparency)
@@ -171,10 +160,8 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
 
             case "slideOverlay":
                 try {
-                    if HasProp(g, "AnimationTimer") && g.AnimationTimer {
-                        SetTimer(g.AnimationTimer, 0)
-                        g.AnimationTimer := ""
-                    }
+                    if HasProp(g, "AnimationTimer") && g.AnimationTimer
+                        SetTimer(g.AnimationTimer, 0), g.AnimationTimer := ""
                 }
 
                 applyTransparency(hwnd, 0)
@@ -186,8 +173,8 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
                     break
                 }
 
-                if (!targetCtrl) {
-                    (transparency == "") ? WinSetTransparent("Off", hwnd) : applyTransparency(hwnd, transparency)
+                if !targetCtrl {
+                    applyTransparency(hwnd, transparency)
                     return
                 }
 
@@ -206,7 +193,7 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
                     targetCtrl.Move(, targetCtrl.origY + offset)
                     DllCall("user32\UpdateWindow", "Ptr", hwnd)
                 } catch {
-                    (transparency == "") ? WinSetTransparent("Off", hwnd) : applyTransparency(hwnd, transparency)
+                    applyTransparency(hwnd, transparency)
                     return
                 }
 
@@ -230,7 +217,7 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
                         currentOffset := offset * easeOutValue
                         currentAlpha := Integer(targetAlpha * (t ** 0.5))
 
-                        if (currentOffset > 0.5 && step < total) {
+                        if currentOffset > 0.5 && step < total {
                             try targetCtrl.Move(, targetCtrl.origY + currentOffset)
                             applyTransparency(hwnd, Min(currentAlpha, targetAlpha))
                         } else {
@@ -238,7 +225,7 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
                             g.AnimationTimer := ""
 
                             try targetCtrl.Move(, targetCtrl.origY)
-                            (transparency == "") ? WinSetTransparent("Off", hwnd) : applyTransparency(hwnd, transparency)
+                            applyTransparency(hwnd, transparency)
                         }
                     } catch {
                         try SetTimer(g.AnimationTimer, 0)
@@ -262,7 +249,7 @@ showGui(g, options := "", animation := var.menuAnimation, hideOnTrayMenu := 0, t
 showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
     tipGui(info) {
         g := createGuiOpt(i18n(titleKey), , "AlwaysOnTop Disabled")
-        if (info.i) {
+        if info.i {
             g.AddText(, line60)
             return g
         }
@@ -294,28 +281,31 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
             try {
                 if dir && !DirExist(dir)
                     DirCreate(dir)
-
                 Download(pathToUrl(u "/" from), out)
-                if (FileExist(out)) {
-                    if (InStr(out, ".ahk") || InStr(out, ".bat")) {
-                        try success := InStr(FileOpen(out, "r").ReadLine(), "InputTip")
+                if FileExist(out) {
+                    if InStr(out, ".ahk") || InStr(out, ".bat") {
+                        try {
+                            f := FileOpen(out, "r")
+                            success := InStr(f.ReadLine(), "InputTip")
+                            f.Close()
+                        }
                     } else {
                         success := 1
                     }
-                    if (success) {
+                    if success {
                         doneFileList.Push(out)
                         break
                     }
                 }
             }
         }
-        if (!success) {
+        if !success {
             done := 0
             break
         }
     }
     downloadingGui.Destroy()
-    if (done) {
+    if done {
         backupList := []
         replaceOk := 1
         for v in doneFileList {
@@ -330,7 +320,7 @@ showDownloadProcessGui(labelKey, downloadList, titleKey := labelKey) {
                 break
             }
         }
-        if (replaceOk) {
+        if replaceOk {
             for item in backupList
                 try FileDelete(item[2])
         } else {

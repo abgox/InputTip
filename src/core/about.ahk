@@ -5,15 +5,14 @@ e_about(*) {
     aboutGui(info) {
         g := createGuiOpt(i18n("about"))
 
-        if (info.i) {
+        if info.i {
             g.AddText(, line60)
             return g
         }
         w := info.w
+        opt := "xs+20 yp+" uicText.yp
 
         renderText(g, "desc", "Section Center", "w" w)
-
-        opt := "xs+20 yp+" uicText.yp
 
         renderGroupBox(g, "about.info", "xs", "h" uicText.h * 1.5 " w" w)
         g.AddLink(opt, i18n("about.version") getLink("inputtip.abgox.com/download", currentVersion))

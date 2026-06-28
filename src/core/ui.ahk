@@ -135,8 +135,8 @@ renderDropDownListGroup(g, groupLabelKey, list, listLabelKey := groupLabelKey, g
  * @param {Func} callback 点击按钮后的回调
  */
 renderRadio(g, key, textKey, value, layout, callback := (key, value, *) => changeConfig(key, value)) {
-    isChecked := (var.%key% == value ? "Checked" : "")
-    labelText := (SubStr(textKey, 1, 1) == ".") ? i18n(key textKey) : i18n(textKey)
+    isChecked := var.%key% == value ? "Checked" : ""
+    labelText := SubStr(textKey, 1, 1) == "." ? i18n(key textKey) : i18n(textKey)
     _ := g.AddRadio(layout " " isChecked, labelText)
     _.OnEvent("Click", callback.Bind(key, value))
     return _

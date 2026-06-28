@@ -32,12 +32,9 @@ isChinese := currentLang == "zh-CN"
 i18n(key, raw := 0) {
     langMap := langStrings.Has(currentLang) ? langStrings.Get(currentLang) : langStrings.Get("zh-CN")
     val := langMap.Has(key) ? langMap.Get(key) : langStrings.Get("zh-CN").Get(key, key)
-    if (raw)
+    if raw
         return val
-    if IsObject(val) {
-        if val.Length >= 2
-            return val[2]
-        return val[1]
-    }
+    if IsObject(val)
+        return val.Length >= 2 ? val[2] : val[1]
     return val
 }

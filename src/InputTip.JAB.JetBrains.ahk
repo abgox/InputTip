@@ -6,9 +6,9 @@
 
 isJAB := 1
 
-;@AHK2Exe-SetName InputTip.JAB
+;@Ahk2Exe-SetName InputTip.JAB
 ;@Ahk2Exe-SetOrigFilename InputTip.JAB.JetBrains.ahk
-;@AHK2Exe-SetDescription InputTip.JAB.JetBrains
+;@Ahk2Exe-SetDescription InputTip.JAB.JetBrains
 
 #Include core\utils.ahk
 #Include core\gui.ahk
@@ -68,7 +68,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
         }
 
         rules := []
-        for ruleList in getMatchingRuleLists(exeName, var.WindowCaretSymbolRule["offset"])
+        for ruleList in getMatchingRuleLists(var.WindowCaretSymbolRule["offset"])
             rules.Push(ruleList*)
         num := String(s.num)
         for rule in rules {

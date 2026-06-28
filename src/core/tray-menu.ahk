@@ -4,7 +4,6 @@
 #Include "*i input-method.ahk"
 #Include "*i more-settings.ahk"
 #Include "*i startup.ahk"
-#Include "*i offset.ahk"
 #Include "*i ui.ahk"
 #Include "*i config.ahk"
 
@@ -19,15 +18,14 @@ makeTrayMenu() {
     A_TrayMenu.Add(i18n("startup"), e_startup)
     checkStartup()
 
-    if (!A_IsCompiled) {
+    if !A_IsCompiled {
         A_TrayMenu.Add(i18n("runCodeWithAdmin"), (*) => (
             A_TrayMenu.ToggleCheck(i18n("runCodeWithAdmin")),
             changeConfig("runCodeWithAdmin", !var.runCodeWithAdmin, 0),
             var.runCodeWithAdmin ? restartApp() : 0
         ))
-        if (A_IsAdmin && var.runCodeWithAdmin) {
+        if A_IsAdmin && var.runCodeWithAdmin
             A_TrayMenu.Check(i18n("runCodeWithAdmin"))
-        }
     }
     A_TrayMenu.Add()
     A_TrayMenu.Add(i18n("inputMethod"), e_inputMethod)
@@ -81,14 +79,9 @@ closeApp(*) {
 }
 restartApp(*) {
     ProcessClose(updaterPID)
-    if (var.symbolJABActive) {
+    if var.symbolJABActive
         killJAB()
-    }
-    if (A_IsCompiled) {
-        Run('"' A_ScriptFullPath '" ' keyCount)
-    } else {
-        Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' keyCount)
-    }
+    A_IsCompiled ? Run('"' A_ScriptFullPath '" ' keyCount) : Run('"' A_AhkPath '" "' A_ScriptFullPath '" ' keyCount)
 }
 
 e_windowInfo(*) {
@@ -97,7 +90,7 @@ e_windowInfo(*) {
         static timer := 0
         g := createGuiOpt(i18n("windowInfo"), , "AlwaysOnTop")
 
-        if (info.i) {
+        if info.i {
             g.AddText(, line60)
             return g
         }
@@ -162,7 +155,7 @@ createProcessMenuGui(meta, *) {
     processMenuGui(info) {
         g := createGuiOpt(meta.title)
 
-        if (info.i) {
+        if info.i {
             g.AddText(, line90)
             return g
         }
@@ -184,10 +177,10 @@ createProcessMenuGui(meta, *) {
                 for i in meta.cols {
                     val := ""
                     if i == "condition" {
-                        if indexOfArr(meta.conditions, item.%i%)
+                        if keyOf(meta.conditions, item.%i%)
                             val := i18n("condition." item.%i%)
                     } else if i == "trigger" {
-                        if indexOfArr(meta.trigger, item.%i%) {
+                        if keyOf(meta.trigger, item.%i%) {
                             val := i18n("trigger." item.%i%)
                         }
                     }
@@ -202,13 +195,11 @@ createProcessMenuGui(meta, *) {
         }
 
         e_handleClick(LV, RowNumber, *) {
-            if (!RowNumber) {
+            if !RowNumber
                 return
-            }
             colValue := {}
-            for k, v in column {
+            for k, v in column
                 colValue.%k% := LV.GetText(RowNumber, v)
-            }
             colValue.time := LV.GetText(RowNumber, LV.GetCount("Col"))
             showGui(createUniqueGui(fn_edit.Bind(LV, RowNumber, "edit", colValue)))
         }
@@ -216,7 +207,7 @@ createProcessMenuGui(meta, *) {
         fn_edit(LV, RowNumber, action, colValue, info) {
             g := createGuiOpt(i18n(action "Rule"), , "AlwaysOnTop")
 
-            if (info.i) {
+            if info.i {
                 g.AddText(, line70)
                 return g
             }
@@ -228,14 +219,11 @@ createProcessMenuGui(meta, *) {
 
             sectionList := []
             i := 0
-            while (i < column.Count) {
-                sectionList.Push("")
-                i++
-            }
+            while i < column.Count
+                sectionList.Push(""), i++
 
             groupLayout := ""
-            num := column.Get("hotkey", 0)
-            if (num) {
+            if num := column.Get("hotkey", 0) {
                 groupLayout := "xs"
                 sectionList[num] := fn_hotkey
                 fn_hotkey() {
@@ -263,9 +251,7 @@ createProcessMenuGui(meta, *) {
                     SuppressControlWheel(_.Hwnd)
                 }
             }
-
-            num := column.Get("process", 0)
-            if (num) {
+            if num := column.Get("process", 0) {
                 sectionList[num] := fn_process
                 fn_process() {
                     renderGroupBox(g, "match.process", groupLayout layout)
@@ -306,9 +292,7 @@ createProcessMenuGui(meta, *) {
                     var._titleEditCtrl.Opt(color)
                 }
             }
-
-            num := column.Get("trigger", 0)
-            if (num) {
+            if num := column.Get("trigger", 0) {
                 sectionList[num] := fn_trigger
                 fn_trigger() {
                     triggerList := [""]
@@ -323,9 +307,7 @@ createProcessMenuGui(meta, *) {
                     SuppressControlWheel(_.Hwnd)
                 }
             }
-
-            num := column.Get("condition", 0)
-            if (num) {
+            if num := column.Get("condition", 0) {
                 sectionList[num] := fn_condition
                 fn_condition() {
                     conditionList := [""]
@@ -374,9 +356,7 @@ createProcessMenuGui(meta, *) {
                     }
                 }
             }
-
-            num := column.Get("class", 0)
-            if (num) {
+            if num := column.Get("class", 0) {
                 sectionList[num] := fn_class
                 fn_class() {
                     renderGroupBox(g, "match.class", "xs" layout)
@@ -385,9 +365,7 @@ createProcessMenuGui(meta, *) {
                     _.OnEvent("Change", (i, *) => colValue.class := i.Text)
                 }
             }
-
-            num := column.Get("title", 0)
-            if (num) {
+            if num := column.Get("title", 0) {
                 sectionList[num] := fn_title
                 fn_title() {
                     renderGroupBox(g, "match.title", "xs" layout)
@@ -396,16 +374,14 @@ createProcessMenuGui(meta, *) {
                     _.OnEvent("Change", (i, *) => colValue.title := i.Text)
                 }
             }
-
-            num := column.Get("capture", 0)
-            if (num) {
+            if num := column.Get("capture", 0) {
                 sectionList[num] := fn_capture
                 fn_capture() {
                     captureList := ["", "", "", "", "", "", "", ""]
                     captureOffsetList := ["", "", "", "", "", "", "", ""]
-                    modeNameList := ["GUI", "UIA", "HOOK", "HOOK_DLL", "MSAA", "WPF", "ACC"]
-                    if var.symbolJABActive
-                        modeNameList.Push("JAB")
+                    modeNameList := var.modeNameList.Clone()
+                    if !var.symbolJABActive
+                        modeNameList.Pop()
                     ddlControls := captureList.Clone()
                     renderGroupBox(g, "symbolCaretCapture", "xs h" uicDDL.h * 1.5 " w" bw)
                     for i, v in captureList {
@@ -455,7 +431,7 @@ createProcessMenuGui(meta, *) {
                                 continue
                             cleanList := []
                             for v in modeNameList {
-                                idx := indexOfArr(captureList, v)
+                                idx := keyOf(captureList, v)
                                 (idx && idx != i) ? 0 : cleanList.Push(v)
                             }
                             currentText := ""
@@ -469,9 +445,8 @@ createProcessMenuGui(meta, *) {
                 }
             }
 
-            num := column.Get("offset", 0)
             btnLayout := "xs"
-            if (num) {
+            if num := column.Get("offset", 0) {
                 btnLayout := "Section"
                 sectionList.Push(fn_offset)
                 fn_offset() {
@@ -483,9 +458,9 @@ createProcessMenuGui(meta, *) {
                     loseFocusOnTab(tab)
 
                     offsetMap := Map()
-                    if (action == "edit") {
+                    if action == "edit" {
                         for o in StrSplit(colValue.offset, "|") {
-                            if (o == "")
+                            if o == ""
                                 continue
                             p := StrSplit(o, "/")
                             try offsetMap.Set(p[1], { x: p[2], y: p[3] })
@@ -659,11 +634,7 @@ createProcessMenuGui(meta, *) {
                     registerHotkey()
                     updateWindowHotkey()
                     initMonitor()
-                    if (action == "edit") {
-                        LV.Modify(RowNumber, , cols*)
-                    } else {
-                        LV.Insert(RowNumber, , cols*)
-                    }
+                    action == "edit" ? LV.Modify(RowNumber, , cols*) : LV.Insert(RowNumber, , cols*)
                     try autoHdrLV(LV)
                 } catch {
                     try IniDelete(configFile, section)
@@ -738,13 +709,10 @@ createProcessMenuGui(meta, *) {
         }
 
         e_add(LV, *) {
-            colValue := {
-                time: returnTimeId(var._ruleIds)
-            }
+            colValue := { time: returnTimeId(var._ruleIds) }
             for k, v in column {
-                if (!colValue.HasProp(k)) {
+                if !colValue.HasProp(k)
                     colValue.%k% := ""
-                }
             }
             showGui(createUniqueGui(fn_edit.Bind(LV, 1, "add", colValue)))
         }
@@ -803,6 +771,9 @@ resumeApp() {
 
         updateTrayTip()
         setTrayIcon(var.iconRunning, 0)
+
+        registerHotkey()
+        updateWindowHotkey()
 
         if var.cursorActive
             loadCursor(currentState, 1)
@@ -886,9 +857,7 @@ showCaptureModeTimer() {
 autoHdrLV(LV) {
     try {
         col := LV.GetCount("Col")
-        while (col >= 1) {
-            LV.ModifyCol(col, "AutoHdr")
-            col--
-        }
+        while col >= 1
+            LV.ModifyCol(col, "AutoHdr"), col--
     }
 }

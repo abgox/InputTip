@@ -16,22 +16,13 @@ normalizeConfig(key, value) {
     } else if InStr(key, "offset") && !InStr(key, "SymbolScreenOffset") {
         value := returnNumber(value)
     } else if InStr(key, "transparent") {
-        value := Abs(returnNumber(value))
-        if value > 255
-            value := 255
+        value := Min(Abs(returnNumber(value)), 255)
     } else if InStr(key, "Width") || InStr(key, "Height") {
-        value := Abs(returnNumber(value))
-        if value < 1
-            value := 1
+        value := Max(Abs(returnNumber(value)), 1)
     } else if InStr(key, "HideDelay") || InStr(key, "DetectionTimeout") {
-        value := Abs(returnNumber(value))
-        if value < 0
-            value := 0
+        value := Max(Abs(returnNumber(value)), 0)
     } else if key == "pollInterval" {
-        value := Abs(returnNumber(value))
-        value += value <= 0
-        if value > 100
-            value := 100
+        value := Min(Abs(returnNumber(value)) + 1, 100)
     }
     return value
 }
@@ -62,12 +53,10 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
     value := normalizeConfig(key, value)
 
     var.%key% := value
-    if (debounce) {
+    if debounce
         writeIniDebounced(key, value, callback.Bind(key, value))
-    } else {
-        writeIni(key, value)
-        try callback(key, value)
-    }
+    else
+        try (writeIni(key, value), callback(key, value))
 
     if key == "cursorActive" || InStr(key, "cursorPath") {
         if var.cursorActive {
@@ -86,24 +75,15 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => restartJA
     } else if InStr(key, "symbol") {
         global lastCaretSymbol := "", lastCursorSymbol := ""
 
-        if InStr(key, "symbolPicture") {
-            symType := "Picture"
-        } else if InStr(key, "symbolText") {
-            symType := "Text"
-        } else {
-            symType := "Shape"
-        }
-
         isCaret := InStr(key, "caret")
         if var.caretSymbolType || var.cursorSymbolType {
             isCaret ? updateSymbol("caret") : updateSymbol("cursor")
 
-            if InStr(key, "cornerPreference") || InStr(key, "edgeStyle") {
+            if InStr(key, "cornerPreference") || InStr(key, "edgeStyle")
                 isCaret ? reloadCaretSymbol() : reloadCursorSymbol()
-            }
 
             if InStr(key, "path") || InStr(key, "color") || InStr(key, "font") {
-                if (value) {
+                if value {
                     isCaret ? reloadCaretSymbol() : reloadCursorSymbol()
                 } else {
                     isCaret ? hideCaretSymbol() : hideCursorSymbol()

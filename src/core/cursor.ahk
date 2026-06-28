@@ -23,7 +23,7 @@ updateCursor() {
         path := "default-" stateVal.%state%.colorText
         dir := readIni("cursorPath" state, path)
         var.%"cursorPath" state% := dir
-        if (dir) {
+        if dir {
             if defaultCursor.Has(dir) {
                 loopDir := defaultCursorDir "\" dir
             } else {
@@ -41,9 +41,8 @@ updateCursor() {
                     var.cursorInfo[n].%state% := A_LoopFileFullPath
             }
         } else {
-            for k, v in var.cursorInfo {
+            for k, v in var.cursorInfo
                 v.%state% := v.origin
-            }
         }
     }
 }
@@ -57,7 +56,7 @@ loadCursor(state, change := 0) {
             DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", p, "Ptr"), "Int", "32513")
     } else {
         for k, v in var.cursorInfo
-            try v.%state% ? DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%state%, "Ptr"), "Int", v.id) : ""
+            try (v.%state% ? DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.%state%, "Ptr"), "Int", v.id) : "")
     }
     lastCursor := state
 }
@@ -86,10 +85,8 @@ getCursorPath() {
     list := []
     for state in stateList {
         path := "default-" stateVal.%state%.colorText
-        if listMap.Has(path) {
-            list.Push(path)
-            listMap.Delete(path)
-        }
+        if listMap.Has(path)
+            list.Push(path), listMap.Delete(path)
     }
     for path in listMap
         list.Push(path)
@@ -103,7 +100,7 @@ e_cursor(*) {
     cursorStyleGui(info) {
         g := createGuiOpt(i18n("cursor"))
 
-        if (info.i) {
+        if info.i {
             g.AddText(, line80)
             return g
         }

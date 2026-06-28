@@ -1,6 +1,6 @@
 ; InputTip
 
-;@AHK2Exe-SetName InputTip
+;@Ahk2Exe-SetName InputTip
 ;@Ahk2Exe-SetOrigFilename InputTip.ahk
 ;@Ahk2Exe-UpdateManifest 1
 
@@ -101,7 +101,7 @@ updateWindowHotkey() {
     if !exeName
         return
 
-    ruleLists := getMatchingRuleLists(exeName, var.hotkeyRule, 1)
+    ruleLists := getMatchingRuleLists(var.hotkeyRule, 1)
     if !ruleLists.Length
         return
 
@@ -109,7 +109,7 @@ updateWindowHotkey() {
         for rule in ruleList {
             if rule.hotkey == "" || rule.trigger == ""
                 continue
-            if matchCondition(rule, exeTitle, exeClass) {
+            if matchCondition(rule) {
                 registered := setHotkeyTrigger(rule.hotkey, rule.trigger)
                 for hk in registered
                     var._lastWindowHotkeyList.Push(hk)
@@ -147,18 +147,18 @@ clearAllRegisteredHotkeys() {
 isResumeTrigger(hk, exeName := "", type := "global") {
     cleanHk := RegExReplace(hk, "i)^~|(?:\s+Up)$", "")
 
-    if (type == "global") {
+    if type == "global" {
         for rule in var.hotkeyRule.Get("", []) {
             cleanRuleHk := RegExReplace(rule.hotkey, "i)^~|(?:\s+Up)$", "")
-            if (cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle"))
+            if cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle")
                 return true
         }
-    } else if (type == "window" && exeName != "") {
-        ruleLists := getMatchingRuleLists(exeName, var.hotkeyRule, 1)
+    } else if type == "window" && exeName != "" {
+        ruleLists := getMatchingRuleLists(var.hotkeyRule, 1)
         for ruleList in ruleLists {
             for rule in ruleList {
                 cleanRuleHk := RegExReplace(rule.hotkey, "i)^~|(?:\s+Up)$", "")
-                if (cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle"))
+                if cleanHk == cleanRuleHk && (rule.trigger == "resume" || rule.trigger == "toggle")
                     return true
             }
         }
@@ -175,7 +175,9 @@ if var.symbolJABActive
 
 returnCanShowSymbol(&left, &top, &right, &bottom) {
     try {
-        res := GetCaretPosEx(&left, &top, &right, &bottom)
+        currentCaptureMode := GetCaretPosEx(&left, &top, &right, &bottom)
+        if !currentCaptureMode
+            return 0
     } catch {
         left := 0, top := 0, right := 0, bottom := 0
         return 0
@@ -194,7 +196,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
     }
 
     s := isWhichScreen()
-    if (s.num) {
+    if s.num {
         scale := s.scale
         try {
             offset := symbolScreenOffset.caret.%s.num%
@@ -222,7 +224,7 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
                 rules.Push(item)
             }
         }
-        for ruleList in getMatchingRuleLists(exeName, var.WindowCaretSymbolRule["offset"]) {
+        for ruleList in getMatchingRuleLists(var.WindowCaretSymbolRule["offset"]) {
             for rule in ruleList {
                 if !previewTimes.Has(rule.time)
                     rules.Push(rule)
@@ -234,14 +236,13 @@ returnCanShowSymbol(&left, &top, &right, &bottom) {
             if rule && rule.offsetMap.Has(num) {
                 offset := rule.offsetMap.Get(num)
                 left += toPhysical(offset.x, scale)
-                if (var.caretSymbolOriginY == "below") {
+                if var.caretSymbolOriginY == "below"
                     bottom += toPhysical(offset.y, scale)
-                } else {
+                else
                     top += toPhysical(offset.y, scale)
-                }
             }
         }
-        return res && left
+        return left
     }
     return 0
 }

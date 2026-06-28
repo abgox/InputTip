@@ -27,12 +27,17 @@ arrJoin(arr, separator := "", filterEmpty := 0) {
     return res
 }
 
-indexOfArr(arr, val) {
-    for i, v in arr {
-        if v == val
-            return i
+/**
+ * 从 Array 或 Map 中通过 value 获取 key/index
+ * @param {Array|Map} obj
+ * @returns {String} 没有找到 key/index 则返回空字符串
+ */
+keyOf(obj, value) {
+    for k, v in obj {
+        if v == value
+            return k
     }
-    return 0
+    return ""
 }
 
 pathToUrl(path) {
@@ -65,15 +70,6 @@ replaceEnvVariables(str) {
     return str
 }
 
-; 从 Map 中通过 value 获取 key
-MapKeyOf(map, value) {
-    for k, v in map {
-        if v = value
-            return k
-    }
-    return ""
-}
-
 safeRegexMatch(Haystack, NeedleRegEx) {
     try {
         return RegExMatch(Haystack, NeedleRegEx)
@@ -84,9 +80,8 @@ safeRegexMatch(Haystack, NeedleRegEx) {
 
 ; 从字符串中提取出数字，支持负数和小数
 returnNumber(value) {
-    if (value == "" || !(value ~= "\d")) {
+    if value == "" || !(value ~= "\d")
         return 0
-    }
     RegExMatch(value, "(-?\d+\.?\d*)", &numbers)
     return Number(numbers[1])
 }
@@ -112,8 +107,8 @@ loseFocusOnTab(tab) {
     try tab.OnEvent("Change", (ctrl, *) => ControlFocus(ctrl.Hwnd, ctrl.Gui.Hwnd))
 }
 
-applyTransparency(hwnd, transparency := "Off") {
-    if transparency == ''
+applyTransparency(hwnd, transparency) {
+    if transparency == ""
         return
     try WinSetTransparent(transparency, hwnd)
 }
@@ -129,9 +124,9 @@ applyTransparency(hwnd, transparency := "Off") {
  * @returns {1|0} 是否创建成功
  */
 createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 0, needStartUp := 0, *) {
-    if (A_IsAdmin) {
+    if A_IsAdmin {
         cmd := '$action = New-ScheduledTaskAction -Execute "' path '" '
-        if (args.Length) {
+        if args.Length {
             cmd .= "-Argument '"
             for v in args {
                 cmd .= '"' v '" '
@@ -139,16 +134,10 @@ createScheduleTask(path, taskName, args := [], runLevel := "Highest", isWait := 
             cmd .= "'"
         }
         cmd .= '`n$principal = New-ScheduledTaskPrincipal -GroupId BUILTIN\Users -RunLevel ' runLevel '`n$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd -ExecutionTimeLimit 10 -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)`n'
-        if (needStartUp) {
-            cmd .= '$trigger = New-ScheduledTaskTrigger -AtLogOn`n$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings -Trigger $trigger'
-        } else {
-            cmd .= '$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings'
-        }
+        cmd .= needStartUp ? '$trigger = New-ScheduledTaskTrigger -AtLogOn`n$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings -Trigger $trigger' : '$task = New-ScheduledTask -Action $action -Principal $principal -Settings $settings'
         cmd .= '`nRegister-ScheduledTask -TaskName "' taskName '" -InputObject $task -Force'
 
-        ps1_path := A_Temp "\abgox.InputTip.createScheduleTask.ps1"
-
-        if (FileExist(ps1_path)) {
+        if FileExist(ps1_path := A_Temp "\abgox.InputTip.createScheduleTask.ps1") {
             try {
                 FileDelete(ps1_path)
             } catch {

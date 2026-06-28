@@ -37,13 +37,10 @@ setTrayIcon(path, isPaused := A_IsPaused) {
     try {
         TraySetIcon(path, , 1)
     } catch {
-        if (isPaused) {
-            changeConfig("iconPaused", pausedIcon, 1)
-            path := pausedIcon
-        } else {
-            changeConfig("iconRunning", runningIcon, 1)
-            path := runningIcon
-        }
+        if isPaused
+            changeConfig("iconPaused", path := pausedIcon, 1)
+        else
+            changeConfig("iconRunning", path := runningIcon, 1)
         TraySetIcon(defaultIconDir "\" path, , 1)
     }
 }
@@ -57,10 +54,10 @@ createShortcut(dir) {
         fileLnk := dir "\" appid
     }
     fileLnk .= ".lnk"
-    if (var.launchAtStartup == 1) {
+    if var.launchAtStartup == 1 {
         FileCreateShortcut("C:\WINDOWS\system32\schtasks.exe", fileLnk, , "/run /tn `"" taskNameNoUAC "`"", i18n("desc"), favicon, , , 7)
     } else {
-        if (A_IsCompiled) {
+        if A_IsCompiled {
             FileCreateShortcut(A_ScriptFullPath, fileLnk, , , i18n("desc"), favicon, , , 7)
         } else {
             FileCreateShortcut(A_AhkPath, fileLnk, , "`"" A_ScriptFullPath "`"", i18n("desc"), favicon, , , 7)
@@ -78,14 +75,13 @@ updateTrayTip(paused := var._paused) {
     A_IconTip := tip
 
     if var.enableKeyStats {
-        static timerInitialized := false
-        if (!timerInitialized) {
+        if !var._keyStatsTimerRunning {
             SetTimer(globalKeyStatsWorker, 50)
-            timerInitialized := true
+            var._keyStatsTimerRunning := 1
         }
     } else {
         SetTimer(globalKeyStatsWorker, 0)
-        timerInitialized := false
+        var._keyStatsTimerRunning := 0
     }
 }
 
@@ -95,6 +91,7 @@ globalKeyStatsWorker() {
 
     if !var.enableKeyStats {
         SetTimer(, 0)
+        var._keyStatsTimerRunning := 0
         last := ""
         return
     }
@@ -120,21 +117,18 @@ getPicList(picDir, defaultList := []) {
         if A_LoopFileExt == "png" && !listMap.Has(A_LoopFilePath)
             listMap.Set(p, 1)
     }
-    list := defaultList
+    list := defaultList.Clone()
     for path in listMap
         list.Push(path)
     return list
 }
 
 pickColor(hwnd, colorKey) {
-    color := var.%colorKey%
-    if (!InStr(color, "0x")) {
+    if !InStr(color := var.%colorKey%, "0x")
         color := "0xffffff"
-    }
     result := colorDialog(color, hwnd, , true)
-    if (result != -1) {
+    if result != -1
         return result
-    }
     return ""
 }
 
@@ -153,18 +147,17 @@ colorDialog(Color := 0, hwnd := 0, &custColors?, disp := false) {
     if !IsSet(custColors) || !IsObject(custColors)
         custColors := []
 
-    if (custColors.Length > 16)
+    if custColors.Length > 16
         throw Error("Too many custom colors. The maximum allowed values is 16.")
 
-    loop (16 - custColors.Length)
+    loop 16 - custColors.Length
         custColors.Push(0)
 
     CUSTOM := Buffer(16 * 4, 0)
     CHOOSECOLOR := Buffer((p == 4) ? 36 : 72, 0)
 
-    loop 16 {
+    loop 16
         NumPut("UInt", RGB_BGR(custColors[A_Index]), CUSTOM, (A_Index - 1) * 4)
-    }
 
     NumPut("UInt", CHOOSECOLOR.Size, CHOOSECOLOR, 0)  ; lStructSize
     NumPut("UPtr", hwnd, CHOOSECOLOR, p)  ; hwndOwner
@@ -176,9 +169,8 @@ colorDialog(Color := 0, hwnd := 0, &custColors?, disp := false) {
         return -1
 
     custColors := []
-    loop 16 {
+    loop 16
         custColors.InsertAt(A_Index, RGB_BGR(NumGet(CUSTOM, (A_Index - 1) * 4, "UInt")))
-    }
 
     Color := NumGet(CHOOSECOLOR, 3 * p, "UInt")
     return Format("0x{:06X}", RGB_BGR(Color))

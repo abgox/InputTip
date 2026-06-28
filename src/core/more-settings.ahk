@@ -5,7 +5,7 @@ e_moreSettings(*) {
     moreSettingsGui(info) {
         g := createGuiOpt(i18n("moreSettings"))
 
-        if (info.i) {
+        if info.i {
             g.AddText(, line70)
             return g
         }
@@ -45,19 +45,17 @@ e_moreSettings(*) {
                 g := createGuiOpt(i18n("updateCheck"))
                 g.AddLink("Section", getDocsLink("update-check"))
 
-                if (info.i) {
+                if info.i
                     return g
-                }
                 g.w := w := info.w
                 g.bw := bw := w - g.MarginX * 2
 
                 renderRadioGroup(g, "checkUpdateOnStartup", [
                     ["yes", 1, (key, value, *) => (changeConfig(key, value), runUpdater())],
                     ["no", 0]
-                ]
-                )
+                ])
 
-                if (A_IsCompiled) {
+                if A_IsCompiled {
                     g.AddButton("xs w" bw, i18n("checkUpdateNow")).OnEvent("Click", update)
                     update(*) {
                         g.Destroy()
@@ -77,7 +75,7 @@ e_moreSettings(*) {
         customizeTrayIconGui(info) {
             g := createGuiOpt(i18n("customizeTrayIcon"))
 
-            if (info.i) {
+            if info.i {
                 g.AddText(, line70)
                 return g
             }
@@ -97,7 +95,7 @@ e_moreSettings(*) {
 
         customizeTrayTipGui(info) {
             g := createGuiOpt(i18n("customizeTrayTip"))
-            if (info.i) {
+            if info.i {
                 g.AddText(, line70)
                 return g
             }

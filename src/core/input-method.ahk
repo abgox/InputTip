@@ -9,7 +9,7 @@ e_inputMethod(*) {
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("input-method"))
 
-        if (info.i) {
+        if info.i {
             g.AddText(, isChinese ? line70 : line90)
             return g
         }
@@ -48,7 +48,7 @@ e_inputMethod(*) {
             if !RowNumber
                 return
 
-            if (add) {
+            if add {
                 state := var.inputMethodBaseState == "CN" ? "EN" : "CN"
                 ruleInfo := {
                     stateRule: "",
@@ -71,7 +71,7 @@ e_inputMethod(*) {
             editRuleGui(info) {
                 g := createGuiOpt(action)
 
-                if (info.i) {
+                if info.i {
                     g.AddText(, isChinese ? line50 : line60)
                     return g
                 }
@@ -91,10 +91,8 @@ e_inputMethod(*) {
 
                 num := 1
                 list := []
-                while (num <= var.inputMethodDetectionRules.Length + add) {
-                    list.Push(" " num)
-                    num++
-                }
+                while num <= var.inputMethodDetectionRules.Length + add
+                    list.Push(" " num), num++
                 _ := g.AddDropDownList("yp r9", list)
                 _.Value := _gc.order
                 _.OnEvent("Change", (i, *) => _gc.order := Trim(i.Value))
@@ -134,19 +132,17 @@ e_inputMethod(*) {
                     ; 输入法状态
                     state := textToState(ruleInfo.state)
 
-                    if (add) {
+                    if add {
                         var.inputMethodDetectionRules.InsertAt(_gc.order, sm "," cm "," state)
                     } else {
-                        if (_gc.order != RowNumber) {
-                            var.inputMethodDetectionRules.RemoveAt(RowNumber)
-                            var.inputMethodDetectionRules.InsertAt(_gc.order, sm "," cm "," state)
-                        } else {
+                        if _gc.order != RowNumber
+                            var.inputMethodDetectionRules.RemoveAt(RowNumber), var.inputMethodDetectionRules.InsertAt(_gc.order, sm "," cm "," state)
+                        else
                             var.inputMethodDetectionRules[RowNumber] := sm "," cm "," state
-                        }
                     }
                     changeConfig("inputMethodDetectionRule", arrJoin(var.inputMethodDetectionRules, "|"), , (*) => reloadLV(LV))
                 }
-                if (!add) {
+                if !add {
                     g.AddButton("xs w" bw, i18n("deleteRule")).OnEvent("Click", e_del)
                     e_del(*) {
                         g.Destroy()
@@ -156,7 +152,6 @@ e_inputMethod(*) {
                         changeConfig("inputMethodDetectionRule", arrJoin(var.inputMethodDetectionRules, "|"), , (*) => reloadLV(LV))
                     }
                 }
-
                 return g
             }
         }
@@ -164,11 +159,8 @@ e_inputMethod(*) {
         reloadLV(LV) {
             LV.Delete()
             LV.Opt("-Redraw")
-
-            for i, v in var.inputMethodDetectionRules {
-                r := StrSplit(v, ",")
-                LV.Add(, i, generateCol(r*)*)
-            }
+            for i, v in var.inputMethodDetectionRules
+                LV.Add(, i, generateCol(StrSplit(v, ",")*)*)
             LV.Opt("+Redraw")
             autoHdrLV(LV)
         }
@@ -184,7 +176,6 @@ e_inputMethod(*) {
             colList := []
             odd := i18n("inputMethodDetectionMode.rule.odd")
             even := i18n("inputMethodDetectionMode.rule.even")
-
             colList.Push(sm == "oddNum" ? odd : sm == "evenNum" ? even : sm)
             colList.Push(cm == "oddNum" ? odd : cm == "evenNum" ? even : cm)
             colList.Push(i18n(state))

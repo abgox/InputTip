@@ -5,7 +5,7 @@ e_border(*) {
     borderStyleGui(info) {
         g := createGuiOpt(i18n("border"))
 
-        if (info.i) {
+        if info.i {
             g.AddText(, isChinese ? line80 : line90)
             return g
         }
@@ -31,15 +31,12 @@ e_border(*) {
         ctrlList.Push(_.radios*)
 
         _w := bw / 2 - g.MarginX / 4
-        for v in [
-            ["hide", "xs", "blacklistBtn"],
-            ["show", "yp", "whitelistBtn"],
-        ] {
-            _ := g.AddButton(v[2] " w" _w, i18n(v[3]))
+        for i, v in [["hide", "blacklistBtn"], ["show", "whitelistBtn"]] {
+            _ := g.AddButton((i == 1 ? "xs" : "yp") " w" _w, i18n(v[2]))
             _.OnEvent("Click",
                 createProcessMenuGui.Bind({
-                    title: i18n("border") " - " i18n(v[3]),
-                    tab: [i18n(v[3])],
+                    title: i18n("border") " - " i18n(v[2]),
+                    tab: [i18n(v[2])],
                     trigger: [v[1]],
                     link: getDocsLink("tip/border/list-mechanism"),
                     section: "Window.Border.Rule",
@@ -126,9 +123,8 @@ showBorder(finalColor, finalWidth, hwnd) {
 
     scr := isWhichScreen(hwnd)
 
-    if (isFullscreen(hwnd)) {
+    if isFullscreen(hwnd) {
         hideBorder()
-        var.maximizedBorders := []
 
         SL := scr.left
         ST := scr.top
@@ -146,31 +142,19 @@ showBorder(finalColor, finalWidth, hwnd) {
         ]
 
         borderConfigs := []
-        for cfg in rawConfigs {
-            if var.%"borderShowOnFullscreen" cfg.side%
-                borderConfigs.Push(cfg)
-        }
+        for cfg in rawConfigs
+            var.%"borderShowOnFullscreen" cfg.side% ? borderConfigs.Push(cfg) : ""
 
         for cfg in borderConfigs {
             box := Gui("-Caption AlwaysOnTop ToolWindow E0x20 -DPIScale")
             box.BackColor := finalColor
             box.Show("W1 H1 NoActivate")
-            SWP_NOACTIVATE := 0x10
-            SWP_SHOWWINDOW := 0x40
-            DllCall("SetWindowPos",
-                "Ptr", box.Hwnd,
-                "Ptr", -1,
-                "Int", cfg.x,
-                "Int", cfg.y,
-                "Int", cfg.w,
-                "Int", cfg.h,
-                "UInt", SWP_NOACTIVATE | SWP_SHOWWINDOW)
+            DllCall("SetWindowPos", "Ptr", box.Hwnd, "Ptr", -1, "Int", cfg.x, "Int", cfg.y, "Int", cfg.w, "Int", cfg.h, "UInt", 0x10 | 0x40)
             var.maximizedBorders.Push(box)
         }
     }
-    else if (WinGetMinMax(hwnd) == 1) {
+    else if WinGetMinMax(hwnd) == 1 {
         hideBorder()
-        var.maximizedBorders := []
 
         if !scr
             return
@@ -190,26 +174,14 @@ showBorder(finalColor, finalWidth, hwnd) {
             { side: "Right", x: WR - t, y: WT + t, w: t, h: H - (2 * t) } ;
         ]
         borderConfigs := []
-        for cfg in rawConfigs {
-            if var.%"borderShowOnMaximized" cfg.side%
-                borderConfigs.Push(cfg)
-        }
+        for cfg in rawConfigs
+            var.%"borderShowOnMaximized" cfg.side% ? borderConfigs.Push(cfg) : ""
 
         for cfg in borderConfigs {
             box := Gui("-Caption AlwaysOnTop ToolWindow E0x20 -DPIScale")
             box.BackColor := finalColor
             box.Show("W1 H1 NoActivate")
-            SWP_NOACTIVATE := 0x10
-            SWP_SHOWWINDOW := 0x40
-            DllCall("SetWindowPos",
-                "Ptr", box.Hwnd,
-                "Ptr", -1,
-                "Int", cfg.x,
-                "Int", cfg.y,
-                "Int", cfg.w,
-                "Int", cfg.h,
-                "UInt", SWP_NOACTIVATE | SWP_SHOWWINDOW)
-
+            DllCall("SetWindowPos", "Ptr", box.Hwnd, "Ptr", -1, "Int", cfg.x, "Int", cfg.y, "Int", cfg.w, "Int", cfg.h, "UInt", 0x10 | 0x40)
             var.maximizedBorders.Push(box)
         }
     }
@@ -225,7 +197,7 @@ hideBorder(hwnd := 0) {
     if var.HasProp("maximizedBorders") && var.maximizedBorders.Length > 0 {
         for box in var.maximizedBorders
             try box.Hide()
-        while (var.maximizedBorders.Length > 0) {
+        while var.maximizedBorders.Length > 0 {
             box := var.maximizedBorders.Pop()
             try box.Destroy()
         }

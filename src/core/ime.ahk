@@ -358,7 +358,7 @@ class IME {
  * @param {0|1} ignoreKeepCaps
  */
 switchKeyboard(state, opened := "", conversionMode := "", ignoreKeepCaps := 0) {
-    if matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule["ignoreKeyboardSwitch"]).Length
+    if matchWindowRules(var.WindowRule["ignoreKeyboardSwitch"]).Length
         return 0
     if !ignoreKeepCaps && IME.GetInputModeText() == "Caps" && !var.keepCapsLockWhenKeyboardSwitch
         SendInput("{CapsLock}")
@@ -371,10 +371,7 @@ switchKeyboard(state, opened := "", conversionMode := "", ignoreKeepCaps := 0) {
  * @param {"{LShift}"|"{RShift}"|"{Ctrl Down}{Space Down}{Ctrl Up}{Space Up}"|"IME"} method  切换方式(模拟按键/IME)
  */
 switchState(state, method) {
-    if !state
-        return
-
-    if matchWindowRules(exeName, exeTitle, exeClass, var.WindowRule["ignoreStateSwitch"]).Length
+    if !state || matchWindowRules(var.WindowRule["ignoreStateSwitch"]).Length
         return
 
     SetTimer(onRun, 50)

@@ -249,6 +249,7 @@ langStrings.Set("zh-CN", Map(
     "position.Right", "右侧",
     "borderShowMode", "显示模式",
     "borderWidth", "边框宽度",
+    "borderWidth.tip", "边框宽度对最大化窗口和全屏窗口有效，但对普通窗口无效。",
     "borderColor", ["边框颜色", "边框颜色🎨"],
     "Pinned", "置顶窗口",
     "symbolConfig", "符号配置",

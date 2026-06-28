@@ -95,12 +95,14 @@ e_border(*) {
             if (Mod(i - 1, 4) == 0) {
                 tab.UseTab(((i - 1) // 3) + 3)
                 opt := "Section"
+                g.AddText("cGray", i18n("borderWidth.tip"))
             } else {
                 opt := "xs"
             }
             renderGroupBox(g, v, opt, "h" uicText.h " w" bw)
-            ; renderEditLabel(g, "borderWidth" v, "w" bw / 3, "borderWidth")
-            _ := renderColorPicker(g, "borderColor" v, "borderColor", "xs+20 yp+" uicText.yp)
+            _ := renderEditLabel(g, "borderWidth" v, "yp Number Limit2 w" bw / 6, "borderWidth")
+            ctrlList.Push(_.edit)
+            _ := renderColorPicker(g, "borderColor" v, "borderColor", "yp")
             ctrlList.Push(_.picker)
         }
 

@@ -249,6 +249,7 @@ langStrings.Set("en-US", Map(
     "position.Right", "Right",
     "borderShowMode", "Show Mode",
     "borderWidth", "Border Width",
+    "borderWidth.tip", "Border width applies to maximized and fullscreen windows, not normal windows.",
     "borderColor", ["Border Color", "Border Color🎨"],
     "Pinned", "Pinned Windows",
     "symbolConfig", "Symbol Config",

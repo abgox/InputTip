@@ -100,7 +100,7 @@ loadConfig() {
         borderShowOnFullscreen: readIni("borderShowOnFullscreen", 1),
         borderHideDelay: readIni("borderHideDelay", 0),
         borderShowMode: readIni("borderShowMode", "blacklist"),
-        borderWidthPinned: readIni("borderWidthPinned", 2),
+        borderWidthPinned: readIni("borderWidthPinned", 3),
         borderColorPinned: readIni("borderColorPinned", "0x00CCCC"),
         ; 符号
         caretSymbolType: readIni("caretSymbolType", 0),
@@ -175,7 +175,7 @@ loadConfig() {
 
     for v in stateList {
         list := [
-            ["borderWidth", 2],
+            ["borderWidth", 3],
             ["borderColor", ""],
             ["overlayText", ""],
             ["overlayTextFont", "Microsoft YaHei"],

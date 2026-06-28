@@ -1029,53 +1029,40 @@ var._lastCaptureMode := ""
  * @link https://github.com/Tebayaki/AutoHotkeyScripts/blob/main/lib/GetCaretPosEx/GetCaretPosEx.ahk
  */
 GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
-    hwnd := 0
+    if !(hwnd := getHwnd())
+        return var._lastCaptureMode := ""
     captureModeChain := getCaretCapture().capture
     modes := StrSplit(captureModeChain, ">")
-    if modes.Length {
-        for mode in modes {
-            if _trySingleCaptureMode(mode) {
-                var._lastCaptureMode := mode
-                return 1
-            }
-        }
-    } else {
-        if getCaretPosFromGui(&hwnd) {
-            var._lastCaptureMode := "GUI"
-            return 1
-        }
-        if getCaretPosFromHook(0) {
-            var._lastCaptureMode := "HOOK"
-            return 1
-        }
-        if getCaretPosFromUIA() {
-            var._lastCaptureMode := "UIA"
-            return 1
-        }
-        if !hwnd
-            hwnd := getHwnd()
-        if getCaretPosFromMSAA() {
-            var._lastCaptureMode := "MSAA"
-            return 1
+    if !modes.Length {
+        if getCaretPosFromGui(&hwnd)
+            return var._lastCaptureMode := "GUI"
+        if hwnd {
+            try
+                className := WinGetClass(hwnd)
+            catch
+                className := ""
+            modes := className ~= "^(?:Windows|Microsoft)\.UI\..+" ? ["UIA", "HOOK", "MSAA"] : ["HOOK", "UIA", "MSAA"]
+        } else {
+            modes := []
         }
     }
-    var._lastCaptureMode := ""
-    return 0
+    for mode in modes {
+        if _trySingleCaptureMode(mode)
+            return var._lastCaptureMode := mode
+    }
+    return var._lastCaptureMode := ""
 
     _trySingleCaptureMode(mode) {
         switch mode {
             case "HOOK":
-                hwnd := getHwnd()
                 return getCaretPosFromHook(0)
             case "GUI":
                 return getCaretPosFromGui(&hwnd)
             case "UIA":
                 return getCaretPosFromUIA()
             case "MSAA":
-                hwnd := getHwnd()
                 return getCaretPosFromMSAA()
             case "Hook_DLL":
-                hwnd := getHwnd()
                 return getCaretPosFromHook(1)
             case "WPF":
                 return getCaretPosFromWpfCaret()
@@ -1089,9 +1076,14 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     getHwnd(hwnd := 0) {
         x64 := A_PtrSize == 8
         guiThreadInfo := Buffer(x64 ? 72 : 48)
-        NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
-        if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
-            hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
+        try {
+            NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
+            if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
+                if hwnd := NumGet(guiThreadInfo, x64 ? 48 : 28, "ptr") {
+                    return hwnd
+                }
+                hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
+            }
         }
         return hwnd
     }
@@ -1099,14 +1091,16 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
     getCaretPosFromGui(&hwnd) {
         x64 := A_PtrSize == 8
         guiThreadInfo := Buffer(x64 ? 72 : 48)
-        NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
-        if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
-            if hwnd := NumGet(guiThreadInfo, x64 ? 48 : 28, "ptr") {
-                getRect(guiThreadInfo.Ptr + (x64 ? 56 : 32), &left, &top, &right, &bottom)
-                clientToScreenRect(hwnd, &left, &top, &right, &bottom)
-                return true
+        try {
+            NumPut("uint", guiThreadInfo.Size, guiThreadInfo)
+            if DllCall("GetGUIThreadInfo", "uint", 0, "ptr", guiThreadInfo) {
+                if hwnd := NumGet(guiThreadInfo, x64 ? 48 : 28, "ptr") {
+                    getRect(guiThreadInfo.Ptr + (x64 ? 56 : 32), &left, &top, &right, &bottom)
+                    clientToScreenRect(hwnd, &left, &top, &right, &bottom)
+                    return true
+                }
+                hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
             }
-            hwnd := NumGet(guiThreadInfo, x64 ? 16 : 12, "ptr")
         }
         return false
     }
@@ -1116,21 +1110,23 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         if !hOleacc
             return false
         static IID_IAccessible := guidFromString("{618736e0-3c3d-11cf-810c-00aa00389b71}")
-        if !DllCall("oleacc\AccessibleObjectFromWindow", "ptr", hwnd, "uint", 0xfffffff8, "ptr", IID_IAccessible, "ptr*", accCaret := ComValue(13, 0), "int") {
-            if A_PtrSize == 8 {
-                varChild := Buffer(24, 0)
-                NumPut("ushort", 3, varChild)
-                hr := ComCall(22, accCaret, "int*", &x := 0, "int*", &y := 0, "int*", &w := 0, "int*", &h := 0, "ptr", varChild, "int")
-            }
-            else {
-                hr := ComCall(22, accCaret, "int*", &x := 0, "int*", &y := 0, "int*", &w := 0, "int*", &h := 0, "int64", 3, "int64", 0, "int")
-            }
-            if !hr {
-                left := x
-                top := y
-                right := x + w
-                bottom := y + h
-                return true
+        try {
+            if !DllCall("oleacc\AccessibleObjectFromWindow", "ptr", hwnd, "uint", 0xfffffff8, "ptr", IID_IAccessible, "ptr*", accCaret := ComValue(13, 0), "int") {
+                if A_PtrSize == 8 {
+                    varChild := Buffer(24, 0)
+                    NumPut("ushort", 3, varChild)
+                    hr := ComCall(22, accCaret, "int*", &x := 0, "int*", &y := 0, "int*", &w := 0, "int*", &h := 0, "ptr", varChild, "int")
+                }
+                else {
+                    hr := ComCall(22, accCaret, "int*", &x := 0, "int*", &y := 0, "int*", &w := 0, "int*", &h := 0, "int64", 3, "int64", 0, "int")
+                }
+                if !hr {
+                    left := x
+                    top := y
+                    right := x + w
+                    bottom := y + h
+                    return true
+                }
             }
         }
         return false
@@ -1256,11 +1252,11 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
         static WM_GET_CARET_POS := DllCall("RegisterWindowMessageW", "str", "WM_GET_CARET_POS", "uint")
         if !tid := DllCall("GetWindowThreadProcessId", "ptr", hwnd, "ptr*", &pid := 0, "uint")
             return false
-        if (updateCaret) {
+        if updateCaret
             ; Update caret position
             ; There may be problems with 32-bit programs
             try SendMessage(0x010f, 0, 0, hwnd) ; WM_IME_COMPOSITION
-        }
+
         ; PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ
         if !hProcess := DllCall("OpenProcess", "uint", 1082, "int", false, "uint", pid, "ptr")
             return false
@@ -1401,9 +1397,10 @@ GetCaretPosEx(&left?, &top?, &right?, &bottom?) {
                 bottom := top + NumGet(h, 0, "int")
                 if (left | top) != 0
                     return 1
-                return 0
             }
         }
+        left := 0, top := 0, right := 0, bottom := 0
+        return 0
     }
 
     static guidFromString(str) {

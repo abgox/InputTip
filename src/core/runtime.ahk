@@ -86,8 +86,8 @@ updateTrayTip(paused := var._paused) {
 }
 
 globalKeyStatsWorker() {
-    static last := ""
     global keyCount
+    static last := "", time := FormatTime(, "yyyy-MM-dd")
 
     if !var.enableKeyStats {
         SetTimer(, 0)
@@ -102,8 +102,11 @@ globalKeyStatsWorker() {
     }
 
     if A_PriorKey != last {
+        currentTime := FormatTime(, "yyyy-MM-dd")
+        if time != currentTime
+            time := currentTime, keyCount := readIni(time, 0, "DailyKeystrokes", statsFile)
         keyCount++
-        try IniWrite(keyCount, statsFile, "DailyKeystrokes", FormatTime(, "yyyy-MM-dd"))
+        try IniWrite(keyCount, statsFile, "DailyKeystrokes", time)
         last := A_PriorKey
         updateTrayTip()
     }

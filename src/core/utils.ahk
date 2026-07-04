@@ -237,3 +237,12 @@ isFullscreen(hwnd) {
     }
     return false
 }
+
+isAutoHideTaskbar() {
+    try {
+        settings := RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3", "Settings")
+        byte := Ord(SubStr(settings, 9, 1))
+        return byte & 1
+    }
+    return 0
+}

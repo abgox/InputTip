@@ -635,10 +635,15 @@ getScreenInfo() {
         , "Int", 0, "Int", 0, "Int", 0, "Int", 0
         , "Ptr", 0, "Ptr", 0, "Ptr", 0, "Ptr", 0, "Ptr")
 
+    autoHide := isAutoHideTaskbar()
+
     Loop MonitorCount
     {
         MonitorGet(A_Index, &L, &T, &R, &B)
-        MonitorGetWorkArea(A_Index, &WL, &WT, &WR, &WB)
+        if autoHide
+            WL := L, WT := T, WR := R, WB := B
+        else
+            MonitorGetWorkArea(A_Index, &WL, &WT, &WR, &WB)
 
         currentScale := 1.0
         if probeHwnd {
@@ -663,7 +668,7 @@ getScreenInfo() {
             workTop: WT,
             workRight: WR,
             workBottom: WB,
-            scale: currentScale ;
+            scale: currentScale
         })
     }
     if probeHwnd
@@ -673,7 +678,6 @@ getScreenInfo() {
 }
 
 isWhichScreen(hwnd := 0) {
-
     try {
         if hwnd
             WinGetPos(&x, &y, &w, &h, hwnd)

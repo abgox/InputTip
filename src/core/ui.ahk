@@ -185,7 +185,8 @@ renderColorPicker(g, key, labelKey := key, layout := "yp") {
     _.key := key
     _.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
     _.OnEvent("ContextMenu", (ctrl, *) => _clearColor(ctrl.ctrl, ctrl.key))
-    var.%ctrlKey% := pickerCtrl := g.AddText("yp", StrReplace(var.%key%, "0x", " ") " ")
+    var.%ctrlKey% := pickerCtrl := g.AddText("yp", " CCCCCC ")
+    pickerCtrl.Value := StrReplace(var.%key%, "0x", "")
     pickerCtrl.ctrl := ctrlKey
     pickerCtrl.key := key
     pickerCtrl.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))

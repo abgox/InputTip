@@ -141,15 +141,6 @@ e_windowInfo(*) {
 
 /**
  * 通用的进程菜单
- * @param {String} title 菜单标题
- * @param {Array} tabList 标签页列表
- * @param {String} link 标签页顶部的链接
- * @param {Array} configSectionList 配置列表
- * @param {Map} column 表格的列和顺序
- * - 每个值是一个对象，包含 config、gui、label 三个属性
- * - config: 配置项中的位置，从 1 开始
- * - gui: 表格列的位置，从 1 开始
- * - label: 表格列的标题
  */
 createProcessMenuGui(meta, *) {
     showGui(createUniqueGui(processMenuGui))
@@ -601,6 +592,12 @@ createProcessMenuGui(meta, *) {
                     }
                     return
                 }
+                timePart := StrSplit(time, "-")
+                if (timePart.Length >= 4) {
+                    time := timePart[1] "-" timePart[2] "-" timePart[3] "." StrSplit(returnTimeId(), ".")[2]
+                    try IniDelete(configFile, section)
+                }
+                section := meta.section "." time
                 cols := []
                 try {
                     for v in meta.cols {

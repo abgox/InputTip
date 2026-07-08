@@ -191,10 +191,10 @@ renderColorPicker(g, key, labelKey := key, layout := "yp") {
     pickerCtrl.key := key
     pickerCtrl.OnEvent("Click", (ctrl, *) => _changeColor(pickColor(ctrl.hwnd, ctrl.key), ctrl.ctrl, ctrl.key))
     _changeColor(color, cKey, oKey) {
-        if !color
+        if color == ""
             return
         try {
-            var.%cKey%.Value := StrReplace(color, "0x", " ") " "
+            var.%cKey%.Value := StrReplace(color, "0x", "") " "
             changeConfig(oKey, color)
         }
     }

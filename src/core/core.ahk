@@ -91,6 +91,12 @@ if isJAB {
         if A_TimeIdle > leaveDelay
             continue
 
+        if var._paused {
+            lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := ""
+            lastTitle := "", lastClass := "", lastProcess := "", lastControl := ""
+            continue
+        }
+
         needShow := var.caretSymbolType
         try {
             hwnd := WinExist("A")
@@ -136,12 +142,6 @@ if isJAB {
         } catch {
             hideCaretSymbol()
             needShow := 0
-        }
-
-        if var._paused {
-            lastCaretSymbol := "", lastCursorSymbol := "", lastCursor := ""
-            lastTitle := "", lastClass := "", lastProcess := "", lastControl := ""
-            continue
         }
 
         try {

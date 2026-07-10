@@ -7,11 +7,20 @@
 </p>
 
 <p align="center">
-    <a href="https://inputtip.abgox.com/docs/system-requirements">
-        <img src="https://img.shields.io/badge/Target-Windows%2010+-blue" alt="target" />
+    <a href="https://github.com/abgox/InputTip">
+        <img src="https://img.shields.io/github/stars/abgox/InputTip" alt="stars" />
     </a>
     <a href="https://inputtip.abgox.com/download">
         <img src="https://img.shields.io/github/v/release/abgox/InputTip?label=version" alt="version" />
+    </a>
+    <a href="./LICENSE">
+        <img src="https://img.shields.io/github/license/abgox/InputTip" alt="license" />
+    </a>
+</p>
+
+<p align="center">
+    <a href="https://inputtip.abgox.com/docs/system-requirements">
+        <img src="https://img.shields.io/badge/platform-Windows%2010+-blue" alt="platform" />
     </a>
     <a href="https://github.com/abgox/InputTip">
         <img src="https://img.shields.io/github/created-at/abgox/InputTip" alt="created" />
@@ -39,7 +48,7 @@ _更多详情请参阅 [官方文档](https://inputtip.abgox.com/docs)_
 
 ## 📅 新的变化
 
-[更新日志](./src/CHANGELOG.md)
+请参阅 [更新日志](./src/CHANGELOG.md)
 
 ## 🤝 相关项目
 

@@ -384,7 +384,11 @@ parseWindowRule() {
             continue
         timeStr := SubStr(name, rulePos + 6)
         rule.time := timeStr
-        id := InStr(timeStr, ":") ? timeStr : StrSplit(timeStr, ".")[2]
+        try {
+            id := InStr(timeStr, ":") ? timeStr : StrSplit(timeStr, ".")[2]
+        } catch {
+            continue
+        }
         var._ruleIds.Set(id, 1)
 
         for k in windowRuleKeys

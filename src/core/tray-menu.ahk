@@ -594,7 +594,11 @@ createProcessMenuGui(meta, *) {
                 }
                 timePart := StrSplit(time, "-")
                 if (timePart.Length >= 4) {
-                    time := timePart[1] "-" timePart[2] "-" timePart[3] "." StrSplit(returnTimeId(), ".")[2]
+                    try {
+                        time := timePart[1] "-" timePart[2] "-" timePart[3] "." StrSplit(returnTimeId(), ".")[2]
+                    } catch {
+                        time := returnTimeId()
+                    }
                     try IniDelete(configFile, section)
                 }
                 section := meta.section "." time

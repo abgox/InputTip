@@ -613,7 +613,7 @@ createProcessMenuGui(meta, *) {
                             col := i18n("trigger." val)
                         }
                         else {
-                            val := colValue.%v%
+                            val := Trim(colValue.%v%)
                             col := val
                         }
                         cols.Push(col)

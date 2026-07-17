@@ -12,6 +12,7 @@ langStrings.Set("en-US", Map(
     "close", "Close",
     "ok", "OK",
     "cancel", "Cancel",
+    "next", "Next",
     "howToUse", "How to use?",
     "add", "Add",
     "edit", "Edit",
@@ -92,15 +93,19 @@ langStrings.Set("en-US", Map(
     "Running", "Running",
     "Paused", "Paused",
     "init.title", "Initialization Guide",
-    "init.cursor", [
-        "Would you like to enable the " getDocsLink("tip/cursor", "Status Tip - Mouse Cursor") " ?",
-        "- Loads different cursor styles based on Input Method State.",
-        "- All cursor styles can be customized."
+    "init.tip", "> Right-click the tray icon to enable and configure features as needed.",
+    "init.statusTips", [
+        getLink("inputtip.abgox.com", "InputTip") " can display status tips based on the current input method state:",
+        "- Switch mouse cursor styles based on state (" getDocsLink("tip/cursor", "Status Tip - Mouse Cursor") ")",
+        "- Show overlay popups on windows or screens (" getDocsLink("tip/overlay", "Status Tip - Overlay Popup") ")",
+        "- Show status symbols near the input caret (" getDocsLink("tip/symbol-caret", "Status Tip - Caret Symbol") ")",
+        "- Show status symbols near the mouse cursor (" getDocsLink("tip/symbol-cursor", "Status Tip - Cursor Symbol") ")",
+        "- Add colors on window borders (" getDocsLink("tip/border", "Status Tip - Window Border") ")",
     ],
-    "init.overlay", [
-        "Would you like to enable the " getDocsLink("tip/overlay", "Status Tip - Overlay Popup") " ?",
-        "- Shows different overlays based on Input Method State.",
-        "- The style and position of all overlays can be customized."
+    "init.rules", [
+        getLink("inputtip.abgox.com", "InputTip") " also provides rule-based behavior scheduling:",
+        "- Capture context via window matching, hotkeys, timers, etc.",
+        "- Trigger state/keyboard switching, hotkey management, window pinning, etc.",
     ],
     "init.donate", [
         getLink("inputtip.abgox.com", "InputTip") " is a free and open-source software",

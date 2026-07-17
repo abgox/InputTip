@@ -308,43 +308,57 @@ checkIni() {
         if currentVersion != oldVersion
             writeIni("version-" versionType, currentVersion)
     } catch {
-        _change(g, key, val, callback, *) {
-            g.Destroy(), changeConfig(key, val), callback()
-        }
-        showGui(createUniqueGui(cursorGuideGui))
-        cursorGuideGui(info) {
+        showGui(createUniqueGui(statusTipsGui))
+        statusTipsGui(info) {
             g := createGuiOpt(i18n("init.title"))
-            for i, v in i18n("init.cursor", 1)
-                i == 1 ? g.AddLink(, v) : g.AddText("xs cRed", v).Focus()
+            for i, v in i18n("init.statusTips", 1)
+                g.AddLink(, v)
+
+            renderText(g, "init.tip", "cGray")
 
             if info.i
                 return g
             w := info.w
             bw := w - g.MarginX * 2
 
-            for v in [["yes", 1], ["no", 0]]
-                g.AddButton("w" bw, i18n(v[1])).OnEvent("Click", _change.Bind(g, "cursorActive", v[2], showOverlayGuide))
-
+            g.AddButton("xs w" bw, i18n("next")).OnEvent("Click", (*) => (g.Destroy(), showRulesGui()))
             g.OnEvent("Close", closeApp)
             return g
         }
 
-        showOverlayGuide() {
-            showGui(createUniqueGui(overlayGuideGui))
-            overlayGuideGui(info) {
-                g := Gui("-DPIScale", "InputTip - " i18n("init.title"))
-                g.SetFont(fontOpt*)
-                for i, v in i18n("init.overlay", 1)
-                    i == 1 ? g.AddLink(, v) : g.AddText("xs cRed", v).Focus()
+        showRulesGui() {
+            showGui(createUniqueGui(rulesGui))
+            rulesGui(info) {
+                g := createGuiOpt(i18n("init.title"))
+                for v in i18n("init.rules", 1)
+                    g.AddLink(, v)
+
+                renderText(g, "init.tip", "cGray")
 
                 if info.i
                     return g
                 w := info.w
                 bw := w - g.MarginX * 2
 
-                for v in [["yes", 1], ["no", 0]]
-                    g.AddButton("w" bw, i18n(v[1])).OnEvent("Click", _change.Bind(g, "overlayActive", v[2], showDonateGui))
+                g.AddButton("xs w" bw, i18n("next")).OnEvent("Click", (*) => (g.Destroy(), showGuideGui()))
+                g.OnEvent("Close", closeApp)
+                return g
+            }
+        }
 
+        showGuideGui() {
+            showGui(createUniqueGui(guideGui))
+            guideGui(info) {
+                g := createGuiOpt(i18n("init.title"))
+                for v in i18n("usageGuide.tips", 1)
+                    g.AddLink(, v)
+
+                if info.i
+                    return g
+                w := info.w
+                bw := w - g.MarginX * 2
+
+                g.AddButton("xs w" bw, i18n("next")).OnEvent("Click", (*) => (g.Destroy(), showDonateGui()))
                 g.OnEvent("Close", closeApp)
                 return g
             }
@@ -353,8 +367,7 @@ checkIni() {
         showDonateGui() {
             showGui(createUniqueGui(donateGui))
             donateGui(info) {
-                g := Gui("-DPIScale", "InputTip - " i18n("init.title"))
-                g.SetFont(fontOpt*)
+                g := createGuiOpt(i18n("init.title"))
                 for i, v in i18n("init.donate", 1)
                     (i <= 2) ? g.AddLink(, v) : g.AddText("xs cRed", v).Focus()
 

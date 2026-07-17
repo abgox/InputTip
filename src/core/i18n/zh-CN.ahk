@@ -12,6 +12,7 @@ langStrings.Set("zh-CN", Map(
     "close", "关闭",
     "ok", "确定",
     "cancel", "取消",
+    "next", "下一步",
     "howToUse", "如何使用？",
     "add", "添加",
     "edit", "编辑",
@@ -92,18 +93,22 @@ langStrings.Set("zh-CN", Map(
     "Running", "运行中",
     "Paused", "已暂停",
     "init.title", "初始化引导",
-    "init.cursor", [
-        "你是否希望 InputTip 使用 " getDocsLink("tip/cursor", "状态提示 - 鼠标样式") " ?",
-        "- 根据输入法状态加载对应的鼠标样式",
-        "- 所有的鼠标样式都可以自定义",
+    "init.tip", "> 右键单击托盘图标，按需启用、配置相关功能",
+    "init.statusTips", [
+        getLink("inputtip.abgox.com", "InputTip") " 可以根据当前的输入法状态，实时显示状态提示：",
+        "- 根据状态切换鼠标的样式 (" getDocsLink("tip/cursor", "状态提示 - 鼠标样式") ")",
+        "- 在窗口或屏幕上显示小窗 (" getDocsLink("tip/overlay", "状态提示 - 悬浮小窗") ")",
+        "- 在光标附近显示状态符号 (" getDocsLink("tip/symbol-caret", "状态提示 - 光标符号") ")",
+        "- 在鼠标附近显示状态符号 (" getDocsLink("tip/symbol-cursor", "状态提示 - 鼠标符号") ")",
+        "- 在窗口的边框上添加颜色 (" getDocsLink("tip/border", "状态提示 - 窗口边框") ")",
     ],
-    "init.overlay", [
-        "你是否希望 InputTip 使用 " getDocsLink("tip/overlay", "状态提示 - 悬浮小窗") " ?",
-        "- 根据输入法状态显示对应的悬浮小窗",
-        "- 所有悬浮小窗的样式和位置都可以自定义",
+    "init.rules", [
+        getLink("inputtip.abgox.com", "InputTip") " 还提供基于规则的行为调度：",
+        "- 通过窗口匹配、热键、计时器等机制捕捉上下文",
+        "- 触发状态/键盘切换，热键管理，窗口置顶等行为",
     ],
     "init.donate", [
-        getLink("inputtip.abgox.com", "InputTip") " 是一个免费的开源软件",
+        getLink("inputtip.abgox.com", "InputTip") " 是一个免费开源的软件",
         "如果它对你有帮助，请用以下方式支持它",
         "💖 给项目仓库点一个 Star",
         "💖 通过赞赏支持我的开发工作"

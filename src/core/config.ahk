@@ -6,8 +6,8 @@ normalizeConfig(key, value) {
             value := "0xFFFFFF"
     } else if InStr(key, "size") {
         value := Abs(returnNumber(value))
-        if value < 8 || value > 200
-            value := 16
+        if value < 8
+            value := 8
     } else if InStr(key, "weight") {
         value := Abs(returnNumber(value))
         value := Round(value / 100) * 100
@@ -46,7 +46,6 @@ changeConfig(key, value, debounce := 0, callback := (key, value, *) => (A_IsAdmi
         writeIni(key, value)
         var.menuFontSize := Number(value)
         fontOpt[1] := "s" value
-        updateUIC()
         return
     }
 

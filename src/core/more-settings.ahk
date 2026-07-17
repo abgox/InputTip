@@ -5,36 +5,26 @@ e_moreSettings(*) {
     moreSettingsGui(info) {
         g := createGuiOpt(i18n("moreSettings"))
 
-        if info.i {
-            g.AddText(, line70)
-            return g
-        }
-        g.w := w := info.w
-        g.bw := bw := w - g.MarginX * 2
-
         tab := renderTab(g, [i18n("moreSettings")])
         loseFocusOnTab(tab)
         tab.UseTab(1)
         g.AddLink("Section", getDocsLink("more-settings"))
 
-        renderRadioGroupList(g, [
-            ["language",
-                [
-                    [".chinese", "zh-CN"],
-                    [".english", "en-US"]
-                ]
-            ],
-            [
-                "menuAnimation",
-                [
-                    ["none", 0],
-                    ["animation.fade", 1]
-                ]
-            ],
-        ])
-        renderDropDownListGroup(g, "menuFontSize", [12, 14, 16, 18, 20])
+        renderBoldText(g, "menuFontSize")
+        renderDDL(g, "menuFontSize", var.nums_8_50)
+        renderBoldText(g, "language")
+        renderDDL(g, "language", ["zh-CN", "en-US"])
+        renderRadioGroup(g, "menuAnimation", [["none", 0], ["animation.fade", 1]])
 
         ; renderEditGroup(g, "pollInterval", "Number limit2")
+
+        if info.i {
+            g.AddButton("xs", i18n("createDesktopShortcut"))
+            g.AddButton("yp", i18n("customizeTrayTip"))
+            return g
+        }
+        g.w := w := info.w
+        g.bw := bw := w - g.MarginX * 2
 
         optW := " w" bw / 2 - g.MarginX / 4
         g.AddButton("xs w" bw, i18n("openDataDirectory")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data"))
@@ -84,8 +74,8 @@ e_moreSettings(*) {
 
             g.AddLink("Section", getDocsLink("customize-tray-icon"))
             iconList := getPicList(iconDir, ["default-app.png", "default-app-paused.png"])
-            renderDropDownListGroup(g, "iconRunning", iconList)
-            renderDropDownListGroup(g, "iconPaused", iconList)
+            renderDDLGroup(g, "iconRunning", iconList)
+            renderDDLGroup(g, "iconPaused", iconList)
 
             g.AddButton("xs w" bw, i18n("icon.open")).OnEvent("Click", (*) => Run("explorer.exe " A_ScriptDir "\data\icon"))
             return g
@@ -108,8 +98,8 @@ e_moreSettings(*) {
             renderRadioGroup(g, "enableKeyStats", [["yes", 1], ["no", 0]])
             renderEditGroup(g, "trayTipTemplate", "")
             renderEditGroup(g, "keyStatsTemplate", "")
-            renderGroupBox(g, "templateVar", , "xs h" uicEdit.h " w" bw)
-            g.AddEdit("xs+20 yp+" uicEdit.yp " ReadOnly w" bw - 40, "%\n%          %appState%          %keyCount%")
+            renderBoldText(g, "templateVar")
+            g.AddEdit("xs ReadOnly w" bw, "              %\n%          %appState%          %keyCount%")
 
             return g
         }

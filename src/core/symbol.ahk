@@ -255,7 +255,7 @@ e_symbol(*) {
         g.AddLink("Section", getDocsLink("tip/symbol-caret"))
 
         if info.i {
-            g.AddText(, isChinese ? line70 : line80)
+            g.AddText(, isChinese ? line60 : line70)
             return g
         }
         g.w := w := info.w
@@ -332,8 +332,8 @@ e_symbol(*) {
 
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/symbol-caret"))
-        _ := renderEditGroup(g, "caretSymbolHideDelay", "Number Limit5")
-        ctrlList.Push(_.edit)
+        renderBoldText(g, "caretSymbolHideDelay")
+        ctrlList.Push(renderEdit(g, "caretSymbolHideDelay", "Number Limit8"))
         _ := renderRadioGroup(g, "caretSymbolOriginY", [[".above", "above", previewSymbol], [".below", "below", previewSymbol]])
         ctrlList.Push(_.radios*)
         _ := renderRadioGroup(g, "symbolJABActive", [["yes", 1], ["no", 0]])
@@ -375,8 +375,9 @@ e_cursorSymbol(*) {
         _ := g.AddButton("yp" btnOpt, i18n("symbolScreenOffset"))
         _.OnEvent("Click", e_screenOffset.Bind("cursor"))
         ctrlList.Push(_)
-        _ := renderEditGroup(g, "cursorSymbolHideDelay", "Number Limit5")
-        ctrlList.Push(_.edit)
+
+        renderBoldText(g, "cursorSymbolHideDelay")
+        ctrlList.Push(renderEdit(g, "cursorSymbolHideDelay", "Number Limit8"))
         _ := renderRadioGroup(g, "cursorSymbolShowMode",
             [
                 ["blacklist", "blacklist"],
@@ -434,7 +435,7 @@ e_symbolConfig(prefix, *) {
                 picList := getSymbolPicturePath()
                 picList.InsertAt(1, "")
 
-                editOpt := " w" bw / 10
+                editOpt := " w" bw / 8
 
                 page := 1
                 for i, state in stateList {
@@ -445,7 +446,7 @@ e_symbolConfig(prefix, *) {
                         g.AddLink("Section", getDocsLink("tip/symbol-caret/picture"))
                         gc.%prefix "PreviewSymbolPicture" page% := prefix == "caret" ? g.AddEdit("xs cGray r1 w" bw, i18n("symbol.preview")) : { Focus: (*) => "" }
                     }
-                    renderGroupBox(g, state, "xs", "h" uicDDL.h * 1.5 " w" bw)
+                    renderBoldText(g, state)
                     _ := prefix "SymbolPictureOffsetX"
                     renderEditLabel(g, _ state, "Limit5 " editOpt, _)
                     _ := prefix "SymbolPictureOffsetY"
@@ -455,7 +456,7 @@ e_symbolConfig(prefix, *) {
                     _ := prefix "SymbolPictureHeight"
                     renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
 
-                    _ := g.AddDropDownList("xs+20 yp+" uicDDL.yp " r9 w" bw - 40, picList)
+                    _ := g.AddDropDownList("xs r9 w" bw, picList)
                     key := prefix "SymbolPicturePath" state
                     _.key := key
                     _.page := page
@@ -484,7 +485,7 @@ e_symbolConfig(prefix, *) {
                 g.AddLink("Section", getDocsLink("tip/symbol-caret/shape"))
 
                 if info.i {
-                    g.AddText(, isChinese ? line60 : line70)
+                    g.AddText(, isChinese ? line50 : line60)
                     return g
                 }
                 g.w := w := info.w
@@ -498,10 +499,11 @@ e_symbolConfig(prefix, *) {
                     [prefix "SymbolShapeCornerPreference", [["none", 0], ["cornerPreference.sharp", 1], ["cornerPreference.round", 2], ["cornerPreference.roundSmall", 3]]],
                     [prefix "SymbolShapeEdgeStyle", [["none", 0], ["edgeStyle.modal", 1], ["edgeStyle.client", 2], ["edgeStyle.static", 3]]]
                 ]
-                for i, v in list
+                for i, v in list {
                     for item in v[2]
                         item.Push((key, value, *) => (changeConfig(key, value), gc.%prefix "PreviewSymbolShape"%.Focus(), reloadCaretSymbol()))
-                renderRadioGroupList(g, list)
+                    renderRadioGroup(g, v[1], v[2])
+                }
 
                 editOpt := " w" bw / 8
 
@@ -512,7 +514,7 @@ e_symbolConfig(prefix, *) {
                     } else {
                         opt := "xs"
                     }
-                    renderGroupBox(g, state, opt, "h" uicDDL.h * 1.5 " w" bw)
+                    renderBoldText(g, state, opt)
                     _ := prefix "SymbolShapeOffsetX"
                     renderEditLabel(g, _ state, "Limit5 " editOpt, _)
                     _ := prefix "SymbolShapeWidth"
@@ -524,7 +526,8 @@ e_symbolConfig(prefix, *) {
                     _ := prefix "SymbolShapeHeight"
                     renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
                     _ := prefix "SymbolShapeTransparent"
-                    renderEditLabel(g, _ state, "Number Limit3" editOpt, _, "yp")
+                    renderText(g, _, "yp")
+                    renderDDL(g, _ state, var.nums_0_255, "yp " editOpt)
                 }
 
                 return g
@@ -553,10 +556,11 @@ e_symbolConfig(prefix, *) {
                     [prefix "SymbolTextCornerPreference", [["none", 0], ["cornerPreference.sharp", 1], ["cornerPreference.round", 2], ["cornerPreference.roundSmall", 3]]],
                     [prefix "SymbolTextEdgeStyle", [["none", 0], ["edgeStyle.modal", 1], ["edgeStyle.client", 2], ["edgeStyle.static", 3]]]
                 ]
-                for i, v in list
+                for i, v in list {
                     for item in v[2]
                         item.Push((key, value, *) => (changeConfig(key, value), gc.%prefix "previewSymbolText"% .Focus(), reloadCaretSymbol()))
-                renderRadioGroupList(g, list)
+                    renderRadioGroup(g, v[1], v[2])
+                }
 
                 editOpt := " w" bw / 6
 
@@ -567,18 +571,30 @@ e_symbolConfig(prefix, *) {
                     } else {
                         opt := "xs"
                     }
-                    renderGroupBox(g, state, opt, "h" uicDDL.h * 2.5 " w" bw)
-                    renderEditLabel(g, prefix "SymbolTextContent" state, editOpt, prefix "SymbolTextContent")
-                    renderEditLabel(g, prefix "SymbolTextOffsetX" state, "Limit5 " editOpt, prefix "SymbolTextOffsetX", "yp")
-                    renderColorPicker(g, prefix "SymbolTextColor" state, prefix "SymbolTextColor")
-                    renderEditLabel(g, prefix "SymbolTextSize" state, "Number Limit2" editOpt, prefix "SymbolTextSize")
-                    renderEditLabel(g, prefix "SymbolTextOffsetY" state, "Limit5 " editOpt, prefix "SymbolTextOffsetY", "yp")
-                    renderColorPicker(g, prefix "SymbolTextBgColor" state, prefix "SymbolTextBgColor")
+                    renderBoldText(g, state, opt)
 
-                    renderText(g, prefix "SymbolTextFont", "xs+20 yp+" uicDDL.yp, "")
-                    renderDropDownList(g, prefix "SymbolTextFont" state, fontList, "yp", "w" bw / 1.2)
-                    renderEditLabel(g, prefix "SymbolTextWeight" state, "Number Limit3" editOpt, prefix "SymbolTextWeight")
-                    renderEditLabel(g, prefix "SymbolTextTransparent" state, "Number Limit3" editOpt, prefix "SymbolTextTransparent", "yp")
+                    _ := prefix "SymbolTextContent"
+                    renderEditLabel(g, _ state, editOpt, _)
+                    _ := prefix "SymbolTextOffsetX"
+                    renderEditLabel(g, _ state, "Limit5 " editOpt, _, "yp")
+                    _ := prefix "SymbolTextColor"
+                    renderColorPicker(g, _ state, _)
+                    _ := prefix "SymbolTextSize"
+                    renderText(g, _)
+                    renderDDL(g, _ state, var.nums_8_100, "yp" editOpt)
+                    _ := prefix "SymbolTextOffsetY"
+                    renderEditLabel(g, _ state, "Limit5 " editOpt, _, "yp")
+                    _ := prefix "SymbolTextBgColor"
+                    renderColorPicker(g, _ state, _)
+                    _ := prefix "SymbolTextFont"
+                    renderText(g, _)
+                    renderDDL(g, _ state, fontList, "yp w" bw / 1.2)
+                    _ := prefix "SymbolTextWeight"
+                    renderText(g, _)
+                    renderDDL(g, _ state, var.nums_100_900, "yp" editOpt)
+                    _ := prefix "SymbolTextTransparent"
+                    renderText(g, _, "yp")
+                    renderDDL(g, _ state, var.nums_0_255, "yp" editOpt)
                 }
 
                 return g
@@ -625,20 +641,12 @@ e_screenOffset(prefix, *) {
             } else {
                 offsetMap.Set(n, { x: 0, y: 0 })
             }
-
-            g.SetFont("Bold")
-            g.AddText("xs", i18n("offset.offset_x"))
-            g.SetFont("Norm")
-            _ := g.AddEdit("yp Limit5 r1")
-            _.Value := x
-            _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
-
-            g.SetFont("Bold")
-            g.AddText("xs", i18n("offset.offset_y"))
-            g.SetFont("Norm")
-            _ := g.AddEdit("yp Limit5 r1")
-            _.Value := y
-            _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
+            for v in ["x", "y"] {
+                renderBoldText(g, "offset.offset_" v)
+                _ := g.AddEdit("yp Limit5 r1")
+                _.Value := %v%
+                _.OnEvent("Change", e_changeOffset.Bind(n, v))
+            }
             e_changeOffset(n, pos, item, *) {
                 if !offsetMap.Has(n)
                     offsetMap.Set(n, { x: 0, y: 0 })

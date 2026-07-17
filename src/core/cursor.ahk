@@ -142,7 +142,7 @@ e_cursor(*) {
             } else {
                 opt := "xs"
             }
-            _ := renderDropDownListGroup(g, state, list, "cursorPath" state, opt)
+            _ := renderDDLGroup(g, state, list, "cursorPath" state, opt)
             ctrlList.Push(_.dropDownList)
         }
 

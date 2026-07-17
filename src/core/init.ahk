@@ -40,6 +40,7 @@ migrateConfig2()
 #Include jab.ahk
 #Include var.ahk
 
+#Include "*i ui.ahk"
 #Include "*i runtime.ahk"
 #Include "*i ime.ahk"
 #Include "*i tray-menu.ahk"

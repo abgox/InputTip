@@ -6,7 +6,7 @@ e_border(*) {
         g := createGuiOpt(i18n("border"))
 
         if info.i {
-            g.AddText(, isChinese ? line80 : line90)
+            renderText(g, "borderWidth.tip", "cGray")
             return g
         }
         g.w := w := info.w
@@ -24,8 +24,8 @@ e_border(*) {
             ["no", 0, (key, value, *) => (changeConfig(key, value), disableCtrl(ctrlList))]
         ])
 
-        _ := renderEditGroup(g, "borderHideDelay", "Number Limit5")
-        ctrlList.Push(_.edit)
+        renderBoldText(g, "borderHideDelay")
+        ctrlList.Push(renderEdit(g, "borderHideDelay", "Number Limit8"))
 
         _ := renderRadioGroup(g, "borderShowMode", [["blacklist", "blacklist"], ["whitelist", "whitelist"]])
         ctrlList.Push(_.radios*)
@@ -50,8 +50,8 @@ e_border(*) {
         tab.UseTab(2)
         g.AddLink("Section", getDocsLink("tip/border"))
 
-        renderGroupBox(g, "borderReshowOnChange", , "h" uicText.h " w" bw)
-        g.AddCheckbox("xs+20 yp+" uicText.yp " Disabled", i18n("borderReshowOnChange.state")).Value := 1
+        renderBoldText(g, "borderReshowOnChange")
+        g.AddCheckbox("Disabled", i18n("borderReshowOnChange.state")).Value := 1
         for v in ["Process", "Title", "Class"] {
             _ := g.AddCheckbox("yp", i18n("borderReshowOnChange." StrLower(v)))
             key := "borderReshowOn" v "Change"
@@ -65,26 +65,26 @@ e_border(*) {
             writeIni(key, val)
         }
 
-        renderGroupBox(g, "showOnWindowState", , "h" uicText.h " w" bw)
+        renderBoldText(g, "showOnWindowState")
         for i, v in ["Normal", "Maximized", "Fullscreen"] {
-            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("showOnWindowState." StrLower(v)))
+            _ := g.AddCheckbox(i == 1 ? "xs" : "yp", i18n("showOnWindowState." StrLower(v)))
             key := "borderShowOn" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
             ctrlList.Push(_)
         }
 
-        renderGroupBox(g, "borderShowOnMaximized", , "h" uicText.h " w" bw)
+        renderBoldText(g, "borderShowOnMaximized")
         for i, v in ["Top", "Bottom", "Left", "Right"] {
-            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("position." v))
+            _ := g.AddCheckbox(i == 1 ? "xs" : "yp", i18n("position." v))
             key := "borderShowOnMaximized" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
             ctrlList.Push(_)
         }
-        renderGroupBox(g, "borderShowOnFullscreen", , "h" uicText.h " w" bw)
+        renderBoldText(g, "borderShowOnFullscreen")
         for i, v in ["Top", "Bottom", "Left", "Right"] {
-            _ := g.AddCheckbox(i == 1 ? "xs+20 yp+" uicText.yp : "yp", i18n("position." v))
+            _ := g.AddCheckbox(i == 1 ? "xs" : "yp", i18n("position." v))
             key := "borderShowOnFullscreen" v
             _.Value := var.%key%
             _.OnEvent("Click", e_change.Bind(key))
@@ -95,13 +95,14 @@ e_border(*) {
             if (Mod(i - 1, 4) == 0) {
                 tab.UseTab(((i - 1) // 3) + 3)
                 opt := "Section"
-                g.AddText("cGray", i18n("borderWidth.tip"))
+                renderText(g, "borderWidth.tip", "cGray")
             } else {
                 opt := "xs"
             }
-            renderGroupBox(g, v, opt, "h" uicText.h " w" bw)
-            _ := renderEditLabel(g, "borderWidth" v, "yp Number Limit2 w" bw / 6, "borderWidth")
-            ctrlList.Push(_.edit)
+            renderBoldText(g, v, opt)
+            renderText(g, "borderWidth")
+
+            ctrlList.Push(renderDDL(g, "borderWidth" v, var.nums_1_100, "yp w" bw / 6))
             _ := renderColorPicker(g, "borderColor" v, "borderColor", "yp")
             ctrlList.Push(_.picker)
         }

@@ -23,10 +23,6 @@ e_startup(item, *) {
             w := info.w
             ; bw := w - g.MarginX * 2
 
-            tab := renderTab(g, [i18n("startup")])
-            loseFocusOnTab(tab)
-            tab.UseTab(1)
-
             g.AddLink(, getDocsLink("startup"))
 
             if A_IsAdmin

@@ -29,8 +29,8 @@ e_inputMethod(*) {
         _.Value := var._showStateCode
         _.OnEvent("Click", (ctrl, *) => (val := ctrl.Value, showStateCode(var._showStateCode := val)))
 
-        renderText(g, "inputMethodBaseState", "xs", "")
-        renderDropDownList(g, "inputMethodBaseState", ["EN", "CN"], "yp", "w" bw / 2)
+        renderText(g, "inputMethodBaseState")
+        renderDDL(g, "inputMethodBaseState", ["EN", "CN"], "yp w" bw / 2)
 
         columns := [
             i18n("inputMethodDetectionMode.matchOrder"), i18n("inputMethodDetectionMode.stateCodeRule"), i18n("inputMethodDetectionMode.conversionCodeRule"), i18n("inputMethodDetectionMode.imeState")
@@ -71,13 +71,6 @@ e_inputMethod(*) {
             editRuleGui(info) {
                 g := createGuiOpt(action)
 
-                if info.i {
-                    g.AddText(, isChinese ? line50 : line60)
-                    return g
-                }
-                w := info.w
-                bw := w - g.MarginX * 2
-
                 _gc := {
                     stateNum: "",
                     stateRule: "",
@@ -86,8 +79,8 @@ e_inputMethod(*) {
                     order: RowNumber,
                 }
 
-                renderGroupBox(g, "inputMethodDetectionMode.matchOrder", "", "h" uicDDL.h " w" bw)
-                g.AddText("xs+20 yp+" uicDDL.yp, i18n("inputMethodDetectionMode.matchOrder.specifyOrder"))
+                renderBoldText(g, "inputMethodDetectionMode.matchOrder", "")
+                renderText(g, "inputMethodDetectionMode.matchOrder.specifyOrder")
 
                 num := 1
                 list := []
@@ -98,19 +91,25 @@ e_inputMethod(*) {
                 _.OnEvent("Change", (i, *) => _gc.order := Trim(i.Value))
                 SuppressControlWheel(_.Hwnd)
 
-                renderGroupBox(g, "inputMethodDetectionMode.imeState", , "h" uicText.h " w" bw)
-                g.AddText("xs+20 yp+" uicText.yp, i18n("inputMethodDetectionMode.imeState.specifyState"))
+                renderBoldText(g, "inputMethodDetectionMode.imeState")
+                renderText(g, "inputMethodDetectionMode.imeState.specifyState")
                 g.AddText("yp cGray", ruleInfo.state)
 
+                if info.i {
+                    return g
+                }
+                w := info.w
+                bw := w - g.MarginX * 2
+
                 for v in ["state", "conversion"] {
-                    renderGroupBox(g, "inputMethodDetectionMode." v "CodeRule", , "h" uicDDL.h * 1.5 " w" bw)
-                    g.AddText("xs+20 yp+" uicDDL.yp, i18n("inputMethodDetectionMode.number"))
+                    renderBoldText(g, "inputMethodDetectionMode." v "CodeRule")
+                    renderText(g, "inputMethodDetectionMode.number")
                     _gc.%v "Num"% := _ := g.AddComboBox("yp", v == "state" ? ["", "0", "1", "1/3"] : ["", "0", "1", "1/1025"])
                     _.v := v
                     if !InStr(ruleInfo.%v "Rule"%, "oddNum") && !InStr(ruleInfo.%v "Rule"%, "evenNum")
                         _.Text := ruleInfo.%v "Rule"%
                     _.OnEvent("Change", (i, *) => (v := i.v, ruleInfo.%v "Rule"% := i.Text, _gc.%v "Rule"%.Value := 0))
-                    g.AddText("xs+20 yp+" uicDDL.yp, i18n("inputMethodDetectionMode.rule"))
+                    renderText(g, "inputMethodDetectionMode.rule")
                     _gc.%v "Rule"% := _ := g.AddDropDownList("yp", ["", i18n("inputMethodDetectionMode.rule.odd"), i18n("inputMethodDetectionMode.rule.even")])
                     _.v := v
                     switch ruleInfo.%v "Rule"% {

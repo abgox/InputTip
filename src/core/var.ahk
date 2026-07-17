@@ -16,7 +16,6 @@ line60 := line50 "----------"
 line70 := line60 "----------"
 line80 := line70 "----------"
 line90 := line80 "----------"
-line100 := line90 "----------"
 
 gc := {}
 
@@ -120,7 +119,7 @@ loadConfig() {
         cursorSymbolTextCornerPreference: readIni("cursorSymbolTextCornerPreference", 3),
         cursorSymbolShapeCornerPreference: readIni("cursorSymbolShapeCornerPreference", 3),
         menuAnimation: readIni("menuAnimation", 1),
-        menuFontSize: Max(readIni("menuFontSize", 16), 12),
+        menuFontSize: readIni("menuFontSize", 16),
         ; 轮询响应间隔
         pollInterval: readIni("pollInterval", 20),
         ; 托盘菜单图标
@@ -139,10 +138,23 @@ loadConfig() {
     var._matchCache := Map()
     var._ruleIds := Map()
 
-    if keyOf([12, 14, 16, 18, 20], var.menuFontSize)
-        fontOpt[1] := "s" Max(var.menuFontSize, 12)
-    else
-        var.menuFontSize := 16
+    var.nums_0_255 := [0]
+    var.nums_1_100 := []
+    var.nums_8_100 := []
+    var.nums_8_50 := []
+    var.nums_100_900 := [100, 200, 300, 400, 500, 600, 700, 800, 900]
+    loop 255 {
+        var.nums_0_255.Push(A_Index)
+        if A_Index <= 100
+            var.nums_1_100.Push(A_Index)
+        if A_Index >= 8 {
+            if A_Index <= 100
+                var.nums_8_100.Push(A_Index)
+            if A_Index <= 50
+                var.nums_8_50.Push(A_Index)
+        }
+    }
+    fontOpt[1] := "s" var.menuFontSize
 
     ; 自定义模式下定义的模式规则
     var.inputMethodDetectionRule := readIni("inputMethodDetectionRule", "")
@@ -211,8 +223,6 @@ loadConfig() {
 }
 
 loadConfig()
-
-try updateUIC()
 
 windowRuleKeys := ["process", "condition", "class", "trigger", "title", "offset", "capture", "captureOffset", "hotkey", "idleTimer", "textMonitor", "hotkeyMonitor"]
 

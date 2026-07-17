@@ -4,7 +4,6 @@
 #Include "*i input-method.ahk"
 #Include "*i more-settings.ahk"
 #Include "*i startup.ahk"
-#Include "*i ui.ahk"
 #Include "*i config.ahk"
 
 fontList := getFontList()
@@ -99,9 +98,8 @@ e_windowInfo(*) {
 
         g.AddLink("Section", getDocsLink("menu/window-info"))
         for v in i18n("windowInfo.list", 1) {
-            renderGroupBox(g, v, , "h" uicEdit.h " w" bw)
-            gc.%v% := _ := g.AddEdit("xs+20 yp+" uicEdit.yp " ReadOnly cGray -VScroll w" bw - 40)
-            _.Text := i18n("windowInfo.tip")
+            renderBoldText(g, v)
+            gc.%v% := g.AddEdit("xs ReadOnly cGray -VScroll w" bw, i18n("windowInfo.tip"))
         }
         g.OnEvent("Close", (*) => timer := 0)
         timer := 1
@@ -206,8 +204,8 @@ createProcessMenuGui(meta, *) {
             w := info.w
             bw := w - g.MarginX * 2
 
-            opt := "xs+20 yp+" uicEdit.yp " w" bw - 40
-            layout := " h" uicEdit.h " w" bw
+            opt := "xs w" bw
+            layout := " w" bw
 
             sectionList := []
             i := 0
@@ -219,7 +217,7 @@ createProcessMenuGui(meta, *) {
                 groupLayout := "xs"
                 sectionList[num] := fn_hotkey
                 fn_hotkey() {
-                    renderGroupBox(g, "match.hotkey", layout)
+                    renderBoldText(g, "match.hotkey", layout)
                     _ := g.AddComboBox(opt, [
                         "",
                         "~LShift Up",
@@ -246,7 +244,7 @@ createProcessMenuGui(meta, *) {
             if num := column.Get("process", 0) {
                 sectionList[num] := fn_process
                 fn_process() {
-                    renderGroupBox(g, "match.process", groupLayout layout)
+                    renderBoldText(g, "match.process", groupLayout layout)
                     _ := g.AddComboBox(opt, [
                         "",
                         "Code.exe",
@@ -291,7 +289,7 @@ createProcessMenuGui(meta, *) {
                     for v in meta.trigger {
                         triggerList.Push(i18n("trigger." v))
                     }
-                    renderGroupBox(g, "match.trigger", "xs" layout)
+                    renderBoldText(g, "match.trigger", "xs" layout)
                     _ := g.AddDropDownList(opt " r9", triggerList)
                     try _.Text := colValue.trigger
                     colValue.trigger := _.Text
@@ -306,7 +304,7 @@ createProcessMenuGui(meta, *) {
                     for v in meta.conditions
                         conditionList.Push(i18n("condition." v))
 
-                    renderGroupBox(g, "match.condition", "xs" layout)
+                    renderBoldText(g, "match.condition", "xs" layout)
                     var._conditionCtrl := _ := g.AddDropDownList(opt " r9", conditionList)
                     try _.Text := colValue.condition
                     colValue.condition := _.Text
@@ -351,7 +349,7 @@ createProcessMenuGui(meta, *) {
             if num := column.Get("class", 0) {
                 sectionList[num] := fn_class
                 fn_class() {
-                    renderGroupBox(g, "match.class", "xs" layout)
+                    renderBoldText(g, "match.class", "xs" layout)
                     var._classEditCtrl := _ := g.AddEdit(opt " r1")
                     try _.Text := colValue.class
                     _.OnEvent("Change", (i, *) => colValue.class := i.Text)
@@ -360,7 +358,7 @@ createProcessMenuGui(meta, *) {
             if num := column.Get("title", 0) {
                 sectionList[num] := fn_title
                 fn_title() {
-                    renderGroupBox(g, "match.title", "xs" layout)
+                    renderBoldText(g, "match.title", "xs" layout)
                     var._titleEditCtrl := _ := g.AddEdit(opt " r1")
                     try _.Text := colValue.title
                     _.OnEvent("Change", (i, *) => colValue.title := i.Text)
@@ -375,10 +373,10 @@ createProcessMenuGui(meta, *) {
                     if !var.symbolJABActive
                         modeNameList.Pop()
                     ddlControls := captureList.Clone()
-                    renderGroupBox(g, "symbolCaretCapture", "xs h" uicDDL.h * 1.5 " w" bw)
+                    renderBoldText(g, "symbolCaretCapture")
                     for i, v in captureList {
                         if i == 1 || i == 5 {
-                            _opt := "xs+20 yp+" uicDDL.yp
+                            _opt := "xs"
                         } else {
                             _opt := "yp"
                             g.AddText("yp", ">")
@@ -390,10 +388,10 @@ createProcessMenuGui(meta, *) {
                         SuppressControlWheel(_.Hwnd)
                     }
 
-                    renderGroupBox(g, "symbolCaretCapture.offset", "xs h" uicDDL.h * 1.5 " w" bw)
+                    renderBoldText(g, "symbolCaretCapture.offset")
                     for i, v in captureOffsetList {
                         if i == 1 || i == 5 {
-                            _opt := "xs+20 yp+" uicDDL.yp
+                            _opt := "xs"
                         } else {
                             _opt := "yp"
                             g.AddText("yp", ">")
@@ -472,20 +470,12 @@ createProcessMenuGui(meta, *) {
                         } else {
                             offsetMap.Set(n, { x: 0, y: 0 })
                         }
-
-                        g.SetFont("Bold")
-                        g.AddText("xs", i18n("offset.offset_x"))
-                        g.SetFont("Norm")
-                        _ := g.AddEdit("yp Limit5 r1")
-                        _.Value := x
-                        _.OnEvent("Change", e_changeOffset.Bind(n, "x"))
-
-                        g.SetFont("Bold")
-                        g.AddText("xs", i18n("offset.offset_y"))
-                        g.SetFont("Norm")
-                        _ := g.AddEdit("yp Limit5 r1")
-                        _.Value := y
-                        _.OnEvent("Change", e_changeOffset.Bind(n, "y"))
+                        for v in ["x", "y"] {
+                            renderBoldText(g, "offset.offset_" v)
+                            _ := g.AddEdit("yp Limit5 r1")
+                            _.Value := %v%
+                            _.OnEvent("Change", e_changeOffset.Bind(n, v))
+                        }
                     }
 
                     e_changeOffset(n, pos, item, *) {
@@ -518,7 +508,7 @@ createProcessMenuGui(meta, *) {
             if meta.section == "Window.Rule" {
                 sectionList.InsertAt(4, fn_content)
                 fn_content() {
-                    var._tthGroupCtrl := renderGroupBox(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs" layout)
+                    var._tthGroupCtrl := renderBoldText(g, "match.textMonitorOrHotkeyMonitorOrIdleTimer", "xs" layout)
                     var._tthEditCtrl := _ := g.AddComboBox(opt)
                     SuppressControlWheel(_.Hwnd)
 

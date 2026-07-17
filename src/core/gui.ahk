@@ -82,8 +82,8 @@ createGuiOpt(title, fontOption := fontOpt, guiOption := "", prefix := "InputTip 
 /**
  * 创建一个提示
  * @param {Array} Tips 显示的提示信息
- * @param {String} tipType Gui 标题
- * @param {"tip"|"warning"|"error"} type 提示的类型
+ * @param {String} title Gui 标题
+ * @param {"tip"|"warning"|"error"} typeKey 提示的类型
  * @param {"ok"|"cancel"|String} btnTextKey 按钮的文本
  * @param {"cRed"|String} opt 文本控件的选项
  * @returns {Gui} 返回 Gui 对象
@@ -91,8 +91,10 @@ createGuiOpt(title, fontOption := fontOpt, guiOption := "", prefix := "InputTip 
 createMsgGui(Tips, title, typeKey := "", btnTextKey := "ok", opt := "") {
     tipGui(info) {
         t := i18n(typeKey)
+        if t
+            t .= " - "
         if title
-            t .= " - " title
+            t .= title
         g := createGuiOpt(t)
 
         for v in Tips

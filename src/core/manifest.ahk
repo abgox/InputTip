@@ -4,11 +4,11 @@
 
 runtimeVersion := "2.0.26.0"
 if A_IsCompiled
-    versionType := "exe", currentVersion := "3.6.10"
+    versionType := "exe", currentVersion := "3.6.11"
 else
-    versionType := "zip", currentVersion := "3.6.10"
+    versionType := "zip", currentVersion := "3.6.11"
 
-;@Ahk2Exe-SetVersion 3.6.10
+;@Ahk2Exe-SetVersion 3.6.11
 ;@Ahk2Exe-SetLanguage 0x0804
 ;@Ahk2Exe-SetMainIcon temp\icon\default-app.ico
 ;@Ahk2Exe-SetCopyright Copyright (c) 2023-present abgox

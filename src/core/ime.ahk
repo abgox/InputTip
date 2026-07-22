@@ -38,8 +38,10 @@ class IME {
       */
     static GetInputModeText(hwnd := this.GetFocusedWindow()) {
         static lastState := "EN"
-        if GetKeyState("CapsLock", "T")
+        if GetKeyState("CapsLock", "T") {
+            this.GeneralStrategy.isHwndInitPending := 0
             return lastState := "Caps"
+        }
 
         try {
             langID := this.GetKeyboardLayout(hwnd) & 0xFF
@@ -61,14 +63,19 @@ class IME {
                 if gs.lastHwnd != hwnd || hasTitleChange || hasClassChange || hasProcessChange {
                     gs.lastHwnd := hwnd
                     gs.hwndChangedTime := A_TickCount
-                    gs.isHwndInitPending := 1
 
                     gs.pendingState := ""
                     gs.lastChangedTime := 0
                     gs.pendingNonBinary := 0
                     gs.nonBinaryTime := 0
 
-                    goto SKIP_STRATEGY_LEARNING
+                    if exeProcess != "explorer.exe" {
+                        gs.isHwndInitPending := 1
+                        goto SKIP_STRATEGY_LEARNING
+                    }
+                    gs.isHwndInitPending := 0
+                    gs.lastOpened := opened
+                    gs.lastConvMode := convMode
                 }
                 if gs.isHwndInitPending {
                     if A_TickCount - gs.hwndChangedTime < 200
@@ -166,8 +173,7 @@ class IME {
                         else
                             state := "EN"
                 }
-                lastState := state
-                return state
+                return lastState := state
             }
 
             state := var.inputMethodBaseState
@@ -179,7 +185,6 @@ class IME {
                     break
                 }
             }
-
             return lastState := state
         } catch {
             return lastState
@@ -403,5 +408,16 @@ switchState(state, method) {
             IME.SetInputMode(state)
         else
             SendInput(method)
+
+        SetTimer(_checkAgain, -200)
+        _checkAgain() {
+            stateText := IME.GetInputModeText()
+            if stateText && state != stateText {
+                if method == "IME"
+                    IME.SetInputMode(state)
+                else
+                    SendInput(method)
+            }
+        }
     }
 }

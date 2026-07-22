@@ -11,14 +11,12 @@ try {
     keyCount := 0
 }
 
+gc := {}
 line50 := "------------------------------------------------"
 line60 := line50 "----------"
 line70 := line60 "----------"
 line80 := line70 "----------"
 line90 := line80 "----------"
-
-gc := {}
-
 
 loadConfig() {
     global var
@@ -315,31 +313,51 @@ runTriggers(triggers, *) {
     }
 }
 
+conflictGroups := Map(
+    "switchState", ["switchState"],
+    "switchKeyboard", ["switchKeyboard"],
+    "ignore", ["ignore"],
+    "windowTop", ["windowTop"],
+    "appControl", ["exit", "restart", "pause", "resume", "toggle"],
+    "show", ["show"],
+)
+
+getConflictGroup(trigger) {
+    for group, prefixes in conflictGroups {
+        for prefix in prefixes {
+            if InStr(trigger, prefix)
+                return group
+        }
+    }
+    return ""
+}
+
 returnTriggers() {
-    conditionalTriggers := []
-    unconditionalTriggers := []
+    result := []
 
     for trigger in windowTriggerKeyList {
         rules := matchWindowRules(var.WindowRule[trigger])
-
-        for rule in rules {
-            if !rule.trigger
-                continue
-            if rule.condition {
-                if rule.condition == "idleTimer" || rule.condition == "textMonitor" || rule.condition == "hotkeyMonitor"
-                    continue
-                if trigger == "exit" && exeProcess == "explorer.exe"
-                    continue
-                conditionalTriggers.Push(trigger)
-            } else {
-                if hasProcessChange
-                    unconditionalTriggers.Push(trigger)
-            }
+        for rule in rules
+            result.Push(rule)
+    }
+    bestByGroup := Map()
+    nonConflictRules := []
+    for rule in result {
+        group := getConflictGroup(rule.trigger)
+        if group {
+            if !bestByGroup.Has(group) || rule._priority > bestByGroup[group]._priority
+                bestByGroup[group] := rule
+        } else {
+            nonConflictRules.Push(rule)
         }
     }
+    finalResult := []
+    for group, rule in bestByGroup
+        finalResult.Push(rule.trigger)
+    for rule in nonConflictRules
+        finalResult.Push(rule.trigger)
 
-    unconditionalTriggers.Push(conditionalTriggers*)
-    return unconditionalTriggers
+    return finalResult
 }
 
 textToState(stateText) {
@@ -532,18 +550,24 @@ getMatchingRuleLists(triggerMap, hotkey := 0) {
         return var._matchCache[cacheKey]
 
     result := []
-    if triggerMap.Has(exeProcess)
+    if triggerMap.Has(exeProcess) {
+        for rule in triggerMap[exeProcess]
+            rule._processPriority := 100
         result.Push(triggerMap[exeProcess])
-
+    }
     for key, ruleList in triggerMap {
         if (key == "" && !hotkey) || key == exeProcess
             continue
-        if safeRegexMatch(exeProcess, key)
+        if safeRegexMatch(exeProcess, key) {
+            priority := 50 + StrLen(key) / 2
+            for rule in ruleList
+                rule._processPriority := priority
             result.Push(ruleList)
+        }
     }
-
     if result.Length > 0
         var._matchCache.Set(cacheKey, result)
+
     return result
 }
 
@@ -561,34 +585,59 @@ matchCondition(rule) {
 }
 
 matchWindowRules(triggerMap) {
-    conditionalTriggers := []
-    unconditionalTriggers := []
+    result := []
 
     ruleLists := getMatchingRuleLists(triggerMap)
     if ruleLists.Length == 0
-        return unconditionalTriggers
+        return result
+
+    bestConditionalByTrigger := Map()
+    bestUnconditionalByTrigger := Map()
 
     for ruleList in ruleLists {
         for rule in ruleList {
-            if !rule.trigger
+            if !rule.trigger || !matchCondition(rule)
                 continue
 
-            isMatch := matchCondition(rule)
-
-            if !isMatch
-                continue
-
+            processPriority := rule.HasProp("_processPriority") ? rule._processPriority : 50
+            conditionPriority := 0
             if rule.condition {
-                conditionalTriggers.Push(rule)
+                switch rule.condition {
+                    case "classAndTitle":
+                        conditionPriority := 20 + StrLen(rule.class) + StrLen(rule.title)
+                    case "class":
+                        conditionPriority := 10 + StrLen(rule.class)
+                    case "title":
+                        conditionPriority := 10 + StrLen(rule.title)
+                    case "textMonitor", "hotkeyMonitor", "idleTimer":
+                        continue
+                }
+            }
+            totalPriority := processPriority + conditionPriority
+            rule._priority := totalPriority
+            if rule.condition {
+                if !bestConditionalByTrigger.Has(rule.trigger) || totalPriority > bestConditionalByTrigger[rule.trigger]._priority
+                    bestConditionalByTrigger[rule.trigger] := rule
             } else {
-                if hasProcessChange
-                    unconditionalTriggers.Push(rule)
+                if !bestUnconditionalByTrigger.Has(rule.trigger) || totalPriority > bestUnconditionalByTrigger[rule.trigger]._priority
+                    bestUnconditionalByTrigger[rule.trigger] := rule
             }
         }
     }
+    for t, rule in bestConditionalByTrigger {
+        if rule.trigger == "exit" && exeProcess == "explorer.exe"
+            continue
+        result.Push(rule)
+    }
+    if hasProcessChange {
+        for t, rule in bestUnconditionalByTrigger {
+            if bestConditionalByTrigger.Has(t)
+                continue
+            result.Push(rule)
+        }
+    }
 
-    unconditionalTriggers.Push(conditionalTriggers*)
-    return unconditionalTriggers
+    return result
 }
 
 matchWindowDisplay(triggerMap) {

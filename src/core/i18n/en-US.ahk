@@ -162,7 +162,7 @@ langStrings.Set("en-US", Map(
     "inputMethodDetectionMode.rule.odd", "Odd",
     "inputMethodDetectionMode.rule.even", "Even",
     "inputMethodDetectionMode.imeState", "Input Method State",
-    "inputMethodDetectionMode.imeState.specifyState", ["Specify State", "Specify State "],
+    "inputMethodDetectionMode.imeState.matchState", ["Match State", "Match State  "],
     "inputMethodDetectionMode.stateCode", "State Code",
     "inputMethodDetectionMode.conversionCode", "Conversion Code",
     "inputMethodDetectionMode.showCode", "Show State/Conversion Code",

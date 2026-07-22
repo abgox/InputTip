@@ -92,7 +92,7 @@ e_inputMethod(*) {
                 SuppressControlWheel(_.Hwnd)
 
                 renderBoldText(g, "inputMethodDetectionMode.imeState")
-                renderText(g, "inputMethodDetectionMode.imeState.specifyState")
+                renderText(g, "inputMethodDetectionMode.imeState.matchState")
                 g.AddText("yp cGray", ruleInfo.state)
 
                 if info.i {

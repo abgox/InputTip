@@ -162,7 +162,7 @@ langStrings.Set("zh-CN", Map(
     "inputMethodDetectionMode.rule.odd", "奇数",
     "inputMethodDetectionMode.rule.even", "偶数",
     "inputMethodDetectionMode.imeState", "输入法状态",
-    "inputMethodDetectionMode.imeState.specifyState", "指定状态",
+    "inputMethodDetectionMode.imeState.matchState", "匹配状态",
     "inputMethodDetectionMode.stateCode", "状态码",
     "inputMethodDetectionMode.conversionCode", "转换码",
     "inputMethodDetectionMode.showCode", "显示状态码和转换码",

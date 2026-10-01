@@ -4,7 +4,7 @@
     <a href="https://inputtip.abgox.com">官网</a> |
     <a href="https://github.com/abgox/InputTip">GitHub</a> |
     <a href="https://gitee.com/abgox/InputTip">Gitee</a> |
-    <a href="https://gitcode.com/abgox/InputTip">GitCode</a>
+    <a href="https://atomgit.com/abgox/InputTip">AtomGit</a>
 </p>
 
 <p align="center">
@@ -63,9 +63,9 @@ _更多详情请查看 [官网](https://inputtip.abgox.com)_
 
 ## 🛠️ 我的其他项目
 
-- [abyss](https://github.com/abgox/abyss)
-- [PSCompletions](https://github.com/abgox/PSCompletions)
-- [SpaceKey](https://github.com/abgox/SpaceKey)
+- [abyss](https://github.com/abgox/abyss): 精心设计、自成体系的 Scoop bucket
+- [PSCompletions](https://github.com/abgox/PSCompletions): 适用于 PowerShell 的 Tab 补全管理器，基于 Rust 引擎与交互式菜单
+- [SpaceKey](https://github.com/abgox/SpaceKey): 以空格键为核心的按键映射方案，优化输入体验与工作效率
 
 ## 💖 支持与赞助
 

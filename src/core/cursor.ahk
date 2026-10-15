@@ -4,11 +4,12 @@ for k, v in var.cursorInfo {
     o := ""
     try o := replaceEnvVariables(RegRead("HKEY_CURRENT_USER\Control Panel\Cursors", k))
     if !o
-        o := "C:\Windows\Cursors\" v[2]
+        o := A_WinDir "\Cursors\" v[2]
     var.cursorInfo[k] := { id: v[1], origin: o }
 }
 
 updateCursor()
+OnExit((*) => (revertCursor(), 0))
 
 updateCursor() {
     defaultCursor := Map(
@@ -61,9 +62,9 @@ loadCursor(state, change := 0) {
     lastCursor := state
 }
 
+; SPI_SETCURSORS: 按注册表重新加载用户当前的指针方案 (包括值为空的项和指针大小)
 revertCursor() {
-    for k, v in var.cursorInfo
-        try (v.origin ? DllCall("SetSystemCursor", "Ptr", DllCall("LoadCursorFromFile", "Str", v.origin, "Ptr"), "Int", v.id) : "")
+    DllCall("SystemParametersInfo", "UInt", 0x57, "UInt", 0, "Ptr", 0, "UInt", 0)
 }
 
 getCursorPath() {
